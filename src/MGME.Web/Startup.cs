@@ -1,35 +1,80 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+
+using Microsoft.IdentityModel.Tokens;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 using Microsoft.OpenApi.Models;
+
+using MGME.Core;
+using MGME.Infra;
 
 namespace MGME.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        private readonly IWebHostEnvironment _environment;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            Configuration = configuration;
+
+            _environment = environment;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
+            string connectionString = string.Empty;
+
+            // Database context: ../MGME.Infra/InfraStartup.cs
+            services.AddDbContext(connectionString);
+
+            // Repositories used accross the application: ../MGME.Infra/InfraStartup.cs
+            services.AddRepositories();
+
+            // Business services used across the application: ../MGME.Core/CoreStartup.cs
+            services.AddBusinessServices();
+
+            // AutoMapper for DTOs: ../MGME.Core/CoreStartup.cs
+            services.AddAutoMapper();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuerSigningKey = true,
+
+                        ValidateIssuer = false,
+
+                        ValidateAudience = false,
+
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.ASCII.GetBytes("123") // Configuration["<my_future_key_here>"]
+                        ),
+                    };
+                });
+
+            services.AddApiVersioning(config =>
+            {
+                config.DefaultApiVersion = new ApiVersion(1, 0);
+            });
+
 
             services.AddControllers();
 
@@ -44,7 +89,6 @@ namespace MGME.Web
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
