@@ -1,4 +1,4 @@
-namespace RPG.Core.DTOs
+namespace MGME.Core.DTOs
 {
     public class DataServiceResponse<TResult> : BaseServiceResponse
     {
