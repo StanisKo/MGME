@@ -2,6 +2,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 using AutoMapper;
 
+using MGME.Core.Interfaces.Services;
+using MGME.Core.Services.Auth;
+
 namespace MGME.Core
 {
     public static class CoreStartup
@@ -16,7 +19,7 @@ namespace MGME.Core
         */
         public static void AddBusinessServices(this IServiceCollection services)
         {
-
+            services.AddScoped<IAuthService, AuthService>();
         }
     }
 }

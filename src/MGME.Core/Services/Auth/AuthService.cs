@@ -61,7 +61,7 @@ namespace MGME.Core.Services.Auth
             return response;
         }
 
-        public async Task <DataServiceResponse<string>> LoginUser(string name, string email, string password)
+        public async Task <DataServiceResponse<string>> LoginUser(string name, string password)
         {
             DataServiceResponse<string> response = new DataServiceResponse<string>();
 
@@ -125,7 +125,7 @@ namespace MGME.Core.Services.Auth
             };
 
             SymmetricSecurityKey key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration["AppSettings:Token"])
+                Encoding.UTF8.GetBytes(_configuration["JWTKey"])
             );
 
             SigningCredentials credentials = new SigningCredentials(

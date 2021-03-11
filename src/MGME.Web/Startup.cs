@@ -74,7 +74,7 @@ namespace MGME.Web
                         ValidateAudience = false,
 
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.ASCII.GetBytes("123") // Configuration["<my_future_key_here>"]
+                            Encoding.ASCII.GetBytes(Configuration["JWTKey"])
                         ),
                     };
                 });
