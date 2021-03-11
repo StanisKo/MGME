@@ -1,5 +1,5 @@
+using System;
 using System.Text;
-
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +15,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Microsoft.OpenApi.Models;
+
+using Npgsql;
 
 using MGME.Core;
 using MGME.Infra;
@@ -36,10 +38,17 @@ namespace MGME.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            string connectionString = string.Empty;
+            NpgsqlConnectionStringBuilder connectionStringBuilder = new NpgsqlConnectionStringBuilder()
+            {
+                Host = Configuration["Host"],
+                Port = Convert.ToInt32(Configuration["Port"]),
+                Database = Configuration["Database"],
+                Username = Configuration["Username"],
+                Password = Configuration["Password"]
+            };
 
             // Database context: ../MGME.Infra/InfraStartup.cs
-            services.AddDbContext(connectionString);
+            services.AddDbContext(connectionStringBuilder.ConnectionString);
 
             // Repositories used accross the application: ../MGME.Infra/InfraStartup.cs
             services.AddRepositories();
@@ -74,7 +83,6 @@ namespace MGME.Web
             {
                 config.DefaultApiVersion = new ApiVersion(1, 0);
             });
-
 
             services.AddControllers();
 
