@@ -32,31 +32,49 @@ namespace MGME.Core.Services.Auth
         {
             DataServiceResponse<int> response = new DataServiceResponse<int>();
 
-            bool userExists = await _repository.CheckIfUserExistsAsync(name);
+            try
+            {
+                bool userNameIsTaken = await _repository.CheckIfUserExistsAsync(name, nameof(User.Name));
 
-            if (userExists)
+                if (userNameIsTaken)
+                {
+                    response.Success = false;
+                    response.Message = $"Username is already taken";
+
+                    return response;
+                }
+
+                bool emailIsTaken = await _repository.CheckIfUserExistsAsync(email, nameof(User.Email));
+
+                if (emailIsTaken)
+                {
+                    response.Success = false;
+                    response.Message = $"Email is already taken";
+
+                    return response;
+                }
+
+                CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+
+                User userToRegister = new User()
+                {
+                    Name = name,
+                    Email = email,
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt
+                };
+
+                await _repository.RegisterUserAsync(userToRegister);
+
+                response.Data = userToRegister.Id;
+                response.Success = true;
+                response.Message = $"{name} was successfully registered";
+            }
+            catch (Exception exception)
             {
                 response.Success = false;
-                response.Message = $"Username {name} is alredy taken";
-
-                return response;
+                response.Message = exception.Message;
             }
-
-            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
-
-            User userToRegister = new User()
-            {
-                Name = name,
-                Email = email,
-                PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt
-            };
-
-            await _repository.RegisterUserAsync(userToRegister);
-
-            response.Data = userToRegister.Id;
-            response.Success = true;
-            response.Message = $"{name} was successfully registered";
 
             return response;
         }
@@ -65,23 +83,31 @@ namespace MGME.Core.Services.Auth
         {
             DataServiceResponse<string> response = new DataServiceResponse<string>();
 
-            User userToLogin = await _repository.RetrieveUserByNameAsync(name);
+            try
+            {
+                User userToLogin = await _repository.RetrieveUserByNameAsync(name);
 
-            if (userToLogin == null)
+                if (userToLogin == null)
+                {
+                    response.Success = false;
+                    response.Message = "Either username or password is wrong";
+                }
+                else if (!VerifyPasswordHash(password, userToLogin.PasswordHash, userToLogin.PasswordSalt))
+                {
+                    response.Success = false;
+                    response.Message = "Either username or password is wrong";
+                }
+                else
+                {
+                    response.Data = CreateToken(userToLogin);
+                    response.Success = true;
+                    response.Message = "User logged in";
+                }
+            }
+            catch (Exception exception)
             {
                 response.Success = false;
-                response.Message = "Either username or password is wrong";
-            }
-            else if (!VerifyPasswordHash(password, userToLogin.PasswordHash, userToLogin.PasswordSalt))
-            {
-                response.Success = false;
-                response.Message = "Either username or password is wrong";
-            }
-            else
-            {
-                response.Data = CreateToken(userToLogin);
-                response.Success = true;
-                response.Message = "User logged in";
+                response.Message = exception.Message;
             }
 
             return response;

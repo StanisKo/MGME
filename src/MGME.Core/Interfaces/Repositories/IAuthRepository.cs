@@ -8,7 +8,7 @@ namespace MGME.Core.Interfaces.Repositories
     {
         Task RegisterUserAsync(User user);
 
-        Task <bool> CheckIfUserExistsAsync(string name);
+        Task <bool> CheckIfUserExistsAsync(string input, string property);
 
         Task <User> RetrieveUserByNameAsync(string name);
     }

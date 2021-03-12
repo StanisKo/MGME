@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
@@ -23,10 +24,10 @@ namespace MGME.Infra.Data.Repositories
             await _database.SaveChangesAsync();
         }
 
-        public async Task <bool> CheckIfUserExistsAsync(string name)
+        public async Task <bool> CheckIfUserExistsAsync(string input, string property)
         {
             return await _database.Users.AnyAsync(
-                user => user.Name.ToLower() == name.ToLower()
+                user => (property == nameof(User.Name) ? user.Name : user.Email).ToLower() == input.ToLower()
             );
         }
 
