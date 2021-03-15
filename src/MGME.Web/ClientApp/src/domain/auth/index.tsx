@@ -33,15 +33,18 @@ export const SignIn = (): ReactElement => {
     const [name, setName] = useState<string>('');
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHelperText, setNameHelperText] = useState<string>('');
-    
+
     const [email, setEmail] = useState<string>('');
     const [emailError, setEmailError] = useState<boolean>(false);
     const [emailHelperText, setEmailHelperText] = useState<string>('');
 
     const [password, setPassword] = useState<string>('');
-    // const [repeatedPassword, setRepeatedPassword] = useState<string>('');
     const [passwordError, setPasswordError] = useState<boolean>(false);
     const [passwordHelperText, setPasswordHelperText]= useState<string>('');
+
+    const [repeatPassword, setRepeatPassword] = useState<string>('');
+    const [repeatPasswordError, setRepeatPasswordError] = useState<boolean>(false);
+    const [repeatPasswordHelperText, setRepeatPasswordHelperText] = useState<string>('');
 
     const handleModeChange = (): void => {
         setMode(mode === MODE.SIGN_UP ? MODE.SIGN_IN : MODE.SIGN_UP);
@@ -93,20 +96,45 @@ export const SignIn = (): ReactElement => {
 
                 break;
 
+            case INPUT_TYPE.REPEAT_PASSWORD:
+                if (password !== repeatPassword) {
+                    setRepeatPasswordError(true);
+                    setRepeatPasswordHelperText('Passwords dont\'t match');
+
+                    break;
+                }
+
+                setRepeatPasswordError(false);
+                setRepeatPasswordHelperText('');
+
+                break;
+
             default:
                 break;
         }
     };
 
     useEffect(() => {
-        if (!nameError && !emailError && !passwordError) {
+        const allInputsArePresent =
+            name
+            && email
+            && password
+            && repeatPassword;
+
+        const allInputsAreValid =
+            !nameError
+            && !emailError
+            && !passwordError
+            && !repeatPasswordError;
+
+        if (allInputsArePresent && allInputsAreValid) {
             setInputIsValid(true);
 
             return;
         }
 
         setInputIsValid(false);
-    }, [nameError, emailError, passwordError]);
+    }, [name, email, password, repeatPassword, nameError, emailError, passwordError, repeatPasswordError]);
 
     const { paper, submit, pointer } = useStyles();
 
@@ -151,10 +179,7 @@ export const SignIn = (): ReactElement => {
                                 name="email"
                                 autoComplete="email"
                                 onChange={(event): void => setEmail(event.target.value)}
-                                {...(mode === MODE.SIGN_UP
-                                    ? { onBlur: (): void => validateInput(INPUT_TYPE.EMAIL) }
-                                    : null)
-                                }
+                                onBlur={(): void => validateInput(INPUT_TYPE.EMAIL)}
                             />
                         </Grid>
                     )}
@@ -177,21 +202,24 @@ export const SignIn = (): ReactElement => {
                             }
                         />
                     </Grid>
-                    {/* <Grid item xs={12}>
-                        <TextField
-                            error={passwordError}
-                            helperText={passwordHelperText}
-                            variant="outlined"
-                            required
-                            fullWidth
-                            name="repeat-password"
-                            label="Repeat Password"
-                            type="password"
-                            id="repeat-password"
-                            autoComplete="repeat-password"
-                            onBlur={(): void => validateInput(INPUT_TYPE.PASSWORD)}
-                        />
-                    </Grid> */}
+                    {mode === MODE.SIGN_UP && (
+                        <Grid item xs={12}>
+                            <TextField
+                                error={repeatPasswordError}
+                                helperText={repeatPasswordHelperText}
+                                variant="outlined"
+                                required
+                                fullWidth
+                                name="repeat-password"
+                                label="Repeat Password"
+                                type="password"
+                                id="repeat-password"
+                                autoComplete="repeat-password"
+                                onChange={(event): void => setRepeatPassword(event.target.value)}
+                                onBlur={(): void => validateInput(INPUT_TYPE.REPEAT_PASSWORD)}
+                            />
+                        </Grid>
+                    )}
                 </Grid>
                 <Button
                     type="submit"
@@ -199,7 +227,7 @@ export const SignIn = (): ReactElement => {
                     variant="contained"
                     color="primary"
                     className={submit}
-                    disabled={!inputIsValid}
+                    disabled={mode === MODE.SIGN_UP ? !inputIsValid : false}
                 >
                     {modeNames[mode]}
                 </Button>

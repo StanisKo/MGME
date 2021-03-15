@@ -6,7 +6,8 @@ export enum MODE {
 export enum INPUT_TYPE {
     USERNAME = 0,
     EMAIL = 1,
-    PASSWORD = 2
+    PASSWORD = 2,
+    REPEAT_PASSWORD = 3
 }
 
 export const modeNames = ['Sign Up', 'Sign In'];
