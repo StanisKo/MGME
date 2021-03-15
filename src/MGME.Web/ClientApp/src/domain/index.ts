@@ -1,4 +1,4 @@
-import { LoginPage } from './auth';
+import { SignIn } from './auth';
 import { StartPage } from './start';
 
-export { LoginPage, StartPage };
+export { SignIn, StartPage };
