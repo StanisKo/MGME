@@ -100,7 +100,7 @@ export const SignIn = (): ReactElement => {
                     setPasswordHelperText(
                         `
                          Password must be at least 8 characters long,
-                         and contain one upper-case, one-lower case letter, and one number
+                         and contain one upper-case, one lower-case letter, and one number
                         `
                     );
 
@@ -115,7 +115,7 @@ export const SignIn = (): ReactElement => {
             case INPUT_TYPE.REPEAT_PASSWORD:
                 if (password !== repeatPassword) {
                     setRepeatPasswordError(true);
-                    setRepeatPasswordHelperText('Passwords dont\'t match');
+                    setRepeatPasswordHelperText('Passwords don\'t match');
 
                     break;
                 }
