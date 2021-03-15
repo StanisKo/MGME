@@ -1,9 +1,8 @@
-import { ReactElement, useState, useEffect } from 'react';
+import { ReactElement, useState, useEffect, ChangeEvent, FocusEvent, Dispatch, SetStateAction } from 'react';
 
 import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } from './helpers';
 
 import { Container, CssBaseline, Button, TextField, Grid, Box, Typography, Link } from '@material-ui/core';
-
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -46,12 +45,29 @@ export const SignIn = (): ReactElement => {
     const [repeatPasswordError, setRepeatPasswordError] = useState<boolean>(false);
     const [repeatPasswordHelperText, setRepeatPasswordHelperText] = useState<string>('');
 
+    const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
+        [INPUT_TYPE.USERNAME]: setName,
+        [INPUT_TYPE.EMAIL]: setEmail,
+        [INPUT_TYPE.PASSWORD]: setPassword,
+        [INPUT_TYPE.REPEAT_PASSWORD]: setRepeatPassword
+    };
+
     const handleModeChange = (): void => {
         setMode(mode === MODE.SIGN_UP ? MODE.SIGN_IN : MODE.SIGN_UP);
     };
 
-    const validateInput = (input: INPUT_TYPE): void => {
-        switch (input) {
+    const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
+
+        const value = event.target.value;
+
+        inputTypeToCallback[inputType](value);
+    };
+
+    const handleInputValidation = (event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
+        const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
+
+        switch (inputType) {
             case INPUT_TYPE.USERNAME:
                 if (name.length < 6) {
                     setNameError(true);
@@ -136,6 +152,16 @@ export const SignIn = (): ReactElement => {
         setInputIsValid(false);
     }, [name, email, password, repeatPassword, nameError, emailError, passwordError, repeatPasswordError]);
 
+    useEffect(() => {
+        if (mode === MODE.SIGN_IN) {
+            setNameError(false);
+            setPasswordError(false);
+
+            setNameHelperText('');
+            setPasswordHelperText('');
+        }
+    }, [mode]);
+
     const { paper, submit, pointer } = useStyles();
 
     return (
@@ -159,11 +185,9 @@ export const SignIn = (): ReactElement => {
                             label="Username"
                             name="username"
                             autoComplete="username"
-                            onChange={(event): void => setName(event.target.value)}
-                            {...(mode === MODE.SIGN_UP
-                                ? { onBlur: (): void => validateInput(INPUT_TYPE.USERNAME) }
-                                : null)
-                            }
+                            inputProps={{ inputtype: INPUT_TYPE.USERNAME }}
+                            onChange={handleInputChange}
+                            {...(mode === MODE.SIGN_UP ? { onBlur: handleInputValidation } : null)}
                         />
                     </Grid>
                     {mode === MODE.SIGN_UP && (
@@ -178,8 +202,9 @@ export const SignIn = (): ReactElement => {
                                 label="Email Address"
                                 name="email"
                                 autoComplete="email"
-                                onChange={(event): void => setEmail(event.target.value)}
-                                onBlur={(): void => validateInput(INPUT_TYPE.EMAIL)}
+                                inputProps={{ inputtype: INPUT_TYPE.EMAIL }}
+                                onChange={handleInputChange}
+                                onBlur={handleInputValidation}
                             />
                         </Grid>
                     )}
@@ -195,11 +220,9 @@ export const SignIn = (): ReactElement => {
                             type="password"
                             id="password"
                             autoComplete="password"
-                            onChange={(event): void => setPassword(event.target.value)}
-                            {...(mode === MODE.SIGN_UP
-                                ? { onBlur: (): void => validateInput(INPUT_TYPE.PASSWORD) }
-                                : null)
-                            }
+                            inputProps={{ inputtype: INPUT_TYPE.PASSWORD }}
+                            onChange={handleInputChange}
+                            {...(mode === MODE.SIGN_UP ? { onBlur: handleInputValidation } : null)}
                         />
                     </Grid>
                     {mode === MODE.SIGN_UP && (
@@ -215,8 +238,9 @@ export const SignIn = (): ReactElement => {
                                 type="password"
                                 id="repeat-password"
                                 autoComplete="repeat-password"
-                                onChange={(event): void => setRepeatPassword(event.target.value)}
-                                onBlur={(): void => validateInput(INPUT_TYPE.REPEAT_PASSWORD)}
+                                inputProps={{ inputtype: INPUT_TYPE.REPEAT_PASSWORD }}
+                                onChange={handleInputChange}
+                                onBlur={handleInputValidation}
                             />
                         </Grid>
                     )}
