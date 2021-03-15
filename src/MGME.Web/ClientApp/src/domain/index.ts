@@ -1,3 +1,4 @@
+import { LoginPage } from './auth';
 import { StartPage } from './start';
 
-export { StartPage };
+export { LoginPage, StartPage };

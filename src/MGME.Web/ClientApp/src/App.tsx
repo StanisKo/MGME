@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 
 import configureStore from './store/configureStore';
 
-import { StartPage } from './domain/';
+import { StartPage, LoginPage } from './domain';
 
 import { ROUTES } from './shared/const';
 import { history } from './shared/utils';
@@ -18,13 +18,23 @@ const PrivateApplication = (): ReactElement => (
     </Switch>
 );
 
-export const PublicApplication = (): ReactElement => (
-    <Provider store={store}>
-        <Router history={history}>
-            <Switch>
-                <Route path={ROUTES.LOGIN} />
-                <Route path={ROUTES.ROOT} component={PrivateApplication} />
-            </Switch>
-        </Router>
-    </Provider>
-);
+export const PublicApplication = (): ReactElement => {
+    return (
+        <Provider store={store}>
+            <Router history={history}>
+                <Switch>
+                    <Route path={ROUTES.LOGIN} component={LoginPage} />
+                    <Route path={ROUTES.ROOT} render={(): ReactElement => {
+                        const user = sessionStorage.getItem('user');
+
+                        if (!user) {
+                            return <Redirect to='/login' />;
+                        }
+
+                        return <PrivateApplication />;
+                    }} />
+                </Switch>
+            </Router>
+        </Provider>
+    );
+};
