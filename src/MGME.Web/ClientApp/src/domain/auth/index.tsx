@@ -1,9 +1,20 @@
-import { ReactElement, useState, useEffect, ChangeEvent, FocusEvent, Dispatch, SetStateAction } from 'react';
+import {
+    ReactElement,
+    useState,
+    useEffect,
+    ChangeEvent,
+    FocusEvent,
+    SyntheticEvent,
+    Dispatch,
+    SetStateAction
+} from 'react';
 
 import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } from './helpers';
 import { loginOrRegisterUser } from './requests';
 
-import { Container, CssBaseline, Button, TextField, Grid, Box, Typography, Link } from '@material-ui/core';
+import { Container, CssBaseline, Button, TextField, Grid, Box, Typography, Link, Snackbar } from '@material-ui/core';
+import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -25,6 +36,15 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+/*
+NOTE:
+
+Had to add { children?: string; } to AlertProps interface in Alert.d.ts for alert message to work
+*/
+const Alert = (props: AlertProps): ReactElement => {
+    return <MuiAlert variant="filled" {...props} />;
+};
+
 export const SignIn = (): ReactElement => {
     const [mode, setMode] = useState<MODE>(MODE.SIGN_UP);
 
@@ -45,6 +65,9 @@ export const SignIn = (): ReactElement => {
     const [repeatPassword, setRepeatPassword] = useState<string>('');
     const [repeatPasswordError, setRepeatPasswordError] = useState<boolean>(false);
     const [repeatPasswordHelperText, setRepeatPasswordHelperText] = useState<string>('');
+
+    const [responseError, setResponseError] = useState<string>('');
+    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
 
     const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
         [INPUT_TYPE.USERNAME]: setName,
@@ -132,7 +155,7 @@ export const SignIn = (): ReactElement => {
     };
 
     const handleRequest = async (): Promise<void> => {
-        const jwt = await loginOrRegisterUser<string>(
+        const authResponse = await loginOrRegisterUser<string>(
             mode,
             {
                 name: name,
@@ -141,7 +164,19 @@ export const SignIn = (): ReactElement => {
             }
         );
 
-        console.log(jwt);
+        if (!authResponse.success) {
+            setResponseError(authResponse.message);
+
+            setOpenSnackbar(true);
+        }
+    };
+
+    const handleSnackbarClose = (event?: SyntheticEvent, reason?: string): void => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenSnackbar(false);
     };
 
     useEffect(() => {
@@ -177,6 +212,9 @@ export const SignIn = (): ReactElement => {
 
             setNameHelperText('');
             setPasswordHelperText('');
+        }
+        else {
+            setInputIsValid(false);
         }
     }, [mode]);
 
@@ -283,6 +321,11 @@ export const SignIn = (): ReactElement => {
                         </Link>
                     </Grid>
                 </Grid>
+                <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleSnackbarClose}>
+                    <Alert onClose={handleSnackbarClose} severity="warning">
+                        {responseError}
+                    </Alert>
+                </Snackbar>
             </div>
         </Container>
     );
