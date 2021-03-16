@@ -114,7 +114,7 @@ export const SignIn = (): ReactElement => {
                 break;
 
             case INPUT_TYPE.REPEAT_PASSWORD:
-                if (repeatPassword.length >= 8 && password !== repeatPassword) {
+                if (repeatPassword.length < 8 && password !== repeatPassword) {
                     setRepeatPasswordError(true);
                     setRepeatPasswordHelperText('Passwords don\'t match');
 
@@ -157,7 +157,11 @@ export const SignIn = (): ReactElement => {
             && !passwordError
             && !repeatPasswordError;
 
-        if (allInputsArePresent && allInputsAreValid) {
+        /*
+        We also check for repeat password length on change to avoid activating button
+        during input (validation handler is triggered only blur)
+        */
+        if (allInputsArePresent && allInputsAreValid && repeatPassword.length >= 8) {
             setInputIsValid(true);
 
             return;
