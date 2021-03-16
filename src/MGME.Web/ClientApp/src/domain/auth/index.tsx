@@ -1,6 +1,7 @@
 import { ReactElement, useState, useEffect, ChangeEvent, FocusEvent, Dispatch, SetStateAction } from 'react';
 
 import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } from './helpers';
+import { loginOrRegisterUser } from './requests';
 
 import { Container, CssBaseline, Button, TextField, Grid, Box, Typography, Link } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -113,7 +114,7 @@ export const SignIn = (): ReactElement => {
                 break;
 
             case INPUT_TYPE.REPEAT_PASSWORD:
-                if (password !== repeatPassword) {
+                if (repeatPassword.length >= 8 && password !== repeatPassword) {
                     setRepeatPasswordError(true);
                     setRepeatPasswordHelperText('Passwords don\'t match');
 
@@ -128,6 +129,19 @@ export const SignIn = (): ReactElement => {
             default:
                 break;
         }
+    };
+
+    const handleRequest = async (): Promise<void> => {
+        const jwt = await loginOrRegisterUser<string>(
+            mode,
+            {
+                name: name,
+                ...(mode === MODE.SIGN_UP ? { email: email } : null),
+                password: password
+            }
+        );
+
+        console.log(jwt);
     };
 
     useEffect(() => {
@@ -252,6 +266,7 @@ export const SignIn = (): ReactElement => {
                     color="primary"
                     className={submit}
                     disabled={mode === MODE.SIGN_UP ? !inputIsValid : false}
+                    onClick={handleRequest}
                 >
                     {modeNames[mode]}
                 </Button>
