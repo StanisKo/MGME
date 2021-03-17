@@ -318,7 +318,11 @@ export const SignIn = (): ReactElement => {
                         </Link>
                     </Grid>
                 </Grid>
-                <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleSnackbarClose}>
+                <Snackbar
+                    open={openSnackbar}
+                    autoHideDuration={response.success ? 60000 : 6000}
+                    onClose={handleSnackbarClose}
+                >
                     <Alert onClose={handleSnackbarClose} severity={response.success ? 'success' : 'warning'}>
                         {response.message}
                     </Alert>
