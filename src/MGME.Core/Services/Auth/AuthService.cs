@@ -87,8 +87,12 @@ namespace MGME.Core.Services.Auth
 
                 BodyBuilder bodyBuilder = new BodyBuilder();
 
-                bodyBuilder.HtmlBody =
-                    "<h1>Welcome to MGME!</h1><br/><p>Please confirm your email by following this link:</p><br/><p>link</p>";
+                bodyBuilder.HtmlBody = @"
+                <h1>Welcome to MGME!</h1>
+                <br/>
+                <p>Please confirm your email by following this link:</p>
+                <br/>
+                <p>link</p>";
 
                 confirmationMessage.Body = bodyBuilder.ToMessageBody();
 

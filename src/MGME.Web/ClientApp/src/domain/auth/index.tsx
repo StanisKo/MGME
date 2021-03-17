@@ -46,7 +46,10 @@ TODO:
 const Alert = (props: AlertProps): ReactElement => <MuiAlert elevation={6} variant="filled" {...props} />;
 
 export const SignIn = (): ReactElement => {
-    const [mode, setMode] = useState<MODE>(MODE.SIGN_UP);
+    const [mode, setMode] = useState<MODE>(
+        // We don't need to parse it: it's either there or not
+        localStorage.getItem('userRegisteredBefore') ? MODE.SIGN_IN : MODE.SIGN_UP
+    );
 
     const [inputIsValid, setInputIsValid] = useState<boolean>(false);
 
@@ -68,6 +71,7 @@ export const SignIn = (): ReactElement => {
 
     const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
     const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
         [INPUT_TYPE.USERNAME]: setName,
@@ -155,6 +159,8 @@ export const SignIn = (): ReactElement => {
     };
 
     const handleRequest = async (): Promise<void> => {
+        setLoading(true);
+
         const authResponse = await loginOrRegisterUser<string>(
             mode,
             {
@@ -166,6 +172,12 @@ export const SignIn = (): ReactElement => {
 
         setResponse(authResponse);
         setOpenSnackbar(true);
+
+        if (authResponse.success) {
+            localStorage.setItem('userRegisteredBefore', JSON.stringify(true));
+        }
+
+        setLoading(false);
     };
 
     const handleSnackbarClose = (event?: SyntheticEvent, reason?: string): void => {
@@ -304,7 +316,7 @@ export const SignIn = (): ReactElement => {
                     variant="contained"
                     color="primary"
                     className={submit}
-                    disabled={mode === MODE.SIGN_UP ? !inputIsValid : false}
+                    disabled={mode === MODE.SIGN_UP ? !inputIsValid || loading : false}
                     onClick={handleRequest}
                 >
                     {modeNames[mode]}
