@@ -20,7 +20,7 @@ namespace MGME.Web.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> RegisterUser(UserRegisterDTO request)
         {
-            DataServiceResponse<int> response =  await _authService.RegisterUser(
+            BaseServiceResponse response =  await _authService.RegisterUser(
                 request.Name,
                 request.Email,
                 request.Password

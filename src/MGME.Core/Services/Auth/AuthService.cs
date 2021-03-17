@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.IdentityModel.Tokens.Jwt;
 
+using MimeKit;
+using MailKit.Net.Smtp;
+
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 
@@ -28,9 +31,9 @@ namespace MGME.Core.Services.Auth
             _configuration = configuration;
         }
 
-        public async Task <DataServiceResponse<int>> RegisterUser(string name, string email, string password)
+        public async Task <BaseServiceResponse> RegisterUser(string name, string email, string password)
         {
-            DataServiceResponse<int> response = new DataServiceResponse<int>();
+            BaseServiceResponse response = new BaseServiceResponse();
 
             try
             {
@@ -66,7 +69,46 @@ namespace MGME.Core.Services.Auth
 
                 await _repository.RegisterUserAsync(userToRegister);
 
-                response.Data = userToRegister.Id;
+                MimeMessage confirmationMessage = new MimeMessage();
+
+                MailboxAddress fromAddress = new MailboxAddress(
+                    "MGME",
+                    _configuration["EmailConfiguration:From"]
+                );
+
+                MailboxAddress toAddress = new MailboxAddress(
+                    "User",
+                    userToRegister.Email
+                );
+
+                confirmationMessage.From.Add(fromAddress);
+                confirmationMessage.To.Add(toAddress);
+                confirmationMessage.Subject = "Confirm your email at MGME";
+
+                BodyBuilder bodyBuilder = new BodyBuilder();
+
+                bodyBuilder.HtmlBody = "<h1>Welcome to MGME!</h1>";
+                bodyBuilder.TextBody = "Please confirm your email by following this link: ";
+
+                confirmationMessage.Body = bodyBuilder.ToMessageBody();
+
+                SmtpClient smptClient = new SmtpClient();
+
+                smptClient.Connect(
+                    _configuration["EmailConfiguration:SmtpServer"],
+                    Convert.ToInt16(_configuration["EmailConfiguration:Port"]),
+                    true
+                );
+
+                smptClient.Authenticate(
+                    _configuration["EmailSenderAddress"],
+                    _configuration["EmailSenderPassword"]
+                );
+
+                smptClient.Send(confirmationMessage);
+                smptClient.Disconnect(true);
+                smptClient.Dispose();
+
                 response.Success = true;
                 response.Message = $"{name} was successfully registered";
             }
