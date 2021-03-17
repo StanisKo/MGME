@@ -3,6 +3,12 @@ import { DataServiceResponse } from '../../../shared/interfaces';
 
 import { MODE } from '../helpers';
 
+/*
+TODO:
+
+Build data controller as an abstraction level around requests
+*/
+
 export const loginOrRegisterUser = async <TResult>(
     mode: number,
     body: { [key: string]: string }

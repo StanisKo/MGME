@@ -40,10 +40,13 @@ const useStyles = makeStyles((theme) => ({
 NOTE:
 
 Had to add { children?: string; } to AlertProps interface in Alert.d.ts for alert message to work
+
+TODO:
+
+1. Improve email validation
+2. Think about the flow
 */
-const Alert = (props: AlertProps): ReactElement => {
-    return <MuiAlert variant="filled" {...props} />;
-};
+const Alert = (props: AlertProps): ReactElement => <MuiAlert variant="filled" {...props} />;
 
 export const SignIn = (): ReactElement => {
     const [mode, setMode] = useState<MODE>(MODE.SIGN_UP);
@@ -194,7 +197,7 @@ export const SignIn = (): ReactElement => {
 
         /*
         We also check for repeat password length on change to avoid activating button
-        during input (validation handler is triggered only blur)
+        during input (validation handler is triggered only on blur)
         */
         if (allInputsArePresent && allInputsAreValid && repeatPassword.length >= 8) {
             setInputIsValid(true);
