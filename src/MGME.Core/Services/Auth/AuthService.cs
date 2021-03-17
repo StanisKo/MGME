@@ -87,8 +87,8 @@ namespace MGME.Core.Services.Auth
 
                 BodyBuilder bodyBuilder = new BodyBuilder();
 
-                bodyBuilder.HtmlBody = "<h1>Welcome to MGME!</h1>";
-                bodyBuilder.TextBody = "Please confirm your email by following this link: ";
+                bodyBuilder.HtmlBody =
+                    "<h1>Welcome to MGME!</h1><br/><p>Please confirm your email by following this link:</p><br/><p>link</p>";
 
                 confirmationMessage.Body = bodyBuilder.ToMessageBody();
 
@@ -101,7 +101,7 @@ namespace MGME.Core.Services.Auth
                 );
 
                 smptClient.Authenticate(
-                    _configuration["EmailSenderAddress"],
+                    _configuration["EmailConfiguration:From"],
                     _configuration["EmailSenderPassword"]
                 );
 
@@ -110,7 +110,7 @@ namespace MGME.Core.Services.Auth
                 smptClient.Dispose();
 
                 response.Success = true;
-                response.Message = $"{name} was successfully registered";
+                response.Message = "You were successfully registered! Please check your email to verify the account";
             }
             catch (Exception exception)
             {

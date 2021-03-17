@@ -10,6 +10,7 @@ import {
 } from 'react';
 
 import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } from './helpers';
+import { BaseServiceResponse } from '../../shared/interfaces';
 import { loginOrRegisterUser } from './requests';
 
 import { Container, CssBaseline, Button, TextField, Grid, Box, Typography, Link, Snackbar } from '@material-ui/core';
@@ -65,7 +66,7 @@ export const SignIn = (): ReactElement => {
     const [repeatPasswordError, setRepeatPasswordError] = useState<boolean>(false);
     const [repeatPasswordHelperText, setRepeatPasswordHelperText] = useState<string>('');
 
-    const [responseError, setResponseError] = useState<string>('');
+    const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
     const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
 
     const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
@@ -163,11 +164,8 @@ export const SignIn = (): ReactElement => {
             }
         );
 
-        if (!authResponse.success) {
-            setResponseError(authResponse.message);
-
-            setOpenSnackbar(true);
-        }
+        setResponse(authResponse);
+        setOpenSnackbar(true);
     };
 
     const handleSnackbarClose = (event?: SyntheticEvent, reason?: string): void => {
@@ -321,8 +319,8 @@ export const SignIn = (): ReactElement => {
                     </Grid>
                 </Grid>
                 <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleSnackbarClose}>
-                    <Alert onClose={handleSnackbarClose} severity="warning">
-                        {responseError}
+                    <Alert onClose={handleSnackbarClose} severity={response.success ? 'success' : 'warning'}>
+                        {response.message}
                     </Alert>
                 </Snackbar>
             </div>
