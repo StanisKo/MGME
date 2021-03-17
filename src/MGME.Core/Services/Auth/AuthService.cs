@@ -89,9 +89,19 @@ namespace MGME.Core.Services.Auth
                 confirmationMessage.To.Add(toAddress);
                 confirmationMessage.Subject = "Confirm your email at MGME";
 
-                // This has to include path to auth/confirm
+                /*
+                TODO:
+
+                De-hardcode the path to controller
+
+                https://blog.bitsrc.io/email-confirmation-with-react-257e5d9de725
+
+                This has to point back to the client; then client has to relay the token request back to server?
+
+                More reading needed
+                */
                 string hostURL =
-                    $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}";
+                    $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/confirm";
 
                 string confirmationToken = CreateToken(
                     userToRegister,
@@ -127,8 +137,9 @@ namespace MGME.Core.Services.Auth
                     _configuration["EmailSenderPassword"]
                 );
 
-                smptClient.Send(confirmationMessage);
-                smptClient.Disconnect(true);
+                await smptClient.SendAsync(confirmationMessage);
+                await smptClient.DisconnectAsync(true);
+
                 smptClient.Dispose();
 
                 response.Success = true;
