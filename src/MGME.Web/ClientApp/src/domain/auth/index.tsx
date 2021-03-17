@@ -37,16 +37,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /*
-NOTE:
-
-Had to add { children?: string; } to AlertProps interface in Alert.d.ts for alert message to work
-
 TODO:
 
 1. Improve email validation
 2. Think about the flow
 */
-const Alert = (props: AlertProps): ReactElement => <MuiAlert variant="filled" {...props} />;
+const Alert = (props: AlertProps): ReactElement => <MuiAlert elevation={6} variant="filled" {...props} />;
 
 export const SignIn = (): ReactElement => {
     const [mode, setMode] = useState<MODE>(MODE.SIGN_UP);
