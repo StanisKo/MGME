@@ -19,6 +19,8 @@ namespace MGME.Core.Entities
         [Required]
         public byte[] PasswordSalt { get; set; }
 
+        public bool EmailIsConfirmed { get; set; }
+
         public string Role { get; set; }
     }
 }

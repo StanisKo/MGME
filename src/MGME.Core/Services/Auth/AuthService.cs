@@ -143,6 +143,11 @@ namespace MGME.Core.Services.Auth
                     response.Success = false;
                     response.Message = "Either username or password is wrong";
                 }
+                else if (!userToLogin.EmailIsConfirmed)
+                {
+                    response.Success = false;
+                    response.Message = "You need to confirm your email before you can sign in";
+                }
                 else
                 {
                     response.Data = CreateToken(userToLogin);

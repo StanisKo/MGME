@@ -20,6 +20,8 @@ namespace MGME.Infra.Data
 
             modelBuilder.Entity<User>().HasIndex(user => user.Email).IsUnique();
 
+            modelBuilder.Entity<User>().Property(user => user.EmailIsConfirmed).HasDefaultValue(false);
+
             modelBuilder.Entity<User>().Property(user => user.Role).HasDefaultValue(UserRole.GAME_MASTER);
         }
     }

@@ -175,6 +175,8 @@ export const SignIn = (): ReactElement => {
 
         if (authResponse.success) {
             localStorage.setItem('userRegisteredBefore', JSON.stringify(true));
+
+            setMode(MODE.SIGN_IN);
         }
 
         setLoading(false);
