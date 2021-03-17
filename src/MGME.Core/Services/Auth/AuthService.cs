@@ -9,6 +9,8 @@ using System.IdentityModel.Tokens.Jwt;
 using MimeKit;
 using MailKit.Net.Smtp;
 
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 
@@ -19,13 +21,15 @@ using MGME.Core.Interfaces.Repositories;
 
 namespace MGME.Core.Services.Auth
 {
-    public class AuthService : IAuthService
+    public class AuthService : BaseEntityService, IAuthService
     {
         private readonly IAuthRepository _repository;
 
         private readonly IConfiguration _configuration;
 
-        public AuthService(IAuthRepository repository, IConfiguration configuration)
+        public AuthService(IAuthRepository repository,
+                           IConfiguration configuration,
+                           IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _repository = repository;
             _configuration = configuration;
@@ -85,14 +89,28 @@ namespace MGME.Core.Services.Auth
                 confirmationMessage.To.Add(toAddress);
                 confirmationMessage.Subject = "Confirm your email at MGME";
 
+                // This has to include path to auth/confirm
+                string hostURL =
+                    $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}";
+
+                string confirmationToken = CreateToken(
+                    userToRegister,
+                    Convert.ToInt16(_configuration["ConfirmationTokenLifetime"])
+                );
+
+                string confirmationURL = QueryHelpers.AddQueryString(
+                    hostURL,
+                    new Dictionary<string, string>() { { "token", confirmationToken } }
+                );
+
                 BodyBuilder bodyBuilder = new BodyBuilder();
 
-                bodyBuilder.HtmlBody = @"
+                bodyBuilder.HtmlBody = $@"
                 <h1>Welcome to MGME!</h1>
                 <br/>
                 <p>Please confirm your email by following this link:</p>
                 <br/>
-                <p>link</p>";
+                <p>{confirmationURL}</p>";
 
                 confirmationMessage.Body = bodyBuilder.ToMessageBody();
 
@@ -150,7 +168,11 @@ namespace MGME.Core.Services.Auth
                 }
                 else
                 {
-                    response.Data = CreateToken(userToLogin);
+                    response.Data = CreateToken(
+                        userToLogin,
+                        Convert.ToInt16(_configuration["SessionLifetime"])
+                    );
+
                     response.Success = true;
                     response.Message = "User logged in";
                 }
@@ -192,7 +214,7 @@ namespace MGME.Core.Services.Auth
             }
         }
 
-        private string CreateToken(User user)
+        private string CreateToken(User user, int expiresInHours)
         {
             List<Claim> claims = new List<Claim>()
             {
@@ -213,7 +235,7 @@ namespace MGME.Core.Services.Auth
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor()
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
+                Expires = DateTime.Now.AddHours(expiresInHours),
                 SigningCredentials = credentials
             };
 
