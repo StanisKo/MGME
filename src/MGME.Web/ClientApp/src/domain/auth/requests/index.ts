@@ -39,3 +39,30 @@ export const loginOrRegisterUser = async (
         return error;
     }
 };
+
+export const confirmEmailAddress = async (token: string): Promise <BaseServiceResponse> => {
+    const entity = 'auth';
+    const action = 'confirm';
+
+    try {
+        const request = await fetch(
+            URLBuilder.buildPOST(entity, action),
+            {
+                method: 'POST',
+                body: JSON.stringify({ token: token }),
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        const response = await request.json();
+
+        return response;
+    }
+    catch (error) {
+        return error;
+    }
+};

@@ -11,6 +11,8 @@ import { MenuBar } from './shared/components/layout';
 import { ROUTES } from './shared/const';
 import { history } from './shared/utils';
 
+import { CssBaseline } from '@material-ui/core';
+
 const store = configureStore();
 
 const PrivateApplication = (): ReactElement => (
@@ -27,6 +29,8 @@ export const PublicApplication = (): ReactElement => {
     return (
         <Provider store={store}>
             <Router history={history}>
+                <CssBaseline />
+                <MenuBar />
                 <Switch>
                     <Route path={ROUTES.LOGIN} component={Login} />
                     <Route path={ROUTES.CONFIRM_EMAIL} component={ConfirmEmail} />

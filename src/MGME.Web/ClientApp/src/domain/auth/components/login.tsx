@@ -13,7 +13,7 @@ import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } fr
 import { BaseServiceResponse, DataServiceResponse } from '../../../shared/interfaces';
 import { loginOrRegisterUser } from '../requests';
 
-import { Container, CssBaseline, Button, TextField, Grid, Box, Typography, Link, Snackbar } from '@material-ui/core';
+import { Container, Button, TextField, Grid, Box, Typography, Link, Snackbar } from '@material-ui/core';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -252,7 +252,6 @@ export const Login = (): ReactElement => {
 
     return (
         <Container component="main" maxWidth="xs">
-            <CssBaseline />
             <div className={paper}>
                 <Box mb={4}>
                     <Typography component="h1" variant="h5">
