@@ -60,7 +60,7 @@ namespace MGME.Web.Controllers
         {
             Console.WriteLine(token);
 
-            return Ok("Test");
+            return Ok("Parse and confirm token here");
         }
     }
 }

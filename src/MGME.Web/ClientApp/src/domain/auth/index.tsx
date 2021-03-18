@@ -10,7 +10,7 @@ import {
 } from 'react';
 
 import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } from './helpers';
-import { BaseServiceResponse } from '../../shared/interfaces';
+import { BaseServiceResponse, DataServiceResponse } from '../../shared/interfaces';
 import { loginOrRegisterUser } from './requests';
 
 import { Container, CssBaseline, Button, TextField, Grid, Box, Typography, Link, Snackbar } from '@material-ui/core';
@@ -41,15 +41,15 @@ const useStyles = makeStyles((theme) => ({
 TODO:
 
 1. Improve email validation
-2. Think about the flow
 */
+
 const Alert = (props: AlertProps): ReactElement => <MuiAlert elevation={6} variant="filled" {...props} />;
 
 export const SignIn = (): ReactElement => {
-    const [mode, setMode] = useState<MODE>(
-        // We don't need to parse it: it's either there or not
-        localStorage.getItem('userRegisteredBefore') ? MODE.SIGN_IN : MODE.SIGN_UP
-    );
+    // We don't need to parse it: it's either there or not
+    const userRegisteredBefore = localStorage.getItem('userRegisteredBefore');
+
+    const [mode, setMode] = useState<MODE>(userRegisteredBefore ? MODE.SIGN_IN : MODE.SIGN_UP);
 
     const [inputIsValid, setInputIsValid] = useState<boolean>(false);
 
@@ -65,14 +65,15 @@ export const SignIn = (): ReactElement => {
     const [passwordError, setPasswordError] = useState<boolean>(false);
     const [passwordHelperText, setPasswordHelperText]= useState<string>('');
 
-    const [repeatPassword, setRepeatPassword] = useState<string>('');
-    const [repeatPasswordError, setRepeatPasswordError] = useState<boolean>(false);
-    const [repeatPasswordHelperText, setRepeatPasswordHelperText] = useState<string>('');
-    
-    /*
-    you can type the request with <BaseServiceResponse | DataServiceResponse<string>>
-    */
-    const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
+    const [confirmPassword, setConfirmPassword] = useState<string>('');
+    const [confirmPasswordError, setConfirmPasswordError] = useState<boolean>(false);
+    const [confirmPasswordHelperText, setConfirmPasswordHelperText] = useState<string>('');
+
+    // We use the same container for result of sugn up and result of sign in (that also holds JWT)
+    const [response, setResponse] = useState<BaseServiceResponse | DataServiceResponse<string>>(
+        {} as BaseServiceResponse
+    );
+
     const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -80,7 +81,7 @@ export const SignIn = (): ReactElement => {
         [INPUT_TYPE.USERNAME]: setName,
         [INPUT_TYPE.EMAIL]: setEmail,
         [INPUT_TYPE.PASSWORD]: setPassword,
-        [INPUT_TYPE.REPEAT_PASSWORD]: setRepeatPassword
+        [INPUT_TYPE.REPEAT_PASSWORD]: setConfirmPassword
     };
 
     const handleModeChange = (): void => {
@@ -144,15 +145,15 @@ export const SignIn = (): ReactElement => {
                 break;
 
             case INPUT_TYPE.REPEAT_PASSWORD:
-                if (repeatPassword.length < 8 && password !== repeatPassword) {
-                    setRepeatPasswordError(true);
-                    setRepeatPasswordHelperText('Passwords don\'t match');
+                if (confirmPassword.length < 8 && password !== confirmPassword) {
+                    setConfirmPasswordError(true);
+                    setConfirmPasswordHelperText('Passwords don\'t match');
 
                     break;
                 }
 
-                setRepeatPasswordError(false);
-                setRepeatPasswordHelperText('');
+                setConfirmPasswordError(false);
+                setConfirmPasswordHelperText('');
 
                 break;
 
@@ -162,17 +163,21 @@ export const SignIn = (): ReactElement => {
     };
 
     const handleRequest = async (): Promise<void> => {
-        setLoading(true);
-        
         /*
-        Rename into signInOrRegisterUser
+        We switch to loading mode only if user haven't registered before
+        Otherwise speed of response causes flickering
         */
-        const authResponse = await loginOrRegisterUser<string>(
+        if (!userRegisteredBefore) {
+            setLoading(true);
+        }
+
+        const authResponse = await loginOrRegisterUser(
             mode,
             {
                 name: name,
                 ...(mode === MODE.SIGN_UP ? { email: email } : null),
-                password: password
+                password: password,
+                ...(mode === MODE.SIGN_UP ? { confirmPassword: confirmPassword } : null)
             }
         );
 
@@ -180,12 +185,20 @@ export const SignIn = (): ReactElement => {
         setOpenSnackbar(true);
 
         if (authResponse.success) {
-            localStorage.setItem('userRegisteredBefore', JSON.stringify(true));
+            if (!userRegisteredBefore) {
+                /*
+                If no value in storage, be it sign in or sign up, we set it there
+                (also helps if they clear cookies or use different machine)
+                */
+                localStorage.setItem('userRegisteredBefore', JSON.stringify(true));
+            }
 
             setMode(MODE.SIGN_IN);
         }
 
-        setLoading(false);
+        if (!userRegisteredBefore) {
+            setLoading(false);
+        }
     };
 
     const handleSnackbarClose = (event?: SyntheticEvent, reason?: string): void => {
@@ -201,26 +214,26 @@ export const SignIn = (): ReactElement => {
             name
             && email
             && password
-            && repeatPassword;
+            && confirmPassword;
 
         const allInputsAreValid =
             !nameError
             && !emailError
             && !passwordError
-            && !repeatPasswordError;
+            && !confirmPasswordError;
 
         /*
         We also check for repeat password length on change to avoid activating button
         during input (validation handler is triggered only on blur)
         */
-        if (allInputsArePresent && allInputsAreValid && repeatPassword.length >= 8) {
+        if (allInputsArePresent && allInputsAreValid && confirmPassword.length >= 8) {
             setInputIsValid(true);
 
             return;
         }
 
         setInputIsValid(false);
-    }, [name, email, password, repeatPassword, nameError, emailError, passwordError, repeatPasswordError]);
+    }, [name, email, password, confirmPassword, nameError, emailError, passwordError, confirmPasswordError]);
 
     useEffect(() => {
         if (mode === MODE.SIGN_IN) {
@@ -301,16 +314,16 @@ export const SignIn = (): ReactElement => {
                     {mode === MODE.SIGN_UP && (
                         <Grid item xs={12}>
                             <TextField
-                                error={repeatPasswordError}
-                                helperText={repeatPasswordHelperText}
+                                error={confirmPasswordError}
+                                helperText={confirmPasswordHelperText}
                                 variant="outlined"
                                 required
                                 fullWidth
-                                name="repeat-password"
-                                label="Repeat Password"
+                                name="confirm-password"
+                                label="Confirm Password"
                                 type="password"
-                                id="repeat-password"
-                                autoComplete="repeat-password"
+                                id="confirm-password"
+                                autoComplete="confirm-password"
                                 inputProps={{ inputtype: INPUT_TYPE.REPEAT_PASSWORD }}
                                 onChange={handleInputChange}
                                 onBlur={handleInputValidation}

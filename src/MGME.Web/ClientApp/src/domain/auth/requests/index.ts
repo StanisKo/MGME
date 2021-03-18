@@ -1,5 +1,5 @@
 import { URLBuilder } from '../../../shared/utils/';
-import { DataServiceResponse } from '../../../shared/interfaces';
+import { BaseServiceResponse, DataServiceResponse } from '../../../shared/interfaces';
 
 import { MODE } from '../helpers';
 
@@ -7,17 +7,13 @@ import { MODE } from '../helpers';
 TODO:
 
 Build data controller as an abstraction level around requests
-
-This does not have to be generic; since register sends back BaseServiceResponse, and sign in sends back DataServiceResponse<string>
-
-you can type the promise with <BaseServiceResponse | DataServiceResponse<string>>
 */
 
-export const loginOrRegisterUser = async <TResult>(
+export const loginOrRegisterUser = async (
     mode: number,
     body: { [key: string]: string }
 
-): Promise <DataServiceResponse<TResult>> => {
+): Promise <BaseServiceResponse | DataServiceResponse<string>> => {
     const entity = 'auth';
     const action = mode === MODE.SIGN_UP ? 'register' : 'login';
 
