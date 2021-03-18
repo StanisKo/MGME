@@ -89,17 +89,6 @@ namespace MGME.Core.Services.Auth
                 confirmationMessage.To.Add(toAddress);
                 confirmationMessage.Subject = "Confirm your email at MGME";
 
-                /*
-                TODO:
-
-                De-hardcode the path to controller
-
-                https://blog.bitsrc.io/email-confirmation-with-react-257e5d9de725
-
-                This has to point back to the client; then client has to relay the token request back to server?
-
-                More reading needed
-                */
                 string hostURL =
                     $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/confirm-email";
 
@@ -195,6 +184,11 @@ namespace MGME.Core.Services.Auth
             }
 
             return response;
+        }
+
+        public Task <BaseServiceResponse> ConfirmEmailAddress(string token)
+        {
+            throw new NotImplementedException();
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

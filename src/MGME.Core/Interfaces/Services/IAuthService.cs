@@ -11,5 +11,7 @@ namespace MGME.Core.Interfaces.Services
 
         // Add user to database and return confirmation
         Task <BaseServiceResponse> RegisterUser(string name, string email, string password);
+
+        Task <BaseServiceResponse> ConfirmEmailAddress(string token);
     }
 }

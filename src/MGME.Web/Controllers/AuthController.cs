@@ -55,12 +55,18 @@ namespace MGME.Web.Controllers
             return BadRequest(response);
         }
 
-        [HttpGet("Confirm")]
-        public async Task <IActionResult> ConfirmEmailAddress([BindRequired, FromQuery] string token)
+        [HttpPost("Confirm")]
+        public async Task <IActionResult> ConfirmEmailAddress(UserConfirmEmailDTO request)
         {
-            Console.WriteLine(token);
+            BaseServiceResponse response = await _authService.ConfirmEmailAddress(request.Token);
 
-            return Ok("Parse and confirm token here");
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            // Token is invalid
+            return BadRequest(response);
         }
     }
 }

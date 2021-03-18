@@ -41,7 +41,7 @@ export const MenuBar = (): ReactElement => {
                     </Typography>
                     <IconButton
                         aria-label="account of current user"
-                        aria-controls="menu-appbar"
+                        aria-controls="menu-bar"
                         aria-haspopup="true"
                         color="inherit"
                     >
