@@ -7,6 +7,10 @@ import { MODE } from '../helpers';
 TODO:
 
 Build data controller as an abstraction level around requests
+
+This does not have to be generic; since register sends back BaseServiceResponse, and sign in sends back DataServiceResponse<string>
+
+you can type the promise with <BaseServiceResponse | DataServiceResponse<string>>
 */
 
 export const loginOrRegisterUser = async <TResult>(
