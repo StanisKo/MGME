@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@types/qs": "^6.9.6"
+  },
+  "dependencies": {
+    "@material-ui/icons": "^4.11.2"
+  }
+}

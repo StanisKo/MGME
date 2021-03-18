@@ -101,7 +101,7 @@ namespace MGME.Core.Services.Auth
                 More reading needed
                 */
                 string hostURL =
-                    $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/confirm";
+                    $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/confirm-email";
 
                 string confirmationToken = CreateToken(
                     userToRegister,

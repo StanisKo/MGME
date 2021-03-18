@@ -4,7 +4,9 @@ import { Provider } from 'react-redux';
 
 import configureStore from './store/configureStore';
 
-import { StartPage, SignIn } from './domain';
+import { Login, ConfirmEmail } from './domain/auth';
+import { StartPage } from './domain/start';
+import { MenuBar } from './shared/components/layout';
 
 import { ROUTES } from './shared/const';
 import { history } from './shared/utils';
@@ -12,10 +14,13 @@ import { history } from './shared/utils';
 const store = configureStore();
 
 const PrivateApplication = (): ReactElement => (
-    <Switch>
-        <Redirect exact from={ROUTES.ROOT} to={ROUTES.START} />
-        <Route path={ROUTES.START} component={StartPage} />
-    </Switch>
+    <>
+        <MenuBar />
+        <Switch>
+            <Redirect exact from={ROUTES.ROOT} to={ROUTES.START} />
+            <Route path={ROUTES.START} component={StartPage} />
+        </Switch>
+    </>
 );
 
 export const PublicApplication = (): ReactElement => {
@@ -23,9 +28,10 @@ export const PublicApplication = (): ReactElement => {
         <Provider store={store}>
             <Router history={history}>
                 <Switch>
-                    <Route path={ROUTES.LOGIN} component={SignIn} />
+                    <Route path={ROUTES.LOGIN} component={Login} />
+                    <Route path={ROUTES.CONFIRM_EMAIL} component={ConfirmEmail} />
                     <Route path={ROUTES.ROOT} render={(): ReactElement => {
-                        const user = sessionStorage.getItem('user');
+                        const user = sessionStorage.getItem('token');
 
                         if (!user) {
                             return <Redirect to='/login' />;
