@@ -21,6 +21,7 @@ namespace MGME.Core.DTOs.User
 
         [Required]
         [StringLength(254, MinimumLength = 8)]
+        [RegularExpression("^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]$")]
         public string Password { get; set; }
     }
 }
