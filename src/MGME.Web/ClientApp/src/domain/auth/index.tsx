@@ -68,7 +68,10 @@ export const SignIn = (): ReactElement => {
     const [repeatPassword, setRepeatPassword] = useState<string>('');
     const [repeatPasswordError, setRepeatPasswordError] = useState<boolean>(false);
     const [repeatPasswordHelperText, setRepeatPasswordHelperText] = useState<string>('');
-
+    
+    /*
+    you can type the request with <BaseServiceResponse | DataServiceResponse<string>>
+    */
     const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
     const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
@@ -160,7 +163,10 @@ export const SignIn = (): ReactElement => {
 
     const handleRequest = async (): Promise<void> => {
         setLoading(true);
-
+        
+        /*
+        Rename into signInOrRegisterUser
+        */
         const authResponse = await loginOrRegisterUser<string>(
             mode,
             {
