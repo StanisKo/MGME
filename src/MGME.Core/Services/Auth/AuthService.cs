@@ -38,9 +38,9 @@ namespace MGME.Core.Services.Auth
 
         private readonly IConfiguration _configuration;
 
-        private readonly SymmetricSecurityKey _key;
-
         private readonly JwtSecurityTokenHandler _tokenHandler;
+
+        private readonly SymmetricSecurityKey _key;
 
         public AuthService(IAuthRepository authRepository,
                            IEntityRepository<User> userRepository,
@@ -52,9 +52,9 @@ namespace MGME.Core.Services.Auth
 
             _configuration = configuration;
 
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTKey"]));
-
             _tokenHandler = new JwtSecurityTokenHandler();
+
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTKey"]));
         }
 
         public async Task <BaseServiceResponse> RegisterUser(string name, string email, string password)
