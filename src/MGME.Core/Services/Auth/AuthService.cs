@@ -20,6 +20,14 @@ using MGME.Core.Entities;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
 
+/*
+TODO:
+
+Add to claims and issuer, audience
+
+Validate isser, audience, and lifetime
+*/
+
 namespace MGME.Core.Services.Auth
 {
     public class AuthService : BaseEntityService, IAuthService
@@ -144,11 +152,6 @@ namespace MGME.Core.Services.Auth
             return response;
         }
 
-        /*
-        TODO:
-
-        Validate Audience and Authority and, of course, lifetime -- add them all to claims
-        */
         public async Task <BaseServiceResponse> ConfirmEmailAddress(string token)
         {
             BaseServiceResponse response = new BaseServiceResponse();
