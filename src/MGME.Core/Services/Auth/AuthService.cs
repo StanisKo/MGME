@@ -24,7 +24,9 @@ namespace MGME.Core.Services.Auth
 {
     public class AuthService : BaseEntityService, IAuthService
     {
-        private readonly IAuthRepository _repository;
+        private readonly IAuthRepository _authRepository;
+
+        private readonly IEntityRepository<User> _userRepository;
 
         private readonly IConfiguration _configuration;
 
@@ -32,11 +34,14 @@ namespace MGME.Core.Services.Auth
 
         private readonly JwtSecurityTokenHandler _tokenHandler;
 
-        public AuthService(IAuthRepository repository,
+        public AuthService(IAuthRepository authRepository,
+                           IEntityRepository<User> userRepository,
                            IConfiguration configuration,
                            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
-            _repository = repository;
+            _authRepository = authRepository;
+            _userRepository = userRepository;
+
             _configuration = configuration;
 
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTKey"]));
@@ -50,7 +55,7 @@ namespace MGME.Core.Services.Auth
 
             try
             {
-                bool userNameIsTaken = await _repository.CheckIfUserExistsAsync(name, nameof(User.Name));
+                bool userNameIsTaken = await _authRepository.CheckIfUserExistsAsync(name, nameof(User.Name));
 
                 if (userNameIsTaken)
                 {
@@ -60,7 +65,7 @@ namespace MGME.Core.Services.Auth
                     return response;
                 }
 
-                bool emailIsTaken = await _repository.CheckIfUserExistsAsync(email, nameof(User.Email));
+                bool emailIsTaken = await _authRepository.CheckIfUserExistsAsync(email, nameof(User.Email));
 
                 if (emailIsTaken)
                 {
@@ -80,11 +85,12 @@ namespace MGME.Core.Services.Auth
                     PasswordSalt = passwordSalt
                 };
 
-                await _repository.RegisterUserAsync(userToRegister);
+                await _authRepository.RegisterUserAsync(userToRegister);
 
                 /*
                 We also send confirmation email with a link
-                that includes JWT of user claims
+                that includes JWT as querystring param
+                We use it later to confirm email if JWT is valid
                 */
 
                 MimeMessage confirmationMessage = new MimeMessage();
@@ -173,7 +179,7 @@ namespace MGME.Core.Services.Auth
 
             try
             {
-                User userToLogin = await _repository.RetrieveUserByNameAsync(name);
+                User userToLogin = await _authRepository.RetrieveUserByNameAsync(name);
 
                 if (userToLogin == null)
                 {
@@ -213,7 +219,7 @@ namespace MGME.Core.Services.Auth
         /*
         TODO:
 
-        Validate Audience and Authority
+        Validate Audience and Authority and, of course, lifetime -- add them all to claims
         */
         public async Task <BaseServiceResponse> ConfirmEmailAddress(string token)
         {
@@ -226,19 +232,25 @@ namespace MGME.Core.Services.Auth
                     new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
-                        ValidateLifetime = true,
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
                         IssuerSigningKey = _key
                     },
                     out SecurityToken validatedToken);
 
-                /*
-                Even if token is valid, still run it againt the database
-                */
+                // Even if token is valid, still run it againt the database
                 JwtSecurityToken securityToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
 
-                string userName = securityToken.Claims.First(claim => claim.Type == ClaimTypes.Name).Value;
+                /*
+                Can't read the claim here:
 
-                bool userExists = await _repository.CheckIfUserExistsAsync(userName, nameof(User.Name));
+                https://stackoverflow.com/questions/64136424/net-core-jwt-decrypt-token-claims-first-returns-sequence-contains-no-ma
+                */
+                string userName = securityToken.Claims
+                    .FirstOrDefault(claim => claim.Type == ClaimTypes.Name)
+                    .Value;
+
+                bool userExists = await _authRepository.CheckIfUserExistsAsync(userName, nameof(User.Name));
 
                 if (!userExists)
                 {
@@ -249,11 +261,17 @@ namespace MGME.Core.Services.Auth
                 }
 
                 // If all good, confirm email and respond with success
-                User userToConfirmEmail = await _repository.RetrieveUserByNameAsync(userName);
+                User userToConfirmEmail = await _authRepository.RetrieveUserByNameAsync(userName);
 
                 userToConfirmEmail.EmailIsConfirmed = true;
 
-                
+                await _userRepository.UpdateEntityAsync(
+                    userToConfirmEmail,
+                    new[] { nameof(User.EmailIsConfirmed) }
+                );
+
+                response.Success = true;
+                response.Message = "Your email was successfully confirmed";
 
             }
             catch (Exception exception)

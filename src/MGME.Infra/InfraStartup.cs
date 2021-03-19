@@ -24,6 +24,8 @@ namespace MGME.Infra
         public static void AddRepositories(this IServiceCollection services)
         {
             services.AddScoped<IAuthRepository, AuthRepository>();
+
+            services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
         }
     }
 }
