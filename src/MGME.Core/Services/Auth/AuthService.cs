@@ -34,8 +34,6 @@ namespace MGME.Core.Services.Auth
 
         private readonly JwtSecurityTokenHandler _tokenHandler;
 
-        private readonly string _hostURL;
-
         public AuthService(IAuthRepository authRepository,
                            IEntityRepository<User> userRepository,
                            IConfiguration configuration,
@@ -49,8 +47,6 @@ namespace MGME.Core.Services.Auth
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTKey"]));
 
             _tokenHandler = new JwtSecurityTokenHandler();
-
-            _hostURL = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host}/confirm-email";
         }
 
         public async Task <BaseServiceResponse> RegisterUser(string name, string email, string password)
@@ -172,7 +168,7 @@ namespace MGME.Core.Services.Auth
 
                 JwtSecurityToken securityToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
 
-                // Somehow ClaimTypes.NameIdentifier returns null ...
+                // Somehow ClaimTypes.Name returns null ...
                 string userId = securityToken.Claims
                     .FirstOrDefault(claim => claim.Type == "nameid")?.Value;
 
@@ -271,8 +267,11 @@ namespace MGME.Core.Services.Auth
                 Convert.ToInt16(_configuration["ConfirmationTokenLifetime"])
             );
 
+            string clientCallback =
+                $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/confirm-email";
+
             string confirmationURL = QueryHelpers.AddQueryString(
-                _hostURL,
+                clientCallback,
                 new Dictionary<string, string>() { { "token", confirmationToken } }
             );
 

@@ -56,9 +56,9 @@ namespace MGME.Web.Controllers
         }
 
         [HttpPost("Confirm")]
-        public async Task <IActionResult> ConfirmEmailAddress(UserConfirmEmailDTO request)
+        public async Task <IActionResult> ConfirmEmailAddress([BindRequired, FromBody] string token)
         {
-            BaseServiceResponse response = await _authService.ConfirmEmailAddress(request.Token);
+            BaseServiceResponse response = await _authService.ConfirmEmailAddress(token);
 
             if (response.Success)
             {
