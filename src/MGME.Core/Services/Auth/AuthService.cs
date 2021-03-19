@@ -170,19 +170,15 @@ namespace MGME.Core.Services.Auth
                     },
                     out SecurityToken validatedToken);
 
-                // Even if token is valid, still run it againt the database
                 JwtSecurityToken securityToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
 
-                /*
-                Can't read the claim here:
+                // Somehow ClaimTypes.NameIdentifier returns null ...
+                string userId = securityToken.Claims
+                    .FirstOrDefault(claim => claim.Type == "nameid")?.Value;
 
-                https://stackoverflow.com/questions/64136424/net-core-jwt-decrypt-token-claims-first-returns-sequence-contains-no-ma
-                */
-                string userName = securityToken.Claims
-                    .FirstOrDefault(claim => claim.Type == ClaimTypes.Name)?.Value;
-
-                // If all good, confirm email and respond with success
-                User userToConfirmEmail = await _authRepository.RetrieveUserByNameAsync(userName);
+                User userToConfirmEmail = await _userRepository.GetEntityAsync(
+                    Convert.ToInt16(userId)
+                );
 
                 userToConfirmEmail.EmailIsConfirmed = true;
 
