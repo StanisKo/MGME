@@ -34,6 +34,8 @@ namespace MGME.Core.Services.Auth
 
         private readonly JwtSecurityTokenHandler _tokenHandler;
 
+        private readonly string _hostURL;
+
         public AuthService(IAuthRepository authRepository,
                            IEntityRepository<User> userRepository,
                            IConfiguration configuration,
@@ -47,6 +49,8 @@ namespace MGME.Core.Services.Auth
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTKey"]));
 
             _tokenHandler = new JwtSecurityTokenHandler();
+
+            _hostURL = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host}/confirm-email";
         }
 
         public async Task <BaseServiceResponse> RegisterUser(string name, string email, string password)
@@ -87,79 +91,7 @@ namespace MGME.Core.Services.Auth
 
                 await _authRepository.RegisterUserAsync(userToRegister);
 
-                /*
-                We also send confirmation email with a link
-                that includes JWT as querystring param
-                We use it later to confirm email if JWT is valid
-                */
-
-                MimeMessage confirmationMessage = new MimeMessage();
-
-                MailboxAddress fromAddress = new MailboxAddress(
-                    "MGME",
-                    _configuration["EmailConfiguration:From"]
-                );
-
-                MailboxAddress toAddress = new MailboxAddress(
-                    "User",
-                    userToRegister.Email
-                );
-
-                confirmationMessage.From.Add(fromAddress);
-                confirmationMessage.To.Add(toAddress);
-                confirmationMessage.Subject = "Confirm your email at MGME";
-
-                /*
-                TODO:
-
-                De-hardcode the path back to client?
-                */
-                string hostURL =
-                    $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/confirm-email";
-
-                string confirmationToken = CreateToken(
-                    userToRegister,
-                    Convert.ToInt16(_configuration["ConfirmationTokenLifetime"])
-                );
-
-                string confirmationURL = QueryHelpers.AddQueryString(
-                    hostURL,
-                    new Dictionary<string, string>() { { "token", confirmationToken } }
-                );
-
-                BodyBuilder bodyBuilder = new BodyBuilder();
-
-                /*
-                TODO:
-
-                Use template
-                */
-                bodyBuilder.HtmlBody = $@"
-                <h1>Welcome to MGME!</h1>
-                <br/>
-                <p>Please confirm your email by following this link:</p>
-                <br/>
-                <p>{confirmationURL}</p>";
-
-                confirmationMessage.Body = bodyBuilder.ToMessageBody();
-
-                SmtpClient smptClient = new SmtpClient();
-
-                smptClient.Connect(
-                    _configuration["EmailConfiguration:SmtpServer"],
-                    Convert.ToInt16(_configuration["EmailConfiguration:Port"]),
-                    true
-                );
-
-                smptClient.Authenticate(
-                    _configuration["EmailConfiguration:From"],
-                    _configuration["EmailSenderPassword"]
-                );
-
-                await smptClient.SendAsync(confirmationMessage);
-                await smptClient.DisconnectAsync(true);
-
-                smptClient.Dispose();
+                SendConfirmationEmail(userToRegister);
 
                 response.Success = true;
                 response.Message = "You were successfully registered! Please check your email to verify the account";
@@ -247,18 +179,7 @@ namespace MGME.Core.Services.Auth
                 https://stackoverflow.com/questions/64136424/net-core-jwt-decrypt-token-claims-first-returns-sequence-contains-no-ma
                 */
                 string userName = securityToken.Claims
-                    .FirstOrDefault(claim => claim.Type == ClaimTypes.Name)
-                    .Value;
-
-                bool userExists = await _authRepository.CheckIfUserExistsAsync(userName, nameof(User.Name));
-
-                if (!userExists)
-                {
-                    response.Success = false;
-                    response.Message = "Unfortunately we were not able to confirm your email address";
-
-                    return response;
-                }
+                    .FirstOrDefault(claim => claim.Type == ClaimTypes.Name)?.Value;
 
                 // If all good, confirm email and respond with success
                 User userToConfirmEmail = await _authRepository.RetrieveUserByNameAsync(userName);
@@ -335,6 +256,58 @@ namespace MGME.Core.Services.Auth
             SecurityToken securityToken = _tokenHandler.CreateToken(tokenDescriptor);
 
             return _tokenHandler.WriteToken(securityToken);
+        }
+
+        private async void SendConfirmationEmail(User user)
+        {
+            MimeMessage confirmationMessage = new MimeMessage();
+
+            MailboxAddress fromAddress = new MailboxAddress("MGME", _configuration["EmailConfiguration:From"]);
+
+            MailboxAddress toAddress = new MailboxAddress("User",user.Email);
+
+            confirmationMessage.From.Add(fromAddress);
+            confirmationMessage.To.Add(toAddress);
+            confirmationMessage.Subject = "Confirm your email at MGME";
+
+            string confirmationToken = CreateToken(
+                user,
+                Convert.ToInt16(_configuration["ConfirmationTokenLifetime"])
+            );
+
+            string confirmationURL = QueryHelpers.AddQueryString(
+                _hostURL,
+                new Dictionary<string, string>() { { "token", confirmationToken } }
+            );
+
+            BodyBuilder bodyBuilder = new BodyBuilder();
+
+            bodyBuilder.HtmlBody = $@"
+            <h1>Welcome to MGME!</h1>
+            <br/>
+            <p>Please confirm your email by following this link:</p>
+            <br/>
+            <p>{confirmationURL}</p>";
+
+            confirmationMessage.Body = bodyBuilder.ToMessageBody();
+
+            SmtpClient smptClient = new SmtpClient();
+
+            smptClient.Connect(
+                _configuration["EmailConfiguration:SmtpServer"],
+                Convert.ToInt16(_configuration["EmailConfiguration:Port"]),
+                true
+            );
+
+            smptClient.Authenticate(
+                _configuration["EmailConfiguration:From"],
+                _configuration["EmailSenderPassword"]
+            );
+
+            await smptClient.SendAsync(confirmationMessage);
+            await smptClient.DisconnectAsync(true);
+
+            smptClient.Dispose();
         }
     }
 }
