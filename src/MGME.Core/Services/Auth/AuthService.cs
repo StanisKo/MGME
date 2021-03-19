@@ -25,7 +25,7 @@ TODO:
 
 Add to claims and issuer, audience
 
-Validate isser, audience, and lifetime
+Validate issuer, audience, and lifetime
 */
 
 namespace MGME.Core.Services.Auth
@@ -257,12 +257,13 @@ namespace MGME.Core.Services.Auth
         {
             MimeMessage confirmationMessage = new MimeMessage();
 
-            MailboxAddress fromAddress = new MailboxAddress("MGME", _configuration["EmailConfiguration:From"]);
-
             MailboxAddress toAddress = new MailboxAddress("User",user.Email);
 
-            confirmationMessage.From.Add(fromAddress);
+            MailboxAddress fromAddress = new MailboxAddress("MGME", _configuration["EmailConfiguration:From"]);
+
             confirmationMessage.To.Add(toAddress);
+            confirmationMessage.From.Add(fromAddress);
+
             confirmationMessage.Subject = "Confirm your email at MGME";
 
             string confirmationToken = CreateToken(
@@ -270,11 +271,11 @@ namespace MGME.Core.Services.Auth
                 Convert.ToInt16(_configuration["ConfirmationTokenLifetime"])
             );
 
-            string clientCallback =
+            string clientCallbackURL =
                 $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/confirm-email";
 
             string confirmationURL = QueryHelpers.AddQueryString(
-                clientCallback,
+                clientCallbackURL,
                 new Dictionary<string, string>() { { "token", confirmationToken } }
             );
 
@@ -303,6 +304,7 @@ namespace MGME.Core.Services.Auth
             );
 
             await smptClient.SendAsync(confirmationMessage);
+
             await smptClient.DisconnectAsync(true);
 
             smptClient.Dispose();
