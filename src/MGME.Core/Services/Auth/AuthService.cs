@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Claims;
@@ -27,12 +28,20 @@ namespace MGME.Core.Services.Auth
 
         private readonly IConfiguration _configuration;
 
+        private readonly SymmetricSecurityKey _key;
+
+        private readonly JwtSecurityTokenHandler _tokenHandler;
+
         public AuthService(IAuthRepository repository,
                            IConfiguration configuration,
                            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _repository = repository;
             _configuration = configuration;
+
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTKey"]));
+
+            _tokenHandler = new JwtSecurityTokenHandler();
         }
 
         public async Task <BaseServiceResponse> RegisterUser(string name, string email, string password)
@@ -73,6 +82,11 @@ namespace MGME.Core.Services.Auth
 
                 await _repository.RegisterUserAsync(userToRegister);
 
+                /*
+                We also send confirmation email with a link
+                that includes JWT of user claims
+                */
+
                 MimeMessage confirmationMessage = new MimeMessage();
 
                 MailboxAddress fromAddress = new MailboxAddress(
@@ -89,6 +103,11 @@ namespace MGME.Core.Services.Auth
                 confirmationMessage.To.Add(toAddress);
                 confirmationMessage.Subject = "Confirm your email at MGME";
 
+                /*
+                TODO:
+
+                De-hardcode the path back to client?
+                */
                 string hostURL =
                     $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/confirm-email";
 
@@ -104,6 +123,11 @@ namespace MGME.Core.Services.Auth
 
                 BodyBuilder bodyBuilder = new BodyBuilder();
 
+                /*
+                TODO:
+
+                Use template
+                */
                 bodyBuilder.HtmlBody = $@"
                 <h1>Welcome to MGME!</h1>
                 <br/>
@@ -186,9 +210,59 @@ namespace MGME.Core.Services.Auth
             return response;
         }
 
-        public Task <BaseServiceResponse> ConfirmEmailAddress(string token)
+        /*
+        TODO:
+
+        Validate Audience and Authority
+        */
+        public async Task <BaseServiceResponse> ConfirmEmailAddress(string token)
         {
-            throw new NotImplementedException();
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            try
+            {
+                _tokenHandler.ValidateToken(
+                    token,
+                    new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        ValidateLifetime = true,
+                        IssuerSigningKey = _key
+                    },
+                    out SecurityToken validatedToken);
+
+                /*
+                Even if token is valid, still run it againt the database
+                */
+                JwtSecurityToken securityToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
+
+                string userName = securityToken.Claims.First(claim => claim.Type == ClaimTypes.Name).Value;
+
+                bool userExists = await _repository.CheckIfUserExistsAsync(userName, nameof(User.Name));
+
+                if (!userExists)
+                {
+                    response.Success = false;
+                    response.Message = "Unfortunately we were not able to confirm your email address";
+
+                    return response;
+                }
+
+                // If all good, confirm email and respond with success
+                User userToConfirmEmail = await _repository.RetrieveUserByNameAsync(userName);
+
+                userToConfirmEmail.EmailIsConfirmed = true;
+
+                
+
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
@@ -228,12 +302,8 @@ namespace MGME.Core.Services.Auth
                 new Claim(ClaimTypes.Role, user.Role)
             };
 
-            SymmetricSecurityKey key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration["JWTKey"])
-            );
-
             SigningCredentials credentials = new SigningCredentials(
-                key,
+                _key,
                 SecurityAlgorithms.HmacSha512Signature
             );
 
@@ -244,11 +314,9 @@ namespace MGME.Core.Services.Auth
                 SigningCredentials = credentials
             };
 
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken securityToken = _tokenHandler.CreateToken(tokenDescriptor);
 
-            SecurityToken securityToken = tokenHandler.CreateToken(tokenDescriptor);
-
-            return tokenHandler.WriteToken(securityToken);
+            return _tokenHandler.WriteToken(securityToken);
         }
     }
 }
