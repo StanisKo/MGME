@@ -265,7 +265,19 @@ namespace MGME.Core.Services.Auth
             confirmationMessage.From.Add(fromAddress);
 
             confirmationMessage.Subject = "Confirm your email at MGME";
+            
+            /* Can this be more concise? */
+            BodyBuilder bodyBuilder = new BodyBuilder();
 
+            bodyBuilder.HtmlBody = $@"
+            <h1>Welcome to MGME!</h1>
+            <br/>
+            <p>Please confirm your email by following this link:</p>
+            <br/>
+            <p>{confirmationURL}</p>";
+
+            confirmationMessage.Body = bodyBuilder.ToMessageBody();
+            
             string confirmationToken = CreateToken(
                 user,
                 Convert.ToInt16(_configuration["ConfirmationTokenLifetime"])
@@ -278,17 +290,6 @@ namespace MGME.Core.Services.Auth
                 clientCallbackURL,
                 new Dictionary<string, string>() { { "token", confirmationToken } }
             );
-
-            BodyBuilder bodyBuilder = new BodyBuilder();
-
-            bodyBuilder.HtmlBody = $@"
-            <h1>Welcome to MGME!</h1>
-            <br/>
-            <p>Please confirm your email by following this link:</p>
-            <br/>
-            <p>{confirmationURL}</p>";
-
-            confirmationMessage.Body = bodyBuilder.ToMessageBody();
 
             SmtpClient smptClient = new SmtpClient();
 
