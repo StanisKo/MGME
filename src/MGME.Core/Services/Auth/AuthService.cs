@@ -173,7 +173,8 @@ namespace MGME.Core.Services.Auth
                         ValidateAudience = false,
                         IssuerSigningKey = _securityKey
                     },
-                    out SecurityToken validatedToken);
+                    out SecurityToken validatedToken
+                );
 
                 JwtSecurityToken securityToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
 
@@ -268,58 +269,74 @@ namespace MGME.Core.Services.Auth
             MailboxAddress fromAddress = new MailboxAddress("MGME", _configuration["EmailConfiguration:From"]);
 
             confirmationMessage.To.Add(toAddress);
+
             confirmationMessage.From.Add(fromAddress);
 
             confirmationMessage.Subject = "Confirm your email at MGME";
+
+            /*
+            Create token and add it as a querystring param to callback url
+            that leads back to the client app
+
+            Token is then parsed by the client side and relayed to ConfirmEmailAddress method
+            */
 
             string confirmationToken = CreateToken(
                 user,
                 Convert.ToInt16(_configuration["ConfirmationTokenLifetime"])
             );
 
-            string clientCallbackURL =
-                $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/confirm-email";
+            string clientCallbackURL = _httpContextAccessor.HttpContext.Request.Scheme
+                                       + "://"
+                                       + _httpContextAccessor.HttpContext.Request.Host
+                                       + "/confirm-email";
 
             string confirmationURL = QueryHelpers.AddQueryString(
                 clientCallbackURL,
                 new Dictionary<string, string>() { { "token", confirmationToken } }
             );
 
+            // We also use a custom template stored under ../../MGME.Web/wwwroot
+            string pathToEmailTemplate = _environment.WebRootPath
+                                         + Path.DirectorySeparatorChar.ToString()
+                                         + "Templates"
+                                         + Path.DirectorySeparatorChar.ToString()
+                                         + "ConfirmEmail.html";
+
             BodyBuilder bodyBuilder = new BodyBuilder();
 
-            string pathToEmailTemplte = _environment.WebRootPath
-                                        + Path.DirectorySeparatorChar.ToString()
-                                        + "Templates"
-                                        + Path.DirectorySeparatorChar.ToString()
-                                        + "ConfirmEmail.html";
-
-            using (StreamReader SourceReader = File.OpenText(pathToEmailTemplte))
+            using (StreamReader SourceReader = File.OpenText(pathToEmailTemplate))
             {
                 bodyBuilder.HtmlBody = SourceReader.ReadToEnd();
             }
 
-            // string messageBody = string.Format(bodyBuilder.HtmlBody, confirmationURL);
+            /*
+            We avoid formatting the template, since it contains other source of {} brackets
+            and use replace to insert the link
+
+            We also don't use Razor since it's a simple job
+            */
+            bodyBuilder.HtmlBody = bodyBuilder.HtmlBody.Replace("confirmationURL", confirmationURL);
 
             confirmationMessage.Body = bodyBuilder.ToMessageBody();
 
-            SmtpClient smptClient = new SmtpClient();
+            using (SmtpClient smtpClient = new SmtpClient())
+            {
+                smtpClient.Connect(
+                    _configuration["EmailConfiguration:SmtpServer"],
+                    Convert.ToInt16(_configuration["EmailConfiguration:Port"]),
+                    true
+                );
 
-            smptClient.Connect(
-                _configuration["EmailConfiguration:SmtpServer"],
-                Convert.ToInt16(_configuration["EmailConfiguration:Port"]),
-                true
-            );
+                smtpClient.Authenticate(
+                    _configuration["EmailConfiguration:From"],
+                    _configuration["EmailSenderPassword"]
+                );
 
-            smptClient.Authenticate(
-                _configuration["EmailConfiguration:From"],
-                _configuration["EmailSenderPassword"]
-            );
+                await smtpClient.SendAsync(confirmationMessage);
 
-            await smptClient.SendAsync(confirmationMessage);
-
-            await smptClient.DisconnectAsync(true);
-
-            smptClient.Dispose();
+                await smtpClient.DisconnectAsync(true);
+            }
         }
     }
 }
