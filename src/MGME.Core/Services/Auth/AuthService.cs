@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using MimeKit;
 using MailKit.Net.Smtp;
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
@@ -38,6 +40,8 @@ namespace MGME.Core.Services.Auth
 
         private readonly IConfiguration _configuration;
 
+        private readonly IWebHostEnvironment _environment;
+
         private readonly JwtSecurityTokenHandler _tokenHandler;
 
         private readonly SymmetricSecurityKey _securityKey;
@@ -45,12 +49,14 @@ namespace MGME.Core.Services.Auth
         public AuthService(IAuthRepository authRepository,
                            IEntityRepository<User> userRepository,
                            IConfiguration configuration,
+                           IWebHostEnvironment environment,
                            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _authRepository = authRepository;
             _userRepository = userRepository;
 
             _configuration = configuration;
+            _environment = environment;
 
             _tokenHandler = new JwtSecurityTokenHandler();
 
@@ -68,7 +74,7 @@ namespace MGME.Core.Services.Auth
                 if (userNameIsTaken)
                 {
                     response.Success = false;
-                    response.Message = $"Username is already taken";
+                    response.Message = "Username is already taken";
 
                     return response;
                 }
@@ -78,7 +84,7 @@ namespace MGME.Core.Services.Auth
                 if (emailIsTaken)
                 {
                     response.Success = false;
-                    response.Message = $"Email is already taken";
+                    response.Message = "Email is already taken";
 
                     return response;
                 }
@@ -281,12 +287,18 @@ namespace MGME.Core.Services.Auth
 
             BodyBuilder bodyBuilder = new BodyBuilder();
 
-            bodyBuilder.HtmlBody = $@"
-            <h1>Welcome to MGME!</h1>
-            <br/>
-            <p>Please confirm your email by following this link:</p>
-            <br/>
-            <p>{confirmationURL}</p>";
+            string pathToEmailTemplte = _environment.WebRootPath
+                                        + Path.DirectorySeparatorChar.ToString()
+                                        + "Templates"
+                                        + Path.DirectorySeparatorChar.ToString()
+                                        + "ConfirmEmail.html";
+
+            using (StreamReader SourceReader = File.OpenText(pathToEmailTemplte))
+            {
+                bodyBuilder.HtmlBody = SourceReader.ReadToEnd();
+            }
+
+            // string messageBody = string.Format(bodyBuilder.HtmlBody, confirmationURL);
 
             confirmationMessage.Body = bodyBuilder.ToMessageBody();
 
