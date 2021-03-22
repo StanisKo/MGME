@@ -40,7 +40,7 @@ namespace MGME.Core.Services.Auth
 
         private readonly JwtSecurityTokenHandler _tokenHandler;
 
-        private readonly SymmetricSecurityKey _key;
+        private readonly SymmetricSecurityKey _securityKey;
 
         public AuthService(IAuthRepository authRepository,
                            IEntityRepository<User> userRepository,
@@ -54,7 +54,7 @@ namespace MGME.Core.Services.Auth
 
             _tokenHandler = new JwtSecurityTokenHandler();
 
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTKey"]));
+            _securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTKey"]));
         }
 
         public async Task <BaseServiceResponse> RegisterUser(string name, string email, string password)
@@ -165,7 +165,7 @@ namespace MGME.Core.Services.Auth
                         ValidateIssuerSigningKey = true,
                         ValidateIssuer = false,
                         ValidateAudience = false,
-                        IssuerSigningKey = _key
+                        IssuerSigningKey = _securityKey
                     },
                     out SecurityToken validatedToken);
 
@@ -237,7 +237,7 @@ namespace MGME.Core.Services.Auth
             };
 
             SigningCredentials credentials = new SigningCredentials(
-                _key,
+                _securityKey,
                 SecurityAlgorithms.HmacSha512Signature
             );
 
@@ -265,19 +265,7 @@ namespace MGME.Core.Services.Auth
             confirmationMessage.From.Add(fromAddress);
 
             confirmationMessage.Subject = "Confirm your email at MGME";
-            
-            /* Can this be more concise? */
-            BodyBuilder bodyBuilder = new BodyBuilder();
 
-            bodyBuilder.HtmlBody = $@"
-            <h1>Welcome to MGME!</h1>
-            <br/>
-            <p>Please confirm your email by following this link:</p>
-            <br/>
-            <p>{confirmationURL}</p>";
-
-            confirmationMessage.Body = bodyBuilder.ToMessageBody();
-            
             string confirmationToken = CreateToken(
                 user,
                 Convert.ToInt16(_configuration["ConfirmationTokenLifetime"])
@@ -290,6 +278,17 @@ namespace MGME.Core.Services.Auth
                 clientCallbackURL,
                 new Dictionary<string, string>() { { "token", confirmationToken } }
             );
+
+            BodyBuilder bodyBuilder = new BodyBuilder();
+
+            bodyBuilder.HtmlBody = $@"
+            <h1>Welcome to MGME!</h1>
+            <br/>
+            <p>Please confirm your email by following this link:</p>
+            <br/>
+            <p>{confirmationURL}</p>";
+
+            confirmationMessage.Body = bodyBuilder.ToMessageBody();
 
             SmtpClient smptClient = new SmtpClient();
 
