@@ -28,6 +28,8 @@ TODO:
 Add to claims and issuer, audience
 
 Validate issuer, audience, and lifetime
+
+Go through, comment and prettify
 */
 
 namespace MGME.Core.Services.Auth
@@ -277,10 +279,8 @@ namespace MGME.Core.Services.Auth
             /*
             Create token and add it as a querystring param to callback url
             that leads back to the client app
-
             Token is then parsed by the client side and relayed to ConfirmEmailAddress method
             */
-
             string confirmationToken = CreateToken(
                 user,
                 Convert.ToInt16(_configuration["ConfirmationTokenLifetime"])
@@ -313,7 +313,6 @@ namespace MGME.Core.Services.Auth
             /*
             We avoid formatting the template, since it contains other source of {} brackets
             and use replace to insert the link
-
             We also don't use Razor since it's a simple job
             */
             bodyBuilder.HtmlBody = bodyBuilder.HtmlBody.Replace("confirmationURL", confirmationURL);
