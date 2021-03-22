@@ -266,7 +266,7 @@ namespace MGME.Core.Services.Auth
         {
             MimeMessage confirmationMessage = new MimeMessage();
 
-            MailboxAddress toAddress = new MailboxAddress("User",user.Email);
+            MailboxAddress toAddress = new MailboxAddress("User", user.Email);
 
             MailboxAddress fromAddress = new MailboxAddress("MGME", _configuration["EmailConfiguration:From"]);
 
