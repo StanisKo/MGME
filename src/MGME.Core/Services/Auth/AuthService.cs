@@ -188,6 +188,12 @@ namespace MGME.Core.Services.Auth
                     Convert.ToInt16(userId)
                 );
 
+                if (userToConfirmEmail.EmailIsConfirmed)
+                {
+                    response.Success = false;
+                    response.Message = "Your email is already confirmed. Go away";
+                }
+
                 userToConfirmEmail.EmailIsConfirmed = true;
 
                 await _userRepository.UpdateEntityAsync(
