@@ -303,19 +303,21 @@ namespace MGME.Core.Services.Auth
                                          + Path.DirectorySeparatorChar.ToString()
                                          + "ConfirmEmail.html";
 
-            BodyBuilder bodyBuilder = new BodyBuilder();
+            string template = null;
 
             using (StreamReader SourceReader = File.OpenText(pathToEmailTemplate))
             {
-                bodyBuilder.HtmlBody = SourceReader.ReadToEnd();
+                template = SourceReader.ReadToEnd();
             }
+
+            BodyBuilder bodyBuilder = new BodyBuilder();
 
             /*
             We avoid formatting the template, since it contains other source of {} brackets
             and use replace to insert the link
             We also don't use Razor since it's a simple job
             */
-            bodyBuilder.HtmlBody = bodyBuilder.HtmlBody.Replace("confirmationURL", confirmationURL);
+            bodyBuilder.HtmlBody = template.Replace("confirmationURL", confirmationURL);
 
             confirmationMessage.Body = bodyBuilder.ToMessageBody();
 

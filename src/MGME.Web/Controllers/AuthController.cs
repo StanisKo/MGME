@@ -20,6 +20,7 @@ namespace MGME.Web.Controllers
             _authService = authService;
         }
 
+        // Pass DTOs instead of values to avoid copyign them
         [HttpPost("Register")]
         public async Task <IActionResult> RegisterUser(UserRegisterDTO request)
         {
