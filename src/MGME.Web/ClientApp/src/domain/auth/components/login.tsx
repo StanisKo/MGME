@@ -25,10 +25,6 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         alignItems: 'center'
     },
-    form: {
-        width: '100%',
-        marginTop: theme.spacing(3)
-    },
     submit: {
         margin: theme.spacing(3, 0, 2)
     },
@@ -75,7 +71,6 @@ export const Login = (): ReactElement => {
     );
 
     const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(false);
 
     const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
         [INPUT_TYPE.USERNAME]: setName,
@@ -163,14 +158,6 @@ export const Login = (): ReactElement => {
     };
 
     const handleRequest = async (): Promise<void> => {
-        /*
-        We switch to loading mode only if user haven't registered before
-        Otherwise speed of response causes flickering
-        */
-        if (!userRegisteredBefore) {
-            setLoading(true);
-        }
-
         const authResponse = await loginOrRegisterUser(
             mode,
             {
@@ -194,10 +181,6 @@ export const Login = (): ReactElement => {
             }
 
             setMode(MODE.SIGN_IN);
-        }
-
-        if (!userRegisteredBefore) {
-            setLoading(false);
         }
     };
 
@@ -336,7 +319,7 @@ export const Login = (): ReactElement => {
                     variant="contained"
                     color="primary"
                     className={submit}
-                    disabled={mode === MODE.SIGN_UP ? !inputIsValid || loading : false}
+                    disabled={mode === MODE.SIGN_UP ? !inputIsValid : false}
                     onClick={handleRequest}
                 >
                     {modeNames[mode]}

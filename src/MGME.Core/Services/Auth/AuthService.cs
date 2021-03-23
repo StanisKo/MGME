@@ -353,7 +353,7 @@ namespace MGME.Core.Services.Auth
             and use replace to insert the link
             We also don't use Razor since it's a simple job
             */
-            bodyBuilder.HtmlBody = template.Replace("confirmationURL", confirmationURL);
+            bodyBuilder.HtmlBody = template.Replace("confirmation-url", confirmationURL);
 
             confirmationMessage.Body = bodyBuilder.ToMessageBody();
 
