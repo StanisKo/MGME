@@ -27,7 +27,9 @@ TODO:
 
 Add to claims and issuer, audience
 
-Validate issuer, audience, and lifetime
+Validate issuer, audience
+
+Lifetime is validated by default
 
 Go through, comment and prettify
 */
@@ -164,6 +166,13 @@ namespace MGME.Core.Services.Auth
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
+            JwtSecurityToken securityToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
+
+            // Somehow ClaimTypes.Name returns null ...
+            int userId = Convert.ToInt16(
+                securityToken.Claims.FirstOrDefault(claim => claim.Type == "nameid")?.Value
+            );
+
             try
             {
                 _tokenHandler.ValidateToken(
@@ -178,20 +187,14 @@ namespace MGME.Core.Services.Auth
                     out SecurityToken validatedToken
                 );
 
-                JwtSecurityToken securityToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
-
-                // Somehow ClaimTypes.Name returns null ...
-                string userId = securityToken.Claims
-                    .FirstOrDefault(claim => claim.Type == "nameid")?.Value;
-
-                User userToConfirmEmail = await _userRepository.GetEntityAsync(
-                    Convert.ToInt16(userId)
-                );
+                User userToConfirmEmail = await _userRepository.GetEntityAsync(userId);
 
                 if (userToConfirmEmail.EmailIsConfirmed)
                 {
                     response.Success = false;
                     response.Message = "Your email is already confirmed. Go away";
+
+                    return response;
                 }
 
                 userToConfirmEmail.EmailIsConfirmed = true;
@@ -203,7 +206,32 @@ namespace MGME.Core.Services.Auth
 
                 response.Success = true;
                 response.Message = "Your email was successfully confirmed";
+            }
+            catch (SecurityTokenExpiredException exception)
+            {
+                _ = exception;
 
+                User userToResendEmail = await _userRepository.GetEntityAsync(userId);
+
+                /*
+                Just in case if user revisits confirmation link after it expired
+                and after the email was already confirmed
+                */
+                if (userToResendEmail.EmailIsConfirmed)
+                {
+                    response.Success = false;
+                    response.Message = "Your email is already confirmed. Go away";
+
+                    return response;
+                }
+
+                // Otherwise we send new confirmation link
+                SendConfirmationEmail(userToResendEmail);
+
+                response.Success = false;
+                response.Message = "Your confirmation link has expired. We've sent you another email";
+
+                return response;
             }
             catch (Exception exception)
             {
