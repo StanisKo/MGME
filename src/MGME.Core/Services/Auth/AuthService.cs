@@ -24,9 +24,6 @@ using MGME.Core.Interfaces.Repositories;
 
 /*
 TODO:
-
-Add to claims and issuer, audience
-
 Validate issuer, audience
 
 Go through, comment and prettify
@@ -178,9 +175,18 @@ namespace MGME.Core.Services.Auth
                     new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = _securityKey,
+
                         ValidateIssuer = false,
+
                         ValidateAudience = false,
-                        IssuerSigningKey = _securityKey
+
+                        ValidateLifetime = true,
+                        /*
+                        We set clockskew to zero so tokens expire
+                        exactly at token expiration time (instead of 5 minutes later)
+                        */
+                        ClockSkew = TimeSpan.Zero
                     },
                     out SecurityToken validatedToken
                 );
@@ -286,7 +292,7 @@ namespace MGME.Core.Services.Auth
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor()
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddHours(expiresInHours),
+                Expires = DateTime.UtcNow.AddHours(expiresInHours),
                 SigningCredentials = credentials
             };
 

@@ -69,13 +69,16 @@ namespace MGME.Web
                     {
                         ValidateIssuerSigningKey = true,
 
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.ASCII.GetBytes(Configuration["JWTKey"])
+                        ),
+
                         ValidateIssuer = false,
 
                         ValidateAudience = false,
 
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.ASCII.GetBytes(Configuration["JWTKey"])
-                        ),
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
                     };
                 });
 
