@@ -29,8 +29,6 @@ Add to claims and issuer, audience
 
 Validate issuer, audience
 
-Lifetime is validated by default
-
 Go through, comment and prettify
 */
 
@@ -168,7 +166,7 @@ namespace MGME.Core.Services.Auth
 
             JwtSecurityToken securityToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
 
-            // Somehow ClaimTypes.Name returns null ...
+            // Somehow claim.Type == ClaimTypes.Name returns null ...
             int userId = Convert.ToInt16(
                 securityToken.Claims.FirstOrDefault(claim => claim.Type == "nameid")?.Value
             );
@@ -192,7 +190,7 @@ namespace MGME.Core.Services.Auth
                 if (userToConfirmEmail.EmailIsConfirmed)
                 {
                     response.Success = false;
-                    response.Message = "Your email is already confirmed. Go away";
+                    response.Message = "Your email is already confirmed";
 
                     return response;
                 }
@@ -220,7 +218,7 @@ namespace MGME.Core.Services.Auth
                 if (userToResendEmail.EmailIsConfirmed)
                 {
                     response.Success = false;
-                    response.Message = "Your email is already confirmed. Go away";
+                    response.Message = "Your email is already confirmed";
 
                     return response;
                 }
@@ -235,6 +233,7 @@ namespace MGME.Core.Services.Auth
             }
             catch (Exception exception)
             {
+                // Otherwise it's issuer/audience/signature exception or database exception
                 response.Success = false;
                 response.Message = exception.Message;
             }
