@@ -22,13 +22,6 @@ using MGME.Core.Entities;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
 
-/*
-TODO:
-Validate issuer, audience
-
-Go through, comment and prettify
-*/
-
 namespace MGME.Core.Services.Auth
 {
     public class AuthService : BaseEntityService, IAuthService
@@ -170,6 +163,10 @@ namespace MGME.Core.Services.Auth
 
             try
             {
+                /*
+                We set clockskew to zero so tokens expire
+                exactly at token expiration time (instead of 5 minutes later)
+                */
                 _tokenHandler.ValidateToken(
                     token,
                     new TokenValidationParameters
@@ -177,15 +174,13 @@ namespace MGME.Core.Services.Auth
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = _securityKey,
 
-                        ValidateIssuer = false,
+                        ValidateIssuer = true,
+                        ValidIssuer = _configuration["Host"],
 
-                        ValidateAudience = false,
+                        ValidateAudience = true,
+                        ValidAudience = _configuration["Host"],
 
                         ValidateLifetime = true,
-                        /*
-                        We set clockskew to zero so tokens expire
-                        exactly at token expiration time (instead of 5 minutes later)
-                        */
                         ClockSkew = TimeSpan.Zero
                     },
                     out SecurityToken validatedToken
@@ -292,6 +287,8 @@ namespace MGME.Core.Services.Auth
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor()
             {
                 Subject = new ClaimsIdentity(claims),
+                Issuer = _configuration["Host"],
+                Audience = _configuration["Host"],
                 Expires = DateTime.UtcNow.AddHours(expiresInHours),
                 SigningCredentials = credentials
             };

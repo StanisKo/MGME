@@ -73,9 +73,11 @@ namespace MGME.Web
                             Encoding.ASCII.GetBytes(Configuration["JWTKey"])
                         ),
 
-                        ValidateIssuer = false,
+                        ValidateIssuer = true,
+                        ValidIssuer = Configuration["Host"],
 
-                        ValidateAudience = false,
+                        ValidateAudience = true,
+                        ValidAudience = Configuration["Host"],
 
                         ValidateLifetime = true,
                         ClockSkew = TimeSpan.Zero

@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
@@ -6,8 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using MGME.Core.DTOs;
 using MGME.Core.DTOs.User;
 using MGME.Core.Interfaces.Services;
-
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace MGME.Web.Controllers
 {
