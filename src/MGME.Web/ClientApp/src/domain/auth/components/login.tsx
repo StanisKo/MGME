@@ -65,7 +65,7 @@ export const Login = (): ReactElement => {
     const [confirmPasswordError, setConfirmPasswordError] = useState<boolean>(false);
     const [confirmPasswordHelperText, setConfirmPasswordHelperText] = useState<string>('');
 
-    // We use the same container for result of sugn up and result of sign in (that also holds JWT)
+    // We use the same container for result of sign up and result of sign in (that also holds JWT)
     const [response, setResponse] = useState<BaseServiceResponse | DataServiceResponse<string>>(
         {} as BaseServiceResponse
     );
