@@ -9,8 +9,11 @@ import {
     SetStateAction
 } from 'react';
 
+import { useHistory } from 'react-router-dom';
+
 import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } from '../helpers';
 import { BaseServiceResponse, DataServiceResponse } from '../../../shared/interfaces';
+import { ROUTES } from '../../../shared/const';
 import { loginOrRegisterUser } from '../requests';
 
 import { Container, Button, TextField, Grid, Box, Typography, Link, Snackbar } from '@material-ui/core';
@@ -44,6 +47,8 @@ const Alert = (props: AlertProps): ReactElement => <MuiAlert elevation={6} varia
 export const Login = (): ReactElement => {
     // We don't need to parse it: it's either there or not
     const userRegisteredBefore = localStorage.getItem('userRegisteredBefore');
+
+    const history = useHistory();
 
     const [mode, setMode] = useState<MODE>(userRegisteredBefore ? MODE.SIGN_IN : MODE.SIGN_UP);
 
@@ -178,6 +183,14 @@ export const Login = (): ReactElement => {
                 (also helps if they clear cookies or use different machine)
                 */
                 localStorage.setItem('userRegisteredBefore', JSON.stringify(true));
+            }
+
+            if (mode === MODE.SIGN_IN) {
+                sessionStorage.setItem('token', (response as DataServiceResponse<string>).data);
+
+                history.push(ROUTES.START);
+
+                return;
             }
 
             setMode(MODE.SIGN_IN);

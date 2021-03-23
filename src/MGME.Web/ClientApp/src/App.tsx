@@ -30,7 +30,6 @@ export const PublicApplication = (): ReactElement => {
         <Provider store={store}>
             <Router history={history}>
                 <CssBaseline />
-                <MenuBar />
                 <Switch>
                     <Route path={ROUTES.LOGIN} component={Login} />
                     <Route path={ROUTES.CONFIRM_EMAIL} component={ConfirmEmail} />
