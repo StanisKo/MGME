@@ -82,7 +82,11 @@ Spec:
 
 4. /auth/refreshtoken must:
     Validate the token
-    Send back access token
+
+    if token okay:
+        Send back new access token
+    else:
+        remove token from db and respond with error (user must login, no active session)
 
 5. Then client app must:
     make logout request that will delete refreshToken from httpOnly cookie (and in such end session)
