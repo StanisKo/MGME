@@ -18,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 
 using MGME.Core.DTOs;
+using MGME.Core.DTOs.User;
 using MGME.Core.Entities;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
@@ -187,9 +188,9 @@ namespace MGME.Core.Services.Auth
             return response;
         }
 
-        public async Task <DataServiceResponse<string>> LoginUser(string name, string password)
+        public async Task <DataServiceResponse<UserLoginResponseDTO>> LoginUser(string name, string password)
         {
-            DataServiceResponse<string> response = new DataServiceResponse<string>();
+            DataServiceResponse<UserLoginResponseDTO> response = new DataServiceResponse<UserLoginResponseDTO>();
 
             try
             {
@@ -212,16 +213,31 @@ namespace MGME.Core.Services.Auth
                 }
                 else
                 {
-                    RefreshToken refreshToken = CreateRefreshToken(userToLogin.Id);
-
-                    await _tokenRepository.AddEntityAsync(refreshToken);
-
-                    response.Data = CreateAccessToken(
+                    string accessToken = CreateAccessToken(
                         userToLogin,
                         DateTime.UtcNow.AddMinutes(
                             Convert.ToInt16(_configuration["TokensLifetime:AccessTokenMinutes"])
                         )
                     );
+
+                    string refreshToken = CreateRefreshToken();
+
+                    RefreshToken refreshTokenForDb = new RefreshToken()
+                    {
+                        UserId = userToLogin.Id,
+                        Token = refreshToken,
+                        Expires = DateTime.UtcNow.AddHours(
+                            Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
+                        )
+                    };
+
+                    await _tokenRepository.AddEntityAsync(refreshTokenForDb);
+
+                    response.Data = new UserLoginResponseDTO()
+                    {
+                        AccessToken = accessToken,
+                        RefreshToken = refreshToken
+                    };
 
                     response.Success = true;
                     response.Message = "User logged in";
@@ -356,7 +372,14 @@ namespace MGME.Core.Services.Auth
             }
         }
 
-        private RefreshToken CreateRefreshToken(int userId)
+        /*
+        https://jasonwatmore.com/post/2020/05/25/aspnet-core-3-api-jwt-authentication-with-refresh-tokens
+
+        Also add ip address to the token entity
+
+        Also check what has to happen when user refreshes the access token
+        */
+        private string CreateRefreshToken()
         {
             byte[] randomInt = new byte[32];
 
@@ -364,15 +387,7 @@ namespace MGME.Core.Services.Auth
             {
                 generator.GetBytes(randomInt);
 
-                // Refresh token is valid only for 8 hours, thus marking the duration of the session
-                return new RefreshToken()
-                {
-                    UserId = userId,
-                    Token = Convert.ToBase64String(randomInt),
-                    Expires = DateTime.UtcNow.AddHours(
-                        Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
-                    )
-                };
+                return Convert.ToBase64String(randomInt);
             }
         }
 

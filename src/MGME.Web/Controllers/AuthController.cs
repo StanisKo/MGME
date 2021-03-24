@@ -1,10 +1,14 @@
+using System;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 using MGME.Core.DTOs;
 using MGME.Core.DTOs.User;
 using MGME.Core.Interfaces.Services;
+
+using Microsoft.Extensions.Configuration;
 
 namespace MGME.Web.Controllers
 {
@@ -12,9 +16,12 @@ namespace MGME.Web.Controllers
     {
         private IAuthService _authService;
 
-        public AuthController(IAuthService authService)
+        private IConfiguration _configuration;
+
+        public AuthController(IAuthService authService, IConfiguration configuration)
         {
             _authService = authService;
+            _configuration = configuration;
         }
 
         // Pass DTOs instead of values to avoid copyign them
@@ -39,13 +46,22 @@ namespace MGME.Web.Controllers
         [HttpPost("Login")]
         public async Task <IActionResult> LoginUser(UserLoginDTO request)
         {
-            DataServiceResponse<string> response =  await _authService.LoginUser(
+            DataServiceResponse<UserLoginResponseDTO> response =  await _authService.LoginUser(
                 request.Name,
                 request.Password
             );
 
             if (response.Success)
             {
+                Response.Cookies.Append("refreshToken", response.Data.RefreshToken, new CookieOptions()
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    Expires = DateTime.UtcNow.AddHours(
+                        Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
+                    )
+                });
+
                 return Ok(response);
             }
 
