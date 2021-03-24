@@ -66,6 +66,29 @@ When refresh token expires, the session must end
 and the refresh token must be removed from cookies -- user must login again
 
 https://www.youtube.com/watch?v=25GS0MLT8JU
+
+Spec:
+
+1. client app makes login request
+
+2. /auth/login must:
+    Login user
+    Send back refresh token in httpOnly cookie
+    Send back access token
+
+3. client app must:
+    Save access token in memory
+    Refetch access token from /auth/refreshtoken when token expires
+    Refetch access token from /auth/refreshtoken when user reloads the page
+
+4. /auth/refreshtoken must:
+    Validate the token
+    Send back access token
+
+Session continues until refresh token has not expired
+
+5. Then client app must:
+    make logout request that will delete refreshToken from httpOnly cookie (and in such end session)
 */
 
 export const PublicApplication = (): ReactElement => {
