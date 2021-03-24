@@ -203,9 +203,11 @@ namespace MGME.Core.Services.Auth
                 }
                 else
                 {
-                    response.Data = CreateToken(
+                    response.Data = CreateAccessToken(
                         userToLogin,
-                        Convert.ToInt16(_configuration["SessionLifetime"])
+                        DateTime.UtcNow.AddMinutes(
+                            Convert.ToInt16(_configuration["TokensLifetime:AccessTokenMinutes"])
+                        )
                     );
 
                     response.Success = true;
@@ -341,7 +343,7 @@ namespace MGME.Core.Services.Auth
             }
         }
 
-        private string CreateToken(User user, int expiresInHours)
+        private string CreateAccessToken(User user, DateTime expires)
         {
             List<Claim> claims = new List<Claim>()
             {
@@ -360,7 +362,7 @@ namespace MGME.Core.Services.Auth
                 Subject = new ClaimsIdentity(claims),
                 Issuer = _configuration["Host"],
                 Audience = _configuration["Host"],
-                Expires = DateTime.UtcNow.AddHours(expiresInHours),
+                Expires = expires,
                 SigningCredentials = credentials
             };
 
@@ -384,13 +386,15 @@ namespace MGME.Core.Services.Auth
             confirmationMessage.Subject = "Confirm your email at MGME";
 
             /*
-            Create token and add it as a querystring param to callback url
+            Create access token and add it as a querystring param to callback url
             that leads back to the client app
             Token is then parsed by the client side and relayed to ConfirmEmailAddress method
             */
-            string confirmationToken = CreateToken(
+            string confirmationToken = CreateAccessToken(
                 user,
-                Convert.ToInt16(_configuration["ConfirmationTokenLifetime"])
+                DateTime.UtcNow.AddHours(
+                    Convert.ToInt16(_configuration["TokensLifetime:ConfirmationTokenHours"])
+                )
             );
 
             string clientCallbackURL = _httpContextAccessor.HttpContext.Request.Scheme

@@ -31,6 +31,9 @@ export const PublicApplication = (): ReactElement => {
             <Router history={history}>
                 <CssBaseline />
                 <Switch>
+                    <Route path={ROUTES.LOGIN} component={Login} />
+                    <Route path={ROUTES.CONFIRM_EMAIL} component={ConfirmEmail} />
+
                     <Route path={ROUTES.ROOT} render={(): ReactElement => {
                         const user = sessionStorage.getItem('token');
 
@@ -40,8 +43,6 @@ export const PublicApplication = (): ReactElement => {
 
                         return <PrivateApplication />;
                     }} />
-                    <Route path={ROUTES.LOGIN} component={Login} />
-                    <Route path={ROUTES.CONFIRM_EMAIL} component={ConfirmEmail} />
                 </Switch>
             </Router>
         </Provider>
