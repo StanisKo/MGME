@@ -319,6 +319,25 @@ namespace MGME.Core.Services.Auth
             return response;
         }
 
+        public RefreshToken CreateRefreshToken()
+        {
+            byte[] randomInt = new byte[32];
+
+            using (RNGCryptoServiceProvider generator = new RNGCryptoServiceProvider())
+            {
+                generator.GetBytes(randomInt);
+
+                // Refresh token is valid only for 8 hours, thus marking the duration of the session
+                return new RefreshToken()
+                {
+                    Token = Convert.ToBase64String(randomInt),
+                    Expires = DateTime.UtcNow.AddHours(
+                        Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
+                    )
+                };
+            }
+        }
+
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (HMACSHA512 hmac = new HMACSHA512())
