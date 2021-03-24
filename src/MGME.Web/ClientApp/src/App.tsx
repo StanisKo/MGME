@@ -28,13 +28,22 @@ const PrivateApplication = (): ReactElement => (
 /*
 TODO:
 
-1. Improve email validation
+1. Switch to refresh + access token
 2. Session management
-3. Switch to http only or refresh + access token
-4. Restrict access to login if user is logged in
+3. Restrict access to login if user is logged in
+4. Improve email validation
 */
 
 /*
+On refresh/access tokens workflow:
+
+https://stackoverflow.com/questions/39176237/how-do-i-store-jwt-and-send-them-with-every-request-using-react
+
+https://www.blinkingcaret.com/2018/05/30/refresh-tokens-in-asp-net-core-web-api/
+
+Save access token in redux
+Save refresh token in local storage
+
 On public and private routing:
 
 https://medium.com/@thanhbinh.tran93/private-route-public-route-and-restricted-route-with-react-router-d50b27c15f5e
