@@ -25,14 +25,18 @@ const PrivateApplication = (): ReactElement => (
     </>
 );
 
+/*
+On public and private routing:
+
+https://medium.com/@thanhbinh.tran93/private-route-public-route-and-restricted-route-with-react-router-d50b27c15f5e
+*/
+
 export const PublicApplication = (): ReactElement => {
     return (
         <Provider store={store}>
             <Router history={history}>
                 <CssBaseline />
                 <Switch>
-                    <Route path={ROUTES.LOGIN} component={Login} />
-                    <Route path={ROUTES.CONFIRM_EMAIL} component={ConfirmEmail} />
                     <Route path={ROUTES.ROOT} render={(): ReactElement => {
                         const user = sessionStorage.getItem('token');
 
@@ -42,6 +46,10 @@ export const PublicApplication = (): ReactElement => {
 
                         return <PrivateApplication />;
                     }} />
+
+                    <Route path={ROUTES.LOGIN} component={Login} />
+
+                    <Route path={ROUTES.CONFIRM_EMAIL} component={ConfirmEmail} />
                 </Switch>
             </Router>
         </Provider>

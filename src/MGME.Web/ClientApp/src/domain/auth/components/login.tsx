@@ -42,6 +42,7 @@ TODO:
 1. Improve email validation
 2. Session management
 3. Switch to http only or refresh + access token
+4. Restrict access to login if user is logged in
 */
 
 const Alert = (props: AlertProps): ReactElement => <MuiAlert elevation={6} variant="filled" {...props} />;
