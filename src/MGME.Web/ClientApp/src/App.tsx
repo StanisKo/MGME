@@ -47,6 +47,25 @@ Save refresh token in local storage
 On public and private routing:
 
 https://medium.com/@thanhbinh.tran93/private-route-public-route-and-restricted-route-with-react-router-d50b27c15f5e
+
+Flow:
+
+Upon login, server sends back to the client a refresh token and an access token
+Refresh token is sent via httpOnly cookie and therefore persists between requests
+Access token is simply saved in memory (redux store)
+
+Client then sends acess token as auth header with every request
+
+Client keeps tabs on access token expiration
+
+When access token expires, client requests new access token from /refreshtoken endpoint
+
+If user reloads the page, client requests new access token from /refreshtoken endpoint
+
+When refresh token expires, the session must end
+and the refresh token must be removed from cookies -- user must login again
+
+https://www.youtube.com/watch?v=25GS0MLT8JU
 */
 
 export const PublicApplication = (): ReactElement => {
