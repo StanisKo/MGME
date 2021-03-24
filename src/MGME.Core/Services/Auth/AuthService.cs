@@ -70,6 +70,7 @@ Spec:
 
 2. /auth/login must:
     Login user
+    Create and save a refresh token for the user
     Send back refresh token in httpOnly cookie
     Send back access token
 
@@ -105,6 +106,8 @@ namespace MGME.Core.Services.Auth
 
         private readonly IEntityRepository<User> _userRepository;
 
+        private readonly IEntityRepository<RefreshToken> _tokenRepository;
+
         private readonly IConfiguration _configuration;
 
         private readonly IWebHostEnvironment _environment;
@@ -115,12 +118,14 @@ namespace MGME.Core.Services.Auth
 
         public AuthService(IAuthRepository authRepository,
                            IEntityRepository<User> userRepository,
+                           IEntityRepository<RefreshToken> tokenRepository,
                            IConfiguration configuration,
                            IWebHostEnvironment environment,
                            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _authRepository = authRepository;
             _userRepository = userRepository;
+            _tokenRepository = tokenRepository;
 
             _configuration = configuration;
             _environment = environment;
@@ -207,6 +212,10 @@ namespace MGME.Core.Services.Auth
                 }
                 else
                 {
+                    RefreshToken refreshToken = CreateRefreshToken(userToLogin.Id);
+
+                    await _tokenRepository.AddEntityAsync(refreshToken);
+
                     response.Data = CreateAccessToken(
                         userToLogin,
                         DateTime.UtcNow.AddMinutes(
@@ -319,25 +328,6 @@ namespace MGME.Core.Services.Auth
             return response;
         }
 
-        public RefreshToken CreateRefreshToken()
-        {
-            byte[] randomInt = new byte[32];
-
-            using (RNGCryptoServiceProvider generator = new RNGCryptoServiceProvider())
-            {
-                generator.GetBytes(randomInt);
-
-                // Refresh token is valid only for 8 hours, thus marking the duration of the session
-                return new RefreshToken()
-                {
-                    Token = Convert.ToBase64String(randomInt),
-                    Expires = DateTime.UtcNow.AddHours(
-                        Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
-                    )
-                };
-            }
-        }
-
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (HMACSHA512 hmac = new HMACSHA512())
@@ -363,6 +353,26 @@ namespace MGME.Core.Services.Auth
                 }
 
                 return true;
+            }
+        }
+
+        private RefreshToken CreateRefreshToken(int userId)
+        {
+            byte[] randomInt = new byte[32];
+
+            using (RNGCryptoServiceProvider generator = new RNGCryptoServiceProvider())
+            {
+                generator.GetBytes(randomInt);
+
+                // Refresh token is valid only for 8 hours, thus marking the duration of the session
+                return new RefreshToken()
+                {
+                    UserId = userId,
+                    Token = Convert.ToBase64String(randomInt),
+                    Expires = DateTime.UtcNow.AddHours(
+                        Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
+                    )
+                };
             }
         }
 
