@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace MGME.Core.Entities
@@ -22,5 +23,7 @@ namespace MGME.Core.Entities
         public bool EmailIsConfirmed { get; set; }
 
         public string Role { get; set; }
+
+        public ICollection<RefreshToken> RefreshTokens { get; set; }
     }
 }
