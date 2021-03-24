@@ -81,6 +81,8 @@ Spec:
     Refetch access token from /auth/refreshtoken when token expires
     Refetch access token from /auth/refreshtoken when user reloads the page
 
+    (This can be in App.tsx?)
+
 4. /auth/refreshtoken must:
     Validate the token
     Send back access token
