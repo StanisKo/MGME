@@ -40,6 +40,8 @@ const useStyles = makeStyles((theme) => ({
 TODO:
 
 1. Improve email validation
+2. Session management
+3. Switch to http only or refresh + access token
 */
 
 const Alert = (props: AlertProps): ReactElement => <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -186,7 +188,7 @@ export const Login = (): ReactElement => {
             }
 
             if (mode === MODE.SIGN_IN) {
-                sessionStorage.setItem('token', (response as DataServiceResponse<string>).data);
+                sessionStorage.setItem('token', (authResponse as DataServiceResponse<string>).data);
 
                 history.push(ROUTES.START);
 
