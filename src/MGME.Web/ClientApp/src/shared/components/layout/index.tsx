@@ -4,9 +4,9 @@ import { AppBar, Toolbar, Tabs, Tab, IconButton } from '@material-ui/core';
 
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
     createStyles({
         flexGrow: {
             flexGrow: 1

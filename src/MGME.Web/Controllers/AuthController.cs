@@ -46,6 +46,23 @@ namespace MGME.Web.Controllers
         [HttpPost("Login")]
         public async Task <IActionResult> LoginUser(UserLoginDTO request)
         {
+            /*
+            Even though we deny login on client side if the user is already logged in
+            It never hurts to double check
+            */
+            bool userLoggedIn = Request.Cookies.ContainsKey("refreshToken");
+
+            if (userLoggedIn)
+            {
+                return BadRequest(
+                    new DataServiceResponse<UserLoginResponseDTO>()
+                    {
+                        Success = false,
+                        Message = "You are already logged in"
+                    }
+                );
+            }
+
             DataServiceResponse<UserLoginResponseDTO> response =  await _authService.LoginUser(
                 request.Name,
                 request.Password
