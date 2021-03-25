@@ -11,14 +11,14 @@ namespace MGME.Core.Interfaces.Repositories
     public interface IEntityRepository<TEntity> where TEntity: BaseEntity
     {
         Task <TEntity> GetEntityAsync(
-            int id,
+            int? id = null,
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
             Expression<Func<TEntity, object>>[] entitiesToInclude = null);
 
         // For when we need to select only some columns
         Task <TEntityDTO> GetEntityAsync<TEntityDTO>(
-            int id,
+            int? id = null,
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
             Expression<Func<TEntity, object>>[] entitiesToInclude = null,

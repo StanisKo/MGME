@@ -89,7 +89,7 @@ namespace MGME.Web.Controllers
                 return Ok(response);
             }
 
-            // Token is invalid
+            // Confirmation is invalid
             return BadRequest(response);
         }
 
@@ -122,7 +122,7 @@ namespace MGME.Web.Controllers
                 return Ok(response);
             }
 
-            // Token is invalid
+            // Refresh token is invalid
             return BadRequest(response);
         }
 

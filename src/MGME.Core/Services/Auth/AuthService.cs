@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Claims;
+using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.IdentityModel.Tokens.Jwt;
@@ -367,7 +368,13 @@ namespace MGME.Core.Services.Auth
 
         public async Task <DataServiceResponse<UserTokensDTO>> RefreshAccessToken(string token)
         {
-            throw new NotImplementedException();
+            User tokenOwner = await _userRepository.GetEntityAsync(
+                predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
+                entitiesToInclude: new Expression<Func<User, object>>[]
+                    {
+                        user => user.RefreshTokens
+                    }
+            );
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

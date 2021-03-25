@@ -23,7 +23,7 @@ namespace MGME.Infra.Data.Repositories
         }
 
         public async Task <TEntity> GetEntityAsync(
-            int id,
+            int? id = null,
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
             Expression<Func<TEntity, object>>[] entitiesToInclude = null)
@@ -43,16 +43,26 @@ namespace MGME.Infra.Data.Repositories
                 }
             }
 
-            if (predicate != null)
+            // If we query only on primary key
+            if (predicate == null && id != null)
             {
-                query = query.Where(predicate);
+                return await query.SingleOrDefaultAsync(entity => entity.Id == id);
             }
 
-            return await query.FirstOrDefaultAsync(entity => entity.Id == id);
+            // If we query on primary key and also want to filter
+            if (predicate != null && id != null)
+            {
+                query = query.Where(predicate);
+
+                return await query.SingleOrDefaultAsync(entity => entity.Id == id);
+            }
+
+            // If we query only on filter avoiding primary key
+            return await query.FirstOrDefaultAsync(predicate);
         }
 
         public async Task <TEntityDTO> GetEntityAsync<TEntityDTO>(
-            int id,
+            int? id = null,
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
             Expression<Func<TEntity, object>>[] entitiesToInclude = null,
@@ -73,12 +83,22 @@ namespace MGME.Infra.Data.Repositories
                 }
             }
 
-            if (predicate != null)
+            // If we query only on primary key and want related entities
+            if (predicate == null && id != null)
             {
-                query = query.Where(predicate);
+                return await query.Select(columnsToSelect).SingleOrDefaultAsync(entity => entity.Id == id);
             }
 
-            return await query.Select(columnsToSelect).FirstOrDefaultAsync(entity => entity.Id == id);
+            // If we query on primary key, want related entities, and also want to filter
+            if (predicate != null && id != null)
+            {
+                query = query.Where(predicate);
+
+                return await query.Select(columnsToSelect).SingleOrDefaultAsync(entity => entity.Id == id);
+            }
+
+            // If we query only on filter avoiding primary key, but still want related entities
+            return await query.Where(predicate).Select(columnsToSelect).FirstOrDefaultAsync();
         }
 
         public async Task<List<TEntity>> GetEntititesAsync(
