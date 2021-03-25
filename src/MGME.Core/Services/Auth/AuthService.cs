@@ -30,6 +30,7 @@ TODO:
 2. Session management
 3. Restrict access to login if user is logged in
 4. Improve client side email validation
+5. Document flow
 */
 
 /*
@@ -111,6 +112,12 @@ On Refresh tokens:
 
 https://codewithmukesh.com/blog/refresh-tokens-in-aspnet-core/
 https://medium.com/@kedren.villena/refresh-jwt-token-with-asp-net-core-c-25c2c9ee984b
+
+https://jasonwatmore.com/post/2020/05/25/aspnet-core-3-api-jwt-authentication-with-refresh-tokens
+
+Also add ip address to the token entity
+
+Also check what has to happen when user refreshes the access token
 */
 
 namespace MGME.Core.Services.Auth
@@ -358,6 +365,11 @@ namespace MGME.Core.Services.Auth
             return response;
         }
 
+        public async Task <DataServiceResponse<UserTokensDTO>> RefreshAccessToken(string token)
+        {
+            throw new NotImplementedException();
+        }
+
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (HMACSHA512 hmac = new HMACSHA512())
@@ -386,13 +398,6 @@ namespace MGME.Core.Services.Auth
             }
         }
 
-        /*
-        https://jasonwatmore.com/post/2020/05/25/aspnet-core-3-api-jwt-authentication-with-refresh-tokens
-
-        Also add ip address to the token entity
-
-        Also check what has to happen when user refreshes the access token
-        */
         private string CreateRefreshToken()
         {
             byte[] randomInt = new byte[32];

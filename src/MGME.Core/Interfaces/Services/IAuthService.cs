@@ -7,9 +7,11 @@ namespace MGME.Core.Interfaces.Services
 {
     public interface IAuthService
     {
+        Task <BaseServiceResponse> RegisterUser(string name, string email, string password);
+
         Task <DataServiceResponse<UserTokensDTO>> LoginUser(string name, string password);
 
-        Task <BaseServiceResponse> RegisterUser(string name, string email, string password);
+        Task <DataServiceResponse<UserTokensDTO>> RefreshAccessToken(string token);
 
         Task <BaseServiceResponse> ConfirmEmailAddress(string token);
     }

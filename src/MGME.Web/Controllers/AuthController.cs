@@ -55,7 +55,7 @@ namespace MGME.Web.Controllers
             if (userLoggedIn)
             {
                 return BadRequest(
-                    new DataServiceResponse<UserTokensDTO>()
+                    new BaseServiceResponse()
                     {
                         Success = false,
                         Message = "You are already logged in"
@@ -70,18 +70,7 @@ namespace MGME.Web.Controllers
 
             if (response.Success)
             {
-                /*
-                Even though we are checking token expiration against the one in the database,
-                we also add expiration to token cookie itself
-                */
-                Response.Cookies.Append("refreshToken", response.Data.RefreshToken, new CookieOptions()
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    Expires = DateTime.UtcNow.AddHours(
-                        Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
-                    )
-                });
+                WriteRefreshTokenToCookie(response.Data.RefreshToken);
 
                 return Ok(response);
             }
@@ -102,6 +91,55 @@ namespace MGME.Web.Controllers
 
             // Token is invalid
             return BadRequest(response);
+        }
+
+        /*
+        We use GET since we avoid any kind of payload
+        and access refresh token from httpOnly cookie
+        */
+        [HttpGet("Refresh-Token")]
+        public async Task <IActionResult> RefreshToken()
+        {
+            string refreshToken = Request.Cookies["refreshToken"];
+
+            if (refreshToken == null)
+            {
+                return Unauthorized(
+                    new BaseServiceResponse()
+                    {
+                        Success = false,
+                        Message = "Refresh token is missing"
+                    }
+                );
+            }
+
+            DataServiceResponse<UserTokensDTO> response =  await _authService.RefreshAccessToken(
+                refreshToken
+            );
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            // Token is invalid
+            return BadRequest(response);
+        }
+
+        private void WriteRefreshTokenToCookie(string token)
+        {
+            /*
+            Even though we are checking token expiration against the one in the database,
+            we also add expiration to token cookie itself
+            */
+            Response.Cookies.Append("refreshToken", token, new CookieOptions()
+            {
+                HttpOnly = true,
+                Secure = true,
+                Expires = DateTime.UtcNow.AddHours(
+                    Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
+                )
+            });
         }
     }
 }
