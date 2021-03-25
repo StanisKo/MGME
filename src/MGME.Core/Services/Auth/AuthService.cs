@@ -70,10 +70,13 @@ Spec:
 1. client app makes login request
 
 2. /auth/login must:
-    Login user
-    Create and save a refresh token for the user
-    Send back refresh token in httpOnly cookie
-    Send back access token
+
+    What kind of checks I need to do here?
+
+    Login user +
+    Create and save a refresh token for the user +
+    Send back refresh token in httpOnly cookie +
+    Send back access token +
 
 3. client app must:
     Save access token in memory

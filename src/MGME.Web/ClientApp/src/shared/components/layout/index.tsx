@@ -1,8 +1,7 @@
-import { ReactElement } from 'react';
+import { ReactElement, useState, ChangeEvent } from 'react';
 
-import { AppBar, Toolbar, Typography, IconButton } from '@material-ui/core';
+import { AppBar, Toolbar, Tabs, Tab, IconButton } from '@material-ui/core';
 
-import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -15,30 +14,36 @@ const useStyles = makeStyles((theme: Theme) =>
         menuButton: {
             marginRight: theme.spacing(2)
         },
-        title: {
+        menuItems: {
             flexGrow: 1
         }
     })
 );
 
 export const MenuBar = (): ReactElement => {
-    const { root, menuButton, title } = useStyles();
+    const [selectedMenu, setSelectedMenu] = useState<number>(0);
+
+    const handleChange = (event: ChangeEvent<unknown>, newValue: number): void => {
+        setSelectedMenu(newValue);
+    };
+
+    const { root, menuItems } = useStyles();
 
     return (
         <div className={root}>
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton
-                        edge="start"
-                        className={menuButton}
-                        color="inherit"
-                        aria-label="menu"
+                    <Tabs
+                        className={menuItems}
+                        centered
+                        value={selectedMenu}
+                        onChange={handleChange}
+                        aria-label="disabled tabs example"
                     >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" className={title}>
-                        MGME
-                    </Typography>
+                        <Tab label="Item One" />
+                        <Tab label="Item Two" />
+                        <Tab label="Item Three" />
+                    </Tabs>
                     <IconButton
                         aria-label="account of current user"
                         aria-controls="menu-bar"
