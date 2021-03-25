@@ -8,13 +8,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        root: {
-            flexGrow: 1
-        },
-        menuButton: {
-            marginRight: theme.spacing(2)
-        },
-        menuItems: {
+        flexGrow: {
             flexGrow: 1
         }
     })
@@ -27,33 +21,31 @@ export const MenuBar = (): ReactElement => {
         setSelectedMenu(newValue);
     };
 
-    const { root, menuItems } = useStyles();
+    const { flexGrow } = useStyles();
 
     return (
-        <div className={root}>
-            <AppBar position="static">
-                <Toolbar>
-                    <Tabs
-                        className={menuItems}
-                        centered
-                        value={selectedMenu}
-                        onChange={handleChange}
-                        aria-label="disabled tabs example"
-                    >
-                        <Tab label="Item One" />
-                        <Tab label="Item Two" />
-                        <Tab label="Item Three" />
-                    </Tabs>
-                    <IconButton
-                        aria-label="account of current user"
-                        aria-controls="menu-bar"
-                        aria-haspopup="true"
-                        color="inherit"
-                    >
-                        <AccountCircle />
-                    </IconButton>
-                </Toolbar>
-            </AppBar>
-        </div>
+        <AppBar position="static">
+            <Toolbar>
+                <Tabs
+                    className={flexGrow}
+                    centered
+                    value={selectedMenu}
+                    onChange={handleChange}
+                    aria-label="menu-tabs"
+                >
+                    <Tab label="Item One" disableRipple={true} />
+                    <Tab label="Item Two" disableRipple={true} />
+                    <Tab label="Item Three" disableRipple={true} />
+                </Tabs>
+                <IconButton
+                    aria-label="account-of-current-user"
+                    aria-controls="menu-bar"
+                    aria-haspopup="true"
+                    color="inherit"
+                >
+                    <AccountCircle />
+                </IconButton>
+            </Toolbar>
+        </AppBar>
     );
 };
