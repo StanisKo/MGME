@@ -55,7 +55,7 @@ namespace MGME.Web.Controllers
             if (userLoggedIn)
             {
                 return BadRequest(
-                    new DataServiceResponse<UserLoginResponseDTO>()
+                    new DataServiceResponse<UserTokensDTO>()
                     {
                         Success = false,
                         Message = "You are already logged in"
@@ -63,7 +63,7 @@ namespace MGME.Web.Controllers
                 );
             }
 
-            DataServiceResponse<UserLoginResponseDTO> response =  await _authService.LoginUser(
+            DataServiceResponse<UserTokensDTO> response =  await _authService.LoginUser(
                 request.Name,
                 request.Password
             );

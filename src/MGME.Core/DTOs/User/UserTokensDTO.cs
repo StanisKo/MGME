@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MGME.Core.DTOs.User
 {
-    public class UserLoginResponseDTO
+    public class UserTokensDTO
     {
         public string AccessToken { get; set; }
 

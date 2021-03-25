@@ -202,9 +202,9 @@ namespace MGME.Core.Services.Auth
             return response;
         }
 
-        public async Task <DataServiceResponse<UserLoginResponseDTO>> LoginUser(string name, string password)
+        public async Task <DataServiceResponse<UserTokensDTO>> LoginUser(string name, string password)
         {
-            DataServiceResponse<UserLoginResponseDTO> response = new DataServiceResponse<UserLoginResponseDTO>();
+            DataServiceResponse<UserTokensDTO> response = new DataServiceResponse<UserTokensDTO>();
 
             try
             {
@@ -247,7 +247,7 @@ namespace MGME.Core.Services.Auth
 
                     await _tokenRepository.AddEntityAsync(refreshTokenForDb);
 
-                    response.Data = new UserLoginResponseDTO()
+                    response.Data = new UserTokensDTO()
                     {
                         AccessToken = accessToken,
                         RefreshToken = refreshToken
