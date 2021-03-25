@@ -70,6 +70,10 @@ namespace MGME.Web.Controllers
 
             if (response.Success)
             {
+                /*
+                Even though we are checking token expiration against the one in the database,
+                we also add expiration to token cookie itself
+                */
                 Response.Cookies.Append("refreshToken", response.Data.RefreshToken, new CookieOptions()
                 {
                     HttpOnly = true,

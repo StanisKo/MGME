@@ -93,6 +93,17 @@ Spec:
     else:
         remove token from db and respond with error (user must login, no active session)
 
+    If the cookie exists and the refresh token is valid
+    then a new JWT authentication token is returned in the response body,
+    a new refresh token cookie (HTTP Only) is returned in the response headers
+    and the old refresh token is revoked.
+
+    When using a refresh token, it is best to delete them from the database so that it can’t be used again.
+    I usually delete them immediately once the refresh token has been used.
+
+    There are times where the refresh tokens are not used and is already expired.
+    I have a HostedService that periodically runs to clean them up.
+
 5. Then client app must:
     make logout request that will delete refreshToken from httpOnly cookie (and in such end session)
 
