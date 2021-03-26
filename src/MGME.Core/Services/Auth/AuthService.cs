@@ -32,6 +32,7 @@ TODO:
 3. Restrict access to login if user is logged in
 4. Improve client side email validation
 5. Document flow
+6. Optimize to update only selected fields ? (build another repo that would inherit from generic repo)?
 */
 
 /*
@@ -252,17 +253,12 @@ namespace MGME.Core.Services.Auth
 
                     string refreshToken = CreateRefreshToken();
 
-                    // TODO: move this to private method
-                    RefreshToken refreshTokenForDb = new RefreshToken()
-                    {
-                        UserId = userToLogin.Id,
-                        Token = refreshToken,
-                        Expires = DateTime.UtcNow.AddHours(
-                            Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
-                        )
-                    };
+                    RefreshToken refreshTokenEntity = CreateRefreshTokenEntity(
+                        userToLogin.Id,
+                        refreshToken
+                    );
 
-                    userToLogin.RefreshTokens.Add(refreshTokenForDb);
+                    userToLogin.RefreshTokens.Add(refreshTokenEntity);
 
                     await _userRepository.AddToEntityAsync(userToLogin, nameof(User.RefreshTokens));
 
@@ -326,17 +322,12 @@ namespace MGME.Core.Services.Auth
                 // Create and add new token
                 string newRefreshToken = CreateRefreshToken();
 
-                // TODO: move this to private method
-                RefreshToken newRefreshTokenForDb = new RefreshToken()
-                {
-                    UserId = tokenOwner.Id,
-                    Token = newRefreshToken,
-                    Expires = DateTime.UtcNow.AddHours(
-                        Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
-                    )
-                };
+                RefreshToken newRefreshTokenEntity = CreateRefreshTokenEntity(
+                    tokenOwner.Id,
+                    newRefreshToken
+                );
 
-                tokenOwner.RefreshTokens.Add(newRefreshTokenForDb);
+                tokenOwner.RefreshTokens.Add(newRefreshTokenEntity);
 
                 await _userRepository.AddToEntityAsync(tokenOwner, nameof(User.RefreshTokens));
 
@@ -495,6 +486,18 @@ namespace MGME.Core.Services.Auth
 
                 return Convert.ToBase64String(randomInt);
             }
+        }
+
+        private RefreshToken CreateRefreshTokenEntity(int userId, string token)
+        {
+            return new RefreshToken()
+            {
+                UserId = userId,
+                Token = token,
+                Expires = DateTime.UtcNow.AddHours(
+                    Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
+                )
+            };
         }
 
         private string CreateAccessToken(User user, DateTime expires)
