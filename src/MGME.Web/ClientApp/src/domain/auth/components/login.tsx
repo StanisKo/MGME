@@ -12,6 +12,7 @@ import {
 import { useHistory } from 'react-router-dom';
 
 import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } from '../helpers';
+import { UserTokenResponse } from '../interfaces';
 import { BaseServiceResponse, DataServiceResponse } from '../../../shared/interfaces';
 import { ROUTES } from '../../../shared/const';
 import { loginOrRegisterUser } from '../requests';
@@ -65,7 +66,7 @@ export const Login = (): ReactElement => {
     const [confirmPasswordHelperText, setConfirmPasswordHelperText] = useState<string>('');
 
     // We use the same container for result of sign up and result of sign in (that also holds JWT)
-    const [response, setResponse] = useState<BaseServiceResponse | DataServiceResponse<string>>(
+    const [response, setResponse] = useState<BaseServiceResponse | DataServiceResponse<UserTokenResponse>>(
         {} as BaseServiceResponse
     );
 
@@ -180,7 +181,10 @@ export const Login = (): ReactElement => {
             }
 
             if (mode === MODE.SIGN_IN) {
-                sessionStorage.setItem('token', (authResponse as DataServiceResponse<string>).data);
+                localStorage.setItem(
+                    'token',
+                    (authResponse as DataServiceResponse<UserTokenResponse>).data.accessToken
+                );
 
                 history.push(ROUTES.START);
 

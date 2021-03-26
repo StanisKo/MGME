@@ -31,11 +31,20 @@ export const PublicApplication = (): ReactElement => {
             <Router history={history}>
                 <CssBaseline />
                 <Switch>
-                    <Route path={ROUTES.LOGIN} component={Login} />
+                    <Route path={ROUTES.LOGIN} render={(): ReactElement => {
+                        // A temp dublication of access to storage, redux hook in parent scope should fix it
+                        const user = localStorage.getItem('token');
+
+                        if (user) {
+                            return <Redirect to={ROUTES.START} />;
+                        }
+
+                        return <Login />;
+                    }} />
                     <Route path={ROUTES.CONFIRM_EMAIL} component={ConfirmEmail} />
 
                     <Route path={ROUTES.ROOT} render={(): ReactElement => {
-                        const user = sessionStorage.getItem('token');
+                        const user = localStorage.getItem('token');
 
                         if (!user) {
                             return <Redirect to='/login' />;
