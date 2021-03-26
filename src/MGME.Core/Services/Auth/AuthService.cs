@@ -25,112 +25,6 @@ using MGME.Core.Entities;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
 
-/*
-TODO:
-
-1. Switch to refresh + access token
-2. Session management
-3. Restrict access to login if user is logged in
-4. Improve client side email validation
-5. Document flow
-6. Optimize to update only selected fields ? (build another repo that would inherit from generic repo)?
-*/
-
-/*
-On refresh/access tokens workflow:
-
-https://stackoverflow.com/questions/39176237/how-do-i-store-jwt-and-send-them-with-every-request-using-react
-
-https://www.blinkingcaret.com/2018/05/30/refresh-tokens-in-asp-net-core-web-api/
-
-Save access token in redux
-Save refresh token in local storage
-
-On public and private routing:
-
-https://medium.com/@thanhbinh.tran93/private-route-public-route-and-restricted-route-with-react-router-d50b27c15f5e
-
-Flow:
-
-Upon login, server sends back to the client a refresh token and an access token
-Refresh token is sent via httpOnly cookie and therefore persists between requests
-Access token is simply saved in memory (redux store)
-
-Client then sends acess token as auth header with every request
-
-Client keeps tabs on access token expiration
-
-When access token expires, client requests new access token from /refreshtoken endpoint
-
-If user reloads the page, client requests new access token from /refreshtoken endpoint
-
-When refresh token expires, the session must end
-and the refresh token must be removed from cookies -- user must login again
-
-https://www.youtube.com/watch?v=25GS0MLT8JU
-
-Spec:
-
-1. client app makes login request
-
-2. /auth/login must:
-
-    What kind of checks I need to do here?
-
-    Login user +
-    Create and save a refresh token for the user +
-    Send back refresh token in httpOnly cookie +
-    Send back access token +
-
-3. client app must:
-    Save access token in memory
-    Refetch access token from /auth/refreshtoken when token expires
-    Refetch access token from /auth/refreshtoken when user reloads the page
-
-    (This can be in App.tsx?)
-
-4. /auth/refreshtoken must:
-    Validate the token
-
-    if token okay:
-        Send back new access token
-    else:
-        remove token from db and respond with error (user must login, no active session)
-
-    If the cookie exists and the refresh token is valid
-    then a new JWT authentication token is returned in the response body,
-    a new refresh token cookie (HTTP Only) is returned in the response headers
-    and the old refresh token is revoked.
-
-    When using a refresh token, it is best to delete them from the database so that it can’t be used again.
-    I usually delete them immediately once the refresh token has been used.
-
-    There are times where the refresh tokens are not used and is already expired.
-    I have a HostedService that periodically runs to clean them up.
-
-5. Then client app must:
-    make logout request that will delete refreshToken from httpOnly cookie (and in such end session)
-
-On Refresh tokens:
-
-https://codewithmukesh.com/blog/refresh-tokens-in-aspnet-core/
-https://medium.com/@kedren.villena/refresh-jwt-token-with-asp-net-core-c-25c2c9ee984b
-
-https://jasonwatmore.com/post/2020/05/25/aspnet-core-3-api-jwt-authentication-with-refresh-tokens
-
-Also add ip address to the token entity
-
-Also check what has to happen when user refreshes the access token
-
-NOTE:
-
-This is how you update only selected columns, optimize!
-
-Don't use retrieve by name form auth repo, use get from userRepo
-
-https://stackoverflow.com/questions/61776149/ef-core-3-1-select-specific-column-and-update-it
-*/
-
 namespace MGME.Core.Services.Auth
 {
     public class AuthService : BaseEntityService, IAuthService
@@ -296,12 +190,17 @@ namespace MGME.Core.Services.Auth
 
             try
             {
-                User tokenOwner = await _userRepository.GetEntityAsync(
+                UserRefreshTokenDTO tokenOwner = await _userRepository.GetEntityAsync(
                     predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
                     tracking: true,
                     entitiesToInclude: new Expression<Func<User, object>>[]
                     {
                         user => user.RefreshTokens
+                    },
+                    columnsToSelect: user => new UserRefreshTokenDTO()
+                    {
+                        Id = user.Id,
+                        RefreshTokens = user.RefreshTokens
                     }
                 );
 
@@ -339,11 +238,13 @@ namespace MGME.Core.Services.Auth
 
                 tokenOwner.RefreshTokens.Add(newRefreshTokenEntity);
 
-                await _userRepository.AddToEntityAsync(tokenOwner, nameof(User.RefreshTokens));
+                User userToUpdate = _mapper.Map<User>(tokenOwner);
+
+                await _userRepository.AddToEntityAsync(userToUpdate, nameof(User.RefreshTokens));
 
                 // We also create new access token
                 string newAccessToken = CreateAccessToken(
-                    tokenOwner,
+                    userToUpdate,
                     DateTime.UtcNow.AddMinutes(
                         Convert.ToInt16(_configuration["TokensLifetime:AccessTokenMinutes"])
                     )
@@ -402,6 +303,7 @@ namespace MGME.Core.Services.Auth
                     out SecurityToken validatedToken
                 );
 
+                // Besides id, we only need one field ...
                 UserConfirmEmailDTO userToConfirmEmail = await _userRepository.GetEntityAsync(
                     id: userId,
                     columnsToSelect: user => new UserConfirmEmailDTO()
@@ -433,6 +335,11 @@ namespace MGME.Core.Services.Auth
             {
                 _ = exception;
 
+                /*
+                We could've used a DTO here as well
+                But ommitting two fields (hash and salt) and then using automapper
+                didn't seem like considerable performance improvement
+                */
                 User userToResendEmail = await _userRepository.GetEntityAsync(userId);
 
                 /*
