@@ -30,7 +30,8 @@ export const confirmEmailAddress = async (token: string): Promise <BaseServiceRe
         {
             url: URLBuilder.buildPOST(entity, action),
             method: 'POST',
-            headers: null
+            headers: null,
+            body: { token: token }
         }
     );
 };
