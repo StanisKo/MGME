@@ -47,7 +47,7 @@ export const PublicApplication = (): ReactElement => {
                         const user = localStorage.getItem('token');
 
                         if (!user) {
-                            return <Redirect to='/login' />;
+                            return <Redirect to={ROUTES.LOGIN} />;
                         }
 
                         return <PrivateApplication />;
