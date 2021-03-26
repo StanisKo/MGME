@@ -6,7 +6,7 @@ import configureStore from './store/configureStore';
 
 import { Login, ConfirmEmail } from './domain/auth';
 import { StartPage } from './domain/start';
-import { MenuBar } from './shared/components/layout';
+import { Menu } from './shared/components/menu';
 
 import { ROUTES } from './shared/const';
 import { history } from './shared/utils';
@@ -17,7 +17,7 @@ const store = configureStore();
 
 const PrivateApplication = (): ReactElement => (
     <>
-        <MenuBar />
+        <Menu />
         <Switch>
             <Redirect exact from={ROUTES.ROOT} to={ROUTES.START} />
             <Route path={ROUTES.START} component={StartPage} />
