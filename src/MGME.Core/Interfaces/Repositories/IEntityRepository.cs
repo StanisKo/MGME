@@ -40,10 +40,15 @@ namespace MGME.Core.Interfaces.Repositories
 
         Task AddEntityAsync(TEntity entity);
 
+        // Updates only specified fields
         Task UpdateEntityAsync(TEntity entity, IEnumerable<string> updatedProperties);
 
         Task UpdateEntitiesAsync(List<TEntity> entities, IEnumerable<string> updatedProperties);
 
+        // Used to update one-to-many collection that belongs to entity
+        Task AddToEntityAsync(TEntity entity, string linkedCollection);
+
+        // Used to update many-to-many relationship between entity and linkedEntity
         Task LinkEntityAsync(TEntity entity, BaseEntity linkedEntity, string linkedCollection);
 
         Task DeleteEntityAsync(TEntity entity);

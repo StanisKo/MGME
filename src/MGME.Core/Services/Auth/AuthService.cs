@@ -141,14 +141,12 @@ namespace MGME.Core.Services.Auth
 
         public AuthService(IAuthRepository authRepository,
                            IEntityRepository<User> userRepository,
-                           IEntityRepository<RefreshToken> tokenRepository,
                            IConfiguration configuration,
                            IWebHostEnvironment environment,
                            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _authRepository = authRepository;
             _userRepository = userRepository;
-            _tokenRepository = tokenRepository;
 
             _configuration = configuration;
             _environment = environment;
@@ -253,7 +251,9 @@ namespace MGME.Core.Services.Auth
                         )
                     };
 
-                    await _tokenRepository.AddEntityAsync(refreshTokenForDb);
+                    userToLogin.RefreshTokens.Add(refreshTokenForDb);
+
+                    await _userRepository.AddToEntityAsync(userToLogin, nameof(User.RefreshTokens));
 
                     response.Data = new UserTokensDTO()
                     {
@@ -326,6 +326,8 @@ namespace MGME.Core.Services.Auth
                 };
 
                 tokenOwner.RefreshTokens.Add(newRefreshTokenForDb);
+
+                await _userRepository.AddToEntityAsync(tokenOwner, nameof(User.RefreshTokens));
 
                 // We also create new access token
                 string newAccessToken = CreateAccessToken(
