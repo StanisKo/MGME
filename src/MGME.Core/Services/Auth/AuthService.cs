@@ -274,6 +274,84 @@ namespace MGME.Core.Services.Auth
             return response;
         }
 
+        public async Task <DataServiceResponse<UserTokensDTO>> RefreshAccessToken(string token)
+        {
+            DataServiceResponse<UserTokensDTO> response = new DataServiceResponse<UserTokensDTO>();
+
+            try
+            {
+                User tokenOwner = await _userRepository.GetEntityAsync(
+                    predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
+                    entitiesToInclude: new Expression<Func<User, object>>[]
+                        {
+                            user => user.RefreshTokens
+                        }
+                );
+
+                if (tokenOwner == null)
+                {
+                    response.Success = false;
+                    response.Message = "Token is invalid";
+
+                    return response;
+                }
+
+                RefreshToken oldRefreshToken = tokenOwner.RefreshTokens.Single(
+                    ownedToken => ownedToken.Token == token
+                );
+
+                // We also give expiration to a cookie, but it never hurts to double check
+                if (DateTime.UtcNow >= oldRefreshToken.Expires)
+                {
+                    response.Success = false;
+                    response.Message = "Token has expired";
+
+                    return response;
+                }
+
+                // Remove old token
+                tokenOwner.RefreshTokens.Remove(oldRefreshToken);
+
+                // Create and add new token
+                string newRefreshToken = CreateRefreshToken();
+
+                // TODO: move this to private method
+                RefreshToken newRefreshTokenForDb = new RefreshToken()
+                {
+                    UserId = tokenOwner.Id,
+                    Token = newRefreshToken,
+                    Expires = DateTime.UtcNow.AddHours(
+                        Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
+                    )
+                };
+
+                tokenOwner.RefreshTokens.Add(newRefreshTokenForDb);
+
+                // We also create new access token
+                string newAccessToken = CreateAccessToken(
+                    tokenOwner,
+                    DateTime.UtcNow.AddMinutes(
+                        Convert.ToInt16(_configuration["TokensLifetime:AccessTokenMinutes"])
+                    )
+                );
+
+                response.Data = new UserTokensDTO()
+                {
+                    AccessToken = newAccessToken,
+                    RefreshToken = newRefreshToken
+                };
+
+                response.Success = true;
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
+        }
+
         public async Task <BaseServiceResponse> ConfirmEmailAddress(string token)
         {
             BaseServiceResponse response = new BaseServiceResponse();
@@ -364,17 +442,6 @@ namespace MGME.Core.Services.Auth
             }
 
             return response;
-        }
-
-        public async Task <DataServiceResponse<UserTokensDTO>> RefreshAccessToken(string token)
-        {
-            User tokenOwner = await _userRepository.GetEntityAsync(
-                predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
-                entitiesToInclude: new Expression<Func<User, object>>[]
-                    {
-                        user => user.RefreshTokens
-                    }
-            );
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
