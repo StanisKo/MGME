@@ -228,7 +228,12 @@ namespace MGME.Core.Services.Auth
             try
             {
                 User userToLogin = await _userRepository.GetEntityAsync(
-                    predicate: user => user.Name == name
+                    predicate: user => user.Name == name,
+                    tracking: true,
+                    entitiesToInclude: new Expression<Func<User, object>>[]
+                    {
+                        user => user.RefreshTokens
+                    }
                 );
 
                 if (userToLogin == null)
@@ -293,10 +298,11 @@ namespace MGME.Core.Services.Auth
             {
                 User tokenOwner = await _userRepository.GetEntityAsync(
                     predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
+                    tracking: true,
                     entitiesToInclude: new Expression<Func<User, object>>[]
-                        {
-                            user => user.RefreshTokens
-                        }
+                    {
+                        user => user.RefreshTokens
+                    }
                 );
 
                 if (tokenOwner == null)
