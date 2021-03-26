@@ -1,5 +1,6 @@
 import { URLBuilder } from '../../../shared/utils/';
 import { BaseServiceResponse, DataServiceResponse } from '../../../shared/interfaces';
+import { UserTokenResponse } from '../interfaces';
 
 import { MODE } from '../helpers';
 
@@ -13,7 +14,7 @@ export const loginOrRegisterUser = async (
     mode: number,
     body: { [key: string]: string }
 
-): Promise <BaseServiceResponse | DataServiceResponse<string>> => {
+): Promise <BaseServiceResponse | DataServiceResponse<UserTokenResponse>> => {
     const entity = 'auth';
     const action = mode === MODE.SIGN_UP ? 'register' : 'login';
 
