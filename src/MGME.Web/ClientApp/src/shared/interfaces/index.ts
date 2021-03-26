@@ -1,5 +1,5 @@
 import { BaseServiceResponse } from './baseServiceResponse';
 import { DataServiceResponse } from './dataServiceResponse';
-import { GET, POST } from './requests';
+import { RequestConfig } from './requestConfig';
 
-export type { BaseServiceResponse, DataServiceResponse, GET, POST };
+export type { BaseServiceResponse, DataServiceResponse, RequestConfig };
