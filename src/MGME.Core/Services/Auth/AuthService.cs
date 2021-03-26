@@ -119,6 +119,14 @@ https://jasonwatmore.com/post/2020/05/25/aspnet-core-3-api-jwt-authentication-wi
 Also add ip address to the token entity
 
 Also check what has to happen when user refreshes the access token
+
+NOTE:
+
+This is how you update only selected columns, optimize!
+
+Don't use retrieve by name form auth repo, use get from userRepo
+
+https://stackoverflow.com/questions/61776149/ef-core-3-1-select-specific-column-and-update-it
 */
 
 namespace MGME.Core.Services.Auth
@@ -192,7 +200,7 @@ namespace MGME.Core.Services.Auth
                     PasswordSalt = passwordSalt
                 };
 
-                await _authRepository.RegisterUserAsync(userToRegister);
+                await _userRepository.AddEntityAsync(userToRegister);
 
                 SendConfirmationEmail(userToRegister);
 
@@ -214,7 +222,9 @@ namespace MGME.Core.Services.Auth
 
             try
             {
-                User userToLogin = await _authRepository.RetrieveUserByNameAsync(name);
+                User userToLogin = await _userRepository.GetEntityAsync(
+                    predicate: user => user.Name == name
+                );
 
                 if (userToLogin == null)
                 {
@@ -242,6 +252,7 @@ namespace MGME.Core.Services.Auth
 
                     string refreshToken = CreateRefreshToken();
 
+                    // TODO: move this to private method
                     RefreshToken refreshTokenForDb = new RefreshToken()
                     {
                         UserId = userToLogin.Id,
