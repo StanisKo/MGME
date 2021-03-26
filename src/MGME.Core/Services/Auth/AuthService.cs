@@ -190,17 +190,21 @@ namespace MGME.Core.Services.Auth
 
             try
             {
-                UserRefreshTokenDTO tokenOwner = await _userRepository.GetEntityAsync(
+                /*
+                We query user and not DTO via Select, since we want to delete tokens
+                through RefreshTokens navigations property, and for that we need identifying relationship
+
+                Identifying relationship requires for owner to be queried as well, or use AsNotTracking
+
+                But since we're in disconnected scenario, we are forced to use tracking
+                and therefore cannot ommit querying fields we don't need (unless we use token-specific repository)
+                */
+                User tokenOwner = await _userRepository.GetEntityAsync(
                     predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
                     tracking: true,
                     entitiesToInclude: new Expression<Func<User, object>>[]
                     {
                         user => user.RefreshTokens
-                    },
-                    columnsToSelect: user => new UserRefreshTokenDTO()
-                    {
-                        Id = user.Id,
-                        RefreshTokens = user.RefreshTokens
                     }
                 );
 
@@ -238,13 +242,11 @@ namespace MGME.Core.Services.Auth
 
                 tokenOwner.RefreshTokens.Add(newRefreshTokenEntity);
 
-                User userToUpdate = _mapper.Map<User>(tokenOwner);
-
-                await _userRepository.AddToEntityAsync(userToUpdate, nameof(User.RefreshTokens));
+                await _userRepository.AddToEntityAsync(tokenOwner, nameof(User.RefreshTokens));
 
                 // We also create new access token
                 string newAccessToken = CreateAccessToken(
-                    userToUpdate,
+                    tokenOwner,
                     DateTime.UtcNow.AddMinutes(
                         Convert.ToInt16(_configuration["TokensLifetime:AccessTokenMinutes"])
                     )

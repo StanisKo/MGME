@@ -1,6 +1,8 @@
 import { ReactElement, useState, ChangeEvent } from 'react';
 
-import { AppBar, Toolbar, Tabs, Tab, IconButton } from '@material-ui/core';
+import { URLBuilder } from '../../utils';
+
+import { AppBar, Toolbar, Tabs, Tab, IconButton, Button } from '@material-ui/core';
 
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
@@ -13,6 +15,8 @@ const useStyles = makeStyles(() =>
         }
     })
 );
+
+// Rename into menu bar
 
 export const MenuBar = (): ReactElement => {
     const [selectedMenu, setSelectedMenu] = useState<number>(0);
@@ -45,6 +49,13 @@ export const MenuBar = (): ReactElement => {
                 >
                     <AccountCircle />
                 </IconButton>
+                <Button
+                    onClick={(): void => {
+                        fetch(URLBuilder.buildPOST('auth', 'refresh-token'));
+                    }}
+                >
+                    Test refresh token
+                </Button>
             </Toolbar>
         </AppBar>
     );

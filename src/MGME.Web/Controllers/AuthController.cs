@@ -119,6 +119,8 @@ namespace MGME.Web.Controllers
 
             if (response.Success)
             {
+                WriteRefreshTokenToCookie(response.Data.RefreshToken);
+
                 return Ok(response);
             }
 
