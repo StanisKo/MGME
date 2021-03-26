@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.IdentityModel.Tokens.Jwt;
 
+using AutoMapper;
 using MimeKit;
 using MailKit.Net.Smtp;
 
@@ -138,7 +139,7 @@ namespace MGME.Core.Services.Auth
 
         private readonly IEntityRepository<User> _userRepository;
 
-        private readonly IEntityRepository<RefreshToken> _tokenRepository;
+        private readonly IMapper _mapper;
 
         private readonly IConfiguration _configuration;
 
@@ -150,12 +151,15 @@ namespace MGME.Core.Services.Auth
 
         public AuthService(IAuthRepository authRepository,
                            IEntityRepository<User> userRepository,
+                           IMapper mapper,
                            IConfiguration configuration,
                            IWebHostEnvironment environment,
                            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _authRepository = authRepository;
             _userRepository = userRepository;
+
+            _mapper = mapper;
 
             _configuration = configuration;
             _environment = environment;
@@ -392,7 +396,14 @@ namespace MGME.Core.Services.Auth
                     out SecurityToken validatedToken
                 );
 
-                User userToConfirmEmail = await _userRepository.GetEntityAsync(userId);
+                UserConfirmEmailDTO userToConfirmEmail = await _userRepository.GetEntityAsync(
+                    id: userId,
+                    columnsToSelect: user => new UserConfirmEmailDTO()
+                    {
+                        Id = user.Id,
+                        EmailIsConfirmed = user.EmailIsConfirmed
+                    }
+                );
 
                 if (userToConfirmEmail.EmailIsConfirmed)
                 {
@@ -405,7 +416,7 @@ namespace MGME.Core.Services.Auth
                 userToConfirmEmail.EmailIsConfirmed = true;
 
                 await _userRepository.UpdateEntityAsync(
-                    userToConfirmEmail,
+                    _mapper.Map<User>(userToConfirmEmail),
                     new[] { nameof(User.EmailIsConfirmed) }
                 );
 
