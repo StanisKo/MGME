@@ -12,7 +12,7 @@ export const loginOrRegisterUser = async (
     const entity = 'auth';
     const action = mode === MODE.SIGN_UP ? 'register' : 'login';
 
-    return makeRequest(
+    return await makeRequest<BaseServiceResponse | DataServiceResponse<UserTokenResponse>>(
         {
             url: URLBuilder.buildPOST(entity, action),
             method: 'POST',
@@ -26,25 +26,11 @@ export const confirmEmailAddress = async (token: string): Promise <BaseServiceRe
     const entity = 'auth';
     const action = 'confirm';
 
-    try {
-        const request = await fetch(
-            URLBuilder.buildPOST(entity, action),
-            {
-                method: 'POST',
-                body: JSON.stringify({ token: token }),
-                credentials: 'same-origin',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
-
-        const response = await request.json();
-
-        return response;
-    }
-    catch (error) {
-        return error;
-    }
+    return await makeRequest<BaseServiceResponse | DataServiceResponse<UserTokenResponse>>(
+        {
+            url: URLBuilder.buildPOST(entity, action),
+            method: 'POST',
+            headers: null
+        }
+    );
 };
