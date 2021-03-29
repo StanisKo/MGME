@@ -2,6 +2,8 @@ import { ReactElement, useState, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
+import { menuOptions } from './helpers';
+
 import { AppBar, Toolbar, Tabs, Tab, IconButton } from '@material-ui/core';
 
 import AccountCircle from '@material-ui/icons/AccountCircle';
@@ -21,10 +23,14 @@ const useStyles = makeStyles(() =>
 export const Menu = (): ReactElement | null => {
     const userLoggedIn = localStorage.getItem('userLoggedIn');
 
+    const activeMenu = menuOptions.indexOf(
+        window.location.pathname.replace('/', '')
+    );
+
     // Here we actually depend on the store, since we need dynamic rerender on login
     const tokenIsAvaialable = useSelector((store: ApplicationState) => store.auth?.token ?? null);
 
-    const [selectedMenu, setSelectedMenu] = useState<number>(0);
+    const [selectedMenu, setSelectedMenu] = useState<number>(activeMenu === -1 ? 0 : activeMenu);
 
     const handleChange = (event: ChangeEvent<unknown>, newValue: number): void => {
         setSelectedMenu(newValue);
