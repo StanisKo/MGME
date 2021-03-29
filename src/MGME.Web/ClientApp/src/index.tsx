@@ -1,8 +1,8 @@
 import ReactDOM from 'react-dom';
 
-import { ContextWrapper } from './App';
+import { Application } from './App';
 
 ReactDOM.render(
-    <ContextWrapper />,
+    <Application />,
     document.getElementById('root')
 );

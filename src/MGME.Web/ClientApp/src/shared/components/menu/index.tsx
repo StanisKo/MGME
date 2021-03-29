@@ -1,4 +1,7 @@
 import { ReactElement, useState, ChangeEvent } from 'react';
+import { useSelector } from 'react-redux';
+
+import { ApplicationState } from '../../../store';
 
 import { AppBar, Toolbar, Tabs, Tab, IconButton } from '@material-ui/core';
 
@@ -14,7 +17,11 @@ const useStyles = makeStyles(() =>
     })
 );
 
-export const Menu = (): ReactElement => {
+export const Menu = (): ReactElement | null => {
+    const userIsLoggedIn = useSelector(
+        (store: ApplicationState) => store.auth?.token ?? null
+    );
+
     const [selectedMenu, setSelectedMenu] = useState<number>(0);
 
     const handleChange = (event: ChangeEvent<unknown>, newValue: number): void => {
@@ -23,7 +30,7 @@ export const Menu = (): ReactElement => {
 
     const { flexGrow } = useStyles();
 
-    return (
+    return userIsLoggedIn ? (
         <AppBar position="static">
             <Toolbar>
                 <Tabs
@@ -47,5 +54,5 @@ export const Menu = (): ReactElement => {
                 </IconButton>
             </Toolbar>
         </AppBar>
-    );
+    ) : null;
 };

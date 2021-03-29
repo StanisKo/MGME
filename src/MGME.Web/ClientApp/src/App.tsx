@@ -1,69 +1,33 @@
 import { ReactElement } from 'react';
-import { Redirect, Route, Router, Switch } from 'react-router-dom';
-import { Provider, useSelector } from 'react-redux';
+import { Router, Switch } from 'react-router-dom';
+import { Provider } from 'react-redux';
 
 import { store } from './store/configureStore';
-import { ApplicationState } from './store';
 
-import { Login, ConfirmEmail } from './domain/auth';
-import { StartPage } from './domain/start';
 import { Menu } from './shared/components/menu';
+import { PublicRoute, PrivateRoute } from './shared/components/routes';
 
 import { ROUTES } from './shared/const';
 import { history } from './shared/utils';
 
+import { Login, ConfirmEmail } from './domain/auth';
+import { StartPage } from './domain/start';
+
 import { CssBaseline } from '@material-ui/core';
 
-const PrivateApplication = (): ReactElement => (
-    <>
-        <Menu />
-        <Switch>
-            <Redirect exact from={ROUTES.ROOT} to={ROUTES.START} />
-            <Route path={ROUTES.START} component={StartPage} />
-        </Switch>
-    </>
-);
-
-export const PublicApplication = (): ReactElement => {
-    const userIsLoggedIn = useSelector(
-        (store: ApplicationState) => store.auth?.token ?? null
-    );
-
+export const Application = (): ReactElement => {
     return (
         <Provider store={store}>
             <Router history={history}>
                 <CssBaseline />
+                <Menu />
                 <Switch>
-                    <Route path={ROUTES.LOGIN} render={(): ReactElement => {
-                        if (userIsLoggedIn) {
-                            return <Redirect to={ROUTES.START} />;
-                        }
+                    <PublicRoute restricted={true} component={Login} path={ROUTES.LOGIN} />
+                    <PublicRoute restricted={true} component={ConfirmEmail} path={ROUTES.CONFIRM_EMAIL} />
 
-                        return <Login />;
-                    }} />
-                    <Route path={ROUTES.CONFIRM_EMAIL} component={ConfirmEmail} />
-
-                    <Route path={ROUTES.ROOT} render={(): ReactElement => {
-                        if (!userIsLoggedIn) {
-                            return <Redirect to={ROUTES.LOGIN} />;
-                        }
-
-                        return <PrivateApplication />;
-                    }} />
+                    <PrivateRoute component={StartPage} path={ROUTES.START} />
                 </Switch>
             </Router>
         </Provider>
     );
 };
-
-export const ContextWrapper = (): ReactElement => {
-    return (
-        <Provider store={store}>
-            <Router history={history}>
-                <CssBaseline />
-                <PublicApplication />
-            </Router>
-        </Provider>
-    );
-};
-
