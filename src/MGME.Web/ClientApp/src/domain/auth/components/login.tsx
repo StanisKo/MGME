@@ -179,6 +179,8 @@ export const Login = (): ReactElement => {
         setOpenSnackbar(true);
 
         if (authResponse.success) {
+            localStorage.setItem('userLoggedIn', JSON.stringify(true));
+
             if (!userRegisteredBefore) {
                 /*
                 If no value in storage, be it sign in or sign up, we set it there

@@ -1,10 +1,12 @@
 import { ReactElement, useState, ChangeEvent } from 'react';
+import { useSelector } from 'react-redux';
 
 import { AppBar, Toolbar, Tabs, Tab, IconButton } from '@material-ui/core';
 
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
+import { ApplicationState } from '../../../store';
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -17,6 +19,9 @@ const useStyles = makeStyles(() =>
 export const Menu = (): ReactElement | null => {
     const userLoggedIn = localStorage.getItem('userLoggedIn');
 
+    // Here we actually depend on the store, since we need dynamic rerender
+    const tokenIsAvaialable = useSelector((store: ApplicationState) => store.auth?.token ?? null);
+
     const [selectedMenu, setSelectedMenu] = useState<number>(0);
 
     const handleChange = (event: ChangeEvent<unknown>, newValue: number): void => {
@@ -25,7 +30,7 @@ export const Menu = (): ReactElement | null => {
 
     const { flexGrow } = useStyles();
 
-    return userLoggedIn ? (
+    return userLoggedIn || tokenIsAvaialable ? (
         <AppBar position="static">
             <Toolbar>
                 <Tabs
