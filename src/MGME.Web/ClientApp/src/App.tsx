@@ -1,4 +1,4 @@
-import { ReactElement, useEffect } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { Router, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
@@ -29,13 +29,14 @@ import jwt_decode from 'jwt-decode';
 TODO:
 
 1. refresh token on access token expiration
-2. remove log in bool from store on refresh token expiration
 */
 
 export const Application = (): ReactElement => {
+    const [accessTokenExpiresIn, setAccessTokenExpiresIn] = useState<number>(0);
+
     /*
     On boot or page refresh, we attempt to refresh the access token
-    If request is unsuccessfull, (refresh token expired) -- sessions has ended
+    If request is unsuccessfull, (refresh token expired) -- session has ended
     and user must login again; otherwise we propagate access token to the store
     */
     useEffect(() => {
@@ -49,6 +50,14 @@ export const Application = (): ReactElement => {
                 const token = (refreshTokenResponse as DataServiceResponse<UserTokenResponse>).data.accessToken;
 
                 const decoded = jwt_decode(token) as DecodedToken;
+
+                /*
+                Our expiration time is 5 minutes
+                we set refresh interval to 4 minutes expressed in milliseconds
+                */
+                setAccessTokenExpiresIn(
+                    (decoded.exp - decoded.iat) * 1000 * 0.8
+                );
 
                 // We access store directly since scope is outside of Provider
                 store.dispatch(
@@ -74,11 +83,40 @@ export const Application = (): ReactElement => {
             }
         })();
 
-        // We clear out bool from local storage on destroy
+        /*
+        We clear out bool from local storage on destroy
+        Yet user will still remain logged in, since we persist session via httpOnly cookie
+
+        This is rather for 'cleanness'
+        */
         return (): void => {
             localStorage.removeItem('userLoggedIn');
         };
     }, []);
+
+    useEffect(() => {
+        // Check for init value to avoid dublicate requests
+        if (accessTokenExpiresIn !== 0) {
+            setInterval(async () => {
+                const refreshTokenResponse = await refreshToken();
+
+                if (refreshTokenResponse.success) {
+                    const token = (refreshTokenResponse as DataServiceResponse<UserTokenResponse>).data.accessToken;
+
+                    store.dispatch(
+                        actionCreators.updateToken(
+                            {
+                                type: 'UPDATE_TOKEN',
+                                payload: {
+                                    token: token
+                                }
+                            }
+                        )
+                    );
+                }
+            }, accessTokenExpiresIn);
+        }
+    }, [accessTokenExpiresIn]);
 
     return (
         <Provider store={store}>
