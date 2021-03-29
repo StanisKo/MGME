@@ -52,6 +52,11 @@ export const Application = (): ReactElement => {
                 console.clear();
             }
         })();
+
+        // We clear out bool from local storage on destroy
+        return (): void => {
+            localStorage.removeItem('userLoggedIn');
+        };
     }, []);
 
     return (
