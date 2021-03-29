@@ -13,8 +13,8 @@ On init, we also parse user values and save them along the token
 Afterwards, we update the token every time it's about to expire
 */
 
-export interface ParseUser {
-    type: 'PARSE_USER';
+export interface LoginUser {
+    type: 'LOGIN_USER';
     payload: {
         token: string;
         userId: number;
@@ -30,10 +30,10 @@ export interface UpdateToken {
     }
 }
 
-export type KnownAction = ParseUser | UpdateToken;
+export type KnownAction = LoginUser | UpdateToken;
 
 export const actionCreators = {
-    parseUser: ({ type, payload }: ParseUser): ParseUser => ({
+    loginUser: ({ type, payload }: LoginUser): LoginUser => ({
         type: type,
         payload: {
             token: payload.token,
@@ -59,7 +59,7 @@ export const AuthReducer: Reducer<AuthState> = (state: AuthState | undefined, in
     const action = incomingAction as KnownAction;
 
     switch (action.type) {
-        case 'PARSE_USER':
+        case 'LOGIN_USER':
             return {
                 ...action.payload
             };

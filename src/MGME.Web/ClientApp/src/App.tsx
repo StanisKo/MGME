@@ -52,9 +52,9 @@ export const Application = (): ReactElement => {
 
                 // We access store directly since scope is outside of Provider
                 store.dispatch(
-                    actionCreators.parseUser(
+                    actionCreators.loginUser(
                         {
-                            type: 'PARSE_USER',
+                            type: 'LOGIN_USER',
                             payload: {
                                 token: token,
                                 userId: decoded.nameid,

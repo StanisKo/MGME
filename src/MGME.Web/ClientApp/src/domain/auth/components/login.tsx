@@ -195,9 +195,9 @@ export const Login = (): ReactElement => {
                 const decoded = jwt_decode(token) as DecodedToken;
 
                 dispatch(
-                    actionCreators.parseUser(
+                    actionCreators.loginUser(
                         {
-                            type: 'PARSE_USER',
+                            type: 'LOGIN_USER',
                             payload: {
                                 token: token,
                                 userId: decoded.nameid,
