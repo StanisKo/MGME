@@ -22,6 +22,13 @@ import { CssBaseline } from '@material-ui/core';
 
 import jwt_decode from 'jwt-decode';
 
+/*
+TODO:
+
+1. refresh token on access token expiration
+2. remove log in bool from store on refresh token expiration
+*/
+
 export const Application = (): ReactElement => {
     /*
     On boot or page refresh, we attempt to refresh the access token
