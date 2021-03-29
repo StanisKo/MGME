@@ -2,7 +2,7 @@ import { ReactElement } from 'react';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
-import configureStore from './store/configureStore';
+import { store } from './store/configureStore';
 
 import { Login, ConfirmEmail } from './domain/auth';
 import { StartPage } from './domain/start';
@@ -12,8 +12,6 @@ import { ROUTES } from './shared/const';
 import { history } from './shared/utils';
 
 import { CssBaseline } from '@material-ui/core';
-
-const store = configureStore();
 
 const PrivateApplication = (): ReactElement => (
     <>
