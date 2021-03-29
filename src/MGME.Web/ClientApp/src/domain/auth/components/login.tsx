@@ -12,8 +12,7 @@ import {
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
-import { BaseServiceResponse, DataServiceResponse, UserTokenResponse } from '../../../shared/interfaces';
-import { DecodedToken } from '../interfaces';
+import { BaseServiceResponse, DataServiceResponse, UserTokenResponse, DecodedToken } from '../../../shared/interfaces';
 
 import { loginOrRegisterUser } from '../requests';
 import { ROUTES } from '../../../shared/const';

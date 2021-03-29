@@ -5,6 +5,8 @@ import { Provider } from 'react-redux';
 import { store } from './store/configureStore';
 import { actionCreators } from './store/reducers/auth';
 
+import { DataServiceResponse, UserTokenResponse, DecodedToken } from './shared/interfaces';
+
 import { Menu } from './shared/components/menu';
 import { PublicRoute, PrivateRoute } from './shared/components/routes';
 
@@ -17,6 +19,8 @@ import { Login, ConfirmEmail } from './domain/auth';
 import { StartPage } from './domain/start';
 
 import { CssBaseline } from '@material-ui/core';
+
+import jwt_decode from 'jwt-decode';
 
 export const Application = (): ReactElement => {
     /*
@@ -32,13 +36,20 @@ export const Application = (): ReactElement => {
                 // We put a bool into localStorage for quicker renders between routes
                 localStorage.setItem('userLoggedIn', JSON.stringify(true));
 
+                const token = (refreshTokenResponse as DataServiceResponse<UserTokenResponse>).data.accessToken;
+
+                const decoded = jwt_decode(token) as DecodedToken;
+
                 // We access store directly since scope is outside of Provider
                 store.dispatch(
-                    actionCreators.updateToken(
+                    actionCreators.parseUser(
                         {
-                            type: 'UPDATE_TOKEN',
+                            type: 'PARSE_USER',
                             payload: {
-                                token: refreshTokenResponse.data.accessToken
+                                token: token,
+                                userId: decoded.nameid,
+                                userName: decoded.unique_name,
+                                userRole: decoded.role
                             }
                         }
                     )
