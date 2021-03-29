@@ -29,6 +29,9 @@ export const Application = (): ReactElement => {
             const refreshTokenResponse = await refreshToken();
 
             if (refreshTokenResponse.success) {
+                // We put a bool into localStorage for quicker renders between routes
+                localStorage.setItem('userLoggedIn', JSON.stringify(true));
+
                 // We access store directly since scope is outside of Provider
                 store.dispatch(
                     actionCreators.updateToken(

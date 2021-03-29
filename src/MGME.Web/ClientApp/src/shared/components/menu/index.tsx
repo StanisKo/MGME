@@ -1,7 +1,4 @@
 import { ReactElement, useState, ChangeEvent } from 'react';
-import { useSelector } from 'react-redux';
-
-import { ApplicationState } from '../../../store';
 
 import { AppBar, Toolbar, Tabs, Tab, IconButton } from '@material-ui/core';
 
@@ -18,9 +15,7 @@ const useStyles = makeStyles(() =>
 );
 
 export const Menu = (): ReactElement | null => {
-    const userIsLoggedIn = useSelector(
-        (store: ApplicationState) => store.auth?.token ?? null
-    );
+    const userLoggedIn = localStorage.getItem('userLoggedIn');
 
     const [selectedMenu, setSelectedMenu] = useState<number>(0);
 
@@ -30,7 +25,7 @@ export const Menu = (): ReactElement | null => {
 
     const { flexGrow } = useStyles();
 
-    return userIsLoggedIn ? (
+    return userLoggedIn ? (
         <AppBar position="static">
             <Toolbar>
                 <Tabs
