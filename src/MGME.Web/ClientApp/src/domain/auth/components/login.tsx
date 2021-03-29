@@ -10,15 +10,21 @@ import {
 } from 'react';
 
 import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
-import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } from '../helpers';
-import { UserTokenResponse } from '../interfaces';
 import { BaseServiceResponse, DataServiceResponse } from '../../../shared/interfaces';
-import { ROUTES } from '../../../shared/const';
+import { UserTokenResponse, DecodedToken } from '../interfaces';
+
 import { loginOrRegisterUser } from '../requests';
+import { ROUTES } from '../../../shared/const';
+import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } from '../helpers';
+
+import { actionCreators } from '../../../store/reducers/auth';
 
 import { Container, Button, TextField, Grid, Box, Typography, Link, Snackbar } from '@material-ui/core';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+
+import jwt_decode from 'jwt-decode';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -44,6 +50,8 @@ export const Login = (): ReactElement => {
     const userRegisteredBefore = localStorage.getItem('userRegisteredBefore');
 
     const history = useHistory();
+
+    const dispatch = useDispatch();
 
     const [mode, setMode] = useState<MODE>(userRegisteredBefore ? MODE.SIGN_IN : MODE.SIGN_UP);
 
@@ -181,9 +189,22 @@ export const Login = (): ReactElement => {
             }
 
             if (mode === MODE.SIGN_IN) {
-                localStorage.setItem(
-                    'token',
-                    (authResponse as DataServiceResponse<UserTokenResponse>).data.accessToken
+                const token = (authResponse as DataServiceResponse<UserTokenResponse>).data.accessToken;
+
+                const decoded = jwt_decode(token) as DecodedToken;
+
+                dispatch(
+                    actionCreators.parseUser(
+                        {
+                            type: 'PARSE_USER',
+                            payload: {
+                                token: token,
+                                userId: decoded.nameid,
+                                userName: decoded.unique_name,
+                                userRole: decoded.role
+                            }
+                        }
+                    )
                 );
 
                 history.push(ROUTES.START);

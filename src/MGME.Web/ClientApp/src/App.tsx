@@ -1,8 +1,9 @@
 import { ReactElement } from 'react';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 
 import { store } from './store/configureStore';
+import { ApplicationState } from './store';
 
 import { Login, ConfirmEmail } from './domain/auth';
 import { StartPage } from './domain/start';
@@ -24,16 +25,17 @@ const PrivateApplication = (): ReactElement => (
 );
 
 export const PublicApplication = (): ReactElement => {
+    const userIsLoggedIn = useSelector(
+        (store: ApplicationState) => store.auth?.token ?? null
+    );
+
     return (
         <Provider store={store}>
             <Router history={history}>
                 <CssBaseline />
                 <Switch>
                     <Route path={ROUTES.LOGIN} render={(): ReactElement => {
-                        // A temp dublication of access to storage, redux hook in parent scope should fix it
-                        const user = localStorage.getItem('token');
-
-                        if (user) {
+                        if (userIsLoggedIn) {
                             return <Redirect to={ROUTES.START} />;
                         }
 
@@ -42,9 +44,7 @@ export const PublicApplication = (): ReactElement => {
                     <Route path={ROUTES.CONFIRM_EMAIL} component={ConfirmEmail} />
 
                     <Route path={ROUTES.ROOT} render={(): ReactElement => {
-                        const user = localStorage.getItem('token');
-
-                        if (!user) {
+                        if (userIsLoggedIn === null) {
                             return <Redirect to={ROUTES.LOGIN} />;
                         }
 
@@ -55,3 +55,15 @@ export const PublicApplication = (): ReactElement => {
         </Provider>
     );
 };
+
+export const ContextWrapper = (): ReactElement => {
+    return (
+        <Provider store={store}>
+            <Router history={history}>
+                <CssBaseline />
+                <PublicApplication />
+            </Router>
+        </Provider>
+    );
+};
+

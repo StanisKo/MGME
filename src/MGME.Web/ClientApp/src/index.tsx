@@ -1,9 +1,8 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { PublicApplication } from './App';
+import { ContextWrapper } from './App';
 
 ReactDOM.render(
-    <PublicApplication />,
+    <ContextWrapper />,
     document.getElementById('root')
 );
