@@ -1,8 +1,9 @@
-import { ReactElement } from 'react';
+import { ReactElement, useEffect } from 'react';
 import { Router, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
 import { store } from './store/configureStore';
+import { actionCreators } from './store/reducers/auth';
 
 import { Menu } from './shared/components/menu';
 import { PublicRoute, PrivateRoute } from './shared/components/routes';
@@ -10,12 +11,46 @@ import { PublicRoute, PrivateRoute } from './shared/components/routes';
 import { ROUTES } from './shared/const';
 import { history } from './shared/utils';
 
+import { refreshToken } from './shared/requests';
+
 import { Login, ConfirmEmail } from './domain/auth';
 import { StartPage } from './domain/start';
 
 import { CssBaseline } from '@material-ui/core';
 
 export const Application = (): ReactElement => {
+    /*
+    On boot or page refresh, we attempt to refresh the access token
+    If request is unsuccessfull, (refresh token expired) -- sessions has ended
+    and user must login again; otherwise we propagate access token to the store
+    */
+    useEffect(() => {
+        (async (): Promise<void> => {
+            const refreshTokenResponse = await refreshToken();
+
+            if (refreshTokenResponse.success) {
+                // We access store directly since scope is outside of Provider
+                store.dispatch(
+                    actionCreators.updateToken(
+                        {
+                            type: 'UPDATE_TOKEN',
+                            payload: {
+                                token: refreshTokenResponse.data.accessToken
+                            }
+                        }
+                    )
+                );
+            }
+            else {
+                /*
+                We don't handle 401 in any specific way since
+                we treat it as a signal of finished sessions, no more no less
+                */
+                console.clear();
+            }
+        })();
+    }, []);
+
     return (
         <Provider store={store}>
             <Router history={history}>

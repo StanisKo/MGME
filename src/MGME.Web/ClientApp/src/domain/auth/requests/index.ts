@@ -1,6 +1,5 @@
 import { URLBuilder, makeRequest } from '../../../shared/utils/';
-import { BaseServiceResponse, DataServiceResponse } from '../../../shared/interfaces';
-import { UserTokenResponse } from '../interfaces';
+import { BaseServiceResponse, DataServiceResponse, UserTokenResponse } from '../../../shared/interfaces';
 
 import { MODE } from '../helpers';
 
@@ -9,12 +8,11 @@ export const loginOrRegisterUser = async (
     body: { [key: string]: string }
 
 ): Promise <BaseServiceResponse | DataServiceResponse<UserTokenResponse>> => {
-    const entity = 'auth';
     const action = mode === MODE.SIGN_UP ? 'register' : 'login';
 
     return await makeRequest<BaseServiceResponse | DataServiceResponse<UserTokenResponse>>(
         {
-            url: URLBuilder.buildPOST(entity, action),
+            url: URLBuilder.buildPOST('auth', action),
             method: 'POST',
             headers: null,
             body: body
@@ -23,12 +21,9 @@ export const loginOrRegisterUser = async (
 };
 
 export const confirmEmailAddress = async (token: string): Promise <BaseServiceResponse> => {
-    const entity = 'auth';
-    const action = 'confirm';
-
     return await makeRequest<BaseServiceResponse | DataServiceResponse<UserTokenResponse>>(
         {
-            url: URLBuilder.buildPOST(entity, action),
+            url: URLBuilder.buildPOST('auth', 'confirm'),
             method: 'POST',
             headers: null,
             body: { token: token }
