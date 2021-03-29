@@ -23,12 +23,12 @@ const useStyles = makeStyles(() =>
 export const Menu = (): ReactElement | null => {
     const userLoggedIn = localStorage.getItem('userLoggedIn');
 
+    // Here we actually depend on the store, since we need dynamic rerender on login
+    const tokenIsAvaialable = useSelector((store: ApplicationState) => store.auth?.token ?? null);
+
     const activeMenu = menuOptions.indexOf(
         window.location.pathname.replace('/', '')
     );
-
-    // Here we actually depend on the store, since we need dynamic rerender on login
-    const tokenIsAvaialable = useSelector((store: ApplicationState) => store.auth?.token ?? null);
 
     const [selectedMenu, setSelectedMenu] = useState<number>(activeMenu === -1 ? 0 : activeMenu);
 
