@@ -1,4 +1,5 @@
 import { ReactElement, useState, ChangeEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import { AppBar, Toolbar, Tabs, Tab, IconButton } from '@material-ui/core';
@@ -7,6 +8,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { ApplicationState } from '../../../store';
+import { ROUTES } from '../../const';
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -19,7 +21,7 @@ const useStyles = makeStyles(() =>
 export const Menu = (): ReactElement | null => {
     const userLoggedIn = localStorage.getItem('userLoggedIn');
 
-    // Here we actually depend on the store, since we need dynamic rerender
+    // Here we actually depend on the store, since we need dynamic rerender on login
     const tokenIsAvaialable = useSelector((store: ApplicationState) => store.auth?.token ?? null);
 
     const [selectedMenu, setSelectedMenu] = useState<number>(0);
@@ -30,6 +32,7 @@ export const Menu = (): ReactElement | null => {
 
     const { flexGrow } = useStyles();
 
+    // But we still use localStorage to speed up re-renders
     return userLoggedIn || tokenIsAvaialable ? (
         <AppBar position="static">
             <Toolbar>
@@ -40,9 +43,24 @@ export const Menu = (): ReactElement | null => {
                     onChange={handleChange}
                     aria-label="menu-tabs"
                 >
-                    <Tab label="Item One" disableRipple={true} />
-                    <Tab label="Item Two" disableRipple={true} />
-                    <Tab label="Item Three" disableRipple={true} />
+                    <Tab
+                        label="Item One"
+                        component={Link}
+                        to={ROUTES.ITEM_ONE}
+                        disableRipple={true}
+                    />
+                    <Tab
+                        label="Item Two"
+                        component={Link}
+                        to={ROUTES.ITEM_TWO}
+                        disableRipple={true}
+                    />
+                    <Tab
+                        label="Item Three"
+                        component={Link}
+                        to={ROUTES.ITEM_THREE}
+                        disableRipple={true}
+                    />
                 </Tabs>
                 <IconButton
                     aria-label="account-of-current-user"

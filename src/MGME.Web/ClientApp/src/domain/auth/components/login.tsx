@@ -208,7 +208,7 @@ export const Login = (): ReactElement => {
                     )
                 );
 
-                history.push(ROUTES.START);
+                history.push(ROUTES.ITEM_ONE);
 
                 return;
             }

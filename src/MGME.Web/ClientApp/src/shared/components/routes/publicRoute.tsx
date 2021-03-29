@@ -20,7 +20,7 @@ export const PublicRoute = ({component: FunctionComponent, restricted, ...props}
     */
     return (
         <Route {...props} render={(props): ReactElement => (userLoggedIn && restricted
-            ? <Redirect to={ROUTES.START} />
+            ? <Redirect to={ROUTES.ITEM_ONE} />
             : <FunctionComponent {...props} />
         )} />
     );

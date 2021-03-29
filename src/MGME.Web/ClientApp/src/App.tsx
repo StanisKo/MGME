@@ -16,7 +16,10 @@ import { history } from './shared/utils';
 import { refreshToken } from './shared/requests';
 
 import { Login, ConfirmEmail } from './domain/auth';
-import { StartPage } from './domain/start';
+
+import { ItemOne } from './domain/itemOne';
+import { ItemTwo } from './domain/itemTwo';
+import { ItemThree } from './domain/itemThree';
 
 import { CssBaseline } from '@material-ui/core';
 
@@ -86,7 +89,9 @@ export const Application = (): ReactElement => {
                     <PublicRoute restricted={true} component={Login} path={ROUTES.LOGIN} />
                     <PublicRoute restricted={true} component={ConfirmEmail} path={ROUTES.CONFIRM_EMAIL} />
 
-                    <PrivateRoute component={StartPage} path={ROUTES.START} />
+                    <PrivateRoute component={ItemOne} path={ROUTES.ITEM_ONE} />
+                    <PrivateRoute component={ItemTwo} path={ROUTES.ITEM_TWO} />
+                    <PrivateRoute component={ItemThree} path={ROUTES.ITEM_THREE} />
                 </Switch>
             </Router>
         </Provider>
