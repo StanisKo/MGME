@@ -346,7 +346,7 @@ namespace MGME.Core.Services.Auth
 
                 /*
                 Just in case if user revisits confirmation link after it expired
-                and after the email was already confirmed
+                and after the email was already confirmed (although, we hide the route on the client side)
                 */
                 if (userToResendEmail.EmailIsConfirmed)
                 {

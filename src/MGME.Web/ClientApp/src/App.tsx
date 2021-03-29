@@ -25,12 +25,6 @@ import { CssBaseline } from '@material-ui/core';
 
 import jwt_decode from 'jwt-decode';
 
-/*
-TODO:
-
-1. refresh token on access token expiration
-*/
-
 export const Application = (): ReactElement => {
     const [accessTokenExpiresIn, setAccessTokenExpiresIn] = useState<number>(0);
 

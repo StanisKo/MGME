@@ -52,6 +52,7 @@ namespace MGME.Web.Controllers
             */
             bool userLoggedIn = Request.Cookies.ContainsKey("refreshToken");
 
+            // Even though we hide route on the client side, it never hurts to double check
             if (userLoggedIn)
             {
                 return BadRequest(
