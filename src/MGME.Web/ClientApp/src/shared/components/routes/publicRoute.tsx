@@ -11,6 +11,7 @@ interface Props {
 
 export const PublicRoute = ({component: FunctionComponent, restricted, ...props}: Props): ReactElement => {
     const userLoggedIn = localStorage.getItem('userLoggedIn');
+
     /*
     restricted = false meaning public route
     restricted = true meaning restricted route

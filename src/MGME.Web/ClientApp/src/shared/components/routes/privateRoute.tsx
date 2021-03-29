@@ -10,6 +10,7 @@ interface Props {
 
 export const PrivateRoute = ({component: FunctionComponent, ...props}: Props): ReactElement => {
     const userLoggedIn = localStorage.getItem('userLoggedIn');
+
     // If user is not logged, every private route will return to loging page
     return (
         <Route {...props} render={(props) : ReactElement => (
