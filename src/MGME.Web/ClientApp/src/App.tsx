@@ -44,7 +44,7 @@ export const PublicApplication = (): ReactElement => {
                     <Route path={ROUTES.CONFIRM_EMAIL} component={ConfirmEmail} />
 
                     <Route path={ROUTES.ROOT} render={(): ReactElement => {
-                        if (userIsLoggedIn === null) {
+                        if (!userIsLoggedIn) {
                             return <Redirect to={ROUTES.LOGIN} />;
                         }
 
