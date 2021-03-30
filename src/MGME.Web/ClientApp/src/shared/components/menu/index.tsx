@@ -1,8 +1,10 @@
 import { ReactElement, useState, ChangeEvent, MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { logoutUser } from '../../../domain/auth/requests';
+
+import { actionCreators } from '../../../store/reducers/auth';
 
 import { menuOptions } from './helpers';
 import { history } from '../../utils';
@@ -29,6 +31,8 @@ export const MenuBar = (): ReactElement | null => {
     // Here we actually depend on the store, since we need dynamic rerender on login
     const tokenIsAvaialable = useSelector((store: ApplicationState) => store.auth?.token ?? null);
 
+    const dispatch = useDispatch();
+
     const activeMenu = menuOptions.indexOf(
         window.location.pathname.replace('/', '')
     );
@@ -52,17 +56,23 @@ export const MenuBar = (): ReactElement | null => {
 
     const handleLogout = (): void => {
         (async (): Promise<void> => {
-            const response = await logoutUser();
+            await logoutUser();
 
-            if (response.success) {
-                localStorage.removeItem('userLoggedIn');
+            localStorage.removeItem('userLoggedIn');
 
-                history.push(ROUTES.LOGIN);
+            history.push(ROUTES.LOGIN);
 
-                return;
-            }
+            setAnchorEl(null);
 
-            // Handle
+
+            // We also clear out store since menu render depends on it
+            dispatch(
+                actionCreators.logoutUser(
+                    {
+                        type: 'LOGOUT_USER'
+                    }
+                )
+            );
         })();
     };
 
