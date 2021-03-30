@@ -55,6 +55,8 @@ export const MenuBar = (): ReactElement | null => {
             const response = await logoutUser();
 
             if (response.success) {
+                localStorage.removeItem('userLoggedIn');
+
                 history.push(ROUTES.LOGIN);
 
                 return;

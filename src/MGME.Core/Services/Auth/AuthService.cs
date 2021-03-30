@@ -33,6 +33,8 @@ namespace MGME.Core.Services.Auth
 
         private readonly IEntityRepository<User> _userRepository;
 
+        private readonly IEntityRepository<RefreshToken> _tokenRepository;
+
         private readonly IMapper _mapper;
 
         private readonly IConfiguration _configuration;
@@ -45,6 +47,7 @@ namespace MGME.Core.Services.Auth
 
         public AuthService(IAuthRepository authRepository,
                            IEntityRepository<User> userRepository,
+                           IEntityRepository<RefreshToken> tokenRepository,
                            IMapper mapper,
                            IConfiguration configuration,
                            IWebHostEnvironment environment,
@@ -52,6 +55,7 @@ namespace MGME.Core.Services.Auth
         {
             _authRepository = authRepository;
             _userRepository = userRepository;
+            _tokenRepository = tokenRepository;
 
             _mapper = mapper;
 
@@ -122,12 +126,7 @@ namespace MGME.Core.Services.Auth
             try
             {
                 User userToLogin = await _userRepository.GetEntityAsync(
-                    predicate: user => user.Name == name,
-                    tracking: true,
-                    entitiesToInclude: new Expression<Func<User, object>>[]
-                    {
-                        user => user.RefreshTokens
-                    }
+                    predicate: user => user.Name == name
                 );
 
                 if (userToLogin == null)
@@ -161,9 +160,7 @@ namespace MGME.Core.Services.Auth
                         refreshToken
                     );
 
-                    userToLogin.RefreshTokens.Add(refreshTokenEntity);
-
-                    await _userRepository.AddToEntityAsync(userToLogin, nameof(User.RefreshTokens));
+                    await _tokenRepository.AddEntityAsync(refreshTokenEntity);
 
                     response.Data = new UserTokensDTO()
                     {
@@ -190,9 +187,9 @@ namespace MGME.Core.Services.Auth
 
             try
             {
+                // Use DTO
                 User tokenOwner = await _userRepository.GetEntityAsync(
                     predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
-                    tracking: true,
                     entitiesToInclude: new Expression<Func<User, object>>[]
                     {
                         user => user.RefreshTokens
@@ -211,9 +208,7 @@ namespace MGME.Core.Services.Auth
                     ownedToken => ownedToken.Token == token
                 );
 
-                tokenOwner.RefreshTokens.Remove(oldRefreshToken);
-
-                await _userRepository.AddToEntityAsync(tokenOwner, nameof(User.RefreshTokens));
+                await _tokenRepository.DeleteEntityAsync(oldRefreshToken);
 
                 response.Success = true;
 
@@ -235,18 +230,9 @@ namespace MGME.Core.Services.Auth
 
             try
             {
-                /*
-                We query user and not DTO via Select, since we want to delete tokens
-                through RefreshTokens navigations property, and for that we need identifying relationship
-
-                Identifying relationship requires for owner to be queried as well, or use AsNotTracking
-
-                But since we're in disconnected scenario, we are forced to use tracking
-                and therefore cannot ommit querying fields we don't need (unless we use token-specific repository)
-                */
+                // Use DTO
                 User tokenOwner = await _userRepository.GetEntityAsync(
                     predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
-                    tracking: true,
                     entitiesToInclude: new Expression<Func<User, object>>[]
                     {
                         user => user.RefreshTokens
@@ -281,7 +267,7 @@ namespace MGME.Core.Services.Auth
                 }
 
                 // Remove old token
-                tokenOwner.RefreshTokens.Remove(oldRefreshToken);
+                await _tokenRepository.DeleteEntityAsync(oldRefreshToken);
 
                 // Create and add new token
                 string newRefreshToken = CreateRefreshToken();
@@ -291,9 +277,7 @@ namespace MGME.Core.Services.Auth
                     newRefreshToken
                 );
 
-                tokenOwner.RefreshTokens.Add(newRefreshTokenEntity);
-
-                await _userRepository.AddToEntityAsync(tokenOwner, nameof(User.RefreshTokens));
+                await _tokenRepository.AddEntityAsync(newRefreshTokenEntity);
 
                 // We also create new access token
                 string newAccessToken = CreateAccessToken(

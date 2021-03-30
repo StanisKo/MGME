@@ -73,6 +73,8 @@ export const Application = (): ReactElement => {
                 We don't handle 401 in any specific way since
                 we treat it as a signal of finished sessions, no more no less
                 */
+                localStorage.removeItem('userLoggedIn');
+
                 console.clear();
 
                 if (window.location.pathname.replace('/', '') !== ROUTES.LOGIN) {
@@ -80,16 +82,6 @@ export const Application = (): ReactElement => {
                 }
             }
         })();
-
-        /*
-        We clear out bool from local storage on destroy
-        Yet user will still remain logged in, since we persist session via httpOnly cookie
-
-        This is rather for 'cleanness'
-        */
-        return (): void => {
-            localStorage.removeItem('userLoggedIn');
-        };
     }, []);
 
     useEffect(() => {
