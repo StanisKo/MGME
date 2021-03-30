@@ -58,7 +58,7 @@ namespace MGME.Web.Controllers
                     new BaseServiceResponse()
                     {
                         Success = false,
-                        Message = "You are already logged in"
+                        Message = "User already logged in"
                     }
                 );
             }
@@ -78,68 +78,6 @@ namespace MGME.Web.Controllers
             }
 
             // User name or password is incorrect
-            return BadRequest(response);
-        }
-
-        [HttpPost("Confirm")]
-        public async Task <IActionResult> ConfirmEmailAddress(UserConifrmationTokenDTO request)
-        {
-            BaseServiceResponse response = await _authService.ConfirmEmailAddress(request.Token);
-
-            if (response.Success)
-            {
-                return Ok(response);
-            }
-
-            // Confirmation is invalid
-            return BadRequest(response);
-        }
-
-        /*
-        We use GET since we avoid any kind of payload
-        and access refresh token from httpOnly cookie
-        */
-        [HttpGet("Refresh-Token")]
-        public async Task <IActionResult> RefreshToken()
-        {
-            bool userLoggedIn = Request.Cookies.ContainsKey("sessionIsActive");
-
-            if (!userLoggedIn)
-            {
-                return Unauthorized(
-                    new BaseServiceResponse()
-                    {
-                        Success = false,
-                        Message = "Session has ended"
-                    }
-                );
-            }
-
-            string refreshToken = Request.Cookies["refreshToken"];
-
-            if (refreshToken == null)
-            {
-                return Unauthorized(
-                    new BaseServiceResponse()
-                    {
-                        Success = false,
-                        Message = "Refresh token is missing"
-                    }
-                );
-            }
-
-            DataServiceResponse<UserTokensDTO> response =  await _authService.RefreshAccessToken(
-                refreshToken
-            );
-
-            if (response.Success)
-            {
-                WriteRefreshTokenToCookie(response.Data.RefreshToken);
-
-                return Ok(response);
-            }
-
-            // Refresh token is invalid
             return BadRequest(response);
         }
 
@@ -184,6 +122,68 @@ namespace MGME.Web.Controllers
             return BadRequest(response);
         }
 
+        [HttpPost("Confirm")]
+        public async Task <IActionResult> ConfirmEmailAddress(UserConifrmationTokenDTO request)
+        {
+            BaseServiceResponse response = await _authService.ConfirmEmailAddress(request.Token);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            // Confirmation is invalid
+            return BadRequest(response);
+        }
+
+        /*
+        We use GET since we avoid any kind of payload
+        and access refresh token from httpOnly cookie
+        */
+        [HttpGet("Refresh-Token")]
+        public async Task <IActionResult> RefreshToken()
+        {
+            bool userLoggedIn = Request.Cookies.ContainsKey("sessionIsActive");
+
+            if (!userLoggedIn)
+            {
+                return BadRequest(
+                    new BaseServiceResponse()
+                    {
+                        Success = false,
+                        Message = "Session has ended"
+                    }
+                );
+            }
+
+            string refreshToken = Request.Cookies["refreshToken"];
+
+            if (refreshToken == null)
+            {
+                return Unauthorized(
+                    new BaseServiceResponse()
+                    {
+                        Success = false,
+                        Message = "Refresh token is missing"
+                    }
+                );
+            }
+
+            DataServiceResponse<UserTokensDTO> response =  await _authService.RefreshAccessToken(
+                refreshToken
+            );
+
+            if (response.Success)
+            {
+                WriteRefreshTokenToCookie(response.Data.RefreshToken);
+
+                return Ok(response);
+            }
+
+            // Refresh token is invalid
+            return BadRequest(response);
+        }
+
         /*
         Note: we don't use refresh token itself for session management, since
         we rotate both refresh and access tokens every time access token is expired
@@ -198,7 +198,7 @@ namespace MGME.Web.Controllers
                 HttpOnly = true,
                 Secure = true,
                 Expires = DateTime.UtcNow.AddHours(
-                    Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
+                    Convert.ToInt32(_configuration["TokensLifetime:RefreshTokenHours"])
                 )
             });
         }
@@ -211,7 +211,7 @@ namespace MGME.Web.Controllers
                 HttpOnly = true,
                 Secure = true,
                 Expires = DateTime.UtcNow.AddHours(
-                    Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
+                    Convert.ToInt32(_configuration["TokensLifetime:RefreshTokenHours"])
                 )
             });
         }

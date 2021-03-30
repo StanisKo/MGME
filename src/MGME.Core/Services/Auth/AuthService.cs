@@ -149,7 +149,7 @@ namespace MGME.Core.Services.Auth
                     string accessToken = CreateAccessToken(
                         userToLogin,
                         DateTime.UtcNow.AddMinutes(
-                            Convert.ToInt16(_configuration["TokensLifetime:AccessTokenMinutes"])
+                            Convert.ToInt32(_configuration["TokensLifetime:AccessTokenMinutes"])
                         )
                     );
 
@@ -234,6 +234,7 @@ namespace MGME.Core.Services.Auth
 
             try
             {
+                // We query for user and DTO, since we need additional values for JWT claims
                 User tokenOwner = await _userRepository.GetEntityAsync(
                     predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
                     entitiesToInclude: new Expression<Func<User, object>>[]
@@ -258,6 +259,7 @@ namespace MGME.Core.Services.Auth
                 Even though receiving expired refresh token is unlikely:
                 1. we use session cookie to deny access to this method if session has ended
                 2. we rotate refresh token every time we need new access token
+                3. refresh token cookie also has an expiration
 
                 It never hurts to double check
                 */
@@ -286,7 +288,7 @@ namespace MGME.Core.Services.Auth
                 string newAccessToken = CreateAccessToken(
                     tokenOwner,
                     DateTime.UtcNow.AddMinutes(
-                        Convert.ToInt16(_configuration["TokensLifetime:AccessTokenMinutes"])
+                        Convert.ToInt32(_configuration["TokensLifetime:AccessTokenMinutes"])
                     )
                 );
 
@@ -314,7 +316,7 @@ namespace MGME.Core.Services.Auth
             JwtSecurityToken securityToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
 
             // Somehow claim.Type == ClaimTypes.Name returns null ...
-            int userId = Convert.ToInt16(
+            int userId = Convert.ToInt32(
                 securityToken.Claims.FirstOrDefault(claim => claim.Type == "nameid")?.Value
             );
 
@@ -459,7 +461,7 @@ namespace MGME.Core.Services.Auth
                 UserId = userId,
                 Token = token,
                 Expires = DateTime.UtcNow.AddHours(
-                    Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
+                    Convert.ToInt32(_configuration["TokensLifetime:RefreshTokenHours"])
                 )
             };
         }
@@ -514,7 +516,7 @@ namespace MGME.Core.Services.Auth
             string confirmationToken = CreateAccessToken(
                 user,
                 DateTime.UtcNow.AddHours(
-                    Convert.ToInt16(_configuration["TokensLifetime:ConfirmationTokenHours"])
+                    Convert.ToInt32(_configuration["TokensLifetime:ConfirmationTokenHours"])
                 )
             );
 
@@ -557,7 +559,7 @@ namespace MGME.Core.Services.Auth
             {
                 smtpClient.Connect(
                     _configuration["EmailConfiguration:SmtpServer"],
-                    Convert.ToInt16(_configuration["EmailConfiguration:Port"]),
+                    Convert.ToInt32(_configuration["EmailConfiguration:Port"]),
                     true
                 );
 

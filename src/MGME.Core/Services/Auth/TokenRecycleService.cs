@@ -45,7 +45,7 @@ namespace MGME.Core.Services.Auth
             }
 
             int interval = (int)TimeSpan.FromHours(
-                Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
+                Convert.ToInt32(_configuration["TokensLifetime:RefreshTokenHours"])
             ).TotalMilliseconds;
 
             _timer = new Timer(RecycleExpiredTokens, null, 0, interval);
