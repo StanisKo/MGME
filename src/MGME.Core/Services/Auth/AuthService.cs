@@ -234,7 +234,7 @@ namespace MGME.Core.Services.Auth
 
             try
             {
-                // We query for user and DTO, since we need additional values for JWT claims
+                // We query for user and not DTO, since we need additional values for JWT claims
                 User tokenOwner = await _userRepository.GetEntityAsync(
                     predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
                     entitiesToInclude: new Expression<Func<User, object>>[]
@@ -355,6 +355,7 @@ namespace MGME.Core.Services.Auth
                     }
                 );
 
+                // Might happen if user revisits the public route
                 if (userToConfirmEmail.EmailIsConfirmed)
                 {
                     response.Success = false;
@@ -386,7 +387,7 @@ namespace MGME.Core.Services.Auth
 
                 /*
                 Just in case if user revisits confirmation link after it expired
-                and after the email was already confirmed (although, we hide the route on the client side)
+                and after the email was already confirmed
                 */
                 if (userToResendEmail.EmailIsConfirmed)
                 {
