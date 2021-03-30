@@ -7,7 +7,7 @@ import { actionCreators } from './store/reducers/auth';
 
 import { DataServiceResponse, UserTokenResponse, DecodedToken } from './shared/interfaces';
 
-import { Menu } from './shared/components/menu';
+import { MenuBar } from './shared/components/menu';
 import { PublicRoute, PrivateRoute } from './shared/components/routes';
 
 import { ROUTES } from './shared/const';
@@ -120,7 +120,7 @@ export const Application = (): ReactElement => {
         <Provider store={store}>
             <Router history={history}>
                 <CssBaseline />
-                <Menu />
+                <MenuBar />
                 <Switch>
                     <PublicRoute restricted={true} component={Login} path={ROUTES.LOGIN} />
                     <PublicRoute restricted={true} component={ConfirmEmail} path={ROUTES.CONFIRM_EMAIL} />

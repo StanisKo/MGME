@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 using MGME.Core.Entities;
 using MGME.Core.Interfaces.Repositories;
@@ -18,7 +19,7 @@ namespace MGME.Core.Services.Auth
 
         private readonly IConfiguration _configuration;
 
-        private readonly IEntityRepository<RefreshToken> _tokenRepository;
+        private readonly IServiceScopeFactory _scopeFactory;
 
         private Timer _timer;
 
@@ -27,11 +28,11 @@ namespace MGME.Core.Services.Auth
 
         public TokenRecycleService(ILogger<TokenRecycleService> logger,
                                    IConfiguration configuration,
-                                   IEntityRepository<RefreshToken> tokenRepository)
+                                   IServiceScopeFactory scopeFactory)
         {
             _logger = logger;
             _configuration = configuration;
-            _tokenRepository = tokenRepository;
+            _scopeFactory = scopeFactory;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -43,12 +44,11 @@ namespace MGME.Core.Services.Auth
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            _timer = new Timer(
-                RecycleExpiredTokens,
-                null,
-                0,
+            int interval = (int)TimeSpan.FromHours(
                 Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
-            );
+            ).TotalMilliseconds;
+
+            _timer = new Timer(RecycleExpiredTokens, null, 0, interval);
 
             return Task.CompletedTask;
         }
@@ -78,11 +78,20 @@ namespace MGME.Core.Services.Auth
             {
                 Interlocked.Increment(ref _numberOfDbRuns);
 
-                List<RefreshToken> expiredTokens = await _tokenRepository.GetEntititesAsync(
-                    predicate: token => DateTime.UtcNow >= token.Expires
-                );
+                using (IServiceScope scope = _scopeFactory.CreateScope())
+                {
+                    IEntityRepository<RefreshToken> tokenRepository =
+                        scope.ServiceProvider.GetRequiredService<IEntityRepository<RefreshToken>>();
 
-                await _tokenRepository.DeleteEntitiesAsync(expiredTokens);
+                    List<RefreshToken> expiredTokens = await tokenRepository.GetEntititesAsync(
+                        predicate: token => DateTime.UtcNow >= token.Expires
+                    );
+
+                    if (expiredTokens.Count > 0)
+                    {
+                        await tokenRepository.DeleteEntitiesAsync(expiredTokens);
+                    }
+                }
 
                 Interlocked.Decrement(ref _numberOfDbRuns);
             }

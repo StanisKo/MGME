@@ -1,10 +1,13 @@
-import { ReactElement, useState, ChangeEvent } from 'react';
+import { ReactElement, useState, ChangeEvent, MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-import { menuOptions } from './helpers';
+import { logoutUser } from '../../../domain/auth/requests';
 
-import { AppBar, Toolbar, Tabs, Tab, IconButton } from '@material-ui/core';
+import { menuOptions } from './helpers';
+import { history } from '../../utils';
+
+import { AppBar, Toolbar, Tabs, Tab, IconButton, Menu, MenuItem } from '@material-ui/core';
 
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
@@ -20,7 +23,7 @@ const useStyles = makeStyles(() =>
     })
 );
 
-export const Menu = (): ReactElement | null => {
+export const MenuBar = (): ReactElement | null => {
     const userLoggedIn = localStorage.getItem('userLoggedIn');
 
     // Here we actually depend on the store, since we need dynamic rerender on login
@@ -34,6 +37,31 @@ export const Menu = (): ReactElement | null => {
 
     const handleChange = (event: ChangeEvent<unknown>, newValue: number): void => {
         setSelectedMenu(newValue);
+    };
+
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+
+    const handleMenu = (event: MouseEvent<HTMLElement>): void => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = (): void => {
+        setAnchorEl(null);
+    };
+
+    const handleLogout = (): void => {
+        (async (): Promise<void> => {
+            const response = await logoutUser();
+
+            if (response.success) {
+                history.push(ROUTES.LOGIN);
+
+                return;
+            }
+
+            // Handle
+        })();
     };
 
     const { flexGrow } = useStyles();
@@ -68,14 +96,35 @@ export const Menu = (): ReactElement | null => {
                         disableRipple={true}
                     />
                 </Tabs>
-                <IconButton
-                    aria-label="account-of-current-user"
-                    aria-controls="menu-bar"
-                    aria-haspopup="true"
-                    color="inherit"
-                >
-                    <AccountCircle />
-                </IconButton>
+                <>
+                    <IconButton
+                        aria-label="account of current user"
+                        aria-controls="menu-appbar"
+                        aria-haspopup="true"
+                        onClick={handleMenu}
+                        color="inherit"
+                    >
+                        <AccountCircle />
+                    </IconButton>
+                    <Menu
+                        id="menu-appbar"
+                        anchorEl={anchorEl}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right'
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right'
+                        }}
+                        open={open}
+                        onClose={handleClose}
+                    >
+                        <MenuItem>Profile</MenuItem>
+                        <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                    </Menu>
+                </>
             </Toolbar>
         </AppBar>
     ) : null;

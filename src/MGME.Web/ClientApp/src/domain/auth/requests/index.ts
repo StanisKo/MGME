@@ -30,3 +30,13 @@ export const confirmEmailAddress = async (token: string): Promise <BaseServiceRe
         }
     );
 };
+
+export const logoutUser = async (): Promise<BaseServiceResponse> => {
+    return await makeRequest<BaseServiceResponse>(
+        {
+            url: URLBuilder.buildPOST('auth', 'logout'),
+            method: 'GET',
+            headers: null
+        }
+    );
+};
