@@ -45,9 +45,6 @@ namespace MGME.Core.Interfaces.Repositories
 
         Task UpdateEntitiesAsync(List<TEntity> entities, IEnumerable<string> updatedProperties);
 
-        // Used to update one-to-many collection that belongs to entity
-        Task AddToEntityAsync(TEntity entity, string linkedCollection);
-
         // Used to update many-to-many relationship between entity and linkedEntity
         Task LinkEntityAsync(TEntity entity, BaseEntity linkedEntity, string linkedCollection);
 

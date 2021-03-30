@@ -226,15 +226,6 @@ namespace MGME.Infra.Data.Repositories
             await _database.SaveChangesAsync();
         }
 
-        public async Task AddToEntityAsync(TEntity entity, string linkedCollection)
-        {
-            _database.Entry(entity).State = EntityState.Unchanged;
-
-            _database.Entry(entity).Collection(linkedCollection).IsModified = true;
-
-            await _database.SaveChangesAsync();
-        }
-
         public async Task LinkEntityAsync(TEntity entity, BaseEntity linkedEntity, string linkedCollection)
         {
             _database.Entry(entity).State = EntityState.Unchanged;
