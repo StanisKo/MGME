@@ -20,6 +20,8 @@ namespace MGME.Core
         public static void AddBusinessServices(this IServiceCollection services)
         {
             services.AddScoped<IAuthService, AuthService>();
+
+            services.AddHostedService<TokenRecycleService>();
         }
     }
 }

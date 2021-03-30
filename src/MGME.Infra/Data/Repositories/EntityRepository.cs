@@ -252,5 +252,12 @@ namespace MGME.Infra.Data.Repositories
 
             await _database.SaveChangesAsync();
         }
+
+        public async Task DeleteEntitiesAsync(List<TEntity> entities)
+        {
+            _database.Set<TEntity>().RemoveRange(entities);
+
+            await _database.SaveChangesAsync();
+        }
     }
 }

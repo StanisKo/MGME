@@ -52,5 +52,7 @@ namespace MGME.Core.Interfaces.Repositories
         Task LinkEntityAsync(TEntity entity, BaseEntity linkedEntity, string linkedCollection);
 
         Task DeleteEntityAsync(TEntity entity);
+
+        Task DeleteEntitiesAsync(List<TEntity> entities);
     }
 }
