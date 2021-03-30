@@ -187,12 +187,16 @@ namespace MGME.Core.Services.Auth
 
             try
             {
-                // Use DTO
-                User tokenOwner = await _userRepository.GetEntityAsync(
+                UserRefreshTokenDTO tokenOwner = await _userRepository.GetEntityAsync(
                     predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
                     entitiesToInclude: new Expression<Func<User, object>>[]
                     {
                         user => user.RefreshTokens
+                    },
+                    columnsToSelect: user => new UserRefreshTokenDTO()
+                    {
+                        Id = user.Id,
+                        RefreshTokens = user.RefreshTokens
                     }
                 );
 
@@ -230,7 +234,6 @@ namespace MGME.Core.Services.Auth
 
             try
             {
-                // Use DTO
                 User tokenOwner = await _userRepository.GetEntityAsync(
                     predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
                     entitiesToInclude: new Expression<Func<User, object>>[]
