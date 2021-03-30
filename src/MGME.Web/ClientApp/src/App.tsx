@@ -25,17 +25,6 @@ import { CssBaseline } from '@material-ui/core';
 
 import jwt_decode from 'jwt-decode';
 
-/*
-TODO:
-
-When refresh token is received upon login,
-start a timer that would count down to 8 hours and will call logout()
-that will remove refresh token from httpOnly cookie
-
-Otherwise, the session will continue indefinately, since every time access
-token will be refreshed, new refresh token will be provided
-*/
-
 export const Application = (): ReactElement => {
     const [accessTokenExpiresIn, setAccessTokenExpiresIn] = useState<number>(0);
 
@@ -85,6 +74,10 @@ export const Application = (): ReactElement => {
                 we treat it as a signal of finished sessions, no more no less
                 */
                 console.clear();
+
+                if (window.location.pathname.replace('/', '') !== ROUTES.LOGIN) {
+                    history.push(ROUTES.LOGIN);
+                }
             }
         })();
 

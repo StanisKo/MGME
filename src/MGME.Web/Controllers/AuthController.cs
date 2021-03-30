@@ -50,9 +50,8 @@ namespace MGME.Web.Controllers
             Even though we deny login on client side if the user is already logged in
             It never hurts to double check
             */
-            bool userLoggedIn = Request.Cookies.ContainsKey("refreshToken");
+            bool userLoggedIn = Request.Cookies.ContainsKey("sessionIsActive");
 
-            // Even though we hide route on the client side, it never hurts to double check
             if (userLoggedIn)
             {
                 return BadRequest(
@@ -72,6 +71,8 @@ namespace MGME.Web.Controllers
             if (response.Success)
             {
                 WriteRefreshTokenToCookie(response.Data.RefreshToken);
+
+                AddSessionCookie();
 
                 return Ok(response);
             }
@@ -101,6 +102,19 @@ namespace MGME.Web.Controllers
         [HttpGet("Refresh-Token")]
         public async Task <IActionResult> RefreshToken()
         {
+            bool userLoggedIn = Request.Cookies.ContainsKey("sessionIsActive");
+
+            if (!userLoggedIn)
+            {
+                return Unauthorized(
+                    new BaseServiceResponse()
+                    {
+                        Success = false,
+                        Message = "Session has ended"
+                    }
+                );
+            }
+
             string refreshToken = Request.Cookies["refreshToken"];
 
             if (refreshToken == null)
@@ -129,13 +143,70 @@ namespace MGME.Web.Controllers
             return BadRequest(response);
         }
 
+        [HttpGet("Logout")]
+        public async Task <IActionResult> Logout()
+        {
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            bool userLoggedIn = Request.Cookies.ContainsKey("sessionIsActive");
+
+            if (!userLoggedIn)
+            {
+                response.Success = false;
+                response.Message = "User is not logged in";
+
+                return BadRequest(response);
+            }
+
+            string refreshToken = Request.Cookies["refreshToken"];
+
+            if (refreshToken == null)
+            {
+                response.Success = false;
+                response.Message = "Refresh token is missing";
+
+                return Unauthorized(response);
+            }
+
+            response = await _authService.LogoutUser(refreshToken);
+
+            if (response.Success)
+            {
+                Response.Cookies.Delete("sessionIsActive");
+                Response.Cookies.Delete("refreshToken");
+
+                response.Success = true;
+
+                return Ok(response);
+            }
+
+            // Provided token is missing from db
+            return BadRequest(response);
+        }
+
+        /*
+        Note: we don't use refresh token itself for session management, since
+        we rotate both refresh and access tokens every time access token is expired
+
+        And in such, refresh token is constantly updated; although we still give it
+        an expiration, so it will be removed when session ends
+        */
         private void WriteRefreshTokenToCookie(string token)
         {
-            /*
-            Even though we are checking token expiration against the one in the database,
-            we also add expiration to token cookie itself
-            */
             Response.Cookies.Append("refreshToken", token, new CookieOptions()
+            {
+                HttpOnly = true,
+                Secure = true,
+                Expires = DateTime.UtcNow.AddHours(
+                    Convert.ToInt16(_configuration["TokensLifetime:RefreshTokenHours"])
+                )
+            });
+        }
+
+        // Instead of refresh token, we use simple flag to imitate sesssions
+        private void AddSessionCookie()
+        {
+            Response.Cookies.Append("sessionIsActive", true.ToString(), new CookieOptions()
             {
                 HttpOnly = true,
                 Secure = true,

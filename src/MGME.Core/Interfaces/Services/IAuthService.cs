@@ -11,6 +11,8 @@ namespace MGME.Core.Interfaces.Services
 
         Task <DataServiceResponse<UserTokensDTO>> LoginUser(string name, string password);
 
+        Task <BaseServiceResponse> LogoutUser(string token);
+
         Task <DataServiceResponse<UserTokensDTO>> RefreshAccessToken(string token);
 
         Task <BaseServiceResponse> ConfirmEmailAddress(string token);

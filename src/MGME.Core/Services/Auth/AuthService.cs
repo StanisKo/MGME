@@ -184,6 +184,51 @@ namespace MGME.Core.Services.Auth
             return response;
         }
 
+        public async Task <BaseServiceResponse> LogoutUser(string token)
+        {
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            try
+            {
+                User tokenOwner = await _userRepository.GetEntityAsync(
+                    predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
+                    tracking: true,
+                    entitiesToInclude: new Expression<Func<User, object>>[]
+                    {
+                        user => user.RefreshTokens
+                    }
+                );
+
+                if (tokenOwner == null)
+                {
+                    response.Success = false;
+                    response.Message = "Token is invalid";
+
+                    return response;
+                }
+
+                RefreshToken oldRefreshToken = tokenOwner.RefreshTokens.Single(
+                    ownedToken => ownedToken.Token == token
+                );
+
+                tokenOwner.RefreshTokens.Remove(oldRefreshToken);
+
+                await _userRepository.AddToEntityAsync(tokenOwner, nameof(User.RefreshTokens));
+
+                response.Success = true;
+
+                return response;
+
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
+        }
+
         public async Task <DataServiceResponse<UserTokensDTO>> RefreshAccessToken(string token)
         {
             DataServiceResponse<UserTokensDTO> response = new DataServiceResponse<UserTokensDTO>();
@@ -220,7 +265,13 @@ namespace MGME.Core.Services.Auth
                     ownedToken => ownedToken.Token == token
                 );
 
-                // We also give expiration to a cookie, but it never hurts to double check
+                /*
+                Even though receiving expired refresh token is unlikely:
+                1. we use session cookie to deny access to this method if session has ended
+                2. we rotate refresh token every time we need new access token
+
+                It never hurts to double check
+                */
                 if (DateTime.UtcNow >= oldRefreshToken.Expires)
                 {
                     response.Success = false;
