@@ -1,6 +1,8 @@
-import React, { ReactElement, useState, SyntheticEvent } from 'react';
+import { ReactElement, useState, SyntheticEvent, useEffect } from 'react';
 
 import { BaseServiceResponse } from '../../../shared/interfaces';
+import { history } from '../../../shared/utils';
+import { ROUTES } from '../../../shared/const';
 import { confirmEmailAddress } from '../requests';
 
 import { Snackbar } from '@material-ui/core';
@@ -25,15 +27,20 @@ export const ConfirmEmail = (): ReactElement => {
         setOpenSnackbar(false);
     };
 
-    if (token) {
-        (async (): Promise<void> => {
-            const confirmationResponse = await confirmEmailAddress(token as string);
+    useEffect(() => {
+        if (token) {
+            (async (): Promise<void> => {
+                const confirmationResponse = await confirmEmailAddress(token as string);
 
-            if (response.success) {
                 setResponse(confirmationResponse);
-            }
-        })();
-    }
+                setOpenSnackbar(true);
+            })();
+        }
+        else {
+            // Otherwise user is logged out and attempting to access the route without token
+            history.push(ROUTES.LOGIN);
+        }
+    }, [token]);
 
     return (
         <>

@@ -75,13 +75,17 @@ export const Application = (): ReactElement => {
                 We don't handle 401 in any specific way since
                 we treat it as a signal of finished sessions, no more no less
                 */
-                localStorage.removeItem('userLoggedIn');
+                const userLoggedIn = localStorage.getItem('userLoggedIn');
 
-                console.clear();
 
-                if (window.location.pathname !== ROUTES.LOGIN) {
+                // Remove flag and redirect if user logged in
+                if (userLoggedIn) {
+                    localStorage.removeItem('userLoggedIn');
+
                     history.push(ROUTES.LOGIN);
                 }
+
+                console.clear();
             }
         })();
     }, []);
