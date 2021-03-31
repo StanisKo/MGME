@@ -77,7 +77,7 @@ export const Application = (): ReactElement => {
 
                 console.clear();
 
-                if (window.location.pathname.replace('/', '') !== ROUTES.LOGIN) {
+                if (window.location.pathname !== ROUTES.LOGIN) {
                     history.push(ROUTES.LOGIN);
                 }
             }

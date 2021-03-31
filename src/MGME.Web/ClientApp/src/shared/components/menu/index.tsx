@@ -6,7 +6,6 @@ import { logoutUser } from '../../../domain/auth/requests';
 
 import { actionCreators } from '../../../store/reducers/auth';
 
-import { menuOptions } from './helpers';
 import { history } from '../../utils';
 
 import { AppBar, Toolbar, Tabs, Tab, IconButton, Menu, MenuItem } from '@material-ui/core';
@@ -33,8 +32,8 @@ export const MenuBar = (): ReactElement | null => {
 
     const dispatch = useDispatch();
 
-    const activeMenu = menuOptions.indexOf(
-        window.location.pathname.replace('/', '')
+    const activeMenu = [ROUTES.ITEM_ONE, ROUTES.ITEM_TWO, ROUTES.ITEM_THREE].indexOf(
+        window.location.pathname
     );
 
     const [selectedMenu, setSelectedMenu] = useState<number>(activeMenu === -1 ? 0 : activeMenu);
