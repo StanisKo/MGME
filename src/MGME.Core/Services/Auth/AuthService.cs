@@ -187,6 +187,7 @@ namespace MGME.Core.Services.Auth
 
             try
             {
+                // Check if you actually need to query for tokens here if you only need to check if user exists 
                 UserRefreshTokenDTO tokenOwner = await _userRepository.GetEntityAsync(
                     predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
                     entitiesToInclude: new Expression<Func<User, object>>[]
