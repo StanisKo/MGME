@@ -32,7 +32,8 @@ export const MenuBar = (): ReactElement | null => {
     const tokenIsAvaialable = useSelector((store: ApplicationState) => store.auth?.token ?? null);
 
     const dispatch = useDispatch();
-
+    
+    // Use ROUTES instead of hardcoded array
     const activeMenu = menuOptions.indexOf(
         window.location.pathname.replace('/', '')
     );
