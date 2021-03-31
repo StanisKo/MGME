@@ -359,7 +359,7 @@ export const Login = (): ReactElement => {
                 </Button>
                 <Grid container justify="flex-end">
                     <Grid item>
-                        <Link variant="body2" className={pointer} onClick={handleModeChange}>
+                        <Link variant="body2" color="secondary" className={pointer} onClick={handleModeChange}>
                             {mode === MODE.SIGN_UP
                                 ? 'Already have an account? Sign in'
                                 : 'Don\'t have an account? Sign up'}

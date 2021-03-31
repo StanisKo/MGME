@@ -13,7 +13,7 @@ import { PublicRoute, PrivateRoute } from './shared/components/routes';
 import { ROUTES } from './shared/const';
 import { history } from './shared/utils';
 
-import { refreshToken } from './shared/requests';
+import { refreshToken } from './domain/auth/requests';
 
 import { Login, ConfirmEmail } from './domain/auth';
 
@@ -21,7 +21,9 @@ import { ItemOne } from './domain/itemOne';
 import { ItemTwo } from './domain/itemTwo';
 import { ItemThree } from './domain/itemThree';
 
-import { CssBaseline } from '@material-ui/core';
+import { CssBaseline, ThemeProvider } from '@material-ui/core';
+
+import { base } from './shared/themes';
 
 import jwt_decode from 'jwt-decode';
 
@@ -110,18 +112,20 @@ export const Application = (): ReactElement => {
 
     return (
         <Provider store={store}>
-            <Router history={history}>
-                <CssBaseline />
-                <MenuBar />
-                <Switch>
-                    <PublicRoute restricted={true} component={Login} path={ROUTES.LOGIN} />
-                    <PublicRoute restricted={true} component={ConfirmEmail} path={ROUTES.CONFIRM_EMAIL} />
+            <ThemeProvider theme={base}>
+                <Router history={history}>
+                    <CssBaseline />
+                    <MenuBar />
+                    <Switch>
+                        <PublicRoute restricted={true} component={Login} path={ROUTES.LOGIN} />
+                        <PublicRoute restricted={true} component={ConfirmEmail} path={ROUTES.CONFIRM_EMAIL} />
 
-                    <PrivateRoute component={ItemOne} path={ROUTES.ITEM_ONE} />
-                    <PrivateRoute component={ItemTwo} path={ROUTES.ITEM_TWO} />
-                    <PrivateRoute component={ItemThree} path={ROUTES.ITEM_THREE} />
-                </Switch>
-            </Router>
+                        <PrivateRoute component={ItemOne} path={ROUTES.ITEM_ONE} />
+                        <PrivateRoute component={ItemTwo} path={ROUTES.ITEM_TWO} />
+                        <PrivateRoute component={ItemThree} path={ROUTES.ITEM_THREE} />
+                    </Switch>
+                </Router>
+            </ThemeProvider>
         </Provider>
     );
 };

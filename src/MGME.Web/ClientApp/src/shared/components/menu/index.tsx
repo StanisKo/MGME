@@ -8,7 +8,7 @@ import { actionCreators } from '../../../store/reducers/auth';
 
 import { history } from '../../utils';
 
-import { AppBar, Toolbar, Tabs, Tab, IconButton, Menu, MenuItem } from '@material-ui/core';
+import { AppBar, Toolbar, Tabs, Tab, IconButton, Menu, MenuItem, Theme } from '@material-ui/core';
 
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
@@ -16,7 +16,7 @@ import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { ApplicationState } from '../../../store';
 import { ROUTES } from '../../const';
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         flexGrow: {
             flexGrow: 1
@@ -79,7 +79,7 @@ export const MenuBar = (): ReactElement | null => {
 
     // But we still use localStorage to speed up re-renders
     return userLoggedIn || tokenIsAvaialable ? (
-        <AppBar position="static">
+        <AppBar position="static" color="primary">
             <Toolbar>
                 <Tabs
                     className={flexGrow}
@@ -87,6 +87,7 @@ export const MenuBar = (): ReactElement | null => {
                     value={selectedMenu}
                     onChange={handleChange}
                     aria-label="menu-tabs"
+                    indicatorColor="secondary"
                 >
                     <Tab
                         label="Item One"
