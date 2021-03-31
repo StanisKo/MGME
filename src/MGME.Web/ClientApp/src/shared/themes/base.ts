@@ -9,8 +9,7 @@ Refine colors
 export const base = createMuiTheme({
     palette: {
         primary: {
-            main: '#39305c',
-            light: '#524878'
+            main: '#39305c'
         },
         secondary: {
             main: '#077b8a'
@@ -19,9 +18,9 @@ export const base = createMuiTheme({
     overrides: {
         MuiButton: {
             containedPrimary: {
-                backgroundColor: '#524878',
+                backgroundColor: '#695c99',
                 '&:hover': {
-                    backgroundColor: '#39305c'
+                    backgroundColor: '#524878'
                 }
             }
         }
