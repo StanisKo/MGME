@@ -55,7 +55,7 @@ export const ConfirmEmail = (): ReactElement => {
             // Otherwise user is logged out and attempting to access the route without token
             history.push(ROUTES.LOGIN);
         }
-    }, [token]);
+    }, [token, history]);
 
     const { paper } = useStyles();
 
@@ -76,7 +76,14 @@ export const ConfirmEmail = (): ReactElement => {
                             >
                                 {`${response.message}. You can now login`}
                             </a>
-                        ) : response.message}
+                        ) : (
+                            <a
+                                href={ROUTES.LOGIN}
+                                style={{color: 'inherit' }}
+                            >
+                                {`${response.message}. Go to login`}
+                            </a>
+                        )}
                     </Alert>
                 </Snackbar>
             </div>

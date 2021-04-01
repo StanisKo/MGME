@@ -9,6 +9,7 @@ Refine colors
 export const base = createMuiTheme({
     palette: {
         primary: {
+            light: '#695c99',
             main: '#524878'
         },
         secondary: {
