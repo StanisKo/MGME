@@ -1,5 +1,5 @@
+using System;
 using System.Text;
-
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +15,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Microsoft.OpenApi.Models;
+
+using Npgsql;
 
 using MGME.Core;
 using MGME.Infra;
@@ -36,10 +38,17 @@ namespace MGME.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            string connectionString = string.Empty;
+            NpgsqlConnectionStringBuilder connectionStringBuilder = new NpgsqlConnectionStringBuilder()
+            {
+                Host = Configuration["Host"],
+                Port = Convert.ToInt32(Configuration["Port"]),
+                Database = Configuration["Database"],
+                Username = Configuration["Username"],
+                Password = Configuration["Password"]
+            };
 
             // Database context: ../MGME.Infra/InfraStartup.cs
-            services.AddDbContext(connectionString);
+            services.AddDbContext(connectionStringBuilder.ConnectionString);
 
             // Repositories used accross the application: ../MGME.Infra/InfraStartup.cs
             services.AddRepositories();
@@ -60,13 +69,18 @@ namespace MGME.Web
                     {
                         ValidateIssuerSigningKey = true,
 
-                        ValidateIssuer = false,
-
-                        ValidateAudience = false,
-
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.ASCII.GetBytes("123") // Configuration["<my_future_key_here>"]
+                            Encoding.ASCII.GetBytes(Configuration["JWTKey"])
                         ),
+
+                        ValidateIssuer = true,
+                        ValidIssuer = Configuration["Host"],
+
+                        ValidateAudience = true,
+                        ValidAudience = Configuration["Host"],
+
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
                     };
                 });
 
@@ -74,7 +88,6 @@ namespace MGME.Web
             {
                 config.DefaultApiVersion = new ApiVersion(1, 0);
             });
-
 
             services.AddControllers();
 
@@ -89,9 +102,9 @@ namespace MGME.Web
             });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            if (_environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
@@ -117,7 +130,7 @@ namespace MGME.Web
             {
                 spa.Options.SourcePath = "ClientApp";
 
-                if (env.IsDevelopment())
+                if (_environment.IsDevelopment())
                 {
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }

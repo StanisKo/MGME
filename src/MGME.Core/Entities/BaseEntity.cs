@@ -1,4 +1,4 @@
-namespace RPG.Core.Entities
+namespace MGME.Core.Entities
 {
     public abstract class BaseEntity
     {

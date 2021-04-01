@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 using MGME.Infra.Data;
+using MGME.Infra.Data.Repositories;
+using MGME.Core.Interfaces.Repositories;
 
 namespace MGME.Infra
 {
@@ -21,7 +23,9 @@ namespace MGME.Infra
         // An extension to add repositories
         public static void AddRepositories(this IServiceCollection services)
         {
+            services.AddScoped<IAuthRepository, AuthRepository>();
 
+            services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
         }
     }
 }

@@ -2,13 +2,7 @@ import { combineReducers, compose, createStore, Store } from 'redux';
 
 import { ApplicationState, reducers } from './';
 
-/*
-On devTools setup:
-
-https://github.com/zalmoxisus/redux-devtools-extension
-*/
-
-export default function configureStore(initialState?: ApplicationState): Store {
+const configureStore = (initialState?: ApplicationState): Store => {
     const rootReducer = combineReducers({
         ...reducers
     });
@@ -25,4 +19,7 @@ export default function configureStore(initialState?: ApplicationState): Store {
         initialState,
         compose(devTools)
     );
-}
+};
+
+// We export store directly in order to access JWT outside of components
+export const store = configureStore();
