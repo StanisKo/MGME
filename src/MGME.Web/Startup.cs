@@ -119,6 +119,8 @@ namespace MGME.Web
 
             app.UseSpaStaticFiles();
 
+            app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
