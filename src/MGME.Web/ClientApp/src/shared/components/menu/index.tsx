@@ -1,4 +1,4 @@
-import { ReactElement, useState, ChangeEvent, MouseEvent } from 'react';
+import { ReactElement, useState, useReducer, useEffect, ChangeEvent, MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -38,6 +38,8 @@ export const MenuBar = (): ReactElement | null => {
 
     const [selectedMenu, setSelectedMenu] = useState<number>(activeMenu === -1 ? 0 : activeMenu);
 
+    const [, forceUpdate] = useReducer(x => x + 1, 0);
+
     const handleChange = (event: ChangeEvent<unknown>, newValue: number): void => {
         setSelectedMenu(newValue);
     };
@@ -63,7 +65,6 @@ export const MenuBar = (): ReactElement | null => {
 
             setAnchorEl(null);
 
-
             // We also clear out store since menu render depends on it
             dispatch(
                 actionCreators.logoutUser(
@@ -74,6 +75,12 @@ export const MenuBar = (): ReactElement | null => {
             );
         })();
     };
+
+    useEffect(() => {
+        if (!tokenIsAvaialable) {
+            forceUpdate();
+        }
+    }, [tokenIsAvaialable]);
 
     const { flexGrow } = useStyles();
 
