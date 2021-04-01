@@ -21,7 +21,7 @@ export const loginOrRegisterUser = async (
 };
 
 export const confirmEmailAddress = async (token: string): Promise <BaseServiceResponse> => {
-    return await makeRequest<BaseServiceResponse | DataServiceResponse<UserTokenResponse>>(
+    return await makeRequest<BaseServiceResponse>(
         {
             url: URLBuilder.buildPOST('auth', 'confirm'),
             method: 'POST',
