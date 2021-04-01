@@ -7,18 +7,34 @@ import { ROUTES } from '../../../shared/const';
 import { Alert } from '../../../shared/components/alert';
 import { BaseServiceResponse } from '../../../shared/interfaces';
 
-import { Container, Box, Typography, Snackbar } from '@material-ui/core';
+import { Container, Box, Typography, Snackbar, Grid, CardMedia } from '@material-ui/core';
 
 import { makeStyles } from '@material-ui/core/styles';
 
 import qs from 'qs';
 
 const useStyles = makeStyles((theme) => ({
-    paper: {
-        marginTop: theme.spacing(8),
+    welcomeContainer: {
+        marginTop: theme.spacing(20),
+        paddingTop: theme.spacing(4),
+        paddingBottom: theme.spacing(10),
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderRadius: '5px'
+    },
+    top: {
+        height: '50vh',
+        backgroundColor: theme.palette.primary.main
+    },
+    bottom: {
+        height: '50vh',
+        backgroundColor: '#f4f4f4'
+    },
+    media: {
+        marginTop: theme.spacing(2),
+        width: '75%'
     }
 }));
 
@@ -57,36 +73,44 @@ export const ConfirmEmail = (): ReactElement => {
         }
     }, [token, history]);
 
-    const { paper } = useStyles();
+    const { welcomeContainer, top, media } = useStyles();
 
     return (
-        <Container component="main" maxWidth="xs">
-            <div className={paper}>
-                <Box mb={4}>
-                    <Typography component="h1" variant="h5">
-                        Welcome!
-                    </Typography>
-                </Box>
-                <Snackbar open={openSnackbar} onClose={handleSnackbarClose}>
-                    <Alert onClose={handleSnackbarClose} severity={response.success ? 'success' : 'warning'}>
-                        {response.success ? (
-                            <a
-                                href={ROUTES.LOGIN}
-                                style={{color: 'inherit' }}
-                            >
-                                {`${response.message}. You can now login`}
-                            </a>
-                        ) : (
-                            <a
-                                href={ROUTES.LOGIN}
-                                style={{color: 'inherit' }}
-                            >
-                                {`${response.message}. Go to login`}
-                            </a>
-                        )}
-                    </Alert>
-                </Snackbar>
-            </div>
-        </Container>
+        <Grid container>
+            <Grid item xs={12} sm={12} lg={12} className={top}>
+                <Container component="main" maxWidth="xs" className={welcomeContainer}>
+                    <Box mb={4}>
+                        <Typography component="h1" variant="h4">
+                            Welcome to MGME!
+                        </Typography>
+                    </Box>
+                    <CardMedia
+                        component="img"
+                        src='/assets/images/confirmation.jpg'
+                        className={media}
+                    />
+                    <Snackbar open={openSnackbar} onClose={handleSnackbarClose}>
+                        <Alert onClose={handleSnackbarClose} severity={response.success ? 'success' : 'warning'}>
+                            {response.success ? (
+                                <a
+                                    href={ROUTES.LOGIN}
+                                    style={{color: 'inherit' }}
+                                >
+                                    {`${response.message}. You can now login`}
+                                </a>
+                            ) : (
+                                <a
+                                    href={ROUTES.LOGIN}
+                                    style={{color: 'inherit' }}
+                                >
+                                    {`${response.message}. Go to login`}
+                                </a>
+                            )}
+                        </Alert>
+                    </Snackbar>
+                </Container>
+            </Grid>
+            <Grid item />
+        </Grid>
     );
 };
