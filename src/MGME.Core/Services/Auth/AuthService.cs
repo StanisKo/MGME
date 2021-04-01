@@ -355,6 +355,14 @@ namespace MGME.Core.Services.Auth
                     }
                 );
 
+                if (userToConfirmEmail == null)
+                {
+                    response.Success = false;
+                    response.Message = "User does not exist";
+
+                    return response;
+                }
+
                 // Might happen if user revisits the public route
                 if (userToConfirmEmail.EmailIsConfirmed)
                 {
@@ -384,6 +392,14 @@ namespace MGME.Core.Services.Auth
                 didn't seem like considerable performance improvement
                 */
                 User userToResendEmail = await _userRepository.GetEntityAsync(userId);
+
+                if (userToResendEmail == null)
+                {
+                    response.Success = false;
+                    response.Message = "User does not exist";
+
+                    return response;
+                }
 
                 /*
                 Just in case if user revisits confirmation link after it expired

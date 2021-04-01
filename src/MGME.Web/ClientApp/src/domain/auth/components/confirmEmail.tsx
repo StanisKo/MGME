@@ -1,14 +1,27 @@
 import { ReactElement, useState, SyntheticEvent, useEffect } from 'react';
 
-import { BaseServiceResponse } from '../../../shared/interfaces';
-import { history } from '../../../shared/utils';
-import { ROUTES } from '../../../shared/const';
 import { confirmEmailAddress } from '../requests';
 
-import { Snackbar } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import { ROUTES } from '../../../shared/const';
+import { history } from '../../../shared/utils';
+import { Alert } from '../../../shared/components/alert';
+import { BaseServiceResponse } from '../../../shared/interfaces';
+
+import { Container, Box, Typography, Snackbar } from '@material-ui/core';
+
+import { makeStyles } from '@material-ui/core/styles';
 
 import qs from 'qs';
+
+const useStyles = makeStyles((theme) => ({
+    paper: {
+        marginTop: theme.spacing(8),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+    }
+}));
+
 
 export const ConfirmEmail = (): ReactElement => {
     const token = qs.parse(window.location.search, { ignoreQueryPrefix: true })?.token;
@@ -42,14 +55,29 @@ export const ConfirmEmail = (): ReactElement => {
         }
     }, [token]);
 
+    const { paper } = useStyles();
+
     return (
-        <>
-            <div>Thank you for confirming email address</div>
-            <Snackbar open={openSnackbar} onClose={handleSnackbarClose}>
-                <Alert onClose={handleSnackbarClose} severity={response.success ? 'success' : 'warning'}>
-                    {response.message}
-                </Alert>
-            </Snackbar>
-        </>
+        <Container component="main" maxWidth="xs">
+            <div className={paper}>
+                <Box mb={4}>
+                    <Typography component="h1" variant="h5">
+                        Welcome!
+                    </Typography>
+                </Box>
+                <Snackbar open={openSnackbar} onClose={handleSnackbarClose}>
+                    <Alert onClose={handleSnackbarClose} severity={response.success ? 'success' : 'warning'}>
+                        {response.success ? (
+                            <a
+                                href={ROUTES.LOGIN}
+                                style={{color: 'inherit' }}
+                            >
+                                {`${response.message}. You can now login`}
+                            </a>
+                        ) : response.message}
+                    </Alert>
+                </Snackbar>
+            </div>
+        </Container>
     );
 };

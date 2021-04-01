@@ -9,19 +9,19 @@ import {
     SetStateAction
 } from 'react';
 
-import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
-import { BaseServiceResponse, DataServiceResponse, UserTokenResponse, DecodedToken } from '../../../shared/interfaces';
-
 import { loginOrRegisterUser } from '../requests';
-import { ROUTES } from '../../../shared/const';
 import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } from '../helpers';
+
+import { ROUTES } from '../../../shared/const';
+import { history } from '../../../shared/utils';
+import { Alert } from '../../../shared/components/alert';
+import { BaseServiceResponse, DataServiceResponse, UserTokenResponse, DecodedToken } from '../../../shared/interfaces';
 
 import { actionCreators } from '../../../store/reducers/auth';
 
 import { Container, Button, TextField, Grid, Box, Typography, Link, Snackbar } from '@material-ui/core';
-import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 
 import jwt_decode from 'jwt-decode';
 
@@ -42,19 +42,16 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Alert = (props: AlertProps): ReactElement => <MuiAlert elevation={6} variant="filled" {...props} />;
-
 export const Login = (): ReactElement => {
     // We don't need to parse it: it's either there or not
     const userRegisteredBefore = localStorage.getItem('userRegisteredBefore');
-
-    const history = useHistory();
 
     const dispatch = useDispatch();
 
     const [mode, setMode] = useState<MODE>(userRegisteredBefore ? MODE.SIGN_IN : MODE.SIGN_UP);
 
-    const [inputIsValid, setInputIsValid] = useState<boolean>(false);
+    const [canSignUp, setCanSignUp] = useState<boolean>(false);
+    const [canSignIn, setCanSignIn] = useState<boolean>(false);
 
     const [name, setName] = useState<string>('');
     const [nameError, setNameError] = useState<boolean>(false);
@@ -179,7 +176,10 @@ export const Login = (): ReactElement => {
         setOpenSnackbar(true);
 
         if (authResponse.success) {
-            localStorage.setItem('userLoggedIn', JSON.stringify(true));
+
+            if (mode === MODE.SIGN_IN) {
+                localStorage.setItem('userLoggedIn', JSON.stringify(true));
+            }
 
             if (!userRegisteredBefore) {
                 /*
@@ -243,12 +243,15 @@ export const Login = (): ReactElement => {
         during input (validation handler is triggered only on blur)
         */
         if (allInputsArePresent && allInputsAreValid && confirmPassword.length >= 8) {
-            setInputIsValid(true);
-
-            return;
+            setCanSignUp(true);
         }
-
-        setInputIsValid(false);
+        else if (name && password && !nameError && !passwordError && password.length >= 8) {
+            setCanSignIn(true);
+        }
+        else {
+            setCanSignUp(false);
+            setCanSignIn(false);
+        }
     }, [name, email, password, confirmPassword, nameError, emailError, passwordError, confirmPasswordError]);
 
     useEffect(() => {
@@ -260,7 +263,7 @@ export const Login = (): ReactElement => {
             setPasswordHelperText('');
         }
         else {
-            setInputIsValid(false);
+            setCanSignUp(false);
         }
     }, [mode]);
 
@@ -352,7 +355,7 @@ export const Login = (): ReactElement => {
                     variant="contained"
                     color="primary"
                     className={submit}
-                    disabled={mode === MODE.SIGN_UP ? !inputIsValid : false}
+                    disabled={mode === MODE.SIGN_UP ? !canSignUp : !canSignIn}
                     onClick={handleRequest}
                 >
                     {modeNames[mode]}

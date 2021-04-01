@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useState } from 'react';
-import { Router, Switch } from 'react-router-dom';
+import { Router, Switch, Redirect } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
 import { store } from './store/configureStore';
@@ -77,7 +77,6 @@ export const Application = (): ReactElement => {
                 */
                 const userLoggedIn = localStorage.getItem('userLoggedIn');
 
-
                 // Remove flag and redirect if user logged in
                 if (userLoggedIn) {
                     localStorage.removeItem('userLoggedIn');
@@ -121,6 +120,8 @@ export const Application = (): ReactElement => {
                     <CssBaseline />
                     <MenuBar />
                     <Switch>
+                        <Redirect exact from={ROUTES.ROOT} to={ROUTES.LOGIN} />
+
                         <PublicRoute restricted={true} component={Login} path={ROUTES.LOGIN} />
                         <PublicRoute restricted={true} component={ConfirmEmail} path={ROUTES.CONFIRM_EMAIL} />
 
