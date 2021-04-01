@@ -1,12 +1,10 @@
 import { ReactElement, useState, useReducer, useEffect, ChangeEvent, MouseEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { logoutUser } from '../../../domain/auth/requests';
 
 import { actionCreators } from '../../../store/reducers/auth';
-
-import { history } from '../../utils';
 
 import { AppBar, Toolbar, Tabs, Tab, IconButton, Menu, MenuItem, Theme } from '@material-ui/core';
 
@@ -25,6 +23,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const MenuBar = (): ReactElement | null => {
+    const history = useHistory();
+
     const userLoggedIn = localStorage.getItem('userLoggedIn');
 
     // Here we actually depend on the store, since we need dynamic rerender on login
@@ -33,7 +33,7 @@ export const MenuBar = (): ReactElement | null => {
     const dispatch = useDispatch();
 
     const activeMenu = [ROUTES.ITEM_ONE, ROUTES.ITEM_TWO, ROUTES.ITEM_THREE].indexOf(
-        window.location.pathname
+        history.location.pathname
     );
 
     const [selectedMenu, setSelectedMenu] = useState<number>(activeMenu === -1 ? 0 : activeMenu);

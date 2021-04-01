@@ -1,9 +1,9 @@
 import { ReactElement, useState, SyntheticEvent, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import { confirmEmailAddress } from '../requests';
 
 import { ROUTES } from '../../../shared/const';
-import { history } from '../../../shared/utils';
 import { Alert } from '../../../shared/components/alert';
 import { BaseServiceResponse } from '../../../shared/interfaces';
 
@@ -24,7 +24,9 @@ const useStyles = makeStyles((theme) => ({
 
 
 export const ConfirmEmail = (): ReactElement => {
-    const token = qs.parse(window.location.search, { ignoreQueryPrefix: true })?.token;
+    const history = useHistory();
+
+    const token = qs.parse(history.location.search, { ignoreQueryPrefix: true })?.token;
 
     const [response, setResponse] = useState<BaseServiceResponse>(
         {} as BaseServiceResponse

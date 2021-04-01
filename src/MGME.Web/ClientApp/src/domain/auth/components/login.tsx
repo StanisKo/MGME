@@ -9,13 +9,13 @@ import {
     SetStateAction
 } from 'react';
 
+import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import { loginOrRegisterUser } from '../requests';
 import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } from '../helpers';
 
 import { ROUTES } from '../../../shared/const';
-import { history } from '../../../shared/utils';
 import { Alert } from '../../../shared/components/alert';
 import { BaseServiceResponse, DataServiceResponse, UserTokenResponse, DecodedToken } from '../../../shared/interfaces';
 
@@ -45,6 +45,8 @@ const useStyles = makeStyles((theme) => ({
 export const Login = (): ReactElement => {
     // We don't need to parse it: it's either there or not
     const userRegisteredBefore = localStorage.getItem('userRegisteredBefore');
+
+    const history = useHistory();
 
     const dispatch = useDispatch();
 
