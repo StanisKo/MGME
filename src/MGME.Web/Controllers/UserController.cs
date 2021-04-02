@@ -8,7 +8,6 @@ using MGME.Core.Interfaces.Services;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace MGME.Web.Controllers
 {
