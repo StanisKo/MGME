@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MGME.Core.Entities;
 using MGME.Core.Interfaces.Repositories;
 
-namespace MGME.Core.Services.Auth
+namespace MGME.Core.Services.AuthService
 {
     public class TokenRecycleService : IHostedService, IDisposable
     {

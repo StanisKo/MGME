@@ -7,8 +7,10 @@ namespace MGME.Core.Interfaces.Services
 {
     public interface IUserService
     {
-        Task <DataServiceResponse<GetUserDTO>> GetUser(int id);
+        Task <DataServiceResponse<GetUserDTO>> GetUser();
 
-        Task <BaseServiceResponse> UpdateUser();
+        Task <BaseServiceResponse> UpdateUser(UpdateUserDTO user);
+
+        Task <BaseServiceResponse> ChageUserPassword(ChangeUserPasswordDTO passwords);
     }
 }

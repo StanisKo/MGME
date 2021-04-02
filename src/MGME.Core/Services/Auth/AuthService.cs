@@ -25,7 +25,7 @@ using MGME.Core.Entities;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
 
-namespace MGME.Core.Services.Auth
+namespace MGME.Core.Services.AuthService
 {
     public class AuthService : BaseEntityService, IAuthService
     {
