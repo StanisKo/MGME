@@ -2,13 +2,11 @@ import { Action, Reducer } from 'redux';
 
 export interface AuthState {
     token: string;
-    userId: number;
-    userName: string;
     userRole: string;
 }
 
 /*
-On init, we also parse user values and save them along the token
+On init, we also parse user role and save it along the token
 
 Afterwards, we update the token every time it's about to expire
 */
@@ -17,8 +15,6 @@ interface LoginUser {
     type: 'LOGIN_USER';
     payload: {
         token: string;
-        userId: number;
-        userName: string;
         userRole: string;
     }
 }
@@ -41,8 +37,6 @@ export const actionCreators = {
         type: type,
         payload: {
             token: payload.token,
-            userId: payload.userId,
-            userName: payload.userName,
             userRole: payload.userRole
         }
     }),

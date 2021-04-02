@@ -63,8 +63,6 @@ export const Application = (): ReactElement => {
                             type: 'LOGIN_USER',
                             payload: {
                                 token: token,
-                                userId: decoded.nameid,
-                                userName: decoded.unique_name,
                                 userRole: decoded.role
                             }
                         }
