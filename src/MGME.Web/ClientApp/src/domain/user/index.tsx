@@ -3,7 +3,7 @@ import { GetUserDTO } from './interfaces';
 
 import { getUser } from './requests';
 
-export const UserCabinet = (): ReactElement => {
+export const UserProfile = (): ReactElement => {
     const [user, setUser] = useState<GetUserDTO>({} as GetUserDTO);
 
     const gotUser = Object.keys(user).length > 0;

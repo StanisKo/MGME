@@ -55,6 +55,11 @@ export const MenuBar = (): ReactElement | null => {
         setAnchorEl(null);
     };
 
+    const goToProfile = (): void => {
+        history.push(ROUTES.USER_PROFILE);
+        setAnchorEl(null);
+    };
+
     const handleLogout = (): void => {
         (async (): Promise<void> => {
             await logoutUser();
@@ -140,7 +145,7 @@ export const MenuBar = (): ReactElement | null => {
                         open={open}
                         onClose={handleClose}
                     >
-                        <MenuItem>Profile</MenuItem>
+                        <MenuItem onClick={goToProfile}>Profile</MenuItem>
                         <MenuItem onClick={handleLogout}>Logout</MenuItem>
                     </Menu>
                 </>
