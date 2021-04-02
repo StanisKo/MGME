@@ -16,6 +16,7 @@ import { history } from './shared/utils';
 import { refreshToken } from './domain/auth/requests';
 
 import { Login, ConfirmEmail } from './domain/auth';
+import { UserCabinet } from './domain/user';
 
 import { ItemOne } from './domain/itemOne';
 import { ItemTwo } from './domain/itemTwo';
@@ -125,6 +126,7 @@ export const Application = (): ReactElement => {
                         <PublicRoute restricted={true} component={Login} path={ROUTES.LOGIN} />
                         <PublicRoute restricted={true} component={ConfirmEmail} path={ROUTES.CONFIRM_EMAIL} />
 
+                        <PrivateRoute component={UserCabinet} path={ROUTES.USER_CABINET} />
                         <PrivateRoute component={ItemOne} path={ROUTES.ITEM_ONE} />
                         <PrivateRoute component={ItemTwo} path={ROUTES.ITEM_TWO} />
                         <PrivateRoute component={ItemThree} path={ROUTES.ITEM_THREE} />

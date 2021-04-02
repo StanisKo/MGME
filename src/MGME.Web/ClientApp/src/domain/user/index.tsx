@@ -1,10 +1,12 @@
 import { ReactElement, useEffect, useState } from 'react';
-import { GetUserDTO } from '../interfaces';
+import { GetUserDTO } from './interfaces';
 
-import { getUser } from '../requests';
+import { getUser } from './requests';
 
 export const UserCabinet = (): ReactElement => {
     const [user, setUser] = useState<GetUserDTO>({} as GetUserDTO);
+
+    const gotUser = Object.keys(user).length > 0;
 
     useEffect(() => {
         (async (): Promise<void> => {
@@ -16,7 +18,7 @@ export const UserCabinet = (): ReactElement => {
         })();
     }, []);
 
-    return Object.keys(user).length > 0 ? (
+    return gotUser ? (
         <>
             <div>{`Name: ${user.name}`}</div>
             <div>{`Email: ${user.email}`}</div>
