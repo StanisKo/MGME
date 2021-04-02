@@ -346,9 +346,9 @@ namespace MGME.Core.Services.Auth
                 );
 
                 // Besides id, we only need one field ...
-                UserConfirmEmailDTO userToConfirmEmail = await _userRepository.GetEntityAsync(
+                ConfirmUserEmailDTO userToConfirmEmail = await _userRepository.GetEntityAsync(
                     id: userId,
-                    columnsToSelect: user => new UserConfirmEmailDTO()
+                    columnsToSelect: user => new ConfirmUserEmailDTO()
                     {
                         Id = user.Id,
                         EmailIsConfirmed = user.EmailIsConfirmed

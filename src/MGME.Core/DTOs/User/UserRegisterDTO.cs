@@ -1,14 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-/*
-https://stackoverflow.com/questions/13237193/data-annotation-to-validate-confirm-password
-
-also check for confirm password with DA
-*/
-
 namespace MGME.Core.DTOs.User
 {
-    public class UserRegisterDTO
+    public class RegisterUserDTO
     {
         [Required]
         [StringLength(254, MinimumLength = 6)]

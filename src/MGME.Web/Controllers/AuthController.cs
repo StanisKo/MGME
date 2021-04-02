@@ -26,7 +26,7 @@ namespace MGME.Web.Controllers
 
         // Pass DTOs instead of values to avoid copyign them
         [HttpPost("Register")]
-        public async Task <IActionResult> RegisterUser(UserRegisterDTO request)
+        public async Task <IActionResult> RegisterUser(RegisterUserDTO request)
         {
             BaseServiceResponse response =  await _authService.RegisterUser(
                 request.Name,
@@ -44,7 +44,7 @@ namespace MGME.Web.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task <IActionResult> LoginUser(UserLoginDTO request)
+        public async Task <IActionResult> LoginUser(LoginUserDTO request)
         {
             /*
             Even though we deny login on client side if the user is already logged in

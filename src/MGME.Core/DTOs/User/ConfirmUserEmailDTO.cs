@@ -1,6 +1,6 @@
 namespace MGME.Core.DTOs.User
 {
-    public class UserConfirmEmailDTO : BaseEntityDTO
+    public class ConfirmUserEmailDTO : BaseEntityDTO
     {
         public bool EmailIsConfirmed { get; set; }
     }

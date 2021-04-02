@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MGME.Core.DTOs.User
 {
-    public class UserLoginDTO
+    public class LoginUserDTO
     {
         [StringLength(254, MinimumLength = 6)]
         [Required]
