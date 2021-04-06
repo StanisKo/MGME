@@ -19,13 +19,17 @@ namespace MGME.Core.Services.UserService
     {
         private readonly IEntityRepository<User> _repository;
 
+        private readonly IHashingService _hashingService;
+
         private readonly IMapper _mapper;
 
         public UserService(IEntityRepository<User> userRepository,
+                           IHashingService hashingService,
                            IMapper mapper,
                            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _repository = userRepository;
+            _hashingService = hashingService;
             _mapper = mapper;
         }
 
@@ -153,7 +157,54 @@ namespace MGME.Core.Services.UserService
 
             try
             {
+                UserPasswordDTO userToChangePassword = await _repository.GetEntityAsync(
+                    id: userId,
+                    columnsToSelect: user => new UserPasswordDTO()
+                    {
+                        Id = user.Id,
+                        PasswordHash = user.PasswordHash,
+                        PasswordSalt = user.PasswordSalt
+                    }
+                );
 
+                if (userToChangePassword == null)
+                {
+                    response.Success = false;
+                    response.Message = "User does not exist";
+
+                    return response;
+                }
+
+                bool passwordIsValid = _hashingService.VerifyPasswordHash(
+                    passwords.OldPassword,
+                    userToChangePassword.PasswordHash,
+                    userToChangePassword.PasswordSalt
+                );
+
+                if (!passwordIsValid)
+                {
+                    response.Success = false;
+                    response.Message = "Wrong password";
+
+                    return response;
+                }
+
+                _hashingService.CreatePasswordHash(
+                    passwords.NewPassword,
+                    out byte[] passwordHash,
+                    out byte[] passwordSalt
+                );
+
+                userToChangePassword.PasswordHash = passwordHash;
+                userToChangePassword.PasswordSalt = passwordSalt;
+
+                await _repository.UpdateEntityAsync(
+                    _mapper.Map<User>(userToChangePassword),
+                    new[] { nameof(User.PasswordHash), nameof(User.PasswordSalt) }
+                );
+
+                response.Success = true;
+                response.Message = "Password was successfully changed";
             }
             catch (Exception exception)
             {

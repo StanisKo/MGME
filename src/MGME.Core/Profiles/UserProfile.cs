@@ -12,6 +12,8 @@ namespace MGME.Core.Profiles
             CreateMap<ConfirmUserEmailDTO, User>();
 
             CreateMap<GetOrUpdateUserDTO, User>();
+
+            CreateMap<UserPasswordDTO, User>();
         }
     }
 }

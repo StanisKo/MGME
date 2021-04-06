@@ -51,6 +51,20 @@ namespace MGME.Web.Controllers
             return NotFound(response);
         }
 
+        [HttpPut("Change-Password")]
+        public async Task <IActionResult> ChangeUserPassword(ChangeUserPasswordDTO passwords)
+        {
+            BaseServiceResponse response = await _userService.ChageUserPassword(passwords);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            // Can also be bad request if user not found
+            return NotFound(response);
+        }
+
         [HttpDelete("Delete")]
         public async Task <IActionResult> DeleteUser()
         {
