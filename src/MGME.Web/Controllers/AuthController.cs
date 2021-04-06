@@ -24,7 +24,6 @@ namespace MGME.Web.Controllers
             _configuration = configuration;
         }
 
-        // Pass DTOs instead of values to avoid copyign them
         [HttpPost("Register")]
         public async Task <IActionResult> RegisterUser(RegisterUserDTO request)
         {
