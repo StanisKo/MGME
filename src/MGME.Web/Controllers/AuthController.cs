@@ -184,7 +184,7 @@ namespace MGME.Web.Controllers
         }
 
         /*
-        Note: we don't use refresh token itself for session management, since
+        NOTE: we don't use refresh token itself for session management, since
         we rotate both refresh and access tokens every time access token is expired
 
         And in such, refresh token is constantly updated; although we still give it

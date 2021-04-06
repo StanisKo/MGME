@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
 
 using MGME.Core.Interfaces.Services;
+using MGME.Core.Services;
 using MGME.Core.Services.AuthService;
 using MGME.Core.Services.UserService;
 
@@ -22,9 +23,11 @@ namespace MGME.Core
         {
             services.AddScoped<IAuthService, AuthService>();
 
-            services.AddHostedService<TokenRecycleService>();
-
             services.AddScoped<IUserService, UserService>();
+
+            services.AddScoped<IHashingService, HashingService>();
+
+            services.AddHostedService<TokenRecycleService>();
         }
     }
 }

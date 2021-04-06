@@ -145,9 +145,23 @@ namespace MGME.Core.Services.UserService
             return response;
         }
 
-        public Task <BaseServiceResponse> ChageUserPassword(ChangeUserPasswordDTO passwords)
+        public async Task <BaseServiceResponse> ChageUserPassword(ChangeUserPasswordDTO passwords)
         {
-            throw new System.NotImplementedException();
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
 
         public async Task <BaseServiceResponse> DeleteUser()

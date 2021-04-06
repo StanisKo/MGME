@@ -35,6 +35,8 @@ namespace MGME.Core.Services.AuthService
 
         private readonly IEntityRepository<RefreshToken> _tokenRepository;
 
+        private readonly IHashingService _hashingService;
+
         private readonly IMapper _mapper;
 
         private readonly IConfiguration _configuration;
@@ -48,6 +50,7 @@ namespace MGME.Core.Services.AuthService
         public AuthService(IAuthRepository authRepository,
                            IEntityRepository<User> userRepository,
                            IEntityRepository<RefreshToken> tokenRepository,
+                           IHashingService hashingService,
                            IMapper mapper,
                            IConfiguration configuration,
                            IWebHostEnvironment environment,
@@ -56,6 +59,8 @@ namespace MGME.Core.Services.AuthService
             _authRepository = authRepository;
             _userRepository = userRepository;
             _tokenRepository = tokenRepository;
+
+            _hashingService = hashingService;
 
             _mapper = mapper;
 
@@ -93,7 +98,7 @@ namespace MGME.Core.Services.AuthService
                     return response;
                 }
 
-                CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+                _hashingService.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
                 User userToRegister = new User()
                 {
@@ -133,8 +138,17 @@ namespace MGME.Core.Services.AuthService
                 {
                     response.Success = false;
                     response.Message = "Either username or password is wrong";
+
+                    return response;
                 }
-                else if (!VerifyPasswordHash(password, userToLogin.PasswordHash, userToLogin.PasswordSalt))
+
+                bool passwordIsValid = _hashingService.VerifyPasswordHash(
+                    password,
+                    userToLogin.PasswordHash,
+                    userToLogin.PasswordSalt
+                );
+
+                if (!passwordIsValid)
                 {
                     response.Success = false;
                     response.Message = "Either username or password is wrong";
@@ -429,34 +443,6 @@ namespace MGME.Core.Services.AuthService
             }
 
             return response;
-        }
-
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (HMACSHA512 hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-            }
-        }
-
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
-        {
-            using (HMACSHA512 hmac = new HMACSHA512(passwordSalt))
-            {
-                byte[] computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-                // Compare hash with the hash from db byte-by-byte
-                for (int i = 0; i < computedHash.Length; i++)
-                {
-                    if (computedHash[i] != passwordHash[i])
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
         }
 
         private string CreateRefreshToken()
