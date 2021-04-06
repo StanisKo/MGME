@@ -28,7 +28,7 @@ namespace MGME.Web.Controllers
         [HttpGet]
         public async Task <IActionResult> GetUser()
         {
-            DataServiceResponse<GetUserDTO> response = await _userService.GetUser();
+            DataServiceResponse<GetOrUpdateUserDTO> response = await _userService.GetUser();
 
             if (response.Success)
             {
@@ -38,13 +38,30 @@ namespace MGME.Web.Controllers
             return NotFound(response);
         }
 
-        [HttpPost("Update")]
-        public async Task<IActionResult> UpdateUser(UpdateUserDTO updatedUser)
+        [HttpPut("Update")]
+        public async Task <IActionResult> UpdateUser(GetOrUpdateUserDTO updatedUser)
         {
             BaseServiceResponse response = await _userService.UpdateUser(updatedUser);
 
             if (response.Success)
             {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
+
+        [HttpDelete("Delete")]
+        public async Task <IActionResult> DeleteUser()
+        {
+            BaseServiceResponse response = await _userService.DeleteUser();
+
+            // We also remove refresh token and session flag, so the user is logged out
+            if (response.Success)
+            {
+                Response.Cookies.Delete("sessionIsActive");
+                Response.Cookies.Delete("refreshToken");
+
                 return Ok(response);
             }
 

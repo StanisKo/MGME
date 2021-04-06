@@ -3,6 +3,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
+using AutoMapper;
+
 using Microsoft.AspNetCore.Http;
 
 using MGME.Core.DTOs;
@@ -17,23 +19,27 @@ namespace MGME.Core.Services.UserService
     {
         private readonly IEntityRepository<User> _repository;
 
+        private readonly IMapper _mapper;
+
         public UserService(IEntityRepository<User> userRepository,
+                           IMapper mapper,
                            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _repository = userRepository;
+            _mapper = mapper;
         }
 
-        public async Task <DataServiceResponse<GetUserDTO>> GetUser()
+        public async Task <DataServiceResponse<GetOrUpdateUserDTO>> GetUser()
         {
-            DataServiceResponse<GetUserDTO> response = new DataServiceResponse<GetUserDTO>();
+            DataServiceResponse<GetOrUpdateUserDTO> response = new DataServiceResponse<GetOrUpdateUserDTO>();
 
             int userId = GetUserIdFromHttpContext();
 
             try
             {
-                GetUserDTO user = await _repository.GetEntityAsync(
+                GetOrUpdateUserDTO user = await _repository.GetEntityAsync(
                     id: userId,
-                    columnsToSelect: user => new GetUserDTO()
+                    columnsToSelect: user => new GetOrUpdateUserDTO()
                     {
                         Id = user.Id,
                         Name = user.Name,
@@ -62,7 +68,7 @@ namespace MGME.Core.Services.UserService
             return response;
         }
 
-        public async Task <BaseServiceResponse> UpdateUser(UpdateUserDTO updatedUser)
+        public async Task <BaseServiceResponse> UpdateUser(GetOrUpdateUserDTO updatedUser)
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
@@ -70,7 +76,15 @@ namespace MGME.Core.Services.UserService
 
             try
             {
-                User userToUpdate = await _repository.GetEntityAsync(userId);
+                GetOrUpdateUserDTO userToUpdate = await _repository.GetEntityAsync(
+                    id: userId,
+                    columnsToSelect: user => new GetOrUpdateUserDTO()
+                    {
+                        Id = user.Id,
+                        Name = user.Name,
+                        Email = user.Email
+                    }
+                );
 
                 if (userToUpdate == null)
                 {
@@ -97,7 +111,7 @@ namespace MGME.Core.Services.UserService
 
                 foreach (PropertyInfo updatedProperty in updatedProperties)
                 {
-                    if (updatedProperty.GetValue(updatedUser) == null)
+                    if (updatedProperty.GetValue(updatedUser) == null || updatedProperty.Name == "Id")
                     {
                         continue;
                     }
@@ -113,7 +127,7 @@ namespace MGME.Core.Services.UserService
                 }
 
                 await _repository.UpdateEntityAsync(
-                    userToUpdate,
+                    _mapper.Map<User>(userToUpdate),
                     propertiesToUpdate
                 );
 
@@ -134,6 +148,40 @@ namespace MGME.Core.Services.UserService
         public Task <BaseServiceResponse> ChageUserPassword(ChangeUserPasswordDTO passwords)
         {
             throw new System.NotImplementedException();
+        }
+
+        public async Task <BaseServiceResponse> DeleteUser()
+        {
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                User userToDelete = await _repository.GetEntityAsync(userId);
+
+                if (userToDelete == null)
+                {
+                    response.Success = false;
+                    response.Message = "User does not exist";
+
+                    return response;
+                }
+
+                await _repository.DeleteEntityAsync(userToDelete);
+
+                response.Success = true;
+                response.Message = $"{userToDelete.Name} was successfully deleted";
+
+                return response;
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
     }
 }
