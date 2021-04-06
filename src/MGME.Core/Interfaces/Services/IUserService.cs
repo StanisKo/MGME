@@ -9,7 +9,7 @@ namespace MGME.Core.Interfaces.Services
     {
         Task <DataServiceResponse<GetUserDTO>> GetUser();
 
-        Task <BaseServiceResponse> UpdateUser(UpdateUserDTO user);
+        Task <BaseServiceResponse> UpdateUser(UpdateUserDTO updatedUser);
 
         Task <BaseServiceResponse> ChageUserPassword(ChangeUserPasswordDTO passwords);
     }

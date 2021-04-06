@@ -37,5 +37,18 @@ namespace MGME.Web.Controllers
 
             return NotFound(response);
         }
+
+        [HttpPost("Update")]
+        public async Task<IActionResult> UpdateUser(UpdateUserDTO updatedUser)
+        {
+            BaseServiceResponse response = await _userService.UpdateUser(updatedUser);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
     }
 }

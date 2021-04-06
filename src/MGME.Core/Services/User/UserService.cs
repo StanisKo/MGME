@@ -1,5 +1,7 @@
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using Microsoft.AspNetCore.Http;
 
@@ -13,12 +15,12 @@ namespace MGME.Core.Services.UserService
 {
     public class UserService : BaseEntityService, IUserService
     {
-        private readonly IEntityRepository<User> _userRepository;
+        private readonly IEntityRepository<User> _repository;
 
         public UserService(IEntityRepository<User> userRepository,
                            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
-            _userRepository = userRepository;
+            _repository = userRepository;
         }
 
         public async Task <DataServiceResponse<GetUserDTO>> GetUser()
@@ -29,7 +31,7 @@ namespace MGME.Core.Services.UserService
 
             try
             {
-                GetUserDTO user = await _userRepository.GetEntityAsync(
+                GetUserDTO user = await _repository.GetEntityAsync(
                     id: userId,
                     columnsToSelect: user => new GetUserDTO()
                     {
@@ -60,9 +62,73 @@ namespace MGME.Core.Services.UserService
             return response;
         }
 
-        public Task <BaseServiceResponse> UpdateUser(UpdateUserDTO user)
+        public async Task <BaseServiceResponse> UpdateUser(UpdateUserDTO updatedUser)
         {
-            throw new System.NotImplementedException();
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                User userToUpdate = await _repository.GetEntityAsync(userId);
+
+                if (userToUpdate == null)
+                {
+                    response.Success = false;
+                    response.Message = "User does not exist";
+
+                    return response;
+                }
+
+                /*
+                Here we use reflections, to loop through updated properties
+                and assign their values to the object queried from the database
+
+                If the property is missing from request
+                (we know that since possible fields are nullable and after serialization will be null)
+                we simply skip the update, effectively updating only provided fields
+                */
+                Type typeOfUser = userToUpdate.GetType();
+
+                PropertyInfo[] updatedProperties = updatedUser.GetType().GetProperties();
+
+                // Is used later to let context know which properties to update
+                List<string> propertiesToUpdate = new List<string>();
+
+                foreach (PropertyInfo updatedProperty in updatedProperties)
+                {
+                    if (updatedProperty.GetValue(updatedUser) == null)
+                    {
+                        continue;
+                    }
+
+                    PropertyInfo propertyToUpdate = typeOfUser.GetProperty(updatedProperty.Name);
+
+                    propertyToUpdate.SetValue(
+                        userToUpdate,
+                        updatedProperty.GetValue(updatedUser)
+                    );
+
+                    propertiesToUpdate.Add(updatedProperty.Name);
+                }
+
+                await _repository.UpdateEntityAsync(
+                    userToUpdate,
+                    propertiesToUpdate
+                );
+
+                response.Success = true;
+                response.Message = $"{updatedUser.Name} was successfully updated";
+
+                return response;
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
 
         public Task <BaseServiceResponse> ChageUserPassword(ChangeUserPasswordDTO passwords)

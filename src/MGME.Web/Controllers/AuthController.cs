@@ -82,7 +82,7 @@ namespace MGME.Web.Controllers
         }
 
         [HttpGet("Logout")]
-        public async Task <IActionResult> Logout()
+        public async Task <IActionResult> LogoutUser()
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
