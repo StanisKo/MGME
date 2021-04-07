@@ -1,3 +1,3 @@
 import { KnownAction, actionCreators } from './actionsCreators';
 
-export { KnownAction, actionCreators };
+export type { KnownAction, actionCreators };
