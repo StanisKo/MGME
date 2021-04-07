@@ -26,3 +26,18 @@ export interface UserTokenResponse {
     accessToken: string;
 }
 
+export interface ReadFromApi {
+    page: string;
+    key: string;
+    url: string;
+    params: { [key: string]: string | number | boolean | number[] | string[] } | null;
+}
+
+export interface WriteToApi {
+    url: string;
+    body: { [key: string]: string | number | boolean | number[] };
+    page: string;
+    keys: string[] | null;
+}
+
+export type GenericApiResponse = { [key: string]: unknown } | { [key: string]: unknown }[];

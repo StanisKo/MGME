@@ -1,3 +1,4 @@
-import { KnownAction, actionCreators } from './actionsCreators';
+import { actionCreators, KnownAction } from './actionsCreators';
 
-export type { KnownAction, actionCreators };
+export { actionCreators };
+export type { KnownAction };
