@@ -32,6 +32,7 @@ export class DataController {
     If request does not need parameters, please provide null
 
     @param page page to fetch data for
+    @param key key to save data under
     @param url endpoint
     @param params parameters to encode in URL
     */
