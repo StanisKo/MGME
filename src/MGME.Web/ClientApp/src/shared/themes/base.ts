@@ -22,7 +22,7 @@ export const base = createMuiTheme({
                 }
             }
         },
-        // kudos to: https://codepen.io/AgnusDei/pen/NWPbOxL
+        // Kudos to: https://codepen.io/AgnusDei/pen/NWPbOxL
         MuiPaper: {
             elevation0: {
                 display: 'flex',
