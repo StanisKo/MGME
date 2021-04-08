@@ -1,4 +1,4 @@
-import { ReactElement, useEffect } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { User } from './interfaces';
@@ -8,7 +8,9 @@ import { getUser, updateUser } from './requests';
 
 import { Button, Paper, Grid, Typography, TextField, IconButton } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+
 import EditIcon from '@material-ui/icons/Edit';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme) => ({
     deleteButton: {
@@ -49,8 +51,14 @@ export const UserProfile = (): ReactElement | null => {
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
     );
 
+    const [editing, setEditing] = useState<boolean>(false);
+
     const handleUpdateTest = async (): Promise<void> => {
         await updateUser('Stanislavskiy');
+    };
+
+    const handleEditing = (): void => {
+        setEditing(!editing);
     };
 
     useEffect(() => {
@@ -74,59 +82,65 @@ export const UserProfile = (): ReactElement | null => {
                     </Grid>
                     <Grid item container xs={11} sm={11} lg={11} direction="column" spacing={4}>
                         <Grid item>
-                            <Typography component="h6" variant="h6">
-                                {`Name: ${user.name}`}
-                            </Typography>
-                        </Grid>
-                        <Grid item>
-                            <Typography component="h6" variant="h6">
-                                {`Email: ${user.email}`}
-                            </Typography>
+                            <TextField
+                                className={quarterWidth}
+                                variant="outlined"
+                                defaultValue={`${user.name}`}
+                                id="username"
+                                name="username"
+                                label="Username"
+                                disabled={!editing}
+                            />
                         </Grid>
                         <Grid item>
                             <TextField
                                 className={quarterWidth}
                                 variant="outlined"
-                                required
-                                name="password"
+                                defaultValue={`${user.email}`}
+                                id="email"
+                                name="email"
+                                label="Email Address"
+                                disabled={!editing}
+                            />
+                        </Grid>
+                        <Grid item>
+                            <TextField
+                                className={quarterWidth}
+                                variant="outlined"
+                                id="old-password"
+                                name="old-password"
                                 label="Old Password"
                                 type="password"
-                                id="password"
-                                autoComplete="password"
-                                disabled
+                                disabled={!editing}
                             />
                         </Grid>
                         <Grid item>
                             <TextField
                                 className={quarterWidth}
                                 variant="outlined"
-                                required
-                                name="password"
-                                label="New Password"
-                                type="password"
-                                id="password"
-                                autoComplete="password"
-                                disabled
-                            />
-                        </Grid>
-                        <Grid item>
-                            <TextField
-                                className={quarterWidth}
-                                variant="outlined"
-                                required
-                                name="password"
+                                id="new-password"
+                                name="new-password"
                                 label="Confirm New Password"
                                 type="password"
-                                id="password"
-                                autoComplete="password"
-                                disabled
+                                disabled={!editing}
+                            />
+                        </Grid>
+                        <Grid item>
+                            <TextField
+                                className={quarterWidth}
+                                variant="outlined"
+                                id="confirm-new-password"
+                                name="confirm-new-password"
+                                label="Confirm New Password"
+                                type="password"
+                                disabled={!editing}
                             />
                         </Grid>
                     </Grid>
 
-                    <Grid item xs={1} sm={1} lg={1} className={editIcon}>
+                    <Grid item xs={1} sm={1} lg={1} className={editIcon} onClick={handleEditing}>
                         <IconButton>
-                            <EditIcon/>
+                            {!editing ? <EditIcon/> : <CloseIcon/>}
                         </IconButton>
                     </Grid>
 
