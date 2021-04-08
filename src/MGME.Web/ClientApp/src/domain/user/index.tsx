@@ -1,24 +1,21 @@
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+
 import { User } from './interfaces';
+import { ApplicationState } from '../../store';
 
 import { getUser } from './requests';
 
 export const UserProfile = (): ReactElement => {
-    const [user, setUser] = useState<User>({} as User);
-
-    const gotUser = Object.keys(user).length > 0;
+    const user: User | null = useSelector((store: ApplicationState) => store.user ?? null);
 
     useEffect(() => {
         (async (): Promise<void> => {
-            const userResponse = await getUser();
-
-            if (userResponse.success) {
-                setUser(userResponse.data);
-            }
+            await getUser();
         })();
     }, []);
 
-    return gotUser ? (
+    return user ? (
         <>
             <div>{`Name: ${user.name}`}</div>
             <div>{`Email: ${user.email}`}</div>

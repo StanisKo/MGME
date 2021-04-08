@@ -1,13 +1,13 @@
 import { User } from '../interfaces';
-import { DataServiceResponse } from '../../../shared/interfaces';
-import { makeRequest, URLBuilder } from '../../../shared/utils';
+import { URLBuilder, DataController } from '../../../shared/utils';
 
-export const getUser = async (): Promise<DataServiceResponse<User>> => {
-    return await makeRequest<DataServiceResponse<User>>(
+export const getUser = async (): Promise<void> => {
+    await DataController.FetchAndSave<User>(
         {
+            page: 'user',
+            key: 'data',
             url: URLBuilder.buildGET('user'),
-            method: 'GET',
-            headers: null
+            params: null
         }
     );
 };
