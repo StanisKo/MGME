@@ -6,7 +6,7 @@ import { ApplicationState } from '../../store';
 
 import { getUser, updateUser } from './requests';
 
-import { Button } from '@material-ui/core';
+import { Button, Paper } from '@material-ui/core';
 
 export const UserProfile = (): ReactElement | null => {
     const user: User | null = useSelector(
@@ -36,6 +36,7 @@ export const UserProfile = (): ReactElement | null => {
             <Button onClick={handleUpdateTest}>
                 Update
             </Button>
+            <Paper>test</Paper>
         </>
     ) : null;
 };

@@ -24,6 +24,16 @@ export const base = createMuiTheme({
                     backgroundColor: '#524878'
                 }
             }
+        },
+        MuiPaper: {
+            elevation0: {
+                background: '#F5F5F5',
+                boxShadow: '-6px -6px 20px #FDFDFD, 6px 6px 20px #E4E4E4',
+                border: 'solid 2px white',
+                borderRadius: '10px',
+                margin: '1.4rem 0',
+                padding: '1rem 3rem'
+            }
         }
     }
 });
