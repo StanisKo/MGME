@@ -1,6 +1,6 @@
 import { BaseServiceResponse, DataServiceResponse, ReadFromApi, WriteToApi } from '../interfaces';
 
-import { makeRequest } from './makeRequest';
+import { request } from './request';
 
 import { store } from '../../store/configureStore';
 import { actionCreators } from '../../store/shared';
@@ -18,6 +18,8 @@ export class DataController {
     */
     private static urlsToRefetch: { [key: string]: { [key: string]: string } } = {};
 
+    private static token: string = store.getState().auth?.token;
+
     /**
     Reads data from API, updates the Redux store with new values, saves requested URLs for future refetch
     If request does not need parameters, please provide null
@@ -30,7 +32,7 @@ export class DataController {
     public static async FetchAndSave<TResult>(
         { page, key, url, params }: ReadFromApi
 
-    ): Promise<void | BaseServiceResponse | DataServiceResponse<TResult>> {
+    ): Promise<void | DataServiceResponse<TResult>> {
 
         if (params && Object.keys(params).length === 0) {
             throw new Error('Parameters object cannot be empty. If you don\'t need params, provide null');
@@ -38,11 +40,11 @@ export class DataController {
 
         const urlToRequest = params ? `${url}/?${qs.stringify(params)}` : url;
 
-        const response = await makeRequest<BaseServiceResponse | DataServiceResponse<TResult>>(
+        const response = await request<DataServiceResponse<TResult>>(
             {
                 url: urlToRequest,
                 method: 'GET',
-                headers: null
+                headers: { 'Authorization': `Bearer ${this.token}` }
             }
         );
 
@@ -50,14 +52,12 @@ export class DataController {
             return response;
         }
 
-        const data = (response as DataServiceResponse<TResult>).data;
-
         store.dispatch(
             actionCreators.updateStore(
                 {
                     type: 'UPDATE_STORE',
                     reducer: page,
-                    payload: { data }
+                    payload: { data: response.data }
                 }
             )
         );
@@ -66,61 +66,84 @@ export class DataController {
     }
 
     /**
-    Makes a POST request, refetches data from the API, updates the store with new values
+    Makes a POST/PUT/DELETE request, refetches data from the API, updates the store with new values
     
     By default, refetches all urls saved for this page
     If you only need one or several specific urls, please provide array of keys to refetch for, otherwise null
     
     @param url endpoint
+    @param method http method
     @param body body of the request
-    @param page page to refetch data for after POST request
+    @param page page to refetch data for after request
     @param keys keys in the page under which data will be saved in store
     */
-    public static async PostAndRefetch({ url, body, page, keys }: WriteToApi): Promise<void>
-    {
-        if (keys && keys.length === 0)
-        {
+    public static async UpdateAndRefetch(
+        { url, method, body, page, keys }: WriteToApi
+
+    ): Promise<void | BaseServiceResponse> {
+
+        if (keys && keys.length === 0) {
             throw new Error('Keys array cannot be empty');
         }
 
-        await post<any>
-        (
-            url,
-            body,
-            { 'X-CSRFToken': this.token }
+        const response = await request<BaseServiceResponse>(
+            {
+                url: url,
+                method: method,
+                body: body,
+                headers: { 'Authorization': `Bearer ${this.token}` }
+            }
         );
 
-        if (keys && keys.length > 0)
-        {
-            for (const key of keys)
-            {
-                const dataset = await get<any>(this.urlsToRefetch[page][key]);
+        if (!response.success) {
+            return response;
+        }
 
-                store.dispatch
-                (
+        if (keys && keys.length > 0) {
+            for (const key of keys) {
+                /*
+                We type data service response with unknown, since we don't know in advance which endpoints
+                We would like to refetch after update
+                */
+                const response = await request<DataServiceResponse<unknown>>(
                     {
-                        type: ActionTypes.UPDATE_STORE,
-                        name: page,
-                        payload: { [key]: dataset },
-                    },
+                        url: this.urlsToRefetch[page][key],
+                        method: 'GET',
+                        headers: { 'Authorization': `Bearer ${this.token}` }
+                    }
+                );
+
+                store.dispatch(
+                    actionCreators.updateStore(
+                        {
+                            type: 'UPDATE_STORE',
+                            reducer: page,
+                            payload: { data: response.data }
+                        }
+                    )
                 );
             }
         }
-        else
-        {
+        else {
             const urls = Object.keys(this.urlsToRefetch[page]);
 
-            for (const key of urls)
-            {
-                const dataset = await get<any>(this.urlsToRefetch[page][key]);
-    
-                store.dispatch
-                (
+            for (const key of urls) {
+                const response = await request<DataServiceResponse<unknown>>(
                     {
-                        type: ActionTypes.UPDATE_STORE,
-                        name: page,
-                        payload: { [key]: dataset },
-                    },
+                        url: this.urlsToRefetch[page][key],
+                        method: 'GET',
+                        headers: { 'Authorization': `Bearer ${this.token}` }
+                    }
+                );
+
+                store.dispatch(
+                    actionCreators.updateStore(
+                        {
+                            type: 'UPDATE_STORE',
+                            reducer: page,
+                            payload: { data: response.data }
+                        }
+                    )
                 );
             }
         }

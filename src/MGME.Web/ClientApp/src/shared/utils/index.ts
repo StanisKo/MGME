@@ -1,5 +1,5 @@
 import { history } from './history';
 import { URLBuilder } from './urlBuilder';
-import { makeRequest } from './makeRequest';
+import { request } from './request';
 
-export { history, URLBuilder, makeRequest };
+export { history, URLBuilder, request };

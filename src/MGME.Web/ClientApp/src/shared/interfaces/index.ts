@@ -35,9 +35,8 @@ export interface ReadFromApi {
 
 export interface WriteToApi {
     url: string;
+    method: 'POST' | 'PUT' | 'DELETE';
     body: { [key: string]: string | number | boolean | number[] };
     page: string;
     keys: string[] | null;
 }
-
-export type GenericApiResponse = { [key: string]: unknown } | { [key: string]: unknown }[];

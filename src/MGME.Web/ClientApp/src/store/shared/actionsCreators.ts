@@ -15,11 +15,10 @@ interface UpdateStore {
 
 export type KnownAction = UpdateStore;
 
-// Yet, we can make it more specific by providing type from the caller's scope
 export const actionCreators = {
-    updateStore: <TResult>({ type, reducer, payload }: UpdateStore): UpdateStore => ({
+    updateStore: ({ type, reducer, payload }: UpdateStore): UpdateStore => ({
         type: type,
         reducer: reducer,
-        payload: { data: payload.data as TResult }
+        payload: { data: payload.data }
     })
 };

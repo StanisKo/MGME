@@ -13,7 +13,7 @@ const http = async <TResult>(request: RequestInfo): Promise<TResult> => {
     }
 };
 
-export const makeRequest = async <TResult>({ url, method, headers, body }: RequestConfig): Promise<TResult> => {
+export const request = async <TResult>({ url, method, headers, body }: RequestConfig): Promise<TResult> => {
     const args: RequestInit = {
         method: method,
         headers: {
