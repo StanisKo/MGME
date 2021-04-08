@@ -46,7 +46,6 @@ export const logoutUser = async (): Promise<BaseServiceResponse> => {
     );
 };
 
-// We use get, since refresh token is anyhow retrieved from httpOnly cookie; TODO: rewrite to POST
 export const refreshToken = async (): Promise <DataServiceResponse<UserTokenResponse>> => {
     return await request<DataServiceResponse<UserTokenResponse>>(
         {

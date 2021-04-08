@@ -9,13 +9,6 @@ import qs from 'qs';
 
 /*
 Client-side controller that manages network requests and application state via redux store
-
-NOTE:
-
-Note to self: maybe there is no need to for keys for this app; maybe it will be enough just to refetch
-one endpoint per page/reducer
-
-but who knows; you don't now yet how many endpoints one feature might use
 */
 
 export class DataController {
