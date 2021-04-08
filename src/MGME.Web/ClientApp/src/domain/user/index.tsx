@@ -30,13 +30,14 @@ export const UserProfile = (): ReactElement | null => {
     }, [isAuthorized]);
 
     return user ? (
-        <>
-            <div>{`Name: ${user.name}`}</div>
-            <div>{`Email: ${user.email}`}</div>
-            <Button onClick={handleUpdateTest}>
-                Update
-            </Button>
-            <Paper>test</Paper>
-        </>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Paper elevation={0}>
+                <div>{`Name: ${user.name}`}</div>
+                <div>{`Email: ${user.email}`}</div>
+                <Button onClick={handleUpdateTest}>
+                    Update
+                </Button>
+            </Paper>
+        </div>
     ) : null;
 };

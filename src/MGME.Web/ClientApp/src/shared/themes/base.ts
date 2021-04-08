@@ -1,11 +1,5 @@
 import { createMuiTheme } from '@material-ui/core/styles';
 
-/*
-TODO:
-
-Refine colors
-*/
-
 export const base = createMuiTheme({
     palette: {
         primary: {
@@ -25,14 +19,17 @@ export const base = createMuiTheme({
                 }
             }
         },
+        // kudos to: https://codepen.io/AgnusDei/pen/NWPbOxL
         MuiPaper: {
             elevation0: {
-                background: '#F5F5F5',
-                boxShadow: '-6px -6px 20px #FDFDFD, 6px 6px 20px #E4E4E4',
-                border: 'solid 2px white',
-                borderRadius: '10px',
-                margin: '1.4rem 0',
-                padding: '1rem 3rem'
+                display: 'flex',
+                width: '97.5%',
+                top: '0%',
+                left: '50%',
+                margin: '2em 0',
+                padding: '3em',
+                boxShadow: '1px 1px 10px #262626, 0 0 60px #8a4d0f inset',
+                background: '#fffef0'
             }
         }
     }
