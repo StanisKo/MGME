@@ -6,7 +6,7 @@ export const getUser = async (): Promise<void> => {
         {
             page: 'user',
             key: 'data',
-            url: URLBuilder.buildGET('user'),
+            url: URLBuilder.ReadFrom('user'),
             params: null
         }
     );

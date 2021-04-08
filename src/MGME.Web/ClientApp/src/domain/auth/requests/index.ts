@@ -3,6 +3,11 @@ import { BaseServiceResponse, DataServiceResponse, UserTokenResponse } from '../
 
 import { MODE } from '../helpers';
 
+/*
+We don't use DataController here, since we don't need to rely on JWT for these requests;
+neither we require refetches after updates
+*/
+
 export const loginOrRegisterUser = async (
     mode: number,
     body: { [key: string]: string }
@@ -12,7 +17,7 @@ export const loginOrRegisterUser = async (
 
     return await request<BaseServiceResponse | DataServiceResponse<UserTokenResponse>>(
         {
-            url: URLBuilder.buildPOST('auth', action),
+            url: URLBuilder.WriteTo('auth', action),
             method: 'POST',
             headers: null,
             body: body
@@ -23,7 +28,7 @@ export const loginOrRegisterUser = async (
 export const confirmEmailAddress = async (token: string): Promise <BaseServiceResponse> => {
     return await request<BaseServiceResponse>(
         {
-            url: URLBuilder.buildPOST('auth', 'confirm'),
+            url: URLBuilder.WriteTo('auth', 'confirm'),
             method: 'POST',
             headers: null,
             body: { token: token }
@@ -34,17 +39,18 @@ export const confirmEmailAddress = async (token: string): Promise <BaseServiceRe
 export const logoutUser = async (): Promise<BaseServiceResponse> => {
     return await request<BaseServiceResponse>(
         {
-            url: URLBuilder.buildPOST('auth', 'logout'),
+            url: URLBuilder.WriteTo('auth', 'logout'),
             method: 'GET',
             headers: null
         }
     );
 };
 
+// We use get, since refresh token is anyhow retrieved from httpOnly cookie; TODO: rewrite to POST
 export const refreshToken = async (): Promise <DataServiceResponse<UserTokenResponse>> => {
     return await request<DataServiceResponse<UserTokenResponse>>(
         {
-            url: URLBuilder.buildPOST('auth', 'refresh-token'),
+            url: URLBuilder.ReadFrom('auth', 'refresh-token'),
             method: 'GET',
             headers: null
         }

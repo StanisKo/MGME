@@ -61,6 +61,7 @@ export class DataController {
                 {
                     type: 'UPDATE_STORE',
                     reducer: page,
+                    key: key,
                     payload: { data: response.data }
                 }
             )
@@ -126,6 +127,7 @@ export class DataController {
                         {
                             type: 'UPDATE_STORE',
                             reducer: page,
+                            key: key,
                             payload: { data: response.data }
                         }
                     )
@@ -149,6 +151,7 @@ export class DataController {
                         {
                             type: 'UPDATE_STORE',
                             reducer: page,
+                            key: key,
                             payload: { data: response.data }
                         }
                     )

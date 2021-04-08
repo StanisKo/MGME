@@ -10,15 +10,17 @@ Also, data key is unknown since we cannot know in advance the shape of response
 interface UpdateStore {
     type: 'UPDATE_STORE';
     reducer: string;
+    key: string;
     payload: { data: unknown };
 }
 
 export type KnownAction = UpdateStore;
 
 export const actionCreators = {
-    updateStore: ({ type, reducer, payload }: UpdateStore): UpdateStore => ({
+    updateStore: ({ type, reducer, key, payload }: UpdateStore): UpdateStore => ({
         type: type,
         reducer: reducer,
+        key: key,
         payload: { data: payload.data }
     })
 };

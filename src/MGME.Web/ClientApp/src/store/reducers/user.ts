@@ -3,8 +3,10 @@ import { Action, Reducer } from 'redux';
 import { KnownAction } from '../shared';
 
 export interface UserState {
-    name: string;
-    email: string;
+    data: {
+        name: string;
+        email: string;
+    }
 }
 
 export const UserReducer: Reducer<UserState> = (state: UserState | undefined, incomingAction: Action): UserState => {
@@ -12,15 +14,22 @@ export const UserReducer: Reducer<UserState> = (state: UserState | undefined, in
         return {} as UserState;
     }
 
-    const action = incomingAction as KnownAction;
+    const { type, reducer, key, payload } = incomingAction as KnownAction;
 
-    switch (action.type) {
+    if (reducer !== 'user') {
+        return state;
+    }
+
+    switch (type) {
         case 'UPDATE_STORE':
-            const data = action.payload.data as unknown as UserState;
+            const incoming = payload as unknown as UserState;
 
             return {
-                name: data.name,
-                email: data.email
+                ...state,
+                [key]: {
+                    name: incoming.data.name,
+                    email: incoming.data.email
+                }
             };
 
         default:
