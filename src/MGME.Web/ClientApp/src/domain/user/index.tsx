@@ -9,11 +9,15 @@ import { getUser } from './requests';
 export const UserProfile = (): ReactElement => {
     const user: User | null = useSelector((store: ApplicationState) => store.user ?? null);
 
+    const isAuthorized: boolean = useSelector((store: ApplicationState) => Boolean(store.auth?.token) ?? false);
+
     useEffect(() => {
         (async (): Promise<void> => {
-            await getUser();
+            if (isAuthorized) {
+                await getUser();
+            }
         })();
-    }, []);
+    }, [isAuthorized]);
 
     return user ? (
         <>

@@ -14,18 +14,17 @@ Client-side controller that manages network requests and application state via r
 export class DataController {
     /*
     Container for urls to refetch after POST/PUT/DELETE requests
-    Namespaced by page (reducer) and different datasets (keys)
+    Namespaced by page (reducer)
     */
-    private static urlsToRefetch: { [key: string]: { [key: string]: string } } = {};
+    private static _urlsToRefetch: { [key: string]: { [key: string]: string } } = {};
 
-    private static token: string = store.getState().auth?.token;
+    private static _token: string;
 
     /**
     Reads data from API, updates the Redux store with new values, saves requested URLs for future refetch
     If request does not need parameters, please provide null
 
     @param page page to fetch data for
-    @param key key under which data will be saved in store
     @param url endpoint
     @param params parameters to encode in URL
     */
@@ -33,6 +32,11 @@ export class DataController {
         { page, key, url, params }: ReadFromApi
 
     ): Promise<void | DataServiceResponse<TResult>> {
+
+        // Check if we got token, otherwise take it
+        if (!this._token) {
+            this._token = store.getState().auth?.token;
+        }
 
         if (params && Object.keys(params).length === 0) {
             throw new Error('Parameters object cannot be empty. If you don\'t need params, provide null');
@@ -44,7 +48,7 @@ export class DataController {
             {
                 url: urlToRequest,
                 method: 'GET',
-                headers: { 'Authorization': `Bearer ${this.token}` }
+                headers: { 'Authorization': `Bearer ${this._token}` }
             }
         );
 
@@ -62,7 +66,7 @@ export class DataController {
             )
         );
 
-        this.urlsToRefetch = { ...this.urlsToRefetch, [page]: { ...this.urlsToRefetch[page], [key]: urlToRequest } };
+        this._urlsToRefetch = { ...this._urlsToRefetch, [page]: { ...this._urlsToRefetch[page], [key]: urlToRequest } };
     }
 
     /**
@@ -82,6 +86,10 @@ export class DataController {
 
     ): Promise<void | BaseServiceResponse> {
 
+        if (!this._token) {
+            this._token = store.getState().auth?.token;
+        }
+
         if (keys && keys.length === 0) {
             throw new Error('Keys array cannot be empty');
         }
@@ -91,7 +99,7 @@ export class DataController {
                 url: url,
                 method: method,
                 body: body,
-                headers: { 'Authorization': `Bearer ${this.token}` }
+                headers: { 'Authorization': `Bearer ${this._token}` }
             }
         );
 
@@ -107,9 +115,9 @@ export class DataController {
                 */
                 const response = await request<DataServiceResponse<unknown>>(
                     {
-                        url: this.urlsToRefetch[page][key],
+                        url: this._urlsToRefetch[page][key],
                         method: 'GET',
-                        headers: { 'Authorization': `Bearer ${this.token}` }
+                        headers: { 'Authorization': `Bearer ${this._token}` }
                     }
                 );
 
@@ -125,14 +133,14 @@ export class DataController {
             }
         }
         else {
-            const urls = Object.keys(this.urlsToRefetch[page]);
+            const urls = Object.keys(this._urlsToRefetch[page]);
 
             for (const key of urls) {
                 const response = await request<DataServiceResponse<unknown>>(
                     {
-                        url: this.urlsToRefetch[page][key],
+                        url: this._urlsToRefetch[page][key],
                         method: 'GET',
-                        headers: { 'Authorization': `Bearer ${this.token}` }
+                        headers: { 'Authorization': `Bearer ${this._token}` }
                     }
                 );
 
