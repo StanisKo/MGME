@@ -4,7 +4,9 @@ import { useSelector } from 'react-redux';
 import { User } from './interfaces';
 import { ApplicationState } from '../../store';
 
-import { getUser } from './requests';
+import { getUser, updateUser } from './requests';
+
+import { Button } from '@material-ui/core';
 
 export const UserProfile = (): ReactElement | null => {
     const user: User | null = useSelector(
@@ -14,6 +16,10 @@ export const UserProfile = (): ReactElement | null => {
     const isAuthorized: boolean = useSelector(
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
     );
+
+    const handleUpdateTest = async (): Promise<void> => {
+        await updateUser('Stanislavskiy');
+    };
 
     useEffect(() => {
         (async (): Promise<void> => {
@@ -27,6 +33,9 @@ export const UserProfile = (): ReactElement | null => {
         <>
             <div>{`Name: ${user.name}`}</div>
             <div>{`Email: ${user.email}`}</div>
+            <Button onClick={handleUpdateTest}>
+                Update
+            </Button>
         </>
     ) : null;
 };
