@@ -33,11 +33,11 @@ const useStyles = makeStyles((theme) => ({
     },
     editIcon: {
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
+        flexGrow: 1,
+        justifyContent: 'flex-end',
+        alignItems: 'flex-end',
         '& > button': {
-            marginLeft: '3em',
-            top: '-0.5em'
+            top: '-0.15em'
         }
     },
     // Some voodoo never hurts: https://github.com/mui-org/material-ui/issues/14427
@@ -87,6 +87,13 @@ export const UserProfile = (): ReactElement | null => {
                             User Profile
                         </Typography>
                     </Grid>
+
+                    <Grid item className={editIcon} onClick={handleEditing}>
+                        <IconButton>
+                            {!editing ? <EditIcon/> : <CloseIcon/>}
+                        </IconButton>
+                    </Grid>
+
                     <Grid item container xs={11} sm={11} lg={11} direction="column" spacing={4}>
                         <Grid item>
                             <TextField
@@ -145,12 +152,6 @@ export const UserProfile = (): ReactElement | null => {
                                 }}
                             />
                         </Grid>
-                    </Grid>
-
-                    <Grid item xs={1} sm={1} lg={1} className={editIcon} onClick={handleEditing}>
-                        <IconButton>
-                            {!editing ? <EditIcon/> : <CloseIcon/>}
-                        </IconButton>
                     </Grid>
 
                     <Grid item container spacing={4} className={toRight}>
