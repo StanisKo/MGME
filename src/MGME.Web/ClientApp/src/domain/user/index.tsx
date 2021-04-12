@@ -149,7 +149,12 @@ export const UserProfile = (): ReactElement | null => {
     };
 
     const handleUpdate = async (): Promise<void> => {
-        const response = await updateUser({ name: name, email: email });
+        const params: { [key: string]: string } = {
+            ...(name && !nameError ? { name: name } : null),
+            ...(email && !emailError ? { email: email } : null)
+        };
+
+        const response = await updateUser(params);
 
         if (response) {
             setResponse(response);
