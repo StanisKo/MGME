@@ -15,9 +15,9 @@ import { ApplicationState } from '../../store';
 
 import { getUser, updateUser } from './requests';
 
-import { INPUT_TYPE } from '../../shared/helpers';
 import { Alert } from '../../shared/components/alert';
 import { BaseServiceResponse } from '../../shared/interfaces';
+import { INPUT_TYPE, validEmailFormat } from '../../shared/helpers';
 
 import { Button, Paper, Grid, Typography, TextField, IconButton, Snackbar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -78,12 +78,17 @@ export const UserProfile = (): ReactElement | null => {
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHelperText, setNameHelperText] = useState<string>('');
 
+    const [email, setEmail] = useState<string>('');
+    const [emailError, setEmailError] = useState<boolean>(false);
+    const [emailHelperText, setEmailHelperText] = useState<string>('');
+
     const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
 
     const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
 
     const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
-        [INPUT_TYPE.USERNAME]: setName
+        [INPUT_TYPE.USERNAME]: setName,
+        [INPUT_TYPE.EMAIL]: setEmail
     };
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -118,13 +123,33 @@ export const UserProfile = (): ReactElement | null => {
 
                 break;
 
+            case INPUT_TYPE.EMAIL:
+                if (!validEmailFormat.test(value)) {
+                    setEmailError(true);
+                    setEmailHelperText('Email address is not valid');
+
+                    break;
+                }
+
+                if (value === user?.email) {
+                    setEmailError(true);
+                    setEmailHelperText('Email cannot be the same as old email');
+
+                    break;
+                }
+
+                setEmailError(false);
+                setEmailHelperText('');
+
+                break;
+
             default:
                 break;
         }
     };
 
     const handleUpdate = async (): Promise<void> => {
-        const response = await updateUser({ name: name });
+        const response = await updateUser({ name: name, email: email });
 
         if (response) {
             setResponse(response);
@@ -162,10 +187,15 @@ export const UserProfile = (): ReactElement | null => {
 
     useEffect(() => {
         if (!editing && user !== null) {
-            setName(user.name);
             setCanUpdate(false);
+
+            setName(user.name);
             setNameError(false);
             setNameHelperText('');
+
+            setEmail(user.email);
+            setEmailError(false);
+            setEmailHelperText('');
         }
     // Explicitly done to avoid unnecessary re-renders
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -182,6 +212,19 @@ export const UserProfile = (): ReactElement | null => {
         setCanUpdate(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [name, nameError]);
+
+    /*
+    Since we want to allow seperate updates, we have separate callbacks for different fields
+    We also double check if email does not equal previous email to handle inital render
+    */
+    useEffect(() => {
+        if (email && !emailError && email !== user?.email) {
+            setCanUpdate(true);
+
+            return;
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [email, emailError]);
 
     const { centered, deleteButton, oneThirdWidth, toRight, editIcon, input } = useStyles();
 
@@ -202,7 +245,6 @@ export const UserProfile = (): ReactElement | null => {
                     </Grid>
 
                     <Grid item xs={11} sm={11} lg={11}>
-
                         <Grid
                             item
                             container
@@ -225,11 +267,15 @@ export const UserProfile = (): ReactElement | null => {
                             </Grid>
                             <Grid item>
                                 <TextField
+                                    error={emailError}
+                                    helperText={emailHelperText}
                                     fullWidth
                                     variant="outlined"
                                     defaultValue={`${user.email}`}
                                     label="Email Address"
                                     disabled={!editing}
+                                    onChange={handleInputChange}
+                                    inputProps={{ inputtype: INPUT_TYPE.EMAIL }}
                                 />
                             </Grid>
                             <Grid item>
