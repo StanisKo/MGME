@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useState, ChangeEvent, FocusEvent, Dispatch, SetStateAction } from 'react';
+import { ReactElement, useEffect, useState, ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useSelector } from 'react-redux';
 
 import { User } from './interfaces';
@@ -60,13 +60,12 @@ export const UserProfile = (): ReactElement | null => {
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
     );
 
+    const [editing, setEditing] = useState<boolean>(false);
     const [canUpdate, setCanUpdate] = useState<boolean>(false);
 
     const [name, setName] = useState<string>('');
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHelperText, setNameHelperText] = useState<string>('');
-
-    const [editing, setEditing] = useState<boolean>(false);
 
     const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
         [INPUT_TYPE.USERNAME]: setName
@@ -78,21 +77,21 @@ export const UserProfile = (): ReactElement | null => {
         const value = event.target.value;
 
         inputTypeToCallback[inputType](value);
+
+        handleInputValidation(inputType, value);
     };
 
-    const handleInputValidation = (event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
-        const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
-
+    const handleInputValidation = (inputType: number, value: string): void => {
         switch (inputType) {
             case INPUT_TYPE.USERNAME:
-                if (name.length < 6) {
+                if (value.length < 6) {
                     setNameError(true);
                     setNameHelperText('Username must be at least 6 characters long');
 
                     break;
                 }
 
-                if (name === user?.name) {
+                if (value === user?.name) {
                     setNameError(true);
                     setNameHelperText('Username cannot be the same as old username');
 
@@ -190,7 +189,6 @@ export const UserProfile = (): ReactElement | null => {
                                     label="Username"
                                     disabled={!editing}
                                     onChange={handleInputChange}
-                                    onBlur={handleInputValidation}
                                     inputProps={{ inputtype: INPUT_TYPE.USERNAME }}
                                 />
                             </Grid>
