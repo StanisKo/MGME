@@ -14,7 +14,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     deleteButton: {
         backgroundColor: '#d32f2f',
         '&:hover': {
@@ -26,8 +26,8 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         justifyContent: 'center'
     },
-    quarterWidth: {
-        width: '25%'
+    oneThirdWidth: {
+        width: '30%'
     },
     toRight: {
         display: 'flex',
@@ -110,7 +110,7 @@ export const UserProfile = (): ReactElement | null => {
     };
 
     const handleUpdate = async (): Promise<void> => {
-        await updateUser('Stanislavskiy');
+        await updateUser(name);
     };
 
     const handleEditing = (): void => {
@@ -137,7 +137,9 @@ export const UserProfile = (): ReactElement | null => {
             setNameError(false);
             setNameHelperText('');
         }
-    }, [user, editing]);
+    // Explicitly done to avoid unnecessary re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [editing]);
 
     useEffect(() => {
         // We also double check if name does not equal previous name to handle inital render
@@ -148,9 +150,10 @@ export const UserProfile = (): ReactElement | null => {
         }
 
         setCanUpdate(false);
-    }, [user, name, nameError]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [name, nameError]);
 
-    const { centered, deleteButton, quarterWidth, toRight, editIcon, input } = useStyles();
+    const { centered, deleteButton, oneThirdWidth, toRight, editIcon, input } = useStyles();
 
     return user ? (
         <div className={centered}>
@@ -168,68 +171,77 @@ export const UserProfile = (): ReactElement | null => {
                         </IconButton>
                     </Grid>
 
-                    <Grid item container xs={11} sm={11} lg={11} direction="column" spacing={4}>
-                        <Grid item>
-                            <TextField
-                                error={nameError}
-                                helperText={nameHelperText}
-                                className={quarterWidth}
-                                variant="outlined"
-                                defaultValue={`${user.name}`}
-                                label="Username"
-                                disabled={!editing}
-                                onChange={handleInputChange}
-                                onBlur={handleInputValidation}
-                                inputProps={{ inputtype: INPUT_TYPE.USERNAME }}
-                            />
-                        </Grid>
-                        <Grid item>
-                            <TextField
-                                className={quarterWidth}
-                                variant="outlined"
-                                defaultValue={`${user.email}`}
-                                label="Email Address"
-                                disabled={!editing}
-                            />
-                        </Grid>
-                        <Grid item>
-                            <TextField
-                                className={quarterWidth}
-                                variant="outlined"
-                                label="Old Password"
-                                disabled={!editing}
-                                type="password"
-                                inputProps={{
-                                    autoComplete: 'new-password',
-                                    className: input
-                                }}
-                            />
-                        </Grid>
-                        <Grid item>
-                            <TextField
-                                className={quarterWidth}
-                                variant="outlined"
-                                label="New Password"
-                                disabled={!editing}
-                                type="password"
-                                inputProps={{
-                                    autoComplete: 'new-password',
-                                    className: input
-                                }}
-                            />
-                        </Grid>
-                        <Grid item>
-                            <TextField
-                                className={quarterWidth}
-                                variant="outlined"
-                                label="Confirm New Password"
-                                disabled={!editing}
-                                type="password"
-                                inputProps={{
-                                    autoComplete: 'new-password',
-                                    className: input
-                                }}
-                            />
+                    <Grid item xs={11} sm={11} lg={11}>
+
+                        <Grid
+                            item
+                            container
+                            direction="column"
+                            spacing={4}
+                            className={oneThirdWidth}
+                        >
+                            <Grid item>
+                                <TextField
+                                    error={nameError}
+                                    helperText={nameHelperText}
+                                    fullWidth
+                                    variant="outlined"
+                                    defaultValue={`${user.name}`}
+                                    label="Username"
+                                    disabled={!editing}
+                                    onChange={handleInputChange}
+                                    onBlur={handleInputValidation}
+                                    inputProps={{ inputtype: INPUT_TYPE.USERNAME }}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    defaultValue={`${user.email}`}
+                                    label="Email Address"
+                                    disabled={!editing}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    label="Old Password"
+                                    disabled={!editing}
+                                    type="password"
+                                    inputProps={{
+                                        autoComplete: 'new-password',
+                                        className: input
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    label="New Password"
+                                    disabled={!editing}
+                                    type="password"
+                                    inputProps={{
+                                        autoComplete: 'new-password',
+                                        className: input
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    label="Confirm New Password"
+                                    disabled={!editing}
+                                    type="password"
+                                    inputProps={{
+                                        autoComplete: 'new-password',
+                                        className: input
+                                    }}
+                                />
+                            </Grid>
                         </Grid>
                     </Grid>
 
