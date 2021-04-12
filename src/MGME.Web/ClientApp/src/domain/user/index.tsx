@@ -1,10 +1,12 @@
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState, ChangeEvent, FocusEvent, Dispatch, SetStateAction } from 'react';
 import { useSelector } from 'react-redux';
 
 import { User } from './interfaces';
 import { ApplicationState } from '../../store';
 
 import { getUser, updateUser } from './requests';
+
+import { INPUT_TYPE } from '../../shared/helpers';
 
 import { Button, Paper, Grid, Typography, TextField, IconButton } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -58,9 +60,56 @@ export const UserProfile = (): ReactElement | null => {
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
     );
 
+    const [canUpdate, setCanUpdate] = useState<boolean>(false);
+
+    const [name, setName] = useState<string>('');
+    const [nameError, setNameError] = useState<boolean>(false);
+    const [nameHelperText, setNameHelperText] = useState<string>('');
+
     const [editing, setEditing] = useState<boolean>(false);
 
-    const handleUpdateTest = async (): Promise<void> => {
+    const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
+        [INPUT_TYPE.USERNAME]: setName
+    };
+
+    const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
+
+        const value = event.target.value;
+
+        inputTypeToCallback[inputType](value);
+    };
+
+    const handleInputValidation = (event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
+        const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
+
+        switch (inputType) {
+            case INPUT_TYPE.USERNAME:
+                if (name.length < 6) {
+                    setNameError(true);
+                    setNameHelperText('Username must be at least 6 characters long');
+
+                    break;
+                }
+
+                if (name === user?.name) {
+                    setNameError(true);
+                    setNameHelperText('Username cannot be the same as old username');
+
+                    break;
+                }
+
+                setNameError(false);
+                setNameHelperText('');
+
+                break;
+
+            default:
+                break;
+        }
+    };
+
+    const handleUpdate = async (): Promise<void> => {
         await updateUser('Stanislavskiy');
     };
 
@@ -75,6 +124,31 @@ export const UserProfile = (): ReactElement | null => {
             }
         })();
     }, [isAuthorized]);
+
+    useEffect(() => {
+        if (user !== null) {
+            setName(user.name);
+        }
+    }, [user]);
+
+    useEffect(() => {
+        if (!editing && user !== null) {
+            setName(user.name);
+            setNameError(false);
+            setNameHelperText('');
+        }
+    }, [user, editing]);
+
+    useEffect(() => {
+        // We also double check if name does not equal previous name to handle inital render
+        if (name && !nameError && name !== user?.name) {
+            setCanUpdate(true);
+
+            return;
+        }
+
+        setCanUpdate(false);
+    }, [user, name, nameError]);
 
     const { centered, deleteButton, quarterWidth, toRight, editIcon, input } = useStyles();
 
@@ -97,11 +171,16 @@ export const UserProfile = (): ReactElement | null => {
                     <Grid item container xs={11} sm={11} lg={11} direction="column" spacing={4}>
                         <Grid item>
                             <TextField
+                                error={nameError}
+                                helperText={nameHelperText}
                                 className={quarterWidth}
                                 variant="outlined"
                                 defaultValue={`${user.name}`}
                                 label="Username"
                                 disabled={!editing}
+                                onChange={handleInputChange}
+                                onBlur={handleInputValidation}
+                                inputProps={{ inputtype: INPUT_TYPE.USERNAME }}
                             />
                         </Grid>
                         <Grid item>
@@ -156,7 +235,12 @@ export const UserProfile = (): ReactElement | null => {
 
                     <Grid item container spacing={4} className={toRight}>
                         <Grid item>
-                            <Button variant="contained" color="primary" onClick={handleUpdateTest} disabled>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleUpdate}
+                                disabled={!canUpdate}
+                            >
                                 Update
                             </Button>
                         </Grid>

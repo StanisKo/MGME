@@ -13,7 +13,8 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import { loginOrRegisterUser } from '../requests';
-import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } from '../helpers';
+import { MODE, modeNames } from '../helpers';
+import { INPUT_TYPE, validEmailFormat, validPasswordFormat } from '../../../shared/helpers';
 
 import { ROUTES } from '../../../shared/const';
 import { Alert } from '../../../shared/components/alert';
