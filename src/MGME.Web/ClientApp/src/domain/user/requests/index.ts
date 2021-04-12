@@ -1,5 +1,11 @@
 import { User } from '../interfaces';
 import { URLBuilder, DataController } from '../../../shared/utils';
+import { BaseServiceResponse } from '../../../shared/interfaces';
+
+interface UpdateUserProps {
+    name?: string;
+    email?: string;
+}
 
 export const getUser = async (): Promise<void> => {
     await DataController.FetchAndSave<User>(
@@ -12,12 +18,12 @@ export const getUser = async (): Promise<void> => {
     );
 };
 
-export const updateUser = async (name?: string, email?: string): Promise<void> => {
+export const updateUser = async ({ name, email }: UpdateUserProps): Promise<BaseServiceResponse | void> => {
     if (!name && !email) {
         throw new Error('Body params are missing');
     }
 
-    await DataController.UpdateAndRefetch(
+    return await DataController.UpdateAndRefetch(
         {
             url: URLBuilder.WriteTo('user', 'update'),
             method: 'PUT',

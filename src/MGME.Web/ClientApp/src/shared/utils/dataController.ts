@@ -159,5 +159,7 @@ export class DataController {
                 );
             }
         }
+
+        return response;
     }
 }

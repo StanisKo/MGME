@@ -136,7 +136,7 @@ namespace MGME.Core.Services.UserService
                 );
 
                 response.Success = true;
-                response.Message = $"{updatedUser.Name} was successfully updated";
+                response.Message = $"User was successfully updated";
 
                 return response;
             }

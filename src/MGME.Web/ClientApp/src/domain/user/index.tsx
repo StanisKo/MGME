@@ -1,4 +1,13 @@
-import { ReactElement, useEffect, useState, ChangeEvent, Dispatch, SetStateAction } from 'react';
+import {
+    ReactElement,
+    useEffect,
+    useState,
+    ChangeEvent,
+    Dispatch,
+    SetStateAction,
+    SyntheticEvent
+} from 'react';
+
 import { useSelector } from 'react-redux';
 
 import { User } from './interfaces';
@@ -7,8 +16,10 @@ import { ApplicationState } from '../../store';
 import { getUser, updateUser } from './requests';
 
 import { INPUT_TYPE } from '../../shared/helpers';
+import { Alert } from '../../shared/components/alert';
+import { BaseServiceResponse } from '../../shared/interfaces';
 
-import { Button, Paper, Grid, Typography, TextField, IconButton } from '@material-ui/core';
+import { Button, Paper, Grid, Typography, TextField, IconButton, Snackbar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import EditIcon from '@material-ui/icons/Edit';
@@ -67,6 +78,10 @@ export const UserProfile = (): ReactElement | null => {
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHelperText, setNameHelperText] = useState<string>('');
 
+    const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
+
+    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+
     const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
         [INPUT_TYPE.USERNAME]: setName
     };
@@ -109,11 +124,26 @@ export const UserProfile = (): ReactElement | null => {
     };
 
     const handleUpdate = async (): Promise<void> => {
-        await updateUser(name);
+        const response = await updateUser({ name: name });
+
+        if (response) {
+            setResponse(response);
+        }
+
+        setEditing(false);
+        setOpenSnackbar(true);
     };
 
     const handleEditing = (): void => {
         setEditing(!editing);
+    };
+
+    const handleSnackbarClose = (event?: SyntheticEvent, reason?: string): void => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenSnackbar(false);
     };
 
     useEffect(() => {
@@ -133,6 +163,7 @@ export const UserProfile = (): ReactElement | null => {
     useEffect(() => {
         if (!editing && user !== null) {
             setName(user.name);
+            setCanUpdate(false);
             setNameError(false);
             setNameHelperText('');
         }
@@ -262,6 +293,11 @@ export const UserProfile = (): ReactElement | null => {
                     </Grid>
                 </Grid>
             </Paper>
+            <Snackbar open={openSnackbar} onClose={handleSnackbarClose}>
+                <Alert onClose={handleSnackbarClose} severity={response.success ? 'success' : 'warning'}>
+                    {response.message}
+                </Alert>
+            </Snackbar>
         </div>
     ) : null;
 };
