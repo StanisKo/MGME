@@ -15,6 +15,6 @@ namespace MGME.Core.DTOs.User
         [Required]
         [Compare("NewPassword")]
         [StringLength(254, MinimumLength = 8)]
-        public string ConfirmNewPassword { get; set; }
+        public string ConfirmPassword { get; set; }
     }
 }

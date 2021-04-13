@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 import { User } from './interfaces';
 import { ApplicationState } from '../../store';
 
-import { getUser, updateUser } from './requests';
+import { getUser, updateUser, changePassword } from './requests';
 
 import { Alert } from '../../shared/components/alert';
 import { BaseServiceResponse } from '../../shared/interfaces';
@@ -94,9 +94,16 @@ export const UserProfile = (): ReactElement | null => {
     const [confirmPasswordError, setConfirmPasswordError] = useState<boolean>(false);
     const [confirmPasswordHelperText, setConfirmPasswordHelperText] = useState<string>('');
 
-    const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
+    const [userUpdateResponse, setUserUpdateResponse] = useState<BaseServiceResponse>(
+        {} as BaseServiceResponse
+    );
 
-    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+    const [changePasswordResponse, setChangePasswordResponse] = useState<BaseServiceResponse>(
+        {} as BaseServiceResponse
+    );
+
+    const [openUserUpdateSnackbar, setUserUpdateOpenSnackbar] = useState<boolean>(false);
+    const [openChangePasswordSnackbar, setChangePasswordOpenSnackbar] = useState<boolean>(false);
 
     const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
         [INPUT_TYPE.USERNAME]: setName,
@@ -207,7 +214,7 @@ export const UserProfile = (): ReactElement | null => {
                     break;
                 }
 
-                if (confirmPassword.length < 8 && newPassword !== confirmPassword) {
+                if (value !== newPassword) {
                     setConfirmPasswordError(true);
                     setConfirmPasswordHelperText('Passwords don\'t match');
 
@@ -224,7 +231,7 @@ export const UserProfile = (): ReactElement | null => {
         }
     };
 
-    const handleUpdate = async (): Promise<void> => {
+    const handleUserUpdate = async (): Promise<void | BaseServiceResponse> => {
         const params: { [key: string]: string } = {
             ...(name && !nameError ? { name: name } : null),
             ...(email && !emailError ? { email: email } : null)
@@ -233,34 +240,52 @@ export const UserProfile = (): ReactElement | null => {
         const response = await updateUser(params);
 
         if (response) {
-            setResponse(response);
+            setUserUpdateResponse(response);
         }
 
         setEditing(false);
-        setOpenSnackbar(true);
+        setUserUpdateOpenSnackbar(true);
     };
 
-    // const handleChangePassword = async (): Promise<void> => {
-    //     const response = await changePassword({ oldPassword, newPassword, confirmPassword });
+    const handleChangePassword = async (): Promise<void | BaseServiceResponse> => {
+        const response = await changePassword({ oldPassword, newPassword, confirmPassword });
 
-    //     if (response) {
-    //         setResponse(response);
-    //     }
+        if (response) {
+            setChangePasswordResponse(response);
+        }
 
-    //     setEditing(false);
-    //     setOpenSnackbar(true);
-    // };
+        setEditing(false);
+        setChangePasswordOpenSnackbar(true);
+    };
+
+    const handleUpdate = async (): Promise<void> => {
+        if (user || email) {
+            await handleUserUpdate();
+        }
+
+        if (oldPassword && newPassword && confirmPassword) {
+            await handleChangePassword();
+        }
+    };
 
     const handleEditing = (): void => {
         setEditing(!editing);
     };
 
-    const handleSnackbarClose = (event?: SyntheticEvent, reason?: string): void => {
+    const handleUserUpdateSnackbarClose = (event?: SyntheticEvent, reason?: string): void => {
         if (reason === 'clickaway') {
             return;
         }
 
-        setOpenSnackbar(false);
+        setUserUpdateOpenSnackbar(false);
+    };
+
+    const handleChangePasswordSnackbarClose = (event?: SyntheticEvent, reason?: string): void => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setChangePasswordOpenSnackbar(false);
     };
 
     useEffect(() => {
@@ -288,6 +313,18 @@ export const UserProfile = (): ReactElement | null => {
             setEmail(user.email);
             setEmailError(false);
             setEmailHelperText('');
+
+            setOldPassword('');
+            setOldPasswordError(false);
+            setOldPasswordHelperText('');
+
+            setNewPassword('');
+            setNewPasswordError(false);
+            setNewPasswordHelperText('');
+
+            setConfirmPassword('');
+            setConfirmPasswordError(false);
+            setConfirmPasswordHelperText('');
         }
     // Explicitly done to avoid unnecessary re-renders
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -315,15 +352,28 @@ export const UserProfile = (): ReactElement | null => {
 
             return;
         }
+
+        setCanUpdate(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [email, emailError]);
 
     useEffect(() => {
-        if (email && !emailError && email !== user?.email) {
+        const allPasswordInputsAreValid =
+            oldPassword
+            && !oldPasswordError
+            && newPassword
+            && !newPasswordError
+            && confirmPassword
+            && !confirmPasswordError
+            && newPassword === confirmPassword;
+
+        if (allPasswordInputsAreValid) {
             setCanUpdate(true);
 
             return;
         }
+
+        setCanUpdate(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [oldPassword, oldPasswordError, newPassword, newPasswordError, confirmPassword, confirmPasswordError]);
 
@@ -452,9 +502,18 @@ export const UserProfile = (): ReactElement | null => {
                     </Grid>
                 </Grid>
             </Paper>
-            <Snackbar open={openSnackbar} onClose={handleSnackbarClose}>
-                <Alert onClose={handleSnackbarClose} severity={response.success ? 'success' : 'warning'}>
-                    {response.message}
+            <Snackbar open={openUserUpdateSnackbar} onClose={handleUserUpdateSnackbarClose}>
+                <Alert
+                    onClose={handleUserUpdateSnackbarClose}
+                    severity={userUpdateResponse.success ? 'success' : 'warning'}>
+                    {userUpdateResponse.message}
+                </Alert>
+            </Snackbar>
+            <Snackbar open={openChangePasswordSnackbar} onClose={handleChangePasswordSnackbarClose}>
+                <Alert
+                    onClose={handleChangePasswordSnackbarClose}
+                    severity={changePasswordResponse.success ? 'success' : 'warning'}>
+                    {changePasswordResponse.message}
                 </Alert>
             </Snackbar>
         </div>
