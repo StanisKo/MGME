@@ -9,11 +9,11 @@ import {
     SetStateAction
 } from 'react';
 
-import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
-import { loginOrRegisterUser } from '../requests';
 import { MODE, modeNames } from '../helpers';
+import { loginOrRegisterUser } from '../requests';
 import { INPUT_TYPE, validEmailFormat, validPasswordFormat } from '../../../shared/helpers';
 
 import { ROUTES } from '../../../shared/const';

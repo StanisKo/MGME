@@ -9,12 +9,14 @@ import {
 } from 'react';
 
 import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { User } from './interfaces';
 import { ApplicationState } from '../../store';
 
-import { getUser, updateUser, changePassword } from './requests';
+import { getUser, updateUser, changePassword, deleteUser } from './requests';
 
+import { ROUTES } from '../../shared/const';
 import { Alert } from '../../shared/components/alert';
 import { BaseServiceResponse } from '../../shared/interfaces';
 import { INPUT_TYPE, validEmailFormat, validPasswordFormat } from '../../shared/helpers';
@@ -63,6 +65,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const UserProfile = (): ReactElement | null => {
+    const history = useHistory();
+
     const user: User | null = useSelector(
         (store: ApplicationState) => store.user?.data ?? null
     );
@@ -265,6 +269,18 @@ export const UserProfile = (): ReactElement | null => {
 
         if (oldPassword && newPassword && confirmPassword) {
             await handleChangePassword();
+        }
+    };
+
+    const handleDelete = async (): Promise<void> => {
+        const response = await deleteUser();
+
+        if ((response as BaseServiceResponse).success) {
+            // Also clean the store
+            localStorage.removeItem('userLoggedIn');
+            localStorage.removeItem('userRegisteredBefore');
+
+            history.push(ROUTES.LOGIN);
         }
     };
 
@@ -495,7 +511,11 @@ export const UserProfile = (): ReactElement | null => {
                             </Button>
                         </Grid>
                         <Grid item>
-                            <Button variant="contained" className={deleteButton}>
+                            <Button
+                                variant="contained"
+                                className={deleteButton}
+                                onClick={handleDelete}
+                            >
                                 Delete
                             </Button>
                         </Grid>

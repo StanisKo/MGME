@@ -1,8 +1,8 @@
 export interface RequestConfig {
-    url: string,
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-    headers: { [key: string]: string } | null,
-    body?: { [key: string]: unknown }
+    url: string;
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+    headers: { [key: string]: string } | null;
+    body?: { [key: string]: unknown } | null;
 }
 
 export interface BaseServiceResponse {
@@ -36,7 +36,7 @@ export interface ReadFromApi {
 export interface WriteToApi {
     url: string;
     method: 'POST' | 'PUT' | 'DELETE';
-    body: { [key: string]: string | number | boolean | number[] };
+    body: { [key: string]: string | number | boolean | number[] } | null;
     page: string;
     keys: string[] | null;
 }

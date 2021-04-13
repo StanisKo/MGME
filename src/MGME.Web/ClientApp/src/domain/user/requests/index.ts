@@ -57,3 +57,15 @@ export const changePassword = async (
     );
 };
 
+export const deleteUser = async(): Promise<BaseServiceResponse | void> => {
+    return await DataController.UpdateAndRefetch(
+        {
+            url: URLBuilder.WriteTo('user', 'delete'),
+            method: 'DELETE',
+            body: null,
+            page: 'user',
+            keys: ['data']
+        }
+    );
+};
+
