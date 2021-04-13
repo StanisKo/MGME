@@ -7,6 +7,12 @@ interface UpdateUserProps {
     email?: string;
 }
 
+interface ChangePasswordParams {
+    oldPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+}
+
 export const getUser = async (): Promise<void> => {
     await DataController.FetchAndSave<User>(
         {
@@ -19,10 +25,6 @@ export const getUser = async (): Promise<void> => {
 };
 
 export const updateUser = async ({ name, email }: UpdateUserProps): Promise<BaseServiceResponse | void> => {
-    if (!name && !email) {
-        throw new Error('Body params are missing');
-    }
-
     return await DataController.UpdateAndRefetch(
         {
             url: URLBuilder.WriteTo('user', 'update'),
@@ -30,6 +32,24 @@ export const updateUser = async ({ name, email }: UpdateUserProps): Promise<Base
             body: {
                 ...(name ? { name: name } : null),
                 ...(email ? { email: email } : null)
+            },
+            page: 'user',
+            keys: ['data']
+        }
+    );
+};
+
+export const changePassword = async (
+    { oldPassword, newPassword, confirmPassword }: ChangePasswordParams): Promise<BaseServiceResponse | void> => {
+
+    return await DataController.UpdateAndRefetch(
+        {
+            url: URLBuilder.WriteTo('user', 'change-password'),
+            method: 'PUT',
+            body: {
+                oldPassword,
+                newPassword,
+                confirmPassword
             },
             page: 'user',
             keys: ['data']

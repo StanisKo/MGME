@@ -83,7 +83,7 @@ export const Login = (): ReactElement => {
         [INPUT_TYPE.USERNAME]: setName,
         [INPUT_TYPE.EMAIL]: setEmail,
         [INPUT_TYPE.PASSWORD]: setPassword,
-        [INPUT_TYPE.REPEAT_PASSWORD]: setConfirmPassword
+        [INPUT_TYPE.CONFRIM_PASSWORD]: setConfirmPassword
     };
 
     const handleModeChange = (): void => {
@@ -146,7 +146,7 @@ export const Login = (): ReactElement => {
 
                 break;
 
-            case INPUT_TYPE.REPEAT_PASSWORD:
+            case INPUT_TYPE.CONFRIM_PASSWORD:
                 if (confirmPassword.length < 8 && password !== confirmPassword) {
                     setConfirmPasswordError(true);
                     setConfirmPasswordHelperText('Passwords don\'t match');
@@ -343,7 +343,7 @@ export const Login = (): ReactElement => {
                                 type="password"
                                 id="confirm-password"
                                 autoComplete="confirm-password"
-                                inputProps={{ inputtype: INPUT_TYPE.REPEAT_PASSWORD }}
+                                inputProps={{ inputtype: INPUT_TYPE.CONFRIM_PASSWORD }}
                                 onChange={handleInputChange}
                                 onBlur={handleInputValidation}
                             />

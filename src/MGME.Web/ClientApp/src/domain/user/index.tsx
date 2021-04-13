@@ -17,7 +17,7 @@ import { getUser, updateUser } from './requests';
 
 import { Alert } from '../../shared/components/alert';
 import { BaseServiceResponse } from '../../shared/interfaces';
-import { INPUT_TYPE, validEmailFormat } from '../../shared/helpers';
+import { INPUT_TYPE, validEmailFormat, validPasswordFormat } from '../../shared/helpers';
 
 import { Button, Paper, Grid, Typography, TextField, IconButton, Snackbar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -82,13 +82,28 @@ export const UserProfile = (): ReactElement | null => {
     const [emailError, setEmailError] = useState<boolean>(false);
     const [emailHelperText, setEmailHelperText] = useState<string>('');
 
+    const [oldPassword, setOldPassword] = useState<string>('');
+    const [oldPasswordError, setOldPasswordError] = useState<boolean>(false);
+    const [oldPasswordHelperText, setOldPasswordHelperText]= useState<string>('');
+
+    const [newPassword, setNewPassword] = useState<string>('');
+    const [newPasswordError, setNewPasswordError] = useState<boolean>(false);
+    const [newPasswordHelperText, setNewPasswordHelperText]= useState<string>('');
+
+    const [confirmPassword, setConfirmPassword] = useState<string>('');
+    const [confirmPasswordError, setConfirmPasswordError] = useState<boolean>(false);
+    const [confirmPasswordHelperText, setConfirmPasswordHelperText] = useState<string>('');
+
     const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
 
     const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
 
     const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
         [INPUT_TYPE.USERNAME]: setName,
-        [INPUT_TYPE.EMAIL]: setEmail
+        [INPUT_TYPE.EMAIL]: setEmail,
+        [INPUT_TYPE.OLD_PASSWORD]: setOldPassword,
+        [INPUT_TYPE.PASSWORD]: setNewPassword,
+        [INPUT_TYPE.CONFRIM_PASSWORD]: setConfirmPassword
     };
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -143,6 +158,67 @@ export const UserProfile = (): ReactElement | null => {
 
                 break;
 
+            case INPUT_TYPE.OLD_PASSWORD:
+                if (!validPasswordFormat.test(value)) {
+                    setOldPasswordError(true);
+                    setOldPasswordHelperText(
+                        `
+                            Password must be at least 8 characters long,
+                            and contain one upper-case, one lower-case letter, and one number
+                        `
+                    );
+
+                    break;
+                }
+
+                setOldPasswordError(false);
+                setOldPasswordHelperText('');
+
+                break;
+
+            case INPUT_TYPE.PASSWORD:
+                if (!validPasswordFormat.test(value)) {
+                    setNewPasswordError(true);
+                    setNewPasswordHelperText(
+                        `
+                            Password must be at least 8 characters long,
+                            and contain one upper-case, one lower-case letter, and one number
+                        `
+                    );
+
+                    break;
+                }
+
+                setNewPasswordError(false);
+                setNewPasswordHelperText('');
+
+                break;
+
+            case INPUT_TYPE.CONFRIM_PASSWORD:
+                if (!validPasswordFormat.test(value)) {
+                    setConfirmPasswordError(true);
+                    setConfirmPasswordHelperText(
+                        `
+                            Password must be at least 8 characters long,
+                            and contain one upper-case, one lower-case letter, and one number
+                        `
+                    );
+
+                    break;
+                }
+
+                if (confirmPassword.length < 8 && newPassword !== confirmPassword) {
+                    setConfirmPasswordError(true);
+                    setConfirmPasswordHelperText('Passwords don\'t match');
+
+                    break;
+                }
+
+                setConfirmPasswordError(false);
+                setConfirmPasswordHelperText('');
+
+                break;
+
             default:
                 break;
         }
@@ -163,6 +239,17 @@ export const UserProfile = (): ReactElement | null => {
         setEditing(false);
         setOpenSnackbar(true);
     };
+
+    // const handleChangePassword = async (): Promise<void> => {
+    //     const response = await changePassword({ oldPassword, newPassword, confirmPassword });
+
+    //     if (response) {
+    //         setResponse(response);
+    //     }
+
+    //     setEditing(false);
+    //     setOpenSnackbar(true);
+    // };
 
     const handleEditing = (): void => {
         setEditing(!editing);
@@ -231,6 +318,15 @@ export const UserProfile = (): ReactElement | null => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [email, emailError]);
 
+    useEffect(() => {
+        if (email && !emailError && email !== user?.email) {
+            setCanUpdate(true);
+
+            return;
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [oldPassword, oldPasswordError, newPassword, newPasswordError, confirmPassword, confirmPasswordError]);
+
     const { centered, deleteButton, oneThirdWidth, toRight, editIcon, input } = useStyles();
 
     return user ? (
@@ -285,40 +381,52 @@ export const UserProfile = (): ReactElement | null => {
                             </Grid>
                             <Grid item>
                                 <TextField
+                                    error={oldPasswordError}
+                                    helperText={oldPasswordHelperText}
                                     fullWidth
                                     variant="outlined"
                                     label="Old Password"
                                     disabled={!editing}
+                                    onChange={handleInputChange}
                                     type="password"
                                     inputProps={{
                                         autoComplete: 'new-password',
-                                        className: input
+                                        className: input,
+                                        inputtype: INPUT_TYPE.OLD_PASSWORD
                                     }}
                                 />
                             </Grid>
                             <Grid item>
                                 <TextField
+                                    error={newPasswordError}
+                                    helperText={newPasswordHelperText}
                                     fullWidth
                                     variant="outlined"
                                     label="New Password"
                                     disabled={!editing}
+                                    onChange={handleInputChange}
                                     type="password"
                                     inputProps={{
                                         autoComplete: 'new-password',
-                                        className: input
+                                        className: input,
+                                        inputtype: INPUT_TYPE.PASSWORD
                                     }}
                                 />
                             </Grid>
                             <Grid item>
                                 <TextField
+                                    error={confirmPasswordError}
+                                    helperText={confirmPasswordHelperText}
                                     fullWidth
                                     variant="outlined"
                                     label="Confirm New Password"
                                     disabled={!editing}
+                                    onChange={handleInputChange}
                                     type="password"
                                     inputProps={{
                                         autoComplete: 'new-password',
-                                        className: input
+                                        className: input,
+                                        inputtype: INPUT_TYPE.CONFRIM_PASSWORD
                                     }}
                                 />
                             </Grid>
