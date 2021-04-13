@@ -8,7 +8,7 @@ import {
     SyntheticEvent
 } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { User } from './interfaces';
@@ -20,6 +20,8 @@ import { ROUTES } from '../../shared/const';
 import { Alert } from '../../shared/components/alert';
 import { BaseServiceResponse } from '../../shared/interfaces';
 import { INPUT_TYPE, validEmailFormat, validPasswordFormat } from '../../shared/helpers';
+
+import { actionCreators } from '../../store/reducers/auth';
 
 import { Button, Paper, Grid, Typography, TextField, IconButton, Snackbar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -66,6 +68,8 @@ const useStyles = makeStyles(() => ({
 
 export const UserProfile = (): ReactElement | null => {
     const history = useHistory();
+
+    const dispatch = useDispatch();
 
     const user: User | null = useSelector(
         (store: ApplicationState) => store.user?.data ?? null
@@ -273,12 +277,20 @@ export const UserProfile = (): ReactElement | null => {
     };
 
     const handleDelete = async (): Promise<void> => {
-        const response = await deleteUser();
+        const response = await deleteUser() as BaseServiceResponse;
 
-        if ((response as BaseServiceResponse).success) {
-            // Also clean the store
+        if (response.success) {
             localStorage.removeItem('userLoggedIn');
             localStorage.removeItem('userRegisteredBefore');
+
+            // We also clear out store since menu render depends on it
+            dispatch(
+                actionCreators.logoutUser(
+                    {
+                        type: 'LOGOUT_USER'
+                    }
+                )
+            );
 
             history.push(ROUTES.LOGIN);
         }
