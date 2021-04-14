@@ -80,6 +80,15 @@ export const Application = (): ReactElement => {
                 if (userLoggedIn) {
                     localStorage.removeItem('userLoggedIn');
 
+                    // We also clear out store since menu render depends on it
+                    store.dispatch(
+                        actionCreators.logoutUser(
+                            {
+                                type: 'LOGOUT_USER'
+                            }
+                        )
+                    );
+
                     history.push(ROUTES.LOGIN);
                 }
 
