@@ -3,7 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
 
 using MGME.Core.Interfaces.Services;
-using MGME.Core.Services.Auth;
+using MGME.Core.Services;
+using MGME.Core.Services.AuthService;
+using MGME.Core.Services.UserService;
 
 namespace MGME.Core
 {
@@ -20,6 +22,10 @@ namespace MGME.Core
         public static void AddBusinessServices(this IServiceCollection services)
         {
             services.AddScoped<IAuthService, AuthService>();
+
+            services.AddScoped<IUserService, UserService>();
+
+            services.AddScoped<IHashingService, HashingService>();
 
             services.AddHostedService<TokenRecycleService>();
         }

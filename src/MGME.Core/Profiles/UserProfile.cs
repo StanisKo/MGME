@@ -9,7 +9,11 @@ namespace MGME.Core.Profiles
     {
         public UserProfile()
         {
-            CreateMap<UserConfirmEmailDTO, User>();
+            CreateMap<ConfirmUserEmailDTO, User>();
+
+            CreateMap<GetOrUpdateUserDTO, User>();
+
+            CreateMap<UserPasswordDTO, User>();
         }
     }
 }

@@ -1,4 +1,4 @@
-import { ReactElement, useState, useReducer, useEffect, ChangeEvent, MouseEvent } from 'react';
+import { ReactElement, useState, ChangeEvent, MouseEvent } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -38,8 +38,6 @@ export const MenuBar = (): ReactElement | null => {
 
     const [selectedMenu, setSelectedMenu] = useState<number>(activeMenu === -1 ? 0 : activeMenu);
 
-    const [, forceUpdate] = useReducer(x => x + 1, 0);
-
     const handleChange = (event: ChangeEvent<unknown>, newValue: number): void => {
         setSelectedMenu(newValue);
     };
@@ -52,6 +50,11 @@ export const MenuBar = (): ReactElement | null => {
     };
 
     const handleClose = (): void => {
+        setAnchorEl(null);
+    };
+
+    const goToProfile = (): void => {
+        history.push(ROUTES.USER_PROFILE);
         setAnchorEl(null);
     };
 
@@ -75,12 +78,6 @@ export const MenuBar = (): ReactElement | null => {
             );
         })();
     };
-
-    useEffect(() => {
-        if (!tokenIsAvaialable) {
-            forceUpdate();
-        }
-    }, [tokenIsAvaialable]);
 
     const { flexGrow } = useStyles();
 
@@ -140,7 +137,7 @@ export const MenuBar = (): ReactElement | null => {
                         open={open}
                         onClose={handleClose}
                     >
-                        <MenuItem>Profile</MenuItem>
+                        <MenuItem onClick={goToProfile}>Profile</MenuItem>
                         <MenuItem onClick={handleLogout}>Logout</MenuItem>
                     </Menu>
                 </>

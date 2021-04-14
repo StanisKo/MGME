@@ -1,5 +1,6 @@
 import { history } from './history';
+import { request } from './request';
 import { URLBuilder } from './urlBuilder';
-import { makeRequest } from './makeRequest';
+import { DataController } from './dataController';
 
-export { history, URLBuilder, makeRequest };
+export { history, request, URLBuilder, DataController };

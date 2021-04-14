@@ -16,6 +16,7 @@ import { history } from './shared/utils';
 import { refreshToken } from './domain/auth/requests';
 
 import { Login, ConfirmEmail } from './domain/auth';
+import { UserProfile } from './domain/user';
 
 import { ItemOne } from './domain/itemOne';
 import { ItemTwo } from './domain/itemTwo';
@@ -62,8 +63,6 @@ export const Application = (): ReactElement => {
                             type: 'LOGIN_USER',
                             payload: {
                                 token: token,
-                                userId: decoded.nameid,
-                                userName: decoded.unique_name,
                                 userRole: decoded.role
                             }
                         }
@@ -80,6 +79,15 @@ export const Application = (): ReactElement => {
                 // Remove flag and redirect if user logged in
                 if (userLoggedIn) {
                     localStorage.removeItem('userLoggedIn');
+
+                    // We also clear out store since menu render depends on it
+                    store.dispatch(
+                        actionCreators.logoutUser(
+                            {
+                                type: 'LOGOUT_USER'
+                            }
+                        )
+                    );
 
                     history.push(ROUTES.LOGIN);
                 }
@@ -125,6 +133,7 @@ export const Application = (): ReactElement => {
                         <PublicRoute restricted={true} component={Login} path={ROUTES.LOGIN} />
                         <PublicRoute restricted={true} component={ConfirmEmail} path={ROUTES.CONFIRM_EMAIL} />
 
+                        <PrivateRoute component={UserProfile} path={ROUTES.USER_PROFILE} />
                         <PrivateRoute component={ItemOne} path={ROUTES.ITEM_ONE} />
                         <PrivateRoute component={ItemTwo} path={ROUTES.ITEM_TWO} />
                         <PrivateRoute component={ItemThree} path={ROUTES.ITEM_THREE} />

@@ -1,7 +1,12 @@
-import { URLBuilder, makeRequest } from '../../../shared/utils/';
+import { URLBuilder, request } from '../../../shared/utils/';
 import { BaseServiceResponse, DataServiceResponse, UserTokenResponse } from '../../../shared/interfaces';
 
 import { MODE } from '../helpers';
+
+/*
+We don't use DataController here, since we don't need to rely on JWT for these requests;
+neither we require refetches after updates
+*/
 
 export const loginOrRegisterUser = async (
     mode: number,
@@ -10,9 +15,9 @@ export const loginOrRegisterUser = async (
 ): Promise <BaseServiceResponse | DataServiceResponse<UserTokenResponse>> => {
     const action = mode === MODE.SIGN_UP ? 'register' : 'login';
 
-    return await makeRequest<BaseServiceResponse | DataServiceResponse<UserTokenResponse>>(
+    return await request<BaseServiceResponse | DataServiceResponse<UserTokenResponse>>(
         {
-            url: URLBuilder.buildPOST('auth', action),
+            url: URLBuilder.WriteTo('auth', action),
             method: 'POST',
             headers: null,
             body: body
@@ -21,9 +26,9 @@ export const loginOrRegisterUser = async (
 };
 
 export const confirmEmailAddress = async (token: string): Promise <BaseServiceResponse> => {
-    return await makeRequest<BaseServiceResponse | DataServiceResponse<UserTokenResponse>>(
+    return await request<BaseServiceResponse>(
         {
-            url: URLBuilder.buildPOST('auth', 'confirm'),
+            url: URLBuilder.WriteTo('auth', 'confirm'),
             method: 'POST',
             headers: null,
             body: { token: token }
@@ -32,9 +37,9 @@ export const confirmEmailAddress = async (token: string): Promise <BaseServiceRe
 };
 
 export const logoutUser = async (): Promise<BaseServiceResponse> => {
-    return await makeRequest<BaseServiceResponse>(
+    return await request<BaseServiceResponse>(
         {
-            url: URLBuilder.buildPOST('auth', 'logout'),
+            url: URLBuilder.WriteTo('auth', 'logout'),
             method: 'GET',
             headers: null
         }
@@ -42,9 +47,9 @@ export const logoutUser = async (): Promise<BaseServiceResponse> => {
 };
 
 export const refreshToken = async (): Promise <DataServiceResponse<UserTokenResponse>> => {
-    return await makeRequest<DataServiceResponse<UserTokenResponse>>(
+    return await request<DataServiceResponse<UserTokenResponse>>(
         {
-            url: URLBuilder.buildPOST('auth', 'refresh-token'),
+            url: URLBuilder.ReadFrom('auth', 'refresh-token'),
             method: 'GET',
             headers: null
         }

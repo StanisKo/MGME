@@ -6,5 +6,6 @@ export const ROUTES = {
     CONFIRM_EMAIL: `${root}confirm-email`,
     ITEM_ONE: `${root}item-one`,
     ITEM_TWO: `${root}item-two`,
-    ITEM_THREE: `${root}item-three`
+    ITEM_THREE: `${root}item-three`,
+    USER_PROFILE: `${root}profile`
 };

@@ -3,17 +3,17 @@ import {
     useState,
     useEffect,
     ChangeEvent,
-    FocusEvent,
     SyntheticEvent,
     Dispatch,
     SetStateAction
 } from 'react';
 
-import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
+import { MODE, modeNames } from '../helpers';
 import { loginOrRegisterUser } from '../requests';
-import { MODE, INPUT_TYPE, modeNames, validEmailFormat, validPasswordFormat } from '../helpers';
+import { INPUT_TYPE, validEmailFormat, validPasswordFormat } from '../../../shared/helpers';
 
 import { ROUTES } from '../../../shared/const';
 import { Alert } from '../../../shared/components/alert';
@@ -28,6 +28,19 @@ import jwt_decode from 'jwt-decode';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
+    root: {
+        '& label.Mui-error': {
+            color: theme.palette.secondary.main
+        },
+        '& .Mui-error': {
+            '& fieldset': {
+                borderColor: '#077b8a !important'
+            }
+        },
+        '& .MuiFormHelperText-root': {
+            color: theme.palette.secondary.main
+        }
+    },
     paper: {
         marginTop: theme.spacing(8),
         display: 'flex',
@@ -82,7 +95,7 @@ export const Login = (): ReactElement => {
         [INPUT_TYPE.USERNAME]: setName,
         [INPUT_TYPE.EMAIL]: setEmail,
         [INPUT_TYPE.PASSWORD]: setPassword,
-        [INPUT_TYPE.REPEAT_PASSWORD]: setConfirmPassword
+        [INPUT_TYPE.CONFRIM_PASSWORD]: setConfirmPassword
     };
 
     const handleModeChange = (): void => {
@@ -95,14 +108,14 @@ export const Login = (): ReactElement => {
         const value = event.target.value;
 
         inputTypeToCallback[inputType](value);
+
+        handleInputValidation(inputType, value);
     };
 
-    const handleInputValidation = (event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
-        const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
-
+    const handleInputValidation = (inputType: number, value: string): void => {
         switch (inputType) {
             case INPUT_TYPE.USERNAME:
-                if (name.length < 6) {
+                if (value.length < 6) {
                     setNameError(true);
                     setNameHelperText('Username must be at least 6 characters long');
 
@@ -115,7 +128,7 @@ export const Login = (): ReactElement => {
                 break;
 
             case INPUT_TYPE.EMAIL:
-                if (!validEmailFormat.test(email)) {
+                if (!validEmailFormat.test(value)) {
                     setEmailError(true);
                     setEmailHelperText('Email address is not valid');
 
@@ -128,7 +141,7 @@ export const Login = (): ReactElement => {
                 break;
 
             case INPUT_TYPE.PASSWORD:
-                if (!validPasswordFormat.test(password)) {
+                if (!validPasswordFormat.test(value)) {
                     setPasswordError(true);
                     setPasswordHelperText(
                         `
@@ -145,8 +158,8 @@ export const Login = (): ReactElement => {
 
                 break;
 
-            case INPUT_TYPE.REPEAT_PASSWORD:
-                if (confirmPassword.length < 8 && password !== confirmPassword) {
+            case INPUT_TYPE.CONFRIM_PASSWORD:
+                if (value !== password) {
                     setConfirmPasswordError(true);
                     setConfirmPasswordHelperText('Passwords don\'t match');
 
@@ -202,8 +215,6 @@ export const Login = (): ReactElement => {
                             type: 'LOGIN_USER',
                             payload: {
                                 token: token,
-                                userId: decoded.nameid,
-                                userName: decoded.unique_name,
                                 userRole: decoded.role
                             }
                         }
@@ -269,7 +280,7 @@ export const Login = (): ReactElement => {
         }
     }, [mode]);
 
-    const { paper, submit, pointer } = useStyles();
+    const { root, paper, submit, pointer } = useStyles();
 
     return (
         <Container component="main" maxWidth="xs">
@@ -293,7 +304,7 @@ export const Login = (): ReactElement => {
                             autoComplete="username"
                             inputProps={{ inputtype: INPUT_TYPE.USERNAME }}
                             onChange={handleInputChange}
-                            {...(mode === MODE.SIGN_UP ? { onBlur: handleInputValidation } : null)}
+                            className={root}
                         />
                     </Grid>
                     {mode === MODE.SIGN_UP && (
@@ -310,7 +321,7 @@ export const Login = (): ReactElement => {
                                 autoComplete="email"
                                 inputProps={{ inputtype: INPUT_TYPE.EMAIL }}
                                 onChange={handleInputChange}
-                                onBlur={handleInputValidation}
+                                className={root}
                             />
                         </Grid>
                     )}
@@ -328,7 +339,7 @@ export const Login = (): ReactElement => {
                             autoComplete="password"
                             inputProps={{ inputtype: INPUT_TYPE.PASSWORD }}
                             onChange={handleInputChange}
-                            {...(mode === MODE.SIGN_UP ? { onBlur: handleInputValidation } : null)}
+                            className={root}
                         />
                     </Grid>
                     {mode === MODE.SIGN_UP && (
@@ -344,9 +355,9 @@ export const Login = (): ReactElement => {
                                 type="password"
                                 id="confirm-password"
                                 autoComplete="confirm-password"
-                                inputProps={{ inputtype: INPUT_TYPE.REPEAT_PASSWORD }}
+                                inputProps={{ inputtype: INPUT_TYPE.CONFRIM_PASSWORD }}
                                 onChange={handleInputChange}
-                                onBlur={handleInputValidation}
+                                className={root}
                             />
                         </Grid>
                     )}

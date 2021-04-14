@@ -24,9 +24,8 @@ namespace MGME.Web.Controllers
             _configuration = configuration;
         }
 
-        // Pass DTOs instead of values to avoid copyign them
         [HttpPost("Register")]
-        public async Task <IActionResult> RegisterUser(UserRegisterDTO request)
+        public async Task <IActionResult> RegisterUser(RegisterUserDTO request)
         {
             BaseServiceResponse response =  await _authService.RegisterUser(
                 request.Name,
@@ -44,7 +43,7 @@ namespace MGME.Web.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task <IActionResult> LoginUser(UserLoginDTO request)
+        public async Task <IActionResult> LoginUser(LoginUserDTO request)
         {
             /*
             Even though we deny login on client side if the user is already logged in
@@ -82,7 +81,7 @@ namespace MGME.Web.Controllers
         }
 
         [HttpGet("Logout")]
-        public async Task <IActionResult> Logout()
+        public async Task <IActionResult> LogoutUser()
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
@@ -185,7 +184,7 @@ namespace MGME.Web.Controllers
         }
 
         /*
-        Note: we don't use refresh token itself for session management, since
+        NOTE: we don't use refresh token itself for session management, since
         we rotate both refresh and access tokens every time access token is expired
 
         And in such, refresh token is constantly updated; although we still give it
