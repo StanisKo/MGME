@@ -1,35 +1,93 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+
+using Microsoft.IdentityModel.Tokens;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 using Microsoft.OpenApi.Models;
+
+using Npgsql;
+
+using MGME.Core;
+using MGME.Infra;
 
 namespace MGME.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        private readonly IWebHostEnvironment _environment;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            Configuration = configuration;
+
+            _environment = environment;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
+            NpgsqlConnectionStringBuilder connectionStringBuilder = new NpgsqlConnectionStringBuilder()
+            {
+                Host = Configuration["Host"],
+                Port = Convert.ToInt32(Configuration["Port"]),
+                Database = Configuration["Database"],
+                Username = Configuration["Username"],
+                Password = Configuration["Password"]
+            };
+
+            // Database context: ../MGME.Infra/InfraStartup.cs
+            services.AddDbContext(connectionStringBuilder.ConnectionString);
+
+            // Repositories used accross the application: ../MGME.Infra/InfraStartup.cs
+            services.AddRepositories();
+
+            // Business services used across the application: ../MGME.Core/CoreStartup.cs
+            services.AddBusinessServices();
+
+            // AutoMapper for DTOs: ../MGME.Core/CoreStartup.cs
+            services.AddAutoMapper();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuerSigningKey = true,
+
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.ASCII.GetBytes(Configuration["JWTKey"])
+                        ),
+
+                        ValidateIssuer = true,
+                        ValidIssuer = Configuration["Host"],
+
+                        ValidateAudience = true,
+                        ValidAudience = Configuration["Host"],
+
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+
+            services.AddApiVersioning(config =>
+            {
+                config.DefaultApiVersion = new ApiVersion(1, 0);
+            });
 
             services.AddControllers();
 
@@ -44,10 +102,9 @@ namespace MGME.Web
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            if (_environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
@@ -62,6 +119,8 @@ namespace MGME.Web
 
             app.UseSpaStaticFiles();
 
+            app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -73,7 +132,7 @@ namespace MGME.Web
             {
                 spa.Options.SourcePath = "ClientApp";
 
-                if (env.IsDevelopment())
+                if (_environment.IsDevelopment())
                 {
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
