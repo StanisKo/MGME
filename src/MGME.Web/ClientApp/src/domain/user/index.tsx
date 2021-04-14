@@ -223,18 +223,6 @@ export const UserProfile = (): ReactElement | null => {
                 break;
 
             case INPUT_TYPE.CONFRIM_PASSWORD:
-                if (!validPasswordFormat.test(value)) {
-                    setConfirmPasswordError(true);
-                    setConfirmPasswordHelperText(
-                        `
-                            Password must be at least 8 characters long,
-                            and contain one upper-case, one lower-case letter, and one number
-                        `
-                    );
-
-                    break;
-                }
-
                 if (value !== newPassword) {
                     setConfirmPasswordError(true);
                     setConfirmPasswordHelperText('Passwords don\'t match');
