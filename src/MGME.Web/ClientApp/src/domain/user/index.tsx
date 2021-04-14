@@ -29,7 +29,20 @@ import { makeStyles } from '@material-ui/core/styles';
 import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
+    root: {
+        '& label.Mui-error': {
+            color: theme.palette.secondary.main
+        },
+        '& .Mui-error': {
+            '& fieldset': {
+                borderColor: '#077b8a !important'
+            }
+        },
+        '& .MuiFormHelperText-root': {
+            color: theme.palette.secondary.main
+        }
+    },
     deleteButton: {
         backgroundColor: '#d32f2f',
         '&:hover': {
@@ -342,15 +355,12 @@ export const UserProfile = (): ReactElement | null => {
             setEmailError(false);
             setEmailHelperText('');
 
-            setOldPassword('');
             setOldPasswordError(false);
             setOldPasswordHelperText('');
 
-            setNewPassword('');
             setNewPasswordError(false);
             setNewPasswordHelperText('');
 
-            setConfirmPassword('');
             setConfirmPasswordError(false);
             setConfirmPasswordHelperText('');
         }
@@ -405,7 +415,7 @@ export const UserProfile = (): ReactElement | null => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [oldPassword, oldPasswordError, newPassword, newPasswordError, confirmPassword, confirmPasswordError]);
 
-    const { centered, deleteButton, oneThirdWidth, toRight, editIcon, input } = useStyles();
+    const { root, centered, deleteButton, oneThirdWidth, toRight, editIcon, input } = useStyles();
 
     return user ? (
         <div className={centered}>
@@ -441,7 +451,8 @@ export const UserProfile = (): ReactElement | null => {
                                     label="Username"
                                     disabled={!editing}
                                     onChange={handleInputChange}
-                                    inputProps={{ inputtype: INPUT_TYPE.USERNAME }}
+                                    inputProps={{inputtype: INPUT_TYPE.USERNAME }}
+                                    className={root}
                                 />
                             </Grid>
                             <Grid item>
@@ -455,6 +466,7 @@ export const UserProfile = (): ReactElement | null => {
                                     disabled={!editing}
                                     onChange={handleInputChange}
                                     inputProps={{ inputtype: INPUT_TYPE.EMAIL }}
+                                    className={root}
                                 />
                             </Grid>
                             <Grid item>
@@ -472,6 +484,7 @@ export const UserProfile = (): ReactElement | null => {
                                         className: input,
                                         inputtype: INPUT_TYPE.OLD_PASSWORD
                                     }}
+                                    className={root}
                                 />
                             </Grid>
                             <Grid item>
@@ -489,6 +502,7 @@ export const UserProfile = (): ReactElement | null => {
                                         className: input,
                                         inputtype: INPUT_TYPE.PASSWORD
                                     }}
+                                    className={root}
                                 />
                             </Grid>
                             <Grid item>
@@ -506,6 +520,7 @@ export const UserProfile = (): ReactElement | null => {
                                         className: input,
                                         inputtype: INPUT_TYPE.CONFRIM_PASSWORD
                                     }}
+                                    className={root}
                                 />
                             </Grid>
                         </Grid>
