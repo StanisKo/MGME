@@ -23,7 +23,21 @@ import { INPUT_TYPE, validEmailFormat, validPasswordFormat } from '../../shared/
 
 import { actionCreators } from '../../store/reducers/auth';
 
-import { Button, Paper, Grid, Typography, TextField, IconButton, Snackbar } from '@material-ui/core';
+import {
+    Button,
+    Paper,
+    Grid,
+    Typography,
+    TextField,
+    IconButton,
+    Snackbar,
+    Dialog,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    DialogActions
+} from '@material-ui/core';
+
 import { makeStyles } from '@material-ui/core/styles';
 
 import EditIcon from '@material-ui/icons/Edit';
@@ -125,6 +139,8 @@ export const UserProfile = (): ReactElement | null => {
 
     const [openUserUpdateSnackbar, setUserUpdateOpenSnackbar] = useState<boolean>(false);
     const [openChangePasswordSnackbar, setChangePasswordOpenSnackbar] = useState<boolean>(false);
+
+    const [dialogOpen, setDialogOpen] = useState(false);
 
     const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
         [INPUT_TYPE.USERNAME]: setName,
@@ -277,26 +293,6 @@ export const UserProfile = (): ReactElement | null => {
         }
     };
 
-    const handleDelete = async (): Promise<void> => {
-        const response = await deleteUser() as BaseServiceResponse;
-
-        if (response.success) {
-            localStorage.removeItem('userLoggedIn');
-            localStorage.removeItem('userRegisteredBefore');
-
-            // We also clear out store since menu render depends on it
-            dispatch(
-                actionCreators.logoutUser(
-                    {
-                        type: 'LOGOUT_USER'
-                    }
-                )
-            );
-
-            history.push(ROUTES.LOGIN);
-        }
-    };
-
     const handleEditing = (): void => {
         setEditing(!editing);
     };
@@ -316,6 +312,37 @@ export const UserProfile = (): ReactElement | null => {
 
         setChangePasswordOpenSnackbar(false);
     };
+
+    const handleDialogOpen = (): void => {
+        setDialogOpen(true);
+    };
+    
+    const handleDialogClose = (): void => {
+        setDialogOpen(false);
+    };
+
+    const handleDelete = async (): Promise<void> => {
+        const response = await deleteUser() as BaseServiceResponse;
+
+        if (response.success) {
+            handleDialogClose();
+
+            localStorage.removeItem('userLoggedIn');
+            localStorage.removeItem('userRegisteredBefore');
+
+            // We also clear out store since menu render depends on it
+            dispatch(
+                actionCreators.logoutUser(
+                    {
+                        type: 'LOGOUT_USER'
+                    }
+                )
+            );
+
+            history.push(ROUTES.LOGIN);
+        }
+    };
+
 
     useEffect(() => {
         (async (): Promise<void> => {
@@ -529,7 +556,7 @@ export const UserProfile = (): ReactElement | null => {
                             <Button
                                 variant="contained"
                                 className={deleteButton}
-                                onClick={handleDelete}
+                                onClick={handleDialogOpen}
                             >
                                 Delete
                             </Button>
@@ -551,6 +578,27 @@ export const UserProfile = (): ReactElement | null => {
                     {changePasswordResponse.message}
                 </Alert>
             </Snackbar>
+            <Dialog
+                open={dialogOpen}
+                onClose={handleDialogClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{'Are you sure you want to delete your account?'}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        This action is irreversable, your account will be deleted forever
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDialogClose} variant="contained" color="secondary">
+                        Back
+                    </Button>
+                    <Button onClick={handleDelete} variant="contained" className={deleteButton}>
+                        Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     ) : null;
 };
