@@ -14,29 +14,29 @@ namespace MGME.Core.Interfaces.Repositories
             int? id = null,
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>>[] entitiesToInclude = null);
+            IEnumerable<string> include = null);
 
         // For when we need to select only some columns
         Task <TEntityDTO> GetEntityAsync<TEntityDTO>(
             int? id = null,
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>>[] entitiesToInclude = null,
-            Expression<Func<TEntity, TEntityDTO>> columnsToSelect = null) where TEntityDTO: BaseEntityDTO;
+            IEnumerable<string> include = null,
+            Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO;
 
         Task <List<TEntity>> GetEntititesAsync(
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>>[] entitiesToInclude = null,
-            Tuple<Expression<Func<TEntity, object>>[], int> fieldsToOrderBy = null);
+            IEnumerable<string> include = null,
+            Tuple<Expression<Func<TEntity, object>>[], int> orderBy = null);
 
         // For when we need to select only some columns
         Task <List<TEntityDTO>> GetEntititesAsync<TEntityDTO>(
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>>[] entitiesToInclude = null,
-            Tuple<Expression<Func<TEntity, object>>[], int> fieldsToOrderBy = null,
-            Expression<Func<TEntity, TEntityDTO>> columnsToSelect = null) where TEntityDTO: BaseEntityDTO;
+            IEnumerable<string> include = null,
+            Tuple<Expression<Func<TEntity, object>>[], int> orderBy = null,
+            Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO;
 
         Task AddEntityAsync(TEntity entity);
 
