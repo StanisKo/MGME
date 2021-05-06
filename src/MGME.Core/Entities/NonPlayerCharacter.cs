@@ -18,6 +18,11 @@ namespace MGME.Core.Entities
         public int UserId { get; set; }
         public User User { get; set; }
 
+        /*
+        FK to PlayerCharacter is nullable, since NPC can exist
+        without PlayerCharacter and in such case is able to take
+        part in multiple Adventures
+        */
         [ForeignKey("PlayerCharacter")]
         public int? PlayerCharacterId { get; set; }
         public PlayerCharacter Character { get; set; }

@@ -10,9 +10,15 @@ namespace MGME.Core.Entities
 
         public string Description { get; set; }
 
+        /*
+        Both FKs are nullable, since Thread can either belong to a Character
+        or to and Adventure and Character's threads can be used as Adventure's
+        threads. But not vice versa
+        */
+
         [ForeignKey("PlayerCharacter")]
         public int? PlayerCharacterId { get; set; }
-        public PlayerCharacter Character { get; set; }
+        public PlayerCharacter PlayerCharacter { get; set; }
 
         [ForeignKey("Adventure")]
         public int? AdventureId { get; set; }

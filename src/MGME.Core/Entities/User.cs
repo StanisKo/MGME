@@ -28,10 +28,10 @@ namespace MGME.Core.Entities
 
         public ICollection<RefreshToken> RefreshTokens { get; set; }
 
-        public ICollection<PlayerCharacter> Characters { get; set; }
+        public ICollection<PlayerCharacter> PlayerCharacters { get; set; }
 
         public ICollection<Adventure> Adventures { get; set; }
 
-        public ICollection<NonPlayerCharacter> NPCs { get; set; }
+        public ICollection<NonPlayerCharacter> NonPlayerCharacters { get; set; }
     }
 }

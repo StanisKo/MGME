@@ -20,9 +20,9 @@ namespace MGME.Core.Entities
         [Required]
         public DateTime CreatedAt { get; set; }
 
-        public ICollection<PlayerCharacter> Characters { get; set; }
+        public ICollection<PlayerCharacter> PlayerCharacters { get; set; }
 
-        public ICollection<NonPlayerCharacter> NPCs { get; set; }
+        public ICollection<NonPlayerCharacter> NonPlayerCharacters { get; set; }
 
         public ICollection<Thread> Threads { get; set; }
 
