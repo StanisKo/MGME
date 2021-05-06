@@ -1,3 +1,5 @@
+using System;
+
 using Microsoft.EntityFrameworkCore;
 
 using MGME.Core.Entities;
@@ -16,8 +18,18 @@ namespace MGME.Infra.Data
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
+        public DbSet<PlayerCharacter> PlayerCharacters { get; set; }
+
+        public DbSet<NonPlayerCharacter> NonPlayerCharacters { get; set; }
+
+        public DbSet<Adventure> Adventures { get; set; }
+
+        public DbSet<Thread> Threads { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            /* User */
+
             modelBuilder.Entity<User>().HasIndex(user => user.Name).IsUnique();
 
             modelBuilder.Entity<User>().HasIndex(user => user.Email).IsUnique();
@@ -25,6 +37,36 @@ namespace MGME.Infra.Data
             modelBuilder.Entity<User>().Property(user => user.EmailIsConfirmed).HasDefaultValue(false);
 
             modelBuilder.Entity<User>().Property(user => user.Role).HasDefaultValue(UserRole.GAME_MASTER);
+
+            /* PlayerCharacter */
+
+            modelBuilder.Entity<PlayerCharacter>().HasIndex(
+                playerCharacter => new { playerCharacter.UserId, playerCharacter.Name }
+            ).IsUnique();
+
+            /* NonPlayerCharacter */
+
+            modelBuilder.Entity<NonPlayerCharacter>().HasIndex(
+                nonPlayerCharacter => new { nonPlayerCharacter.UserId, nonPlayerCharacter.Name }
+            ).IsUnique();
+
+            /* Adventure */
+
+            modelBuilder.Entity<Adventure>().HasIndex(
+                adventure => new { adventure.UserId, adventure.Title }
+            ).IsUnique();
+
+            modelBuilder.Entity<Adventure>().Property(
+                adventure => adventure.ChaosFactor
+            ).HasDefaultValue(5);
+
+            modelBuilder.Entity<Adventure>().Property(
+                adventure => adventure.CreatedAt
+            ).HasDefaultValue(DateTime.Now);
+
+            /* Thread */
+
+            modelBuilder.Entity<Thread>().HasIndex(thread => thread.Name).IsUnique();
         }
     }
 }

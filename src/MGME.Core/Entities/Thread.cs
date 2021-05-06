@@ -6,6 +6,7 @@ namespace MGME.Core.Entities
     public class Thread : BaseEntity
     {
         [Required]
+        [StringLength(254)]
         public string Name { get; set; }
 
         public string Description { get; set; }
