@@ -18,6 +18,9 @@ namespace MGME.Core.Entities
         public int ChaosFactor { get; set; }
 
         [Required]
+        public bool Resolved { get; set; }
+
+        [Required]
         public DateTime CreatedAt { get; set; }
 
         public ICollection<PlayerCharacter> PlayerCharacters { get; set; }

@@ -61,12 +61,18 @@ namespace MGME.Infra.Data
             ).HasDefaultValue(5);
 
             modelBuilder.Entity<Adventure>().Property(
+                adventure => adventure.Resolved
+            ).HasDefaultValue(false);
+
+            modelBuilder.Entity<Adventure>().Property(
                 adventure => adventure.CreatedAt
             ).HasDefaultValue(DateTime.Now);
 
             /* Thread */
 
-            modelBuilder.Entity<Thread>().HasIndex(thread => thread.Name).IsUnique();
+            modelBuilder.Entity<Thread>().HasIndex(
+                thread => new { thread.UserId, thread.Name }
+            ).IsUnique();
         }
     }
 }
