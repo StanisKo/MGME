@@ -34,6 +34,13 @@ namespace MGME.Core.Entities
 
         public ICollection<NonPlayerCharacter> NonPlayerCharacters { get; set; }
 
+        /*
+        The connection to Threads is established only for the sake of denying
+        duplicate Thread names via composite User.Id/Thread.Name index
+
+        In reality, we don't query for User's threads directly
+        */
+
         public ICollection<Thread> Threads { get; set; }
     }
 }
