@@ -25,6 +25,6 @@ namespace MGME.Core.Entities
         */
         [ForeignKey("PlayerCharacter")]
         public int? PlayerCharacterId { get; set; }
-        public PlayerCharacter Character { get; set; }
+        public PlayerCharacter PlayerCharacter { get; set; }
     }
 }

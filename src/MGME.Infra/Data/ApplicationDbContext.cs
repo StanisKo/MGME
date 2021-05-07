@@ -46,12 +46,26 @@ namespace MGME.Infra.Data
 
             /* NonPlayerCharacter */
 
-            // Think of the OnDelete actions, in such that deleting character
-            // Does not delete the npc
-
             modelBuilder.Entity<NonPlayerCharacter>().HasIndex(
                 nonPlayerCharacter => new { nonPlayerCharacter.UserId, nonPlayerCharacter.Name }
             ).IsUnique();
+
+            /*
+            We explicitly specify the relations between NonPlayerCharacter and User,
+            and NonPlayerCharacter and PlayerCharacter since OnDelete actions
+            for two types is different: if User is deleted, so are his/her NonPlayerCharacters,
+            but if PlayerCharacter is deleted, NonPlayerCharacters are simply unlinked
+            */
+
+            modelBuilder.Entity<NonPlayerCharacter>()
+                .HasOne(nonPlayerCharacter => nonPlayerCharacter.User)
+                .WithMany(user => user.NonPlayerCharacters)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<NonPlayerCharacter>()
+                .HasOne(nonPlayerCharacter => nonPlayerCharacter.PlayerCharacter)
+                .WithMany(playerCharacter => playerCharacter.NonPlayerCharacters)
+                .OnDelete(DeleteBehavior.SetNull);
 
             /* Adventure */
 
@@ -76,6 +90,33 @@ namespace MGME.Infra.Data
             modelBuilder.Entity<Thread>().HasIndex(
                 thread => new { thread.UserId, thread.Name }
             ).IsUnique();
+
+            /*
+            We explicitly configure relations for Threads as well
+            Since we want Cascade delete behavior even in case of
+            nullable foreign keys:
+
+            If PlayerCharacter is deleted, so are his/her Threads, even those
+            that became Adventure's Threads
+
+            If Adventure is delered, so are its Threads, even those
+            that were taken from PlayerCharacter(s)
+            */
+
+            modelBuilder.Entity<Thread>()
+                .HasOne(thread => thread.User)
+                .WithMany(user => user.Threads)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Thread>()
+                .HasOne(thread => thread.PlayerCharacter)
+                .WithMany(playerCharacter => playerCharacter.Threads)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Thread>()
+                .HasOne(thread => thread.Adventure)
+                .WithMany(adventure => adventure.Threads)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
