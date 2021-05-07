@@ -14,6 +14,12 @@ namespace MGME.Core.Entities
         [Required]
         public DateTime CreatedAt { get; set; }
 
+        public FateQuestion FateQuestion { get; set; }
+
+        public RandomEvent RandomEvent { get; set; }
+
+        public Battle Battle { get; set; }
+
         [ForeignKey("Scene")]
         public int SceneId { get; set; }
         public Scene Scene { get; set; }
