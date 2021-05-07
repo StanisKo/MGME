@@ -51,8 +51,8 @@ namespace MGME.Infra.Data
             ).IsUnique();
 
             /*
-            We explicitly specify the relations between NonPlayerCharacter and User,
-            and NonPlayerCharacter and PlayerCharacter since OnDelete actions
+            We explicitly specify the relations between NonPlayerCharacter/User,
+            and NonPlayerCharacter/PlayerCharacter since OnDelete actions
             for two types is different: if User is deleted, so are his/her NonPlayerCharacters,
             but if PlayerCharacter is deleted, NonPlayerCharacters are simply unlinked
             */
