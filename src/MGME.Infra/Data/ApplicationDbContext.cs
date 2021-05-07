@@ -26,6 +26,16 @@ namespace MGME.Infra.Data
 
         public DbSet<Thread> Threads { get; set; }
 
+        public DbSet<Scene> Scenes { get; set; }
+
+        public DbSet<SceneItem> SceneItems { get; set; }
+
+        public DbSet<FateQuestion> FateQuestions { get; set; }
+
+        public DbSet<RandomEvent> RandomEvents { get; set; }
+
+        public DbSet<Battle> Battles { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             /* User */
