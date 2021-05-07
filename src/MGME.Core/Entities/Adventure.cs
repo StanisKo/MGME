@@ -29,6 +29,8 @@ namespace MGME.Core.Entities
 
         public ICollection<Thread> Threads { get; set; }
 
+        public ICollection<Scene> Scenes { get; set; }
+
         [ForeignKey("User")]
         public int UserId { get; set; }
         public User User { get; set; }
