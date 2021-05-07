@@ -33,5 +33,7 @@ namespace MGME.Core.Entities
         public ICollection<Adventure> Adventures { get; set; }
 
         public ICollection<NonPlayerCharacter> NonPlayerCharacters { get; set; }
+
+        public ICollection<Thread> Threads { get; set; }
     }
 }

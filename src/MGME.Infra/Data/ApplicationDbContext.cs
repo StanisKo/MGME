@@ -46,6 +46,9 @@ namespace MGME.Infra.Data
 
             /* NonPlayerCharacter */
 
+            // Think of the OnDelete actions, in such that deleting character
+            // Does not delete the npc
+
             modelBuilder.Entity<NonPlayerCharacter>().HasIndex(
                 nonPlayerCharacter => new { nonPlayerCharacter.UserId, nonPlayerCharacter.Name }
             ).IsUnique();
