@@ -99,7 +99,7 @@ namespace MGME.Infra.Data
             If PlayerCharacter is deleted, so are his/her Threads, even those
             that became Adventure's Threads
 
-            If Adventure is delered, so are its Threads, even those
+            If Adventure is deleted, so are its Threads, even those
             that were taken from PlayerCharacter(s)
             */
 
