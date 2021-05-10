@@ -93,7 +93,7 @@ namespace MGME.Infra.Data
 
             modelBuilder.Entity<Adventure>().Property(
                 adventure => adventure.CreatedAt
-            ).HasDefaultValue(DateTime.Now);
+            ).HasDefaultValue(DateTime.UtcNow);
 
             /* Thread */
 
@@ -140,7 +140,13 @@ namespace MGME.Infra.Data
 
             modelBuilder.Entity<Scene>().Property(
                 scene => scene.CreatedAt
-            ).HasDefaultValue(DateTime.Now);
+            ).HasDefaultValue(DateTime.UtcNow);
+
+            /* SceneItem */
+
+            modelBuilder.Entity<SceneItem>().Property(
+                sceneItem => sceneItem.CreatedAt
+            ).HasDefaultValue(DateTime.UtcNow);
         }
     }
 }
