@@ -18,9 +18,6 @@ namespace MGME.Core.Entities
         [Required]
         public string Setup { get; set; }
 
-        [Required]
-        public bool Modified { get; set; }
-
         public string InterrupEvent { get; set; }
 
         public string ModifiedSetup { get; set; }

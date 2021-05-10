@@ -127,6 +127,20 @@ namespace MGME.Infra.Data
                 .HasOne(thread => thread.Adventure)
                 .WithMany(adventure => adventure.Threads)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            /* Scene */
+
+            modelBuilder.Entity<Scene>().HasIndex(
+                scene => new { scene.AdventureId, scene.Title }
+            ).IsUnique();
+
+            modelBuilder.Entity<Scene>().Property(
+                scene => scene.Resolved
+            ).HasDefaultValue(false);
+
+            modelBuilder.Entity<Scene>().Property(
+                scene => scene.CreatedAt
+            ).HasDefaultValue(DateTime.Now);
         }
     }
 }
