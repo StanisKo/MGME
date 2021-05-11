@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using MGME.Core.DTOs;
 using MGME.Core.DTOs.PlayerCharacter;
 
-
 namespace MGME.Core.Interfaces.Services
 {
     public interface IPlayerCharacterService
@@ -13,7 +12,7 @@ namespace MGME.Core.Interfaces.Services
 
          Task <DataServiceResponse<GetPlayerCharacterDetailDTO>> GetPlayerCharacter(int id);
 
-         Task <BaseServiceResponse> AddPlayerCharacter();
+         Task <BaseServiceResponse> AddPlayerCharacter(AddPlayerCharacterDTO newPlayerCharacter);
 
          Task <BaseServiceResponse> UpdatePlayerCharacter();
 
