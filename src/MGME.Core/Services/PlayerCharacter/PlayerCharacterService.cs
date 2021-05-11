@@ -74,8 +74,15 @@ namespace MGME.Core.Services.PlayerCharacterService
                     UserId = userId
                 };
 
+                /*
+                We add initial NPCs and Threads to a Character here,
+                since it is faster then sepearating these transactions into their own service
+                (Though, we would use their own services when Character is already created)
+                */
+
                 List<NonPlayerCharacter> NPCsToAdd = new List<NonPlayerCharacter>();
 
+                // Get existing NPCs
                 if (thereAreExisitingNPCsToAdd)
                 {
                     NPCsToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
@@ -83,6 +90,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                     );
                 }
 
+                // Map new NPCs to data models
                 if (thereAreNewNPCsToAdd)
                 {
                     List<NonPlayerCharacter> newNPCsToAdd = newPlayerCharacter.NewNPCs.Select(
@@ -92,10 +100,12 @@ namespace MGME.Core.Services.PlayerCharacterService
                     NPCsToAdd.AddRange(newNPCsToAdd);
                 }
 
+                // Map Threads to data models
                 List<Thread> threadsToAdd = newPlayerCharacter.Threads.Select(
                     thread => _mapper.Map<Thread>(thread)
                 ).ToList();
 
+                // Add Character and then add NPCs and Threads in parallel
                 await _playerCharacterRepository.AddEntityAsync(characterToAdd);
 
                 await Task.WhenAll(new List<Task>()
