@@ -65,8 +65,6 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             int userId = GetUserIdFromHttpContext();
 
-            // TODO: optimize and prettify
-
             try
             {
                 /*
@@ -96,25 +94,26 @@ namespace MGME.Core.Services.PlayerCharacterService
                     );
                 }
 
-                // Map new NPCs to data models
                 if (thereAreNewNPCsToAdd)
                 {
-                    List<NonPlayerCharacter> newNPCsToAdd = newPlayerCharacter.NewNPCs.Select(
-                        npc => _mapper.Map<NonPlayerCharacter>(npc)
-                    ).ToList();
+                    List<NonPlayerCharacter> newNPCsToAdd = newPlayerCharacter.NewNPCs
+                        .Select(npc => _mapper.Map<NonPlayerCharacter>(npc))
+                        .ToList();
 
                     NPCsToAdd.AddRange(newNPCsToAdd);
                 }
 
-                // Map Threads to data models
-                List<Thread> threadsToAdd = newPlayerCharacter.Threads.Select(
-                    thread => _mapper.Map<Thread>(thread)
-                ).ToList();
+                List<Thread> threadsToAdd = newPlayerCharacter.Threads
+                    .Select(thread => _mapper.Map<Thread>(thread))
+                    .ToList();
 
-                // Bind both collections to current user
-                NPCsToAdd = NPCsToAdd.Select(npc => { npc.UserId = userId; return npc; }).ToList();
+                NPCsToAdd = NPCsToAdd
+                    .Select(npc => { npc.UserId = userId; return npc; })
+                    .ToList();
 
-                threadsToAdd = threadsToAdd.Select(thread => { thread.UserId = userId; return thread; }).ToList();
+                threadsToAdd = threadsToAdd
+                    .Select(thread => { thread.UserId = userId; return thread; })
+                    .ToList();
 
                 PlayerCharacter characterToAdd = new PlayerCharacter()
                 {
@@ -125,7 +124,6 @@ namespace MGME.Core.Services.PlayerCharacterService
                     UserId = userId
                 };
 
-                // Add Character
                 await _playerCharacterRepository.AddEntityAsync(characterToAdd);
 
                 response.Success = true;
