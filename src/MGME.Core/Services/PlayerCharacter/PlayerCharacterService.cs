@@ -76,7 +76,7 @@ namespace MGME.Core.Services.PlayerCharacterService
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
-            bool thereAreNewNonPlayerCharactersToAddToAdd =
+            bool thereAreNewNonPlayerCharactersToAdd =
                 newPlayerCharacter.NewNonPlayerCharacters != null
                 && newPlayerCharacter.NewNonPlayerCharacters.Any();
 
@@ -84,7 +84,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 newPlayerCharacter.ExistingNonPlayerCharacters != null
                 && newPlayerCharacter.ExistingNonPlayerCharacters.Any();
 
-            if (!thereAreNewNonPlayerCharactersToAddToAdd && !thereAreExisitingNonPlayerCharactersToAdd)
+            if (!thereAreNewNonPlayerCharactersToAdd && !thereAreExisitingNonPlayerCharactersToAdd)
             {
                 response.Success = false;
                 response.Message = "At least one new or existing NPC must be provided";
@@ -107,16 +107,20 @@ namespace MGME.Core.Services.PlayerCharacterService
                 /*
                 Get existing NPCs
 
-                We can add only those that are not assigned to another PlayerCharacter
-                or not taking part in any Adventure
+                We can add only those that are not taking part in any Adventure
+                or not assigned to another PlayerCharacter
+
+                It is unlikely that this code will receive IDs of those that do not
+                meet conditions above, since we don't supply it to the client app,
+                but it never hurts to double check
                 */
-                if (thereAreNewNonPlayerCharactersToAddToAdd)
+                if (thereAreNewNonPlayerCharactersToAdd)
                 {
                     Expression<Func<NonPlayerCharacter, bool>> predicate =
-                        npc => npc.UserId == userId
-                        && newPlayerCharacter.ExistingNonPlayerCharacters.Contains(npc.Id)
-                        && npc.PlayerCharacterId == null
-                        && npc.Adventures.Count == 0;
+                        nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                        && nonPlayerCharacter.Adventures.Count == 0
+                        && nonPlayerCharacter.PlayerCharacterId == null
+                        && newPlayerCharacter.ExistingNonPlayerCharacters.Contains(nonPlayerCharacter.Id);
 
                     nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
                         predicate: predicate
@@ -126,7 +130,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 if (thereAreExisitingNonPlayerCharactersToAdd)
                 {
                     List<NonPlayerCharacter> newNonPlayerCharactersToAdd = newPlayerCharacter.NewNonPlayerCharacters
-                        .Select(npc => _mapper.Map<NonPlayerCharacter>(npc))
+                        .Select(nonPlayerCharacter => _mapper.Map<NonPlayerCharacter>(nonPlayerCharacter))
                         .ToList();
 
                     nonPlayerCharactersToAdd.AddRange(newNonPlayerCharactersToAdd);
@@ -137,7 +141,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                     .ToList();
 
                 nonPlayerCharactersToAdd = nonPlayerCharactersToAdd
-                    .Select(npc => { npc.UserId = userId; return npc; })
+                    .Select(nonPlayerCharacter => { nonPlayerCharacter.UserId = userId; return nonPlayerCharacter; })
                     .ToList();
 
                 threadsToAdd = threadsToAdd
