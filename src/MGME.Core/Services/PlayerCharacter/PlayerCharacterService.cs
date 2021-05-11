@@ -89,10 +89,18 @@ namespace MGME.Core.Services.PlayerCharacterService
                         Name = playerCharacter.Name,
                         Description = playerCharacter.Description,
                         Adventures = playerCharacter.Adventures.Select(
-                            adventure => _mapper.Map<GetAdventureDTO>(adventure)
+                            adventure => new GetAdventureDTO()
+                            {
+                                Id = adventure.Id,
+                                Title = adventure.Title
+                            }
                         ),
                         NonPlayerCharacters = playerCharacter.NonPlayerCharacters.Select(
-                            nonPlayerCharacter => _mapper.Map<GetNonPlayerCharacterDTO>(nonPlayerCharacter)
+                            nonPlayerCharacter => new GetNonPlayerCharacterDTO()
+                            {
+                                Id = nonPlayerCharacter.Id,
+                                Name = nonPlayerCharacter.Name
+                            }
                         )
                     }
                 );

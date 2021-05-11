@@ -34,7 +34,18 @@ namespace MGME.Web.Controllers
             return NotFound(response);
         }
 
-        
+        [HttpGet("{id}")]
+        public async Task <IActionResult> GetPlayerCharacter(int id)
+        {
+            DataServiceResponse<GetPlayerCharacterDetailDTO> response = await _playerCharacterService.GetPlayerCharacter(id);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
 
         [HttpPost("Add")]
         public async Task <IActionResult> AddPlayerCharacter(AddPlayerCharacterDTO newPlayerCharacter)
