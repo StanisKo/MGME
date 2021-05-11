@@ -21,15 +21,19 @@ namespace MGME.Core.Services.PlayerCharacterService
 
         private readonly IEntityRepository<NonPlayerCharacter> _nonPlayerCharacterRepository;
 
+        private readonly IEntityRepository<Thread> _threadRepository;
+
         private readonly IMapper _mapper;
 
         public PlayerCharacterService(IEntityRepository<PlayerCharacter> playerCharacterRepository,
                                       IEntityRepository<NonPlayerCharacter> nonPlayerCharacterRepository,
+                                      IEntityRepository<Thread> threadRepository,
                                       IMapper mapper,
                                       IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _playerCharacterRepository = playerCharacterRepository;
             _nonPlayerCharacterRepository = nonPlayerCharacterRepository;
+            _threadRepository = threadRepository;
             _mapper = mapper;
         }
 
@@ -47,8 +51,9 @@ namespace MGME.Core.Services.PlayerCharacterService
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
-            bool thereAreNewNPCsToAdd = newPlayerCharacter.NewNonPlayerCharacters.Any();
-            bool thereAreExisitingNPCsToAdd = newPlayerCharacter.ExistingNonPlayerCharacters.Any();
+            bool thereAreNewNPCsToAdd = newPlayerCharacter.NewNPCs.Any();
+
+            bool thereAreExisitingNPCsToAdd = newPlayerCharacter.ExistingNPCs.Any();
 
             if (!thereAreNewNPCsToAdd && !thereAreExisitingNPCsToAdd)
             {
@@ -69,16 +74,38 @@ namespace MGME.Core.Services.PlayerCharacterService
                     UserId = userId
                 };
 
-                List<NonPlayerCharacter> existingNPCsToAdd = new List<NonPlayerCharacter>();
+                List<NonPlayerCharacter> NPCsToAdd = new List<NonPlayerCharacter>();
 
                 if (thereAreExisitingNPCsToAdd)
                 {
-
+                    NPCsToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
+                        predicate: npc => npc.UserId == userId && newPlayerCharacter.ExistingNPCs.Contains(npc.Id)
+                    );
                 }
+
+                if (thereAreNewNPCsToAdd)
+                {
+                    List<NonPlayerCharacter> newNPCsToAdd = newPlayerCharacter.NewNPCs.Select(
+                        npc => _mapper.Map<NonPlayerCharacter>(npc)
+                    ).ToList();
+
+                    NPCsToAdd.AddRange(newNPCsToAdd);
+                }
+
+                List<Thread> threadsToAdd = newPlayerCharacter.Threads.Select(
+                    thread => _mapper.Map<Thread>(thread)
+                ).ToList();
 
                 await _playerCharacterRepository.AddEntityAsync(characterToAdd);
 
-                // Parallelize adding npcs and threads
+                await Task.WhenAll(new List<Task>()
+                {
+                    _nonPlayerCharacterRepository.AddEntitiesAsync(NPCsToAdd),
+                    _threadRepository.AddEntitiesAsync(threadsToAdd)
+                });
+
+                response.Success = true;
+                response.Message = "Character was successfully added";
             }
             catch (Exception exception)
             {
