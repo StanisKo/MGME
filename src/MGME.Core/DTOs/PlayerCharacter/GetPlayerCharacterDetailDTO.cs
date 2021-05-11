@@ -11,8 +11,8 @@ namespace MGME.Core.DTOs.PlayerCharacter
 
         public string Description { get; set; }
 
-        public List<GetNonPlayerCharacterDTO> NonPlayerCharacters { get; set; }
+        public IEnumerable<GetNonPlayerCharacterDTO> NonPlayerCharacters { get; set; }
 
-        public List<GetAdventureDTO> Adventures { get; set; }
+        public IEnumerable<GetAdventureDTO> Adventures { get; set; }
     }
 }

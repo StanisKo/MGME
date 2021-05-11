@@ -34,6 +34,8 @@ namespace MGME.Web.Controllers
             return NotFound(response);
         }
 
+        
+
         [HttpPost("Add")]
         public async Task <IActionResult> AddPlayerCharacter(AddPlayerCharacterDTO newPlayerCharacter)
         {

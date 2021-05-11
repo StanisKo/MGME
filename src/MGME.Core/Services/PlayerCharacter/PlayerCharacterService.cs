@@ -78,26 +78,27 @@ namespace MGME.Core.Services.PlayerCharacterService
             {
                 GetPlayerCharacterDetailDTO playerCharacter = await _playerCharacterRepository.GetEntityAsync<GetPlayerCharacterDetailDTO>(
                     predicate: playerCharacter => playerCharacter.UserId == userId && playerCharacter.Id == id,
+                    include: new[]
+                    {
+                        "Adventures",
+                        "NonPlayerCharacters"
+                    },
                     select: playerCharacter => new GetPlayerCharacterDetailDTO()
                     {
                         Id = playerCharacter.Id,
                         Name = playerCharacter.Name,
                         Description = playerCharacter.Description,
-                        Adventures = playerCharacter.Adventures.Select(adventure =>
-                        {
-                            _mapper.Map<GetAdventureDTO>(adventure);
-                        }),
-                        NonPlayerCharacters = playerCharacter.NonPlayerCharacters.Select(nonPlayerCharacter =>
-                        {
-                            _mapper.Map<GetNonPlayerCharacterDTO>(nonPlayerCharacter);
-                        })
-                    },
-                    include: new[]
-                    {
-                        "NonPlayerCharacters",
-                        "Adventures"
+                        Adventures = playerCharacter.Adventures.Select(
+                            adventure => _mapper.Map<GetAdventureDTO>(adventure)
+                        ),
+                        NonPlayerCharacters = playerCharacter.NonPlayerCharacters.Select(
+                            nonPlayerCharacter => _mapper.Map<GetNonPlayerCharacterDTO>(nonPlayerCharacter)
+                        )
                     }
                 );
+
+                response.Data = playerCharacter;
+                response.Success = true;
             }
             catch (Exception exception)
             {
