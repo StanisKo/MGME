@@ -20,10 +20,27 @@ namespace MGME.Core.Entities
         [Required]
         public byte[] PasswordSalt { get; set; }
 
+        [Required]
         public bool EmailIsConfirmed { get; set; }
 
+        [Required]
         public string Role { get; set; }
 
         public ICollection<RefreshToken> RefreshTokens { get; set; }
+
+        public ICollection<PlayerCharacter> PlayerCharacters { get; set; }
+
+        public ICollection<Adventure> Adventures { get; set; }
+
+        public ICollection<NonPlayerCharacter> NonPlayerCharacters { get; set; }
+
+        /*
+        The connection to Threads is established only for the sake of denying
+        duplicate Thread names via composite User.Id/Thread.Name index
+
+        In reality, we don't query for User's threads directly
+        */
+
+        public ICollection<Thread> Threads { get; set; }
     }
 }

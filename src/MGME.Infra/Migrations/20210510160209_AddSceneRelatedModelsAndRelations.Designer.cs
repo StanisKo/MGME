@@ -3,21 +3,23 @@ using System;
 using MGME.Infra.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace MGME.Infra.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210510160209_AddSceneRelatedModelsAndRelations")]
+    partial class AddSceneRelatedModelsAndRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .UseIdentityByDefaultColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.5");
+                .HasAnnotation("ProductVersion", "5.0.2");
 
             modelBuilder.Entity("AdventureNonPlayerCharacter", b =>
                 {
@@ -68,7 +70,7 @@ namespace MGME.Infra.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasDefaultValueSql("NOW()");
+                        .HasDefaultValue(new DateTime(2021, 5, 10, 16, 2, 8, 739, DateTimeKind.Utc).AddTicks(1390));
 
                     b.Property<bool>("Resolved")
                         .ValueGeneratedOnAdd()
@@ -262,7 +264,7 @@ namespace MGME.Infra.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasDefaultValueSql("NOW()");
+                        .HasDefaultValue(new DateTime(2021, 5, 10, 16, 2, 8, 740, DateTimeKind.Utc).AddTicks(3180));
 
                     b.Property<string>("InterruptEvent")
                         .HasColumnType("text");
@@ -284,7 +286,7 @@ namespace MGME.Infra.Migrations
                         .HasMaxLength(254)
                         .HasColumnType("character varying(254)");
 
-                    b.Property<int?>("Type")
+                    b.Property<int>("Type")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -305,7 +307,7 @@ namespace MGME.Infra.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasDefaultValueSql("NOW()");
+                        .HasDefaultValue(new DateTime(2021, 5, 10, 16, 2, 8, 740, DateTimeKind.Utc).AddTicks(4950));
 
                     b.Property<int>("SceneId")
                         .HasColumnType("integer");
