@@ -68,7 +68,21 @@ namespace MGME.Core.Services.PlayerCharacterService
 
         public async Task <DataServiceResponse<GetPlayerCharacterDetailDTO>> GetPlayerCharacter(int id)
         {
-            throw new System.NotImplementedException();
+            DataServiceResponse<GetPlayerCharacterDetailDTO> response = new DataServiceResponse<GetPlayerCharacterDetailDTO>();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
 
         public async Task <BaseServiceResponse> AddPlayerCharacter(AddPlayerCharacterDTO newPlayerCharacter)
@@ -113,7 +127,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 meet conditions above, since we don't supply it to the client app,
                 but it never hurts to double check
                 */
-                if (thereAreNewNonPlayerCharactersToAdd)
+                if (thereAreExisitingNonPlayerCharactersToAdd)
                 {
                     Expression<Func<NonPlayerCharacter, bool>> predicate =
                         nonPlayerCharacter => nonPlayerCharacter.UserId == userId
@@ -126,7 +140,8 @@ namespace MGME.Core.Services.PlayerCharacterService
                     );
                 }
 
-                if (thereAreExisitingNonPlayerCharactersToAdd)
+                // Map DTOs to data models and add to pool of all NPCs to add
+                if (thereAreNewNonPlayerCharactersToAdd)
                 {
                     List<NonPlayerCharacter> newNonPlayerCharactersToAdd = newPlayerCharacter.NewNonPlayerCharacters
                         .Select(nonPlayerCharacter => _mapper.Map<NonPlayerCharacter>(nonPlayerCharacter))
@@ -135,10 +150,12 @@ namespace MGME.Core.Services.PlayerCharacterService
                     nonPlayerCharactersToAdd.AddRange(newNonPlayerCharactersToAdd);
                 }
 
+                // Map DTOs to data models
                 List<Thread> threadsToAdd = newPlayerCharacter.Threads
                     .Select(thread => _mapper.Map<Thread>(thread))
                     .ToList();
 
+                // Link both collections of NPCs and Threads to current user
                 nonPlayerCharactersToAdd = nonPlayerCharactersToAdd
                     .Select(nonPlayerCharacter => { nonPlayerCharacter.UserId = userId; return nonPlayerCharacter; })
                     .ToList();
@@ -147,6 +164,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                     .Select(thread => { thread.UserId = userId; return thread; })
                     .ToList();
 
+                // Finally create and write character to db
                 PlayerCharacter characterToAdd = new PlayerCharacter()
                 {
                     Name = newPlayerCharacter.Name,
@@ -172,7 +190,7 @@ namespace MGME.Core.Services.PlayerCharacterService
             return response;
         }
 
-        public async Task <BaseServiceResponse> UpdatePlayerCharacter()
+        public async Task <BaseServiceResponse> UpdatePlayerCharacter(int id)
         {
             throw new System.NotImplementedException();
         }

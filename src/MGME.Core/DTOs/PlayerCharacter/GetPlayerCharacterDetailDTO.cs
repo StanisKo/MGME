@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
 using MGME.Core.DTOs.NonPlayerCharacter;
+using MGME.Core.DTOs.Adventure;
 
 namespace MGME.Core.DTOs.PlayerCharacter
 {
@@ -11,5 +12,7 @@ namespace MGME.Core.DTOs.PlayerCharacter
         public string Description { get; set; }
 
         public List<GetNonPlayerCharacterDTO> NonPlayerCharacters { get; set; }
+
+        public List<GetAdventureDTO> Adventures { get; set; }
     }
 }
