@@ -1,8 +1,8 @@
-using System;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
+
+using Microsoft.AspNetCore.Authorization;
 
 using MGME.Core.DTOs;
 using MGME.Core.DTOs.PlayerCharacter;
@@ -10,6 +10,7 @@ using MGME.Core.Interfaces.Services;
 
 namespace MGME.Web.Controllers
 {
+    [Authorize(Roles = "GameMaster,Admin")]
     public class PlayerCharacterController : BaseAPIController
     {
         private readonly IPlayerCharacterService _playerCharacterService;

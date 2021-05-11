@@ -8,7 +8,5 @@ namespace MGME.Core.DTOs.NonPlayerCharacter
         public string Name { get; set; }
 
         public string Description { get; set; }
-
-        
     }
 }

@@ -12,6 +12,7 @@ using MGME.Core.DTOs;
 using MGME.Core.DTOs.PlayerCharacter;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
+using System.Linq.Expressions;
 
 namespace MGME.Core.Services.PlayerCharacterService
 {
@@ -20,8 +21,6 @@ namespace MGME.Core.Services.PlayerCharacterService
         private readonly IEntityRepository<PlayerCharacter> _playerCharacterRepository;
 
         private readonly IEntityRepository<NonPlayerCharacter> _nonPlayerCharacterRepository;
-
-        private readonly IEntityRepository<Thread> _threadRepository;
 
         private readonly IMapper _mapper;
 
@@ -33,7 +32,6 @@ namespace MGME.Core.Services.PlayerCharacterService
         {
             _playerCharacterRepository = playerCharacterRepository;
             _nonPlayerCharacterRepository = nonPlayerCharacterRepository;
-            _threadRepository = threadRepository;
             _mapper = mapper;
         }
 
@@ -51,9 +49,11 @@ namespace MGME.Core.Services.PlayerCharacterService
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
-            bool thereAreNewNPCsToAdd = newPlayerCharacter.NewNPCs.Any();
+            bool thereAreNewNPCsToAdd =
+                newPlayerCharacter.NewNPCs != null && newPlayerCharacter.NewNPCs.Any();
 
-            bool thereAreExisitingNPCsToAdd = newPlayerCharacter.ExistingNPCs.Any();
+            bool thereAreExisitingNPCsToAdd =
+                newPlayerCharacter.ExistingNPCs != null && newPlayerCharacter.ExistingNPCs.Any();
 
             if (!thereAreNewNPCsToAdd && !thereAreExisitingNPCsToAdd)
             {
@@ -65,28 +65,34 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             int userId = GetUserIdFromHttpContext();
 
+            // TODO: optimize and prettify
+
             try
             {
-                PlayerCharacter characterToAdd = new PlayerCharacter()
-                {
-                    Name = newPlayerCharacter.Name,
-                    Description = newPlayerCharacter.Description,
-                    UserId = userId
-                };
-
                 /*
-                We add initial NPCs and Threads to a Character here,
-                since it is faster then sepearating these transactions into their own service
-                (Though, we would use their own services when Character is already created)
+                We add initial NPCs and Threads to a PlayerCharacter here,
+                since it is faster then sepearating these transactions into their own services
+                (Though, we would use their own services when PlayerCharacter is already created)
                 */
 
                 List<NonPlayerCharacter> NPCsToAdd = new List<NonPlayerCharacter>();
 
-                // Get existing NPCs
+                /*
+                Get existing NPCs
+
+                We can add only those that are not assigned to another PlayerCharacter
+                or not taking part in any Adventure
+                */
                 if (thereAreExisitingNPCsToAdd)
                 {
+                    Expression<Func<NonPlayerCharacter, bool>> predicate =
+                        npc => npc.UserId == userId
+                        && newPlayerCharacter.ExistingNPCs.Contains(npc.Id)
+                        && npc.PlayerCharacterId == null
+                        && npc.Adventures.Count == 0;
+
                     NPCsToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
-                        predicate: npc => npc.UserId == userId && newPlayerCharacter.ExistingNPCs.Contains(npc.Id)
+                        predicate: predicate
                     );
                 }
 
@@ -105,14 +111,22 @@ namespace MGME.Core.Services.PlayerCharacterService
                     thread => _mapper.Map<Thread>(thread)
                 ).ToList();
 
-                // Add Character and then add NPCs and Threads in parallel
-                await _playerCharacterRepository.AddEntityAsync(characterToAdd);
+                // Bind both collections to current user
+                NPCsToAdd = NPCsToAdd.Select(npc => { npc.UserId = userId; return npc; }).ToList();
 
-                await Task.WhenAll(new List<Task>()
+                threadsToAdd = threadsToAdd.Select(thread => { thread.UserId = userId; return thread; }).ToList();
+
+                PlayerCharacter characterToAdd = new PlayerCharacter()
                 {
-                    _nonPlayerCharacterRepository.AddEntitiesAsync(NPCsToAdd),
-                    _threadRepository.AddEntitiesAsync(threadsToAdd)
-                });
+                    Name = newPlayerCharacter.Name,
+                    Description = newPlayerCharacter.Description,
+                    NonPlayerCharacters = NPCsToAdd,
+                    Threads = threadsToAdd,
+                    UserId = userId
+                };
+
+                // Add Character
+                await _playerCharacterRepository.AddEntityAsync(characterToAdd);
 
                 response.Success = true;
                 response.Message = "Character was successfully added";
