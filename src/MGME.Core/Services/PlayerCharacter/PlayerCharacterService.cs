@@ -26,7 +26,6 @@ namespace MGME.Core.Services.PlayerCharacterService
 
         public PlayerCharacterService(IEntityRepository<PlayerCharacter> playerCharacterRepository,
                                       IEntityRepository<NonPlayerCharacter> nonPlayerCharacterRepository,
-                                      IEntityRepository<Thread> threadRepository,
                                       IMapper mapper,
                                       IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
