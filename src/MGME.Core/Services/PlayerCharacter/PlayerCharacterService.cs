@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
@@ -12,7 +13,6 @@ using MGME.Core.DTOs;
 using MGME.Core.DTOs.PlayerCharacter;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
-using System.Linq.Expressions;
 
 namespace MGME.Core.Services.PlayerCharacterService
 {
