@@ -76,13 +76,15 @@ namespace MGME.Core.Services.PlayerCharacterService
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
-            bool thereAreNewNPCsToAdd =
-                newPlayerCharacter.NewNPCs != null && newPlayerCharacter.NewNPCs.Any();
+            bool thereAreNewNonPlayerCharactersToAddToAdd =
+                newPlayerCharacter.NewNonPlayerCharacters != null
+                && newPlayerCharacter.NewNonPlayerCharacters.Any();
 
-            bool thereAreExisitingNPCsToAdd =
-                newPlayerCharacter.ExistingNPCs != null && newPlayerCharacter.ExistingNPCs.Any();
+            bool thereAreExisitingNonPlayerCharactersToAdd =
+                newPlayerCharacter.ExistingNonPlayerCharacters != null
+                && newPlayerCharacter.ExistingNonPlayerCharacters.Any();
 
-            if (!thereAreNewNPCsToAdd && !thereAreExisitingNPCsToAdd)
+            if (!thereAreNewNonPlayerCharactersToAddToAdd && !thereAreExisitingNonPlayerCharactersToAdd)
             {
                 response.Success = false;
                 response.Message = "At least one new or existing NPC must be provided";
@@ -100,7 +102,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 (Though, we would use their own services when PlayerCharacter is already created)
                 */
 
-                List<NonPlayerCharacter> NPCsToAdd = new List<NonPlayerCharacter>();
+                List<NonPlayerCharacter> nonPlayerCharactersToAdd = new List<NonPlayerCharacter>();
 
                 /*
                 Get existing NPCs
@@ -108,33 +110,33 @@ namespace MGME.Core.Services.PlayerCharacterService
                 We can add only those that are not assigned to another PlayerCharacter
                 or not taking part in any Adventure
                 */
-                if (thereAreExisitingNPCsToAdd)
+                if (thereAreNewNonPlayerCharactersToAddToAdd)
                 {
                     Expression<Func<NonPlayerCharacter, bool>> predicate =
                         npc => npc.UserId == userId
-                        && newPlayerCharacter.ExistingNPCs.Contains(npc.Id)
+                        && newPlayerCharacter.ExistingNonPlayerCharacters.Contains(npc.Id)
                         && npc.PlayerCharacterId == null
                         && npc.Adventures.Count == 0;
 
-                    NPCsToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
+                    nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
                         predicate: predicate
                     );
                 }
 
-                if (thereAreNewNPCsToAdd)
+                if (thereAreExisitingNonPlayerCharactersToAdd)
                 {
-                    List<NonPlayerCharacter> newNPCsToAdd = newPlayerCharacter.NewNPCs
+                    List<NonPlayerCharacter> newNonPlayerCharactersToAdd = newPlayerCharacter.NewNonPlayerCharacters
                         .Select(npc => _mapper.Map<NonPlayerCharacter>(npc))
                         .ToList();
 
-                    NPCsToAdd.AddRange(newNPCsToAdd);
+                    nonPlayerCharactersToAdd.AddRange(newNonPlayerCharactersToAdd);
                 }
 
                 List<Thread> threadsToAdd = newPlayerCharacter.Threads
                     .Select(thread => _mapper.Map<Thread>(thread))
                     .ToList();
 
-                NPCsToAdd = NPCsToAdd
+                nonPlayerCharactersToAdd = nonPlayerCharactersToAdd
                     .Select(npc => { npc.UserId = userId; return npc; })
                     .ToList();
 
@@ -146,7 +148,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 {
                     Name = newPlayerCharacter.Name,
                     Description = newPlayerCharacter.Description,
-                    NonPlayerCharacters = NPCsToAdd,
+                    NonPlayerCharacters = nonPlayerCharactersToAdd,
                     Threads = threadsToAdd,
                     UserId = userId
                 };

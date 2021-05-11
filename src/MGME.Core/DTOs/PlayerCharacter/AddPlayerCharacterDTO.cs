@@ -14,9 +14,9 @@ namespace MGME.Core.DTOs.PlayerCharacter
         public string Description { get; set; }
 
         // There always has to be at least one new or one existing NonPlayerCharacter
-        public IEnumerable<AddNonPlayerCharacterDTO> NewNPCs { get; set; }
+        public IEnumerable<AddNonPlayerCharacterDTO> NewNonPlayerCharacters { get; set; }
 
-        public IEnumerable<int> ExistingNPCs { get; set; }
+        public IEnumerable<int> ExistingNonPlayerCharacters { get; set; }
 
         // There always has to be at least one Thread
         [Required]
