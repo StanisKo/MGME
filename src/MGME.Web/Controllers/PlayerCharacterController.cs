@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,19 @@ namespace MGME.Web.Controllers
         public PlayerCharacterController(IPlayerCharacterService playerCharacterService)
         {
             _playerCharacterService = playerCharacterService;
+        }
+
+        [HttpGet]
+        public async Task <IActionResult> GetAllPlayerCharacters()
+        {
+            DataServiceResponse<List<GetPlayerCharacterListDTO>> response = await _playerCharacterService.GetAllPlayerCharacters();
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
         }
 
         [HttpPost("Add")]

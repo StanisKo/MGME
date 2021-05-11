@@ -37,7 +37,34 @@ namespace MGME.Core.Services.PlayerCharacterService
 
         public async Task <DataServiceResponse<List<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters()
         {
-            throw new System.NotImplementedException();
+            DataServiceResponse<List<GetPlayerCharacterListDTO>> response = new DataServiceResponse<List<GetPlayerCharacterListDTO>>();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                List<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
+                    predicate: playerCharacter => playerCharacter.UserId == userId,
+                    select: playerCharacter => new GetPlayerCharacterListDTO()
+                    {
+                        Id = playerCharacter.Id,
+                        Name = playerCharacter.Name,
+                        AdventureCount = playerCharacter.Adventures.Count,
+                        NonPlayerCharacterCount = playerCharacter.NonPlayerCharacters.Count
+                    }
+                );
+
+                response.Data = playerCharacters;
+                response.Success = true;
+                response.Message = playerCharacters.Count == 0 ? "No characters exist yet" : null;
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
 
         public async Task <DataServiceResponse<GetPlayerCharacterDetailDTO>> GetPlayerCharacter(int id)
