@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Http;
 using MGME.Core.Entities;
 using MGME.Core.DTOs;
 using MGME.Core.DTOs.PlayerCharacter;
+using MGME.Core.DTOs.Adventure;
+using MGME.Core.DTOs.NonPlayerCharacter;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
 
@@ -74,7 +76,28 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             try
             {
-
+                GetPlayerCharacterDetailDTO playerCharacter = await _playerCharacterRepository.GetEntityAsync<GetPlayerCharacterDetailDTO>(
+                    predicate: playerCharacter => playerCharacter.UserId == userId && playerCharacter.Id == id,
+                    select: playerCharacter => new GetPlayerCharacterDetailDTO()
+                    {
+                        Id = playerCharacter.Id,
+                        Name = playerCharacter.Name,
+                        Description = playerCharacter.Description,
+                        Adventures = playerCharacter.Adventures.Select(adventure =>
+                        {
+                            _mapper.Map<GetAdventureDTO>(adventure);
+                        }),
+                        NonPlayerCharacters = playerCharacter.NonPlayerCharacters.Select(nonPlayerCharacter =>
+                        {
+                            _mapper.Map<GetNonPlayerCharacterDTO>(nonPlayerCharacter);
+                        })
+                    },
+                    include: new[]
+                    {
+                        "NonPlayerCharacters",
+                        "Adventures"
+                    }
+                );
             }
             catch (Exception exception)
             {
