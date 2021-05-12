@@ -106,6 +106,14 @@ namespace MGME.Core.Services.PlayerCharacterService
                     }
                 );
 
+                if (playerCharacter == null)
+                {
+                    response.Success = false;
+                    response.Message = "Character doesn't exist";
+
+                    return response;
+                }
+
                 response.Data = playerCharacter;
                 response.Success = true;
             }
@@ -221,7 +229,7 @@ namespace MGME.Core.Services.PlayerCharacterService
             return response;
         }
 
-        public async Task <BaseServiceResponse> UpdatePlayerCharacter(UpdatePlayerCharacterDTO updatedPlayerCharacter)
+            public async Task <BaseServiceResponse> UpdatePlayerCharacter(UpdatePlayerCharacterDTO updatedPlayerCharacter)
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
