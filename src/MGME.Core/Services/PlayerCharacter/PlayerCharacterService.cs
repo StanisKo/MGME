@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -222,9 +223,65 @@ namespace MGME.Core.Services.PlayerCharacterService
             return response;
         }
 
-        public async Task <BaseServiceResponse> UpdatePlayerCharacter(int id)
+        public async Task <BaseServiceResponse> UpdatePlayerCharacter(UpdatePlayerCharacterDTO updatedPlayerCharacter)
         {
-            throw new System.NotImplementedException();
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                PlayerCharacter playerCharacterToUpdate = await _playerCharacterRepository.GetEntityAsync(
+                    id: updatedPlayerCharacter.Id,
+                    predicate: playerCharacter => playerCharacter.UserId == userId
+                );
+
+                if (playerCharacterToUpdate == null)
+                {
+                    response.Success = false;
+                    response.Message = "Character doesn't exists";
+
+                    return response;
+                }
+
+                Type typeOfPlayerCharacter = playerCharacterToUpdate.GetType();
+
+                PropertyInfo[] updatedProperties = updatedPlayerCharacter.GetType().GetProperties();
+
+                List<string> propertiesToUpdate = new List<string>();
+
+                foreach (PropertyInfo updatedProperty in updatedProperties)
+                {
+                    if (updatedProperty.GetValue(updatedPlayerCharacter) == null || updatedProperty.Name == "Id")
+                    {
+                        continue;
+                    }
+
+                    PropertyInfo propertyToUpdate = typeOfPlayerCharacter.GetProperty(updatedProperty.Name);
+
+                    propertyToUpdate.SetValue(
+                        playerCharacterToUpdate,
+                        updatedProperty.GetValue(updatedPlayerCharacter)
+                    );
+
+                    propertiesToUpdate.Add(updatedProperty.Name);
+                }
+
+                await _playerCharacterRepository.UpdateEntityAsync(
+                    playerCharacterToUpdate,
+                    propertiesToUpdate
+                );
+
+                response.Success = true;
+                response.Message = $"Character was successfully updated";
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
 
         public async Task <BaseServiceResponse> DeletePlayerCharacter(int id)

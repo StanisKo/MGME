@@ -14,7 +14,7 @@ namespace MGME.Core.Interfaces.Services
 
          Task <BaseServiceResponse> AddPlayerCharacter(AddPlayerCharacterDTO newPlayerCharacter);
 
-         Task <BaseServiceResponse> UpdatePlayerCharacter(int id);
+         Task <BaseServiceResponse> UpdatePlayerCharacter(UpdatePlayerCharacterDTO updatedPlayerCharacter);
 
          Task <BaseServiceResponse> DeletePlayerCharacter(int id);
     }
