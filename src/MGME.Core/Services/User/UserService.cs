@@ -61,7 +61,6 @@ namespace MGME.Core.Services.UserService
 
                 response.Data = user;
                 response.Success = true;
-
             }
             catch (Exception exception)
             {
