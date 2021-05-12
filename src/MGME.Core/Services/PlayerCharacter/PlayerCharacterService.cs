@@ -229,6 +229,14 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             int userId = GetUserIdFromHttpContext();
 
+            if (updatedPlayerCharacter.Name == null && updatedPlayerCharacter.Description == null)
+            {
+                response.Success = false;
+                response.Message = "To update character, either name or description must be provided";
+
+                return response;
+            }
+
             try
             {
                 PlayerCharacter playerCharacterToUpdate = await _playerCharacterRepository.GetEntityAsync(

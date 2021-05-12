@@ -229,9 +229,6 @@ namespace MGME.Core.Services.AuthService
                 await _tokenRepository.DeleteEntityAsync(oldRefreshToken);
 
                 response.Success = true;
-
-                return response;
-
             }
             catch (Exception exception)
             {
@@ -429,8 +426,6 @@ namespace MGME.Core.Services.AuthService
 
                 response.Success = false;
                 response.Message = "Your confirmation link has expired. We've sent you another email";
-
-                return response;
             }
             catch (Exception exception)
             {

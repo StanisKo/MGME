@@ -9,6 +9,7 @@ namespace MGME.Core.DTOs.PlayerCharacter
     public class AddPlayerCharacterDTO
     {
         [Required]
+        [StringLength(254)]
         public string Name { get; set; }
 
         public string Description { get; set; }
