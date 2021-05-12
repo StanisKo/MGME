@@ -229,7 +229,7 @@ namespace MGME.Core.Services.PlayerCharacterService
             return response;
         }
 
-            public async Task <BaseServiceResponse> UpdatePlayerCharacter(UpdatePlayerCharacterDTO updatedPlayerCharacter)
+        public async Task <BaseServiceResponse> UpdatePlayerCharacter(UpdatePlayerCharacterDTO updatedPlayerCharacter)
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
@@ -245,6 +245,12 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             try
             {
+                /*
+                We query for PlayerCharacter directly and not DTO,
+                since at this point in time it only has 3 fields, 2 of which we need to update
+
+                Though, should use DTO when/if model will grow
+                */
                 PlayerCharacter playerCharacterToUpdate = await _playerCharacterRepository.GetEntityAsync(
                     id: updatedPlayerCharacter.Id,
                     predicate: playerCharacter => playerCharacter.UserId == userId
