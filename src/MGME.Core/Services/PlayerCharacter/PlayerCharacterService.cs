@@ -287,7 +287,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 );
 
                 response.Success = true;
-                response.Message = $"Character was successfully updated";
+                response.Message = "Character was successfully updated";
             }
             catch (Exception exception)
             {
