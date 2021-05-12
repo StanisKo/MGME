@@ -60,5 +60,18 @@ namespace MGME.Web.Controllers
             // Input params are missing or invalid
             return BadRequest(response);
         }
+
+        [HttpPut("Update")]
+        public async Task <IActionResult> UpdatePlayerCharacter(UpdatePlayerCharacterDTO updatedPlayerCharacter)
+        {
+            BaseServiceResponse response = await _playerCharacterService.UpdatePlayerCharacter(updatedPlayerCharacter);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
     }
 }
