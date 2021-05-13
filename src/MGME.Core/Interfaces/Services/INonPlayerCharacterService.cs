@@ -8,6 +8,16 @@ namespace MGME.Core.Interfaces.Services
 {
     public interface INonPlayerCharacterService
     {
-        Task <DataServiceResponse<GetNonPlayerCharacterListDTO>> GetAllNonPlayerCharacters();
+        Task <DataServiceResponse<List<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters();
+
+        Task <DataServiceResponse<GetNonPlayerCharacterDetailDTO>> GetNonPlayerCharacter(int id);
+
+        Task <BaseServiceResponse> AddNonPlayerCharacter(AddNonPlayerCharacterDTO newNonPlayerCharacter);
+
+        Task <BaseServiceResponse> UpdateNonPlayerCharacter(UpdateNonPlayerCharacterDTO updatedNonPlayerCharacter);
+
+        Task <BaseServiceResponse> AddToPlayerCharacter(AddToPlayerCharacterDTO ids);
+
+        Task <BaseServiceResponse> AddToAdventure(AddToAdventureDTO ids);
     }
 }

@@ -22,13 +22,13 @@ namespace MGME.Core
         */
         public static void AddBusinessServices(this IServiceCollection services)
         {
+            services.AddHostedService<TokenRecycleService>();
+
             services.AddScoped<IAuthService, AuthService>();
 
             services.AddScoped<IUserService, UserService>();
 
             services.AddScoped<IHashingService, HashingService>();
-
-            services.AddHostedService<TokenRecycleService>();
 
             services.AddScoped<IPlayerCharacterService, PlayerCharacterService>();
         }
