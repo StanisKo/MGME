@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
@@ -78,7 +78,8 @@ namespace MGME.Core.Services.PlayerCharacterService
             try
             {
                 GetPlayerCharacterDetailDTO playerCharacter = await _playerCharacterRepository.GetEntityAsync<GetPlayerCharacterDetailDTO>(
-                    predicate: playerCharacter => playerCharacter.UserId == userId && playerCharacter.Id == id,
+                    id: id,
+                    predicate: playerCharacter => playerCharacter.UserId == userId,
                     include: new[]
                     {
                         "Adventures",
@@ -152,7 +153,7 @@ namespace MGME.Core.Services.PlayerCharacterService
             {
                 /*
                 We add initial NPCs and Threads to a PlayerCharacter here,
-                since it is faster then sepearating these transactions into their own services
+                since it is faster than sepearating these transactions into their own services
                 (Though, we would use their own services when PlayerCharacter is already created)
                 */
 
@@ -184,9 +185,11 @@ namespace MGME.Core.Services.PlayerCharacterService
                 // Map DTOs to data models and add to pool of all NPCs to add
                 if (thereAreNewNonPlayerCharactersToAdd)
                 {
-                    List<NonPlayerCharacter> newNonPlayerCharactersToAdd = newPlayerCharacter.NewNonPlayerCharacters
-                        .Select(nonPlayerCharacter => _mapper.Map<NonPlayerCharacter>(nonPlayerCharacter))
-                        .ToList();
+                    // We don't need List<T> here
+                    IEnumerable<NonPlayerCharacter> newNonPlayerCharactersToAdd =
+                        newPlayerCharacter.NewNonPlayerCharacters.Select(
+                            nonPlayerCharacter => _mapper.Map<NonPlayerCharacter>(nonPlayerCharacter)
+                    );
 
                     nonPlayerCharactersToAdd.AddRange(newNonPlayerCharactersToAdd);
                 }

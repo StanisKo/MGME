@@ -58,7 +58,6 @@ namespace MGME.Web.Controllers
                 return Ok(response);
             }
 
-            // Input params are missing or invalid
             return BadRequest(response);
         }
 
