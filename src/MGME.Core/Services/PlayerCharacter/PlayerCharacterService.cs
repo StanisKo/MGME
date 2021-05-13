@@ -306,7 +306,37 @@ namespace MGME.Core.Services.PlayerCharacterService
 
         public async Task <BaseServiceResponse> DeletePlayerCharacter(int id)
         {
-            throw new System.NotImplementedException();
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                PlayerCharacter playerCharacterToDelete = await _playerCharacterRepository.GetEntityAsync(
+                    id: id,
+                    predicate: playerCharacter => playerCharacter.UserId == userId
+                );
+
+                if (playerCharacterToDelete == null)
+                {
+                    response.Success = false;
+                    response.Message = "Character doesn't exist";
+
+                    return response;
+                }
+
+                await _playerCharacterRepository.DeleteEntityAsync(playerCharacterToDelete);
+
+                response.Success = true;
+                response.Message = "Character was successfully deleted";
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
     }
 }
