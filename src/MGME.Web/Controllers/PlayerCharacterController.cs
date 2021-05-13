@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 using MGME.Core.DTOs;
 using MGME.Core.DTOs.PlayerCharacter;
@@ -65,6 +66,19 @@ namespace MGME.Web.Controllers
         public async Task <IActionResult> UpdatePlayerCharacter(UpdatePlayerCharacterDTO updatedPlayerCharacter)
         {
             BaseServiceResponse response = await _playerCharacterService.UpdatePlayerCharacter(updatedPlayerCharacter);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
+
+        [HttpDelete("Delete")]
+        public async Task <IActionResult> DeletePlayerCharacter([BindRequired, FromQuery] int id)
+        {
+            BaseServiceResponse response = await _playerCharacterService.DeletePlayerCharacter(id);
 
             if (response.Success)
             {
