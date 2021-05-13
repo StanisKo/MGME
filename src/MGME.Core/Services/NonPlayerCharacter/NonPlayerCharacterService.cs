@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -22,22 +21,19 @@ namespace MGME.Core.Services.NonPlayerCharacterService
 {
     public class NonPlayerCharacterService : BaseEntityService, INonPlayerCharacterService
     {
-        public Task<BaseServiceResponse> AddNonPlayerCharacter(AddNonPlayerCharacterDTO newNonPlayerCharacter)
+        private readonly IEntityRepository<NonPlayerCharacter> _repository;
+
+        private readonly IMapper _mapper;
+
+        public NonPlayerCharacterService(IEntityRepository<NonPlayerCharacter> repository,
+                                         IMapper mapper,
+                                         IHttpContextAccessor httpContextAccessor): base(httpContextAccessor)
         {
-            throw new NotImplementedException();
+            _repository = repository;
+            _mapper = mapper;
         }
 
-        public Task<BaseServiceResponse> AddToAdventure(AddToAdventureDTO ids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<BaseServiceResponse> AddToPlayerCharacter(AddToPlayerCharacterDTO ids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<DataServiceResponse<List<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters()
+        public Task<DataServiceResponse<List<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter)
         {
             throw new NotImplementedException();
         }
@@ -47,7 +43,27 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             throw new NotImplementedException();
         }
 
+        public Task<BaseServiceResponse> AddNonPlayerCharacter(AddNonPlayerCharacterDTO newNonPlayerCharacter)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<BaseServiceResponse> UpdateNonPlayerCharacter(UpdateNonPlayerCharacterDTO updatedNonPlayerCharacter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<BaseServiceResponse> AddToPlayerCharacter(AddToPlayerCharacterDTO ids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<BaseServiceResponse> AddToAdventure(AddToAdventureDTO ids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<BaseServiceResponse> DeleteNonPlayerCharacter(int id)
         {
             throw new NotImplementedException();
         }
