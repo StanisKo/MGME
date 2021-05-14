@@ -38,9 +38,59 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             throw new NotImplementedException();
         }
 
-        public Task <DataServiceResponse<GetNonPlayerCharacterDetailDTO>> GetNonPlayerCharacter(int id)
+        public async Task <DataServiceResponse<GetNonPlayerCharacterDetailDTO>> GetNonPlayerCharacter(int id)
         {
-            throw new NotImplementedException();
+            DataServiceResponse<GetNonPlayerCharacterDetailDTO> response = new DataServiceResponse<GetNonPlayerCharacterDetailDTO>();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                GetNonPlayerCharacterDetailDTO nonPlayerCharacter = await _repository.GetEntityAsync<GetNonPlayerCharacterDetailDTO>(
+                    id: id,
+                    predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId,
+                    include: new[]
+                    {
+                        "PlayerCharacter",
+                        "Adventures"
+                    },
+                    select: nonPlayerCharacter => new GetNonPlayerCharacterDetailDTO()
+                    {
+                        Name = nonPlayerCharacter.Name,
+                        Description = nonPlayerCharacter.Description,
+                        PlayerCharacter = new GetPlayerCharacterDTO()
+                        {
+                            Id = nonPlayerCharacter.PlayerCharacter.Id,
+                            Name = nonPlayerCharacter.PlayerCharacter.Name
+                        },
+                        Adventures = nonPlayerCharacter.Adventures.Select(
+                            adventure => new GetAdventureDTO()
+                            {
+                                Id = adventure.Id,
+                                Title = adventure.Title
+                            }
+                        )
+                    }
+                );
+
+                if (nonPlayerCharacter == null)
+                {
+                    response.Success = false;
+                    response.Message = "NPC doesn't exist";
+
+                    return response;
+                }
+
+                response.Data = nonPlayerCharacter;
+                response.Success = true;
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
 
         public async Task <BaseServiceResponse> AddNonPlayerCharacter(AddNonPlayerCharacterDTO newNonPlayerCharacter)

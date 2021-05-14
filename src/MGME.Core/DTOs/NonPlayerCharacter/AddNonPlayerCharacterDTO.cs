@@ -9,7 +9,7 @@ namespace MGME.Core.DTOs.NonPlayerCharacter
 
         public string Description { get; set; }
 
-        // Nullable if we want to add NPCs without binding them to PlayerCharacter
+        // Nullable if we want to add NPCs without binding them to PlayerCharacters
         public int? PlayerCharacter { get; set; }
     }
 }
