@@ -33,37 +33,62 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             _mapper = mapper;
         }
 
-        public Task<DataServiceResponse<List<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter)
+        public Task <DataServiceResponse<List<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter)
         {
             throw new NotImplementedException();
         }
 
-        public Task<DataServiceResponse<GetNonPlayerCharacterDetailDTO>> GetNonPlayerCharacter(int id)
+        public Task <DataServiceResponse<GetNonPlayerCharacterDetailDTO>> GetNonPlayerCharacter(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<BaseServiceResponse> AddNonPlayerCharacter(AddNonPlayerCharacterDTO newNonPlayerCharacter)
+        public async Task <BaseServiceResponse> AddNonPlayerCharacter(AddNonPlayerCharacterDTO newNonPlayerCharacter)
+        {
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                NonPlayerCharacter nonPlayerCharacterToAdd = new NonPlayerCharacter()
+                {
+                    Name = newNonPlayerCharacter.Name,
+                    Description = newNonPlayerCharacter.Description,
+                    PlayerCharacterId = newNonPlayerCharacter.PlayerCharacter, // null if not provided
+                    UserId = userId
+                };
+
+                await _repository.AddEntityAsync(nonPlayerCharacterToAdd);
+
+                response.Success = true;
+                response.Message = "NPC was successfully added";
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
+        }
+
+        public Task <BaseServiceResponse> UpdateNonPlayerCharacter(UpdateNonPlayerCharacterDTO updatedNonPlayerCharacter)
         {
             throw new NotImplementedException();
         }
 
-        public Task<BaseServiceResponse> UpdateNonPlayerCharacter(UpdateNonPlayerCharacterDTO updatedNonPlayerCharacter)
+        public Task <BaseServiceResponse> AddToPlayerCharacter(AddToPlayerCharacterDTO ids)
         {
             throw new NotImplementedException();
         }
 
-        public Task<BaseServiceResponse> AddToPlayerCharacter(AddToPlayerCharacterDTO ids)
+        public Task <BaseServiceResponse> AddToAdventure(AddToAdventureDTO ids)
         {
             throw new NotImplementedException();
         }
 
-        public Task<BaseServiceResponse> AddToAdventure(AddToAdventureDTO ids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<BaseServiceResponse> DeleteNonPlayerCharacter(int id)
+        public Task <BaseServiceResponse> DeleteNonPlayerCharacter(int id)
         {
             throw new NotImplementedException();
         }
