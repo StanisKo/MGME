@@ -22,6 +22,19 @@ namespace MGME.Web.Controllers
             _nonPlayerCharacterService = nonPlayerCharacterService;
         }
 
+        [HttpGet("{id}")]
+        public async Task <IActionResult> GetNonPlayerCharacter(int id)
+        {
+            DataServiceResponse<GetNonPlayerCharacterDetailDTO> response = await _nonPlayerCharacterService.GetNonPlayerCharacter(id);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
+
         [HttpPost("Add")]
         public async Task <IActionResult> AddNonPlayerCharacter(AddNonPlayerCharacterDTO newNonPlayerCharacter)
         {

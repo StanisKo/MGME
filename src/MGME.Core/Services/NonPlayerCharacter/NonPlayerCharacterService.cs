@@ -56,6 +56,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                     },
                     select: nonPlayerCharacter => new GetNonPlayerCharacterDetailDTO()
                     {
+                        Id = nonPlayerCharacter.Id,
                         Name = nonPlayerCharacter.Name,
                         Description = nonPlayerCharacter.Description,
                         PlayerCharacter = new GetPlayerCharacterDTO()
