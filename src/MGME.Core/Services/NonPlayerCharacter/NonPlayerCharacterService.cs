@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -9,13 +10,13 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 
 using MGME.Core.Entities;
+using MGME.Core.Constants;
 using MGME.Core.DTOs;
 using MGME.Core.DTOs.PlayerCharacter;
 using MGME.Core.DTOs.Adventure;
 using MGME.Core.DTOs.NonPlayerCharacter;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
-
 
 namespace MGME.Core.Services.NonPlayerCharacterService
 {
@@ -33,9 +34,54 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             _mapper = mapper;
         }
 
-        public Task <DataServiceResponse<List<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter)
+        public async Task <DataServiceResponse<List<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter)
         {
-            throw new NotImplementedException();
+            DataServiceResponse<List<GetNonPlayerCharacterListDTO>> response = new DataServiceResponse<List<GetNonPlayerCharacterListDTO>>();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                Expression<Func<NonPlayerCharacter, bool>> predicate =
+                    nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                    /*
+                    The condition to add NonPlayerCharacter to a PlayerCharacter or an Adventure is the same
+                    It shouldn't belong to the PlayerCharacter already
+                    */
+                    && filter == (int)NonPlayerCharacterFilter.AVAILABLE ? nonPlayerCharacter.PlayerCharacterId == null : true;
+
+                List<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await _repository.GetEntititesAsync<GetNonPlayerCharacterListDTO>(
+                    predicate: predicate,
+                    include: new[]
+                    {
+                        "PlayerCharacter"
+                    },
+                    select: nonPlayerCharacter => new GetNonPlayerCharacterListDTO()
+                    {
+                        Id = nonPlayerCharacter.Id,
+                        Name = nonPlayerCharacter.Name,
+                        Description = nonPlayerCharacter.Description,
+                        PlayerCharacter = new GetPlayerCharacterDTO()
+                        {
+                            Id = nonPlayerCharacter.PlayerCharacter.Id,
+                            Name = nonPlayerCharacter.PlayerCharacter.Name
+                        },
+                        AdventureCount = nonPlayerCharacter.Adventures.Count
+                    }
+                );
+
+                response.Data = nonPlayerCharacters;
+                response.Success = true;
+                response.Message = nonPlayerCharacters.Count == 0 ? "No NPCs exist yet" : null;
+
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
 
         public async Task <DataServiceResponse<GetNonPlayerCharacterDetailDTO>> GetNonPlayerCharacter(int id)
