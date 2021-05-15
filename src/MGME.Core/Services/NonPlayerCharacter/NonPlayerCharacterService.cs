@@ -40,6 +40,10 @@ namespace MGME.Core.Services.NonPlayerCharacterService
 
             int userId = GetUserIdFromHttpContext();
 
+            bool weNeedAll = filter == (int)NonPlayerCharacterFilter.ALL;
+
+            bool weNeedOnlyAvailable = !weNeedAll;
+
             try
             {
                 Expression<Func<NonPlayerCharacter, bool>> predicate =
@@ -48,25 +52,28 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                     The condition to add NonPlayerCharacter to a PlayerCharacter or an Adventure is the same
                     It shouldn't belong to the PlayerCharacter already
                     */
-                    && filter == (int)NonPlayerCharacterFilter.AVAILABLE ? nonPlayerCharacter.PlayerCharacterId == null : true;
+                    && weNeedOnlyAvailable ? nonPlayerCharacter.PlayerCharacterId == null : true;
 
                 List<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await _repository.GetEntititesAsync<GetNonPlayerCharacterListDTO>(
                     predicate: predicate,
-                    include: new[]
-                    {
-                        "PlayerCharacter"
-                    },
+                    include: weNeedAll
+                        ? new[]
+                        { "PlayerCharacter" }
+                        : null,
                     select: nonPlayerCharacter => new GetNonPlayerCharacterListDTO()
                     {
                         Id = nonPlayerCharacter.Id,
                         Name = nonPlayerCharacter.Name,
-                        Description = nonPlayerCharacter.Description,
-                        PlayerCharacter = new GetPlayerCharacterDTO()
-                        {
+                        PlayerCharacter = weNeedAll && nonPlayerCharacter.PlayerCharacter != null
+                            ? new GetPlayerCharacterDTO()
+                            {
                             Id = nonPlayerCharacter.PlayerCharacter.Id,
                             Name = nonPlayerCharacter.PlayerCharacter.Name
-                        },
-                        AdventureCount = nonPlayerCharacter.Adventures.Count
+                            }
+                            : null,
+                        AdventureCount = weNeedAll
+                            ? nonPlayerCharacter.Adventures.Count
+                            : null
                     }
                 );
 

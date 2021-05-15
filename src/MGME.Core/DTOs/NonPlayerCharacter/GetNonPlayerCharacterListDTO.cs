@@ -6,10 +6,8 @@ namespace MGME.Core.DTOs.NonPlayerCharacter
     {
         public string Name { get; set; }
 
-        public string Description { get; set; }
-
         public GetPlayerCharacterDTO PlayerCharacter { get; set; }
 
-        public int AdventureCount { get; set; }
+        public int? AdventureCount { get; set; }
     }
 }
