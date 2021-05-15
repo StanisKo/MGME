@@ -57,8 +57,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                 List<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await _repository.GetEntititesAsync<GetNonPlayerCharacterListDTO>(
                     predicate: predicate,
                     include: weNeedAll
-                        ? new[]
-                        { "PlayerCharacter" }
+                        ? new[] { "PlayerCharacter" }
                         : null,
                     select: nonPlayerCharacter => new GetNonPlayerCharacterListDTO()
                     {
@@ -67,8 +66,8 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                         PlayerCharacter = weNeedAll && nonPlayerCharacter.PlayerCharacter != null
                             ? new GetPlayerCharacterDTO()
                             {
-                            Id = nonPlayerCharacter.PlayerCharacter.Id,
-                            Name = nonPlayerCharacter.PlayerCharacter.Name
+                                Id = nonPlayerCharacter.PlayerCharacter.Id,
+                                Name = nonPlayerCharacter.PlayerCharacter.Name
                             }
                             : null,
                         AdventureCount = weNeedAll
