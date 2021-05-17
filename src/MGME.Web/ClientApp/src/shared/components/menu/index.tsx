@@ -32,7 +32,7 @@ export const MenuBar = (): ReactElement | null => {
 
     const dispatch = useDispatch();
 
-    const activeMenu = [ROUTES.ITEM_ONE, ROUTES.ITEM_TWO, ROUTES.ITEM_THREE].indexOf(
+    const activeMenu = [ROUTES.CATALOGUES, ROUTES.ADVENTURES].indexOf(
         history.location.pathname
     );
 
@@ -94,21 +94,15 @@ export const MenuBar = (): ReactElement | null => {
                     indicatorColor="secondary"
                 >
                     <Tab
-                        label="Item One"
+                        label="Catalogues"
                         component={Link}
-                        to={ROUTES.ITEM_ONE}
+                        to={ROUTES.CATALOGUES}
                         disableRipple={true}
                     />
                     <Tab
-                        label="Item Two"
+                        label="Adventures"
                         component={Link}
-                        to={ROUTES.ITEM_TWO}
-                        disableRipple={true}
-                    />
-                    <Tab
-                        label="Item Three"
-                        component={Link}
-                        to={ROUTES.ITEM_THREE}
+                        to={ROUTES.ADVENTURES}
                         disableRipple={true}
                     />
                 </Tabs>

@@ -221,7 +221,7 @@ export const Login = (): ReactElement => {
                     )
                 );
 
-                history.push(ROUTES.ITEM_ONE);
+                history.push(ROUTES.CATALOGUES);
 
                 return;
             }

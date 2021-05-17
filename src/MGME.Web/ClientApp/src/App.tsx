@@ -18,9 +18,8 @@ import { refreshToken } from './domain/auth/requests';
 import { Login, ConfirmEmail } from './domain/auth';
 import { UserProfile } from './domain/user';
 
-import { ItemOne } from './domain/itemOne';
-import { ItemTwo } from './domain/itemTwo';
-import { ItemThree } from './domain/itemThree';
+import { Catalogues } from './domain/catalogues';
+import { Adventures } from './domain/adventures';
 
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
 
@@ -134,9 +133,8 @@ export const Application = (): ReactElement => {
                         <PublicRoute restricted={true} component={ConfirmEmail} path={ROUTES.CONFIRM_EMAIL} />
 
                         <PrivateRoute component={UserProfile} path={ROUTES.USER_PROFILE} />
-                        <PrivateRoute component={ItemOne} path={ROUTES.ITEM_ONE} />
-                        <PrivateRoute component={ItemTwo} path={ROUTES.ITEM_TWO} />
-                        <PrivateRoute component={ItemThree} path={ROUTES.ITEM_THREE} />
+                        <PrivateRoute component={Catalogues} path={ROUTES.CATALOGUES} />
+                        <PrivateRoute component={Adventures} path={ROUTES.ADVENTURES} />
                     </Switch>
                 </Router>
             </ThemeProvider>

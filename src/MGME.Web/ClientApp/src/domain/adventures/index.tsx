@@ -2,10 +2,10 @@ import { ReactElement } from 'react';
 
 import { Box, Typography } from '@material-ui/core';
 
-export const ItemTwo = (): ReactElement => (
+export const Adventures = (): ReactElement => (
     <Box>
         <Typography>
-            Item Two
+            Adventures
         </Typography>
     </Box>
 );
