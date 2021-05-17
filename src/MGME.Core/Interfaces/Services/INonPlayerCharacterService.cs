@@ -18,8 +18,6 @@ namespace MGME.Core.Interfaces.Services
 
         Task <BaseServiceResponse> DeleteNonPlayerCharacter(int id);
 
-        Task <BaseServiceResponse> AddToPlayerCharacter(AddToPlayerCharacterDTO ids);
-
-        Task <BaseServiceResponse> AddToAdventure(AddToAdventureDTO ids);
+        Task <BaseServiceResponse> AddToPlayerCharacterOrAdventure(AddToPlayerCharacterOrAdventureDTO ids);
     }
 }

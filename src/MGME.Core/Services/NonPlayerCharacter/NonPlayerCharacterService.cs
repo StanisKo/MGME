@@ -176,17 +176,12 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             return response;
         }
 
+        public Task <BaseServiceResponse> AddToPlayerCharacterOrAdventure(AddToPlayerCharacterOrAdventureDTO ids)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task <BaseServiceResponse> UpdateNonPlayerCharacter(UpdateNonPlayerCharacterDTO updatedNonPlayerCharacter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task <BaseServiceResponse> AddToPlayerCharacter(AddToPlayerCharacterDTO ids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task <BaseServiceResponse> AddToAdventure(AddToAdventureDTO ids)
         {
             throw new NotImplementedException();
         }
