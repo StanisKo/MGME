@@ -46,7 +46,7 @@ namespace MGME.Infra.Data
 
             modelBuilder.Entity<User>().Property(user => user.EmailIsConfirmed).HasDefaultValue(false);
 
-            modelBuilder.Entity<User>().Property(user => user.Role).HasDefaultValue(UserRole.GAME_MASTER);
+            modelBuilder.Entity<User>().Property(user => user.Role).HasDefaultValue(UserRoles.GAME_MASTER);
 
             /* PlayerCharacter */
 

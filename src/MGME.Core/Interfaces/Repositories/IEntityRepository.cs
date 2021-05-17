@@ -40,6 +40,8 @@ namespace MGME.Core.Interfaces.Repositories
 
         Task AddEntityAsync(TEntity entity);
 
+        Task AddEntitiesAsync(List<TEntity> entities);
+
         // Updates only specified fields
         Task UpdateEntityAsync(TEntity entity, IEnumerable<string> updatedProperties);
 

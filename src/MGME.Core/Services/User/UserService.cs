@@ -61,7 +61,6 @@ namespace MGME.Core.Services.UserService
 
                 response.Data = user;
                 response.Success = true;
-
             }
             catch (Exception exception)
             {
@@ -137,8 +136,6 @@ namespace MGME.Core.Services.UserService
 
                 response.Success = true;
                 response.Message = $"User was successfully updated";
-
-                return response;
             }
             catch (Exception exception)
             {
@@ -237,8 +234,6 @@ namespace MGME.Core.Services.UserService
 
                 response.Success = true;
                 response.Message = $"{userToDelete.Name} was successfully deleted";
-
-                return response;
             }
             catch (Exception exception)
             {

@@ -1,6 +1,6 @@
 namespace MGME.Core.Constants
 {
-    public static class UserRole
+    public static class UserRoles
     {
         public const string ADMIN = "Admin";
 
