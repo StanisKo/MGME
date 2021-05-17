@@ -346,11 +346,11 @@ export const UserProfile = (): ReactElement | null => {
 
     useEffect(() => {
         (async (): Promise<void> => {
-            if (isAuthorized) {
+            if (isAuthorized && user === null) {
                 await getUser();
             }
         })();
-    }, [isAuthorized]);
+    }, [isAuthorized, user]);
 
     useEffect(() => {
         if (user !== null) {

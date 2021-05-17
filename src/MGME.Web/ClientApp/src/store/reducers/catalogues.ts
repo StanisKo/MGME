@@ -26,7 +26,7 @@ export const CataloguesReducer: Reducer<CataloguesState> = (
 
             return {
                 ...state,
-                [key]: { ...payload as unknown as CataloguesState }
+                [key]: payload as unknown as CataloguesState
             };
 
         default:
