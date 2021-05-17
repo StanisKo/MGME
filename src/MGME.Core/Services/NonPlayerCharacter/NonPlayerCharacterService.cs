@@ -5,8 +5,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-using AutoMapper;
-
 using Microsoft.AspNetCore.Http;
 
 using MGME.Core.Entities;
@@ -24,14 +22,10 @@ namespace MGME.Core.Services.NonPlayerCharacterService
     {
         private readonly IEntityRepository<NonPlayerCharacter> _repository;
 
-        private readonly IMapper _mapper;
-
         public NonPlayerCharacterService(IEntityRepository<NonPlayerCharacter> repository,
-                                         IMapper mapper,
                                          IHttpContextAccessor httpContextAccessor): base(httpContextAccessor)
         {
             _repository = repository;
-            _mapper = mapper;
         }
 
         public async Task <DataServiceResponse<List<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter)
