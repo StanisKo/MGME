@@ -1,5 +1,7 @@
 import { ReactElement, useState, ChangeEvent } from 'react';
 
+import { PlayerCharactersTable } from './components/playerCharactersTable';
+
 import { Paper, Tabs, Tab, Theme } from '@material-ui/core';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
@@ -39,6 +41,7 @@ export const Catalogues = (): ReactElement => {
                     <Tab label="Player Characters" disableRipple={true}/>
                     <Tab label="Non Player Characters" disableRipple={true}/>
                 </Tabs>
+                {selectedMenu === 0 && <PlayerCharactersTable />}
             </Paper>
         </div>
     );

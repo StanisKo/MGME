@@ -23,11 +23,10 @@ export const CataloguesReducer: Reducer<CataloguesState> = (
 
     switch (type) {
         case 'UPDATE_STORE':
-            const incoming = payload as unknown as CataloguesState;
 
             return {
                 ...state,
-                [key]: { ...incoming[key as keyof CataloguesState] }
+                [key]: { ...payload as unknown as CataloguesState }
             };
 
         default:

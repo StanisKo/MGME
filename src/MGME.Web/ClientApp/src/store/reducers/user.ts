@@ -22,11 +22,10 @@ export const UserReducer: Reducer<UserState> = (state: UserState | undefined, in
 
     switch (type) {
         case 'UPDATE_STORE':
-            const incoming = payload as unknown as UserState;
 
             return {
                 ...state,
-                [key]: { ...incoming[key as keyof UserState] }
+                [key]: { ...payload as unknown as UserState }
             };
 
         default:
