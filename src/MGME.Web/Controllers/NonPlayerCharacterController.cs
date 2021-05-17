@@ -75,5 +75,18 @@ namespace MGME.Web.Controllers
 
             return NotFound(response);
         }
+
+        [HttpDelete("Delete")]
+        public async Task <IActionResult> DeleteNonPlayerCharacter([BindRequired, FromQuery] int id)
+        {
+            BaseServiceResponse response = await _nonPlayerCharacterService.DeleteNonPlayerCharacter(id);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
     }
 }

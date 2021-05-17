@@ -176,11 +176,6 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             return response;
         }
 
-        public Task <BaseServiceResponse> AddToPlayerCharacterOrAdventure(AddToPlayerCharacterOrAdventureDTO ids)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task <BaseServiceResponse> UpdateNonPlayerCharacter(UpdateNonPlayerCharacterDTO updatedNonPlayerCharacter)
         {
             BaseServiceResponse response = new BaseServiceResponse();
@@ -255,9 +250,44 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             return response;
         }
 
-        public Task <BaseServiceResponse> DeleteNonPlayerCharacter(int id)
+        public Task <BaseServiceResponse> AddToPlayerCharacterOrAdventure(AddToPlayerCharacterOrAdventureDTO ids)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task <BaseServiceResponse> DeleteNonPlayerCharacter(int id)
+        {
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                NonPlayerCharacter nonPlayerCharacterToDelete = await _repository.GetEntityAsync(
+                    id: id,
+                    predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                );
+
+                if (nonPlayerCharacterToDelete == null)
+                {
+                    response.Success = false;
+                    response.Message = "NPC doesn't exist";
+
+                    return response;
+                }
+
+                await _repository.DeleteEntityAsync(nonPlayerCharacterToDelete);
+
+                response.Success = true;
+                response.Message = "NPC was successfully deleted";
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
     }
 }
