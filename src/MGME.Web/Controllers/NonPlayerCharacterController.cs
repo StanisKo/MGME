@@ -62,5 +62,18 @@ namespace MGME.Web.Controllers
 
             return BadRequest(response);
         }
+
+        [HttpPut("Update")]
+        public async Task <IActionResult> UpdateNonPlayerCharacter(UpdateNonPlayerCharacterDTO updatedNonPlayerCharacter)
+        {
+            BaseServiceResponse response = await _nonPlayerCharacterService.UpdateNonPlayerCharacter(updatedNonPlayerCharacter);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
     }
 }
