@@ -17,7 +17,6 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const Catalogues = (): ReactElement => {
-
     const [selectedMenu, setSelectedMenu] = useState<number>(0);
 
     const handleChange = (event: ChangeEvent<unknown>, newValue: number): void => {

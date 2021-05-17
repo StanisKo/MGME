@@ -26,7 +26,7 @@ export const UserReducer: Reducer<UserState> = (state: UserState | undefined, in
 
             return {
                 ...state,
-                [key]: { ...incoming.data }
+                [key]: { ...incoming[key as keyof UserState] }
             };
 
         default:

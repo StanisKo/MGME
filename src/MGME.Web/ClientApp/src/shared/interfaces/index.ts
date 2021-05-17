@@ -14,6 +14,10 @@ export interface DataServiceResponse<TResult> extends BaseServiceResponse {
     data: TResult;
 }
 
+export interface BaseEntity {
+    id: number;
+}
+
 export interface DecodedToken {
     nameid: number;
     unique_name: string;

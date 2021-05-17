@@ -63,7 +63,7 @@ export class DataController {
                     type: 'UPDATE_STORE',
                     reducer: page,
                     key: key,
-                    payload: { data: response.data }
+                    payload: response.data
                 }
             )
         );
