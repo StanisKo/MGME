@@ -181,9 +181,78 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             throw new NotImplementedException();
         }
 
-        public Task <BaseServiceResponse> UpdateNonPlayerCharacter(UpdateNonPlayerCharacterDTO updatedNonPlayerCharacter)
+        public async Task <BaseServiceResponse> UpdateNonPlayerCharacter(UpdateNonPlayerCharacterDTO updatedNonPlayerCharacter)
         {
-            throw new NotImplementedException();
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            int userId = GetUserIdFromHttpContext();
+
+            if (updatedNonPlayerCharacter.Name == null && updatedNonPlayerCharacter.Description == null)
+            {
+                response.Success = false;
+                response.Message = "To update NPC, either name or description must be provided";
+
+                return response;
+            }
+
+            try
+            {
+                NonPlayerCharacter nonPlayerCharacterToUpdate = await _repository.GetEntityAsync(
+                    id: updatedNonPlayerCharacter.Id,
+                    predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                );
+
+                if (nonPlayerCharacterToUpdate == null)
+                {
+                    response.Success = false;
+                    response.Message = "NPC doesn't exist";
+
+                    return response;
+                }
+
+                /*
+                We avoid explicitly updating fields, since model can grow in the future and
+                at some point we might want to get rid of Name/Description check above and
+                let front end update variable number of fields
+                */
+                Type typeOfNonPlayerCharacter = nonPlayerCharacterToUpdate.GetType();
+
+                PropertyInfo[] updatedProperties = updatedNonPlayerCharacter.GetType().GetProperties();
+
+                List<string> propertiesToUpdate = new List<string>();
+
+                foreach (PropertyInfo updatedProperty in updatedProperties)
+                {
+                    if (updatedProperty.GetValue(updatedNonPlayerCharacter) == null || updatedProperty.Name == "Id")
+                    {
+                        continue;
+                    }
+
+                    PropertyInfo propertyToUpdate = typeOfNonPlayerCharacter.GetProperty(updatedProperty.Name);
+
+                    propertyToUpdate.SetValue(
+                        nonPlayerCharacterToUpdate,
+                        updatedProperty.GetValue(updatedNonPlayerCharacter)
+                    );
+
+                    propertiesToUpdate.Add(updatedProperty.Name);
+                }
+
+                await _repository.UpdateEntityAsync(
+                    nonPlayerCharacterToUpdate,
+                    propertiesToUpdate
+                );
+
+                response.Success = true;
+                response.Message = "NPC was successfully updated";
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
 
         public Task <BaseServiceResponse> DeleteNonPlayerCharacter(int id)

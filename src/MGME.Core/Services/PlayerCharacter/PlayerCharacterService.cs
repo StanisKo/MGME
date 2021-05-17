@@ -267,6 +267,11 @@ namespace MGME.Core.Services.PlayerCharacterService
                     return response;
                 }
 
+                /*
+                We avoid explicitly updating fields, since model can grow in the future and
+                at some point we might want to get rid of Name/Description check above and
+                let front end update variable number of fields
+                */
                 Type typeOfPlayerCharacter = playerCharacterToUpdate.GetType();
 
                 PropertyInfo[] updatedProperties = updatedPlayerCharacter.GetType().GetProperties();
