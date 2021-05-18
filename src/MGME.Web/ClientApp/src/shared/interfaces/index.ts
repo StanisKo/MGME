@@ -44,3 +44,9 @@ export interface WriteToApi {
     page: string;
     keys: string[] | null;
 }
+
+export interface HeadCell {
+    label: string;
+    sorting: string;
+    numeric: boolean;
+}

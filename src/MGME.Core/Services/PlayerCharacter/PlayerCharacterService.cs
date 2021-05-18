@@ -47,11 +47,32 @@ namespace MGME.Core.Services.PlayerCharacterService
             {
                 IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
                     predicate: playerCharacter => playerCharacter.UserId == userId,
+                    include: new[]
+                    {
+                        "Adventures",
+                        "NonPlayerCharacters"
+                    },
                     select: playerCharacter => new GetPlayerCharacterListDTO()
                     {
                         Id = playerCharacter.Id,
                         Name = playerCharacter.Name,
+
+                        Adventure = playerCharacter.Adventures.Select(
+                            adventure => new GetAdventureDTO()
+                            {
+                                Id = adventure.Id,
+                                Title = adventure.Title
+                            }
+                        ).FirstOrDefault(),
                         AdventureCount = playerCharacter.Adventures.Count,
+
+                        NonPlayerCharacter = playerCharacter.NonPlayerCharacters.Select(
+                            nonPlayerCharacter => new GetNonPlayerCharacterDTO()
+                            {
+                                Id = nonPlayerCharacter.Id,
+                                Name = nonPlayerCharacter.Name
+                            }
+                        ).FirstOrDefault(),
                         NonPlayerCharacterCount = playerCharacter.NonPlayerCharacters.Count
                     }
                 );

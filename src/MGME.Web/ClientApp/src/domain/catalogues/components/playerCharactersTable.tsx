@@ -4,7 +4,18 @@ import { useSelector } from 'react-redux';
 import { PlayerCharacter } from '../interfaces';
 import { fetchPlayerCharacters } from '../requests';
 
+// import { HeadCell } from '../../../shared/interfaces';
+
 import { ApplicationState } from '../../../store';
+
+import { LinearProgress } from '@material-ui/core';
+
+// Change the response to Adventure if 1 or count of them; same for npcs
+// const headCells: HeadCell[] = [
+//     { label: 'Name', sorting: 'name', numeric: false },
+//     { label: 'Adventure Count', sorting: 'adventure', numeric: true },
+//     { label: 'NPC Count', sorting: 'npc', numeric: true }
+// ];
 
 export const PlayerCharactersTable = (): ReactElement | null => {
     const playerCharacters: PlayerCharacter[] | null = useSelector(
@@ -25,5 +36,6 @@ export const PlayerCharactersTable = (): ReactElement | null => {
 
     return playerCharacters !== null ? (
         <div>{playerCharacters?.length} characters</div>
-    ) : null;
+    ) : <LinearProgress />; // Change for skeleton
 };
+
