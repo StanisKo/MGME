@@ -37,15 +37,15 @@ namespace MGME.Core.Services.PlayerCharacterService
             _mapper = mapper;
         }
 
-        public async Task <DataServiceResponse<List<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters()
+        public async Task <DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters()
         {
-            DataServiceResponse<List<GetPlayerCharacterListDTO>> response = new DataServiceResponse<List<GetPlayerCharacterListDTO>>();
+            DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = new DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>();
 
             int userId = GetUserIdFromHttpContext();
 
             try
             {
-                List<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
+                IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
                     predicate: playerCharacter => playerCharacter.UserId == userId,
                     select: playerCharacter => new GetPlayerCharacterListDTO()
                     {
@@ -58,7 +58,6 @@ namespace MGME.Core.Services.PlayerCharacterService
 
                 response.Data = playerCharacters;
                 response.Success = true;
-                response.Message = playerCharacters.Count == 0 ? "No characters exist yet" : null;
             }
             catch (Exception exception)
             {

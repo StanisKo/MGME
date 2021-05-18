@@ -8,7 +8,7 @@ namespace MGME.Core.Interfaces.Services
 {
     public interface IPlayerCharacterService
     {
-         Task <DataServiceResponse<List<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters();
+         Task <DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters();
 
          Task <DataServiceResponse<GetPlayerCharacterDetailDTO>> GetPlayerCharacter(int id);
 

@@ -28,9 +28,9 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             _repository = repository;
         }
 
-        public async Task <DataServiceResponse<List<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter)
+        public async Task <DataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter)
         {
-            DataServiceResponse<List<GetNonPlayerCharacterListDTO>> response = new DataServiceResponse<List<GetNonPlayerCharacterListDTO>>();
+            DataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>> response = new DataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>>();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -48,7 +48,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                     */
                     && weNeedOnlyAvailable ? nonPlayerCharacter.PlayerCharacterId == null : true;
 
-                List<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await _repository.GetEntititesAsync<GetNonPlayerCharacterListDTO>(
+                IEnumerable<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await _repository.GetEntititesAsync<GetNonPlayerCharacterListDTO>(
                     predicate: predicate,
                     include: weNeedAll
                         ? new[] { "PlayerCharacter" }
@@ -72,8 +72,6 @@ namespace MGME.Core.Services.NonPlayerCharacterService
 
                 response.Data = nonPlayerCharacters;
                 response.Success = true;
-                response.Message = nonPlayerCharacters.Count == 0 ? "No NPCs exist yet" : null;
-
             }
             catch (Exception exception)
             {

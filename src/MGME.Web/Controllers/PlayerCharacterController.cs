@@ -25,7 +25,7 @@ namespace MGME.Web.Controllers
         [HttpGet]
         public async Task <IActionResult> GetAllPlayerCharacters()
         {
-            DataServiceResponse<List<GetPlayerCharacterListDTO>> response = await _playerCharacterService.GetAllPlayerCharacters();
+            DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = await _playerCharacterService.GetAllPlayerCharacters();
 
             if (response.Success)
             {
