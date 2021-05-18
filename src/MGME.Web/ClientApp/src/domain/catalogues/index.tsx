@@ -2,7 +2,7 @@ import { ReactElement, useState, ChangeEvent } from 'react';
 
 import { PlayerCharactersTable } from './components/playerCharactersTable';
 
-import { Paper, Grid, Tabs, Tab, Theme } from '@material-ui/core';
+import { Paper, Grid, FormControl, Select, MenuItem, Button, Theme } from '@material-ui/core';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -12,8 +12,8 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
             justifyContent: 'center'
         },
-        flexGrow: {
-            flexGrow: 1
+        formControl: {
+            minWidth: 220
         }
     })
 );
@@ -21,28 +21,33 @@ const useStyles = makeStyles((theme: Theme) =>
 export const Catalogues = (): ReactElement => {
     const [selectedMenu, setSelectedMenu] = useState<number>(0);
 
-    const handleChange = (event: ChangeEvent<unknown>, newValue: number): void => {
-        setSelectedMenu(newValue);
+    const handleChange = (event: ChangeEvent<{ value: unknown }>): void => {
+        setSelectedMenu(event.target.value as number);
     };
 
-    const { centered, flexGrow } = useStyles();
+    const { centered, formControl } = useStyles();
 
     return (
         <div className={centered}>
             <Paper elevation={0}>
-                <Grid container>
-                    <Grid item xs={12}>
-                        <Tabs
-                            className={flexGrow}
-                            centered
-                            value={selectedMenu}
-                            onChange={handleChange}
-                            aria-label="menu-tabs"
-                            indicatorColor="primary"
-                        >
-                            <Tab label="Player Characters" disableRipple={true}/>
-                            <Tab label="Non Player Characters" disableRipple={true}/>
-                        </Tabs>
+                <Grid container spacing={4}>
+                    <Grid item xs={6} container justify="flex-start">
+                        <FormControl variant="outlined" className={formControl}>
+                            <Select
+                                value={selectedMenu}
+                                onChange={handleChange}
+                            >
+                                <MenuItem value={0}>Player Characters</MenuItem>
+                                <MenuItem value={1}>Non Player Characters</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+
+                    <Grid item xs={6} container alignItems="center" justify="flex-end">
+                        <Button variant="outlined" color="primary" size="medium">Add to Adventure</Button>
+                        <Button variant="outlined" color="primary" size="medium">Add to Character</Button>
+                        <Button variant="outlined" color="primary" size="medium">Create</Button>
+                        <Button variant="outlined" color="primary" size="medium">Remove</Button>
                     </Grid>
 
                     <Grid item xs={12}>
