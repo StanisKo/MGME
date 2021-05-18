@@ -14,6 +14,18 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         formControl: {
             minWidth: 220
+        },
+        buttons: {
+            '& button': {
+                margin: '0 .5em 0 .5em'
+            }
+        },
+        deleteButton: {
+            borderColor: '#d32f2f',
+            '&:hover': {
+                borderColor: '#b52828'
+            },
+            color: '#d32f2f'
         }
     })
 );
@@ -25,7 +37,7 @@ export const Catalogues = (): ReactElement => {
         setSelectedMenu(event.target.value as number);
     };
 
-    const { centered, formControl } = useStyles();
+    const { centered, formControl, buttons, deleteButton } = useStyles();
 
     return (
         <div className={centered}>
@@ -43,11 +55,18 @@ export const Catalogues = (): ReactElement => {
                         </FormControl>
                     </Grid>
 
-                    <Grid item xs={6} container alignItems="center" justify="flex-end">
+                    <Grid item xs={6} container alignItems="center" justify="flex-end" className={buttons}>
                         <Button variant="outlined" color="primary" size="medium">Add to Adventure</Button>
                         <Button variant="outlined" color="primary" size="medium">Add to Character</Button>
                         <Button variant="outlined" color="primary" size="medium">Create</Button>
-                        <Button variant="outlined" color="primary" size="medium">Remove</Button>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            size="medium"
+                            className={deleteButton}
+                        >
+                            Remove
+                        </Button>
                     </Grid>
 
                     <Grid item xs={12}>
