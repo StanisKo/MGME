@@ -63,6 +63,8 @@ namespace MGME.Core.Services.PlayerCharacterService
                                 Id = adventure.Id,
                                 Title = adventure.Title
                             }
+                        ).Where(
+                            adventure => playerCharacter.Adventures.Count == 1
                         ).FirstOrDefault(),
                         AdventureCount = playerCharacter.Adventures.Count,
 
@@ -72,6 +74,8 @@ namespace MGME.Core.Services.PlayerCharacterService
                                 Id = nonPlayerCharacter.Id,
                                 Name = nonPlayerCharacter.Name
                             }
+                        ).Where(
+                            nonPlayerCharacter => playerCharacter.NonPlayerCharacters.Count == 1
                         ).FirstOrDefault(),
                         NonPlayerCharacterCount = playerCharacter.NonPlayerCharacters.Count
                     }
