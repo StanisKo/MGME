@@ -16,10 +16,10 @@ import { ApplicationState } from '../../store';
 
 import { getUser, updateUser, changePassword, deleteUser } from './requests';
 
-import { ROUTES } from '../../shared/const';
 import { Alert } from '../../shared/components/alert';
+import { ROUTES, INPUT_TYPE } from '../../shared/const';
 import { BaseServiceResponse } from '../../shared/interfaces';
-import { INPUT_TYPE, validEmailFormat, validPasswordFormat } from '../../shared/helpers';
+import { validEmailFormat, validPasswordFormat } from '../../shared/helpers';
 
 import { actionCreators } from '../../store/reducers/auth';
 

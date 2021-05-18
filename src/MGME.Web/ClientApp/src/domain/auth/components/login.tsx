@@ -13,7 +13,8 @@ import { useHistory } from 'react-router-dom';
 
 import { MODE, modeNames } from '../helpers';
 import { loginOrRegisterUser } from '../requests';
-import { INPUT_TYPE, validEmailFormat, validPasswordFormat } from '../../../shared/helpers';
+import { INPUT_TYPE } from '../../../shared/const';
+import { validEmailFormat, validPasswordFormat } from '../../../shared/helpers';
 
 import { ROUTES } from '../../../shared/const';
 import { Alert } from '../../../shared/components/alert';

@@ -1,11 +1,3 @@
-export enum INPUT_TYPE {
-    USERNAME = 0,
-    EMAIL = 1,
-    OLD_PASSWORD = 2,
-    PASSWORD = 3,
-    CONFRIM_PASSWORD = 4
-}
-
 // At least 8 chars, 1 upper case and 1 lower case, and 1 digit
 export const validPasswordFormat = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
 

@@ -1,3 +1,5 @@
 import { ROUTES } from './routes';
 
-export { ROUTES };
+import { INPUT_TYPE } from './enums';
+
+export { ROUTES, INPUT_TYPE };
