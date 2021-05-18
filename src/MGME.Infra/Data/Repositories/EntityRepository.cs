@@ -83,13 +83,13 @@ namespace MGME.Infra.Data.Repositories
                 }
             }
 
-            // If we query only on primary key and want related entities
+            // If we query only on primary key
             if (predicate == null && id != null)
             {
                 return await query.Select(select).SingleOrDefaultAsync(entity => entity.Id == id);
             }
 
-            // If we query on primary key, want related entities, and also want to filter
+            // If we query on primary key and also want to filter
             if (predicate != null && id != null)
             {
                 query = query.Where(predicate);
@@ -97,7 +97,7 @@ namespace MGME.Infra.Data.Repositories
                 return await query.Select(select).SingleOrDefaultAsync(entity => entity.Id == id);
             }
 
-            // If we query only on filter avoiding primary key, but still want related entities
+            // If we query only on filter avoiding primary key
             return await query.Where(predicate).Select(select).FirstOrDefaultAsync();
         }
 
