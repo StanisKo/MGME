@@ -21,11 +21,11 @@ const useStyles = makeStyles((theme: Theme) =>
             }
         },
         deleteButton: {
-            borderColor: '#d32f2f',
+            borderColor: '#bf7c7c',
             '&:hover': {
                 borderColor: '#b52828'
             },
-            color: '#d32f2f'
+            color: '#b52828'
         }
     })
 );
@@ -56,9 +56,27 @@ export const Catalogues = (): ReactElement => {
                     </Grid>
 
                     <Grid item xs={6} container alignItems="center" justify="flex-end" className={buttons}>
-                        <Button variant="outlined" color="primary" size="medium">Add to Adventure</Button>
-                        <Button variant="outlined" color="primary" size="medium">Add to Character</Button>
-                        <Button variant="outlined" color="primary" size="medium">Create</Button>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            size="medium"
+                        >
+                            Add to Adventure
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            size="medium"
+                        >
+                            Add to Character
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            size="medium"
+                        >
+                            Create
+                        </Button>
                         <Button
                             variant="outlined"
                             color="primary"
