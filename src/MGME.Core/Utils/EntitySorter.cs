@@ -1,6 +1,8 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Collections.Generic;
+
 using MGME.Core.Entities;
 using MGME.Core.Interfaces.Utils;
 
@@ -16,5 +18,31 @@ namespace MGME.Core.Utils
         {
             throw new NotImplementedException();
         }
+
+        private Dictionary<string, List<Expression<Func<PlayerCharacter, object>>>> _playerCharacterSortingPriority = new()
+        {
+            {
+                "name", new()
+                {
+                    playerCharacter => playerCharacter.Name
+                }
+            },
+            {
+                "adventure", new()
+                {
+                    playerCharacter => playerCharacter.Adventures.Count,
+                    playerCharacter => playerCharacter.Adventures.FirstOrDefault().Title,
+                    playerCharacter => playerCharacter.Adventures.FirstOrDefault().Id
+                }
+            },
+            {
+                "npc", new()
+                {
+                    playerCharacter => playerCharacter.NonPlayerCharacters.Count,
+                    playerCharacter => playerCharacter.NonPlayerCharacters.FirstOrDefault().Name,
+                    playerCharacter => playerCharacter.NonPlayerCharacters.FirstOrDefault().Name
+                }
+            }
+        };
     }
 }
