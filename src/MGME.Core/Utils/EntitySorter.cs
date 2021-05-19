@@ -37,8 +37,8 @@ namespace MGME.Core.Utils
             string cleanedString = sortingParameter.Trim();
 
             return cleanedString.StartsWith('-')
-                ? new Tuple<string, SortOrder>(sortingParameter.Substring(1), SortOrder.DESCENDING)
-                : new Tuple<string, SortOrder>(sortingParameter, SortOrder.ASCENDING);
+                ? new Tuple<string, SortOrder>(cleanedString.Substring(1), SortOrder.DESCENDING)
+                : new Tuple<string, SortOrder>(cleanedString, SortOrder.ASCENDING);
         }
     }
 }
