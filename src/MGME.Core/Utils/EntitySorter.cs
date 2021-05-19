@@ -36,7 +36,7 @@ namespace MGME.Core.Utils
         {
             string cleanedString = sortingParameter.Trim();
 
-            return sortingParameter.StartsWith('-')
+            return cleanedString.StartsWith('-')
                 ? new Tuple<string, SortOrder>(sortingParameter.Substring(1), SortOrder.DESCENDING)
                 : new Tuple<string, SortOrder>(sortingParameter, SortOrder.ASCENDING);
         }
