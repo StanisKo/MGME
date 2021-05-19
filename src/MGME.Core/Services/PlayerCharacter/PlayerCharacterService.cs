@@ -45,6 +45,12 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             try
             {
+                /*
+                public async Task <DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters(string sorting)
+
+                string[] sortColumns, int order = EntitySorter.ParseSortingParameters(sorting);
+                */
+
                 IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
                     predicate: playerCharacter => playerCharacter.UserId == userId,
                     include: new[]

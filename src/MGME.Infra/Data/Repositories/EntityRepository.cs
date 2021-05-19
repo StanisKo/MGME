@@ -105,7 +105,7 @@ namespace MGME.Infra.Data.Repositories
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
             IEnumerable<string> include = null,
-            Tuple<Expression<Func<TEntity, object>>[], int> orderBy = null)
+            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, int> orderBy = null)
         {
             IQueryable<TEntity> query = _database.Set<TEntity>();
 
@@ -129,7 +129,7 @@ namespace MGME.Infra.Data.Repositories
 
             if (orderBy != null)
             {
-                (Expression<Func<TEntity, object>>[] fields, int order) = orderBy;
+                (IEnumerable<Expression<Func<TEntity, object>>> fields, int order) = orderBy;
 
                 query = order == (int)SortOrder.ASCENDING
                     ? query.OrderBy(fields.First())
@@ -150,7 +150,7 @@ namespace MGME.Infra.Data.Repositories
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
             IEnumerable<string> include = null,
-            Tuple<Expression<Func<TEntity, object>>[], int> orderBy = null,
+            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, int> orderBy = null,
             Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO
         {
             IQueryable<TEntity> query = _database.Set<TEntity>();
@@ -175,7 +175,7 @@ namespace MGME.Infra.Data.Repositories
 
             if (orderBy != null)
             {
-                (Expression<Func<TEntity, object>>[] fields, int order) = orderBy;
+                (IEnumerable<Expression<Func<TEntity, object>>> fields, int order) = orderBy;
 
                 query = order == (int)SortOrder.ASCENDING
                     ? query.OrderBy(fields.First())
