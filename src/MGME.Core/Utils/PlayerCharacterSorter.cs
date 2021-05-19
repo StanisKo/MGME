@@ -13,27 +13,11 @@ namespace MGME.Core.Utils
     we want to sort on multiple columns, based on one parameter
     */
 
-    public class PlayerCharacterSorter : EntitySorter
+    public class PlayerCharacterSorter : EntitySorter<PlayerCharacter>
     {
-        // This should be shared by all sorters
         public Tuple<IEnumerable<Expression<Func<PlayerCharacter, object>>>, SortOrder> DetermineSorting(string sortingParameter)
         {
-            (string parameter, SortOrder order) = ParseSortingParameter(sortingParameter);
-
-            IEnumerable<string> allowedParameters = _playerCharacterSortingPriority.Keys;
-
-            if (!allowedParameters.Contains(parameter))
-            {
-                throw new Exception(
-                    $"Provided sorting parameter is not supported. Sorting must be: {string.Join(", ", allowedParameters)}"
-                );
-            }
-
-            List<Expression<Func<PlayerCharacter, object>>> priority = _playerCharacterSortingPriority.GetValueOrDefault(
-                parameter
-            );
-
-            return new Tuple<IEnumerable<Expression<Func<PlayerCharacter, object>>>, SortOrder>(priority, order);
+            return base.DetermineSorting(sortingParameter, _playerCharacterSortingPriority);
         }
 
         private Dictionary<string, List<Expression<Func<PlayerCharacter, object>>>> _playerCharacterSortingPriority = new()
