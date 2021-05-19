@@ -23,9 +23,11 @@ namespace MGME.Web.Controllers
         }
 
         [HttpGet]
-        public async Task <IActionResult> GetAllPlayerCharacters()
+        public async Task <IActionResult> GetAllPlayerCharacters([FromQuery] string sorting)
         {
-            DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = await _playerCharacterService.GetAllPlayerCharacters();
+            DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = await _playerCharacterService.GetAllPlayerCharacters(
+                sorting ?? "name"
+            );
 
             if (response.Success)
             {

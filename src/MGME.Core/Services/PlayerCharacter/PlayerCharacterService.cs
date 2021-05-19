@@ -16,6 +16,7 @@ using MGME.Core.DTOs.Adventure;
 using MGME.Core.DTOs.NonPlayerCharacter;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
+using MGME.Core.Utils;
 
 namespace MGME.Core.Services.PlayerCharacterService
 {
@@ -27,17 +28,21 @@ namespace MGME.Core.Services.PlayerCharacterService
 
         private readonly IMapper _mapper;
 
+        private readonly PlayerCharacterSorter _sorter;
+
         public PlayerCharacterService(IEntityRepository<PlayerCharacter> playerCharacterRepository,
                                       IEntityRepository<NonPlayerCharacter> nonPlayerCharacterRepository,
                                       IMapper mapper,
+                                      PlayerCharacterSorter sorter,
                                       IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _playerCharacterRepository = playerCharacterRepository;
             _nonPlayerCharacterRepository = nonPlayerCharacterRepository;
             _mapper = mapper;
+            _sorter = sorter;
         }
 
-        public async Task <DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters()
+        public async Task <DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters(string sortingParameter)
         {
             DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = new DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>();
 
@@ -45,12 +50,6 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             try
             {
-                /*
-                public async Task <DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters(string sorting)
-
-                string[] sortColumns, int order = EntitySorter.ParseSortingParameters(sorting);
-                */
-
                 IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
                     predicate: playerCharacter => playerCharacter.UserId == userId,
                     include: new[]
@@ -84,7 +83,8 @@ namespace MGME.Core.Services.PlayerCharacterService
                             nonPlayerCharacter => playerCharacter.NonPlayerCharacters.Count == 1
                         ).FirstOrDefault(),
                         NonPlayerCharacterCount = playerCharacter.NonPlayerCharacters.Count
-                    }
+                    },
+                    orderBy: _sorter.DetermineSorting(sortingParameter)
                 );
 
                 response.Data = playerCharacters;

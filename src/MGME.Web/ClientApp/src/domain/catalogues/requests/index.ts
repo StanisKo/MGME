@@ -6,7 +6,9 @@ export const fetchPlayerCharacters = async (): Promise<void> => {
     await DataController.FetchAndSave<PlayerCharacter>(
         {
             url: URLBuilder.ReadFrom('playerCharacter'),
-            params: null,
+            params: {
+                sorting: '-npc'
+            },
             page: 'catalogues',
             key: 'playerCharacters'
         }

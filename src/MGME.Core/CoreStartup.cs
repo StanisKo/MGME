@@ -8,6 +8,7 @@ using MGME.Core.Services.AuthService;
 using MGME.Core.Services.UserService;
 using MGME.Core.Services.PlayerCharacterService;
 using MGME.Core.Services.NonPlayerCharacterService;
+using MGME.Core.Utils;
 
 namespace MGME.Core
 {
@@ -25,13 +26,15 @@ namespace MGME.Core
         {
             services.AddHostedService<TokenRecycleService>();
 
+            services.AddScoped<IHashingService, HashingService>();
+
             services.AddScoped<IAuthService, AuthService>();
 
             services.AddScoped<IUserService, UserService>();
 
-            services.AddScoped<IHashingService, HashingService>();
-
             services.AddScoped<IPlayerCharacterService, PlayerCharacterService>();
+
+            services.AddScoped<PlayerCharacterSorter>();
 
             services.AddScoped<INonPlayerCharacterService, NonPlayerCharacterService>();
         }

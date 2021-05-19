@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 using MGME.Core.DTOs;
 using MGME.Core.Entities;
+using MGME.Core.Constants;
 
 namespace MGME.Core.Interfaces.Repositories
 {
@@ -28,14 +29,14 @@ namespace MGME.Core.Interfaces.Repositories
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
             IEnumerable<string> include = null,
-            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, int> orderBy = null);
+            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null);
 
         // For when we need to select only some columns
         Task <List<TEntityDTO>> GetEntititesAsync<TEntityDTO>(
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
             IEnumerable<string> include = null,
-            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, int> orderBy = null,
+            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
             Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO;
 
         Task AddEntityAsync(TEntity entity);
