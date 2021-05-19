@@ -4,7 +4,6 @@ using System.Linq.Expressions;
 using System.Collections.Generic;
 
 using MGME.Core.Entities;
-using MGME.Core.Interfaces.Utils;
 
 namespace MGME.Core.Utils
 {
@@ -12,11 +11,33 @@ namespace MGME.Core.Utils
     We don't parse string to Entity's property, but create mapper of string to lambda[], since
     we want to sort on multiple columns, based on one parameter
     */
-    public class EntitySorter : IEntitySorter
+
+    public class EntitySorter
     {
-        public Tuple<IEnumerable<Expression<Func<BaseEntity, object>>>, int> ParseSortingParameter(string sorting)
+        protected Tuple<string, int> ParseSortingParameter(string sorting)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class PlayerCharacterSorter : EntitySorter
+    {
+        public Tuple<IEnumerable<Expression<Func<PlayerCharacter, object>>>, int> DetermineSorting(string sortingParameter)
+        {
+            (string parameter, int order) = ParseSortingParameter(sortingParameter);
+
+            IEnumerable<string> allowedParameters = _playerCharacterSortingPriority.Keys;
+
+            if (!allowedParameters.Contains(parameter))
+            {
+                throw new Exception(
+                    $"Provided sorting parameter is not supported. Sorting must be {string.Join(", ", allowedParameters)}"
+                );
+            }
+
+            List<Expression<Func<PlayerCharacter, object>>> priority = _playerCharacterSortingPriority.GetValueOrDefault(
+                sortingParameter
+            );
         }
 
         private Dictionary<string, List<Expression<Func<PlayerCharacter, object>>>> _playerCharacterSortingPriority = new()
