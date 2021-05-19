@@ -17,10 +17,10 @@ namespace MGME.Core.Utils
     {
         public Tuple<IEnumerable<Expression<Func<PlayerCharacter, object>>>, SortOrder> DetermineSorting(string sortingParameter)
         {
-            return base.DetermineSorting(sortingParameter, _playerCharacterSortingPriority);
+            return base.DetermineSorting(sortingParameter, _playerCharacterSortingOptions);
         }
 
-        private Dictionary<string, List<Expression<Func<PlayerCharacter, object>>>> _playerCharacterSortingPriority = new()
+        private Dictionary<string, List<Expression<Func<PlayerCharacter, object>>>> _playerCharacterSortingOptions = new()
         {
             {
                 "name", new()

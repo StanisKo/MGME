@@ -8,7 +8,7 @@ using MGME.Core.Constants;
 
 namespace MGME.Core.Utils
 {
-    public class EntitySorter<TEntity> where TEntity: BaseEntity
+    public abstract class EntitySorter<TEntity> where TEntity: BaseEntity
     {
         protected Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> DetermineSorting(
             string sortingParameter,
