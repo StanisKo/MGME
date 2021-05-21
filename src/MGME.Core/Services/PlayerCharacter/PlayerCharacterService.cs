@@ -62,7 +62,7 @@ namespace MGME.Core.Services.PlayerCharacterService
 
                 response.Pagination.Page = selectedPage;
                 response.Pagination.NumberOfResults = numberOfResults;
-                response.Pagination.NumberOfPages = (int)Math.Ceiling(numberOfResults / (double)DataAccessConfig.PAGINATE_BY);
+                response.Pagination.NumberOfPages = DataAccessConfig.GetNumberOfPages(numberOfResults);
 
                 response.Success = true;
             }
