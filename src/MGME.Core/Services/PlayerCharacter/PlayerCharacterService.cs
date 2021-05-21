@@ -42,7 +42,7 @@ namespace MGME.Core.Services.PlayerCharacterService
             _sorter = sorter;
         }
 
-        public async Task <DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters(string sortingParameter)
+        public async Task <DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters(string sortingParameter, int selectedPage)
         {
             DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = new DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>();
 
