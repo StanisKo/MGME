@@ -271,5 +271,10 @@ namespace MGME.Infra.Data.Repositories
 
             await _database.SaveChangesAsync();
         }
+
+        public async Task <int> GetEntitiesCount()
+        {
+            return await _database.Set<TEntity>().CountAsync();
+        }
     }
 }

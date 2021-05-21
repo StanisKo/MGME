@@ -56,5 +56,7 @@ namespace MGME.Core.Interfaces.Repositories
         Task DeleteEntityAsync(TEntity entity);
 
         Task DeleteEntitiesAsync(List<TEntity> entities);
+
+        Task <int> GetEntitiesCount();
     }
 }

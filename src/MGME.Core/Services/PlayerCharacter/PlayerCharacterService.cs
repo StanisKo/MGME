@@ -50,51 +50,18 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             try
             {
-                IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
-                    predicate: playerCharacter => playerCharacter.UserId == userId,
-                    include: new[]
-                    {
-                        "Adventures",
-                        "NonPlayerCharacters"
-                    },
-                    select: playerCharacter => new GetPlayerCharacterListDTO()
-                    {
-                        Id = playerCharacter.Id,
-                        Name = playerCharacter.Name,
+                int numberOfResults = await _playerCharacterRepository.GetEntitiesCount();
 
-                        Adventure = playerCharacter.Adventures.Select(
-                            adventure => new GetAdventureDTO()
-                            {
-                                Id = adventure.Id,
-                                Title = adventure.Title
-                            }
-                        ).Where(
-                            adventure => playerCharacter.Adventures.Count == 1
-                        ).FirstOrDefault(),
-                        AdventureCount = playerCharacter.Adventures.Count,
-
-                        NonPlayerCharacter = playerCharacter.NonPlayerCharacters.Select(
-                            nonPlayerCharacter => new GetNonPlayerCharacterDTO()
-                            {
-                                Id = nonPlayerCharacter.Id,
-                                Name = nonPlayerCharacter.Name
-                            }
-                        ).Where(
-                            nonPlayerCharacter => playerCharacter.NonPlayerCharacters.Count == 1
-                        ).FirstOrDefault(),
-                        NonPlayerCharacterCount = playerCharacter.NonPlayerCharacters.Count
-                    },
-                    orderBy: _sorter.DetermineSorting(sortingParameter),
-                    page: selectedPage
+                IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await QueryPlayerCharacters(
+                    sortingParameter,
+                    selectedPage
                 );
-
-                int numberOfResults = playerCharacters.Count();
 
                 response.Data = playerCharacters;
 
                 response.Pagination.Page = selectedPage;
                 response.Pagination.NumberOfResults = numberOfResults;
-                response.Pagination.NumberOfPages = (int)Math.Ceiling(numberOfResults / (double)15); // Find this value proper place
+                response.Pagination.NumberOfPages = (int)Math.Ceiling(numberOfResults / (double)15);
 
                 response.Success = true;
             }
@@ -383,6 +350,51 @@ namespace MGME.Core.Services.PlayerCharacterService
             }
 
             return response;
+        }
+
+        private async Task <IEnumerable<GetPlayerCharacterListDTO>> QueryPlayerCharacters(string sortingParameter, int selectedPage)
+        {
+            int userId = GetUserIdFromHttpContext();
+
+            IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
+                predicate: playerCharacter => playerCharacter.UserId == userId,
+                include: new[]
+                {
+                    "Adventures",
+                    "NonPlayerCharacters"
+                },
+                select: playerCharacter => new GetPlayerCharacterListDTO()
+                {
+                    Id = playerCharacter.Id,
+                    Name = playerCharacter.Name,
+
+                    Adventure = playerCharacter.Adventures.Select(
+                        adventure => new GetAdventureDTO()
+                        {
+                            Id = adventure.Id,
+                            Title = adventure.Title
+                        }
+                    ).Where(
+                        adventure => playerCharacter.Adventures.Count == 1
+                    ).FirstOrDefault(),
+                    AdventureCount = playerCharacter.Adventures.Count,
+
+                    NonPlayerCharacter = playerCharacter.NonPlayerCharacters.Select(
+                        nonPlayerCharacter => new GetNonPlayerCharacterDTO()
+                        {
+                            Id = nonPlayerCharacter.Id,
+                            Name = nonPlayerCharacter.Name
+                        }
+                    ).Where(
+                        nonPlayerCharacter => playerCharacter.NonPlayerCharacters.Count == 1
+                    ).FirstOrDefault(),
+                    NonPlayerCharacterCount = playerCharacter.NonPlayerCharacters.Count
+                },
+                orderBy: _sorter.DetermineSorting(sortingParameter),
+                page: selectedPage
+            );
+
+            return playerCharacters;
         }
     }
 }
