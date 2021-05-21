@@ -57,13 +57,15 @@ export class DataController {
             return response;
         }
 
+        const { success, message, ...onlyRelevantValues } = response;
+
         store.dispatch(
             actionCreators.updateStore(
                 {
                     type: 'UPDATE_STORE',
                     reducer: page,
                     key: key,
-                    payload: response.data
+                    payload: onlyRelevantValues
                 }
             )
         );

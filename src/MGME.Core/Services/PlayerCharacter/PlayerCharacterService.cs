@@ -42,9 +42,9 @@ namespace MGME.Core.Services.PlayerCharacterService
             _sorter = sorter;
         }
 
-        public async Task <DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters(string sortingParameter, int selectedPage)
+        public async Task <PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters(string sortingParameter, int selectedPage)
         {
-            DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = new DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>();
+            PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = new PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -84,10 +84,18 @@ namespace MGME.Core.Services.PlayerCharacterService
                         ).FirstOrDefault(),
                         NonPlayerCharacterCount = playerCharacter.NonPlayerCharacters.Count
                     },
-                    orderBy: _sorter.DetermineSorting(sortingParameter)
+                    orderBy: _sorter.DetermineSorting(sortingParameter),
+                    page: selectedPage
                 );
 
+                int numberOfResults = playerCharacters.Count();
+
                 response.Data = playerCharacters;
+
+                response.Pagination.Page = selectedPage;
+                response.Pagination.NumberOfResults = numberOfResults;
+                response.Pagination.NumberOfPages = (int)Math.Ceiling(numberOfResults / (double)15); // Find this value proper place
+
                 response.Success = true;
             }
             catch (Exception exception)

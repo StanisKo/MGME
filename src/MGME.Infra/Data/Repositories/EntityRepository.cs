@@ -15,6 +15,8 @@ namespace MGME.Infra.Data.Repositories
 {
     public class EntityRepository<TEntity> : IEntityRepository<TEntity> where TEntity: BaseEntity
     {
+        private const int PAGINATE_BY = 15;
+
         private readonly ApplicationDbContext _database;
 
         public EntityRepository(ApplicationDbContext database)
@@ -105,7 +107,8 @@ namespace MGME.Infra.Data.Repositories
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
             IEnumerable<string> include = null,
-            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null)
+            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
+            int? page = null)
         {
             IQueryable<TEntity> query = _database.Set<TEntity>();
 
@@ -143,6 +146,11 @@ namespace MGME.Infra.Data.Repositories
                 }
             }
 
+            if (page != null)
+            {
+                query = query.Skip(((int)page - 1) * PAGINATE_BY).Take(PAGINATE_BY);
+            }
+
             return await query.ToListAsync();
         }
 
@@ -151,6 +159,7 @@ namespace MGME.Infra.Data.Repositories
             Expression<Func<TEntity, bool>> predicate = null,
             IEnumerable<string> include = null,
             Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
+            int? page = null,
             Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO
         {
             IQueryable<TEntity> query = _database.Set<TEntity>();
@@ -187,6 +196,11 @@ namespace MGME.Infra.Data.Repositories
                         ? (query as IOrderedQueryable<TEntity>).ThenBy(field)
                         : (query as IOrderedQueryable<TEntity>).ThenByDescending(field);
                 }
+            }
+
+            if (page != null)
+            {
+                query = query.Skip(((int)page - 1) * PAGINATE_BY).Take(PAGINATE_BY);
             }
 
             return await query.Select(select).ToListAsync();

@@ -29,7 +29,8 @@ namespace MGME.Core.Interfaces.Repositories
             bool tracking = false,
             Expression<Func<TEntity, bool>> predicate = null,
             IEnumerable<string> include = null,
-            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null);
+            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
+            int? page = null);
 
         // For when we need to select only some columns
         Task <List<TEntityDTO>> GetEntititesAsync<TEntityDTO>(
@@ -37,6 +38,7 @@ namespace MGME.Core.Interfaces.Repositories
             Expression<Func<TEntity, bool>> predicate = null,
             IEnumerable<string> include = null,
             Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
+            int? page = null,
             Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO;
 
         Task AddEntityAsync(TEntity entity);
