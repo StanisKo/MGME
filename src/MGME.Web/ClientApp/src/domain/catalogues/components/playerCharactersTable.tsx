@@ -19,7 +19,7 @@ import { LinearProgress } from '@material-ui/core';
 
 export const PlayerCharactersTable = (): ReactElement | null => {
     const playerCharacters: PlayerCharacter[] | null = useSelector(
-        (state: ApplicationState) => state.catalogues?.playerCharacters ?? null
+        (state: ApplicationState) => state.catalogues?.playerCharacters?.data ?? null
     );
 
     const isAuthorized: boolean = useSelector(

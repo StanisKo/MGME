@@ -1,11 +1,15 @@
 import { Action, Reducer } from 'redux';
 
 import { PlayerCharacter } from '../../domain/catalogues/interfaces';
+import { Pagination } from '../../shared/interfaces';
 
 import { KnownAction } from '../shared';
 
 export interface CataloguesState {
-    playerCharacters: PlayerCharacter[],
+    playerCharacters: {
+        data: PlayerCharacter[],
+        pagination: Pagination
+    },
 }
 
 export const CataloguesReducer: Reducer<CataloguesState> = (

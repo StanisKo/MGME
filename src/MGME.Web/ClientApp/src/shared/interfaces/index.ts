@@ -50,3 +50,9 @@ export interface HeadCell {
     sorting: string;
     numeric: boolean;
 }
+
+export interface Pagination {
+    page: number;
+    numberOfPages: number;
+    numberOfResults: number;
+}

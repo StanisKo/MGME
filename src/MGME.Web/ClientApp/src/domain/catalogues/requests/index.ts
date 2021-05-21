@@ -7,7 +7,8 @@ export const fetchPlayerCharacters = async (): Promise<void> => {
         {
             url: URLBuilder.ReadFrom('playerCharacter'),
             params: {
-                sorting: '-npc'
+                sorting: '-npc',
+                page: 1
             },
             page: 'catalogues',
             key: 'playerCharacters'

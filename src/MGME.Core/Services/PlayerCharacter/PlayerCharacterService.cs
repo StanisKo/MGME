@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 
 using MGME.Core.Entities;
 using MGME.Core.DTOs;
+using MGME.Core.Constants;
 using MGME.Core.DTOs.PlayerCharacter;
 using MGME.Core.DTOs.Adventure;
 using MGME.Core.DTOs.NonPlayerCharacter;
@@ -61,7 +62,7 @@ namespace MGME.Core.Services.PlayerCharacterService
 
                 response.Pagination.Page = selectedPage;
                 response.Pagination.NumberOfResults = numberOfResults;
-                response.Pagination.NumberOfPages = (int)Math.Ceiling(numberOfResults / (double)15);
+                response.Pagination.NumberOfPages = (int)Math.Ceiling(numberOfResults / (double)DataAccessConfig.PAGINATE_BY);
 
                 response.Success = true;
             }

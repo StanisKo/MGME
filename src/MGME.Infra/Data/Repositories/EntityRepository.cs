@@ -15,8 +15,6 @@ namespace MGME.Infra.Data.Repositories
 {
     public class EntityRepository<TEntity> : IEntityRepository<TEntity> where TEntity: BaseEntity
     {
-        private const int PAGINATE_BY = 15;
-
         private readonly ApplicationDbContext _database;
 
         public EntityRepository(ApplicationDbContext database)
@@ -148,7 +146,7 @@ namespace MGME.Infra.Data.Repositories
 
             if (page != null)
             {
-                query = query.Skip(((int)page - 1) * PAGINATE_BY).Take(PAGINATE_BY);
+                query = query.Skip(((int)page - 1) * DataAccessConfig.PAGINATE_BY).Take(DataAccessConfig.PAGINATE_BY);
             }
 
             return await query.ToListAsync();
@@ -200,7 +198,7 @@ namespace MGME.Infra.Data.Repositories
 
             if (page != null)
             {
-                query = query.Skip(((int)page - 1) * PAGINATE_BY).Take(PAGINATE_BY);
+                query = query.Skip(((int)page - 1) * DataAccessConfig.PAGINATE_BY).Take(DataAccessConfig.PAGINATE_BY);
             }
 
             return await query.Select(select).ToListAsync();
