@@ -11,13 +11,13 @@ using Microsoft.AspNetCore.Http;
 
 using MGME.Core.Entities;
 using MGME.Core.DTOs;
-using MGME.Core.Constants;
 using MGME.Core.DTOs.PlayerCharacter;
 using MGME.Core.DTOs.Adventure;
 using MGME.Core.DTOs.NonPlayerCharacter;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
 using MGME.Core.Utils;
+using MGME.Core.Utils.Sorters;
 
 namespace MGME.Core.Services.PlayerCharacterService
 {
@@ -62,7 +62,7 @@ namespace MGME.Core.Services.PlayerCharacterService
 
                 response.Pagination.Page = selectedPage;
                 response.Pagination.NumberOfResults = numberOfResults;
-                response.Pagination.NumberOfPages = DataAccessConfig.GetNumberOfPages(numberOfResults);
+                response.Pagination.NumberOfPages = DataAccessHelpers.GetNumberOfPages(numberOfResults);
 
                 response.Success = true;
             }

@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using MGME.Core.DTOs;
 using MGME.Core.Entities;
 using MGME.Core.Constants;
+using MGME.Core.Utils;
 using MGME.Core.Interfaces.Repositories;
 
 namespace MGME.Infra.Data.Repositories
@@ -146,7 +147,7 @@ namespace MGME.Infra.Data.Repositories
 
             if (page != null)
             {
-                query = query.Skip(((int)page - 1) * DataAccessConfig.PAGINATE_BY).Take(DataAccessConfig.PAGINATE_BY);
+                query = query.Skip(((int)page - 1) * DataAccessHelpers.PAGINATE_BY).Take(DataAccessHelpers.PAGINATE_BY);
             }
 
             return await query.ToListAsync();
@@ -198,7 +199,7 @@ namespace MGME.Infra.Data.Repositories
 
             if (page != null)
             {
-                query = query.Skip(((int)page - 1) * DataAccessConfig.PAGINATE_BY).Take(DataAccessConfig.PAGINATE_BY);
+                query = query.Skip(((int)page - 1) * DataAccessHelpers.PAGINATE_BY).Take(DataAccessHelpers.PAGINATE_BY);
             }
 
             return await query.Select(select).ToListAsync();

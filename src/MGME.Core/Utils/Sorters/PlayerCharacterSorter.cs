@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using MGME.Core.Entities;
 using MGME.Core.Constants;
 
-namespace MGME.Core.Utils
+namespace MGME.Core.Utils.Sorters
 {
     /*
     We don't parse string to Entity's property, but create mapper of string to lambda[], since

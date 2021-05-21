@@ -1,8 +1,8 @@
 using System;
 
-namespace MGME.Core.Constants
+namespace MGME.Core.Utils
 {
-    public static class DataAccessConfig
+    public static class DataAccessHelpers
     {
         public const int PAGINATE_BY = 15;
 

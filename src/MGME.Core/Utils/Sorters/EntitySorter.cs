@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using MGME.Core.Entities;
 using MGME.Core.Constants;
 
-namespace MGME.Core.Utils
+namespace MGME.Core.Utils.Sorters
 {
     public abstract class EntitySorter<TEntity> where TEntity: BaseEntity
     {
