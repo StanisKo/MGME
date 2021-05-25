@@ -32,16 +32,16 @@ export const CataloguesReducer: Reducer<CataloguesState> = (
 
             return {
 
-                // Retain state of other features
+                // Retain previous state of other keys
                 ...state,
 
-                // Here we update relevant feature
+                // Update THIS key
                 [key]: {
 
-                    // Retain state of this feature
+                    // Retain previous state of THIS key
                     ...state[key as keyof CataloguesState],
 
-                    // Here we add new things
+                    // Add/update things in THIS key
                     ...(payload as unknown as CataloguesState)
                 }
             };
