@@ -7,24 +7,17 @@ It only makes sence to have shared actions creators...
 NOTE: We also provide reducer name in order to trigger only that update we need
 Also, payload is unknown since we cannot know in advance the shape of response
 */
-interface GenericUpdate {
+interface UpdateStore {
+    type: 'UPDATE_STORE';
     reducer: string;
     key: string;
     payload: unknown;
 }
 
-interface UpdateStore extends GenericUpdate {
-    type: 'UPDATE_STORE';
-}
-
-interface UpdateRequestParameters extends GenericUpdate {
-    type: 'UPDATE_REQUEST_PARAMETERS';
-}
-
-export type KnownAction = UpdateStore | UpdateRequestParameters;
+export type KnownAction = UpdateStore;
 
 export const actionCreators = {
-    update: ({ type, reducer, key, payload }: KnownAction): KnownAction => ({
+    updateStore: ({ type, reducer, key, payload }: UpdateStore): UpdateStore => ({
         type: type,
         reducer: reducer,
         key: key,
