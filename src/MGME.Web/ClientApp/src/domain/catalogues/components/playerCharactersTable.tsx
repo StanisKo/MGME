@@ -140,18 +140,16 @@ export const PlayerCharactersTable = (): ReactElement | null => {
         setPage(newPage);
     };
 
+    // Initial request
     useEffect(() => {
         (async (): Promise<void> => {
             if (isAuthorized && playerCharacters === null) {
-                await fetchPlayerCharacters(
-                    page + 1,
-                    `${order === 'asc' ? '' : '-'}${orderBy}`
-                );
+                await fetchPlayerCharacters();
             }
         })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthorized, playerCharacters]);
 
+    // Request with changed params
     useEffect(() => {
         (async (): Promise<void> => {
             if (isAuthorized) {
