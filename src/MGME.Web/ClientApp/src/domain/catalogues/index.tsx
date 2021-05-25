@@ -90,7 +90,6 @@ export const Catalogues = (): ReactElement => {
                             variant="outlined"
                             color="primary"
                             size="medium"
-                            disabled={nothingSelected}
                         >
                             Create
                         </Button>

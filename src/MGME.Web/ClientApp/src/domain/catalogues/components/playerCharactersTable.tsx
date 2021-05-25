@@ -134,19 +134,6 @@ export const PlayerCharactersTable = (): ReactElement | null => {
         setOrder(wasAscending ? 'desc' : 'asc');
 
         setOrderBy(newSortingParam);
-
-        dispatch(
-            actionCreators.updateStore(
-                {
-                    type: 'UPDATE_STORE',
-                    reducer: 'catalogues',
-                    key: 'playerCharacters',
-                    payload: {
-                        sorting: `${wasAscending ? '-' : ''}${newSortingParam}`
-                    }
-                }
-            )
-        );
     };
 
     const handlePageChange = (event: unknown, newPage: number): void => {
@@ -156,10 +143,26 @@ export const PlayerCharactersTable = (): ReactElement | null => {
     useEffect(() => {
         (async (): Promise<void> => {
             if (isAuthorized && playerCharacters === null) {
-                await fetchPlayerCharacters();
+                await fetchPlayerCharacters(
+                    page + 1,
+                    `${order === 'asc' ? '' : '-'}${orderBy}`
+                );
             }
         })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthorized, playerCharacters]);
+
+    useEffect(() => {
+        (async (): Promise<void> => {
+            if (isAuthorized) {
+                await fetchPlayerCharacters(
+                    page + 1,
+                    `${order === 'asc' ? '' : '-'}${orderBy}`
+                );
+            }
+        })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page, order, orderBy]);
 
     const { root, visuallyHidden } = useStyles();
 
