@@ -38,7 +38,7 @@ export class DataController {
     public static async FetchAndSave<TResult>(
         { page, key, url, params }: ReadFromApi
 
-    ): Promise<void | DataServiceResponse<TResult>> {
+    ): Promise<void | DataServiceResponse<TResult> | PaginatedDataServiceResponse<TResult>> {
 
         // Check if we got token, otherwise take it
         if (!this._token) {
