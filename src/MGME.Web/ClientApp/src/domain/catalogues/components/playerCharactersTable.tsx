@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { PlayerCharacter } from '../interfaces';
 import { fetchPlayerCharacters } from '../requests';
 
-import { HeadCell } from '../../../shared/interfaces';
+import { HeadCell, Pagination } from '../../../shared/interfaces';
 import { isSelected } from '../../../shared/helpers';
 import { SortOrder } from '../../../shared/const';
 
@@ -19,7 +19,9 @@ import {
     TableCell,
     Checkbox,
     TableSortLabel,
-    LinearProgress
+    TablePagination,
+    LinearProgress,
+    Box
 } from '@material-ui/core';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -56,6 +58,10 @@ export const PlayerCharactersTable = (): ReactElement | null => {
         (state: ApplicationState) => state.catalogues?.playerCharacters?.data ?? null
     );
 
+    const pagination: Pagination | null = useSelector(
+        (state: ApplicationState) => state.catalogues?.playerCharacters?.pagination ?? null
+    );
+
     const isAuthorized: boolean = useSelector(
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
     );
@@ -63,18 +69,37 @@ export const PlayerCharactersTable = (): ReactElement | null => {
     const [order, setOrder] = useState<SortOrder>('asc');
     const [orderBy, setOrderBy] = useState<string>('name');
     const [selected, setSelected] = useState<number[]>([]);
-    // const [page, setPage] = useState(0);
+    const [page, setPage] = useState(0);
+
+    /*
+    We dispatch values to store in separate handlers and not on hook, to avoid unnecessary
+    rerendered in subscribed components
+    */
 
     const handleSelectAll = (event: ChangeEvent<HTMLInputElement>): void => {
-        if (event.target.checked) {
-            setSelected(
-                (playerCharacters ?? []).map((playerCharacter: PlayerCharacter) => playerCharacter.id)
-            );
+        let newSelected: number[] = [];
 
-            return;
+        if (event.target.checked) {
+            newSelected = (playerCharacters ?? []).map((playerCharacter: PlayerCharacter) => playerCharacter.id);
+        }
+        else {
+            newSelected = [];
         }
 
-        setSelected([]);
+        setSelected(newSelected);
+
+        dispatch(
+            actionCreators.updateStore(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'playerCharacters',
+                    payload: {
+                        selected: newSelected
+                    }
+                }
+            )
+        );
     };
 
     const handleSelect = (selectedId: number) => (event: MouseEvent<unknown>): void => {
@@ -124,6 +149,10 @@ export const PlayerCharactersTable = (): ReactElement | null => {
         );
     };
 
+    const handlePageChange = (event: unknown, newPage: number): void => {
+        setPage(newPage);
+    };
+
     useEffect(() => {
         (async (): Promise<void> => {
             if (isAuthorized && playerCharacters === null) {
@@ -134,78 +163,90 @@ export const PlayerCharactersTable = (): ReactElement | null => {
 
     const { root, visuallyHidden } = useStyles();
 
-    return playerCharacters !== null ? (
-        <Table className={root}>
-            <TableHead>
-                <TableRow>
-                    <TableCell padding="checkbox">
-                        <Checkbox
-                            checked={selected.length === playerCharacters.length}
-                            onChange={handleSelectAll}
-                        />
-                    </TableCell>
-                    {headCells.map((headCell) => (
-                        <TableCell
-                            key={headCell.label}
-                            align={headCell.numeric ? 'right' : 'left'}
-                            sortDirection={orderBy === headCell.sorting ? order : false}
-                        >
-                            <TableSortLabel
-                                active={orderBy === headCell.sorting}
-                                direction={orderBy === headCell.sorting ? order : 'asc'}
-                                onClick={handleSorting(headCell.sorting)}
-                            >
-                                {headCell.label}
-                                {orderBy === headCell.sorting ? (
-                                    <span className={visuallyHidden}>
-                                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                    </span>
-                                ) : null}
-                            </TableSortLabel>
+    return playerCharacters !== null && pagination !== null ? (
+        <>
+            <Table className={root}>
+                <TableHead>
+                    <TableRow>
+                        <TableCell padding="checkbox">
+                            <Checkbox
+                                checked={selected.length === playerCharacters.length}
+                                onChange={handleSelectAll}
+                            />
                         </TableCell>
-                    ))}
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                {playerCharacters.map((playerCharacter, index) => {
-                    const isItemSelected = isSelected(playerCharacter.id, selected);
-                    const labelId = `playerCharacter-table-checkbox-${index}`;
-
-                    return (
-                        <TableRow
-                            hover
-                            onClick={handleSelect(playerCharacter.id)}
-                            role="checkbox"
-                            aria-checked={isItemSelected}
-                            tabIndex={-1}
-                            key={playerCharacter.name}
-                            selected={isItemSelected}
-                        >
-                            <TableCell padding="checkbox">
-                                <Checkbox
-                                    checked={isItemSelected}
-                                    inputProps={{ 'aria-labelledby': labelId }}
-                                />
+                        {headCells.map((headCell) => (
+                            <TableCell
+                                key={headCell.label}
+                                align={headCell.numeric ? 'right' : 'left'}
+                                sortDirection={orderBy === headCell.sorting ? order : false}
+                            >
+                                <TableSortLabel
+                                    active={orderBy === headCell.sorting}
+                                    direction={orderBy === headCell.sorting ? order : 'asc'}
+                                    onClick={handleSorting(headCell.sorting)}
+                                >
+                                    {headCell.label}
+                                    {orderBy === headCell.sorting ? (
+                                        <span className={visuallyHidden}>
+                                            {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                        </span>
+                                    ) : null}
+                                </TableSortLabel>
                             </TableCell>
+                        ))}
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {playerCharacters.map((playerCharacter, index) => {
+                        const isItemSelected = isSelected(playerCharacter.id, selected);
+                        const labelId = `playerCharacter-table-checkbox-${index}`;
 
-                            <TableCell align="left">
-                                {playerCharacter.name}
-                            </TableCell>
+                        return (
+                            <TableRow
+                                hover
+                                onClick={handleSelect(playerCharacter.id)}
+                                role="checkbox"
+                                aria-checked={isItemSelected}
+                                tabIndex={-1}
+                                key={playerCharacter.name}
+                                selected={isItemSelected}
+                            >
+                                <TableCell padding="checkbox">
+                                    <Checkbox
+                                        checked={isItemSelected}
+                                        inputProps={{ 'aria-labelledby': labelId }}
+                                    />
+                                </TableCell>
 
-                            <TableCell align="right">
-                                {playerCharacter.adventure?.title
-                                    ?? `${playerCharacter.adventureCount} adventures`}
-                            </TableCell>
+                                <TableCell align="left">
+                                    {playerCharacter.name}
+                                </TableCell>
 
-                            <TableCell align="right">
-                                {playerCharacter.nonPlayerCharacter?.name
-                                    ?? `${playerCharacter.nonPlayerCharacterCount} NPCs`}
-                            </TableCell>
-                        </TableRow>
-                    );
-                })}
-            </TableBody>
-        </Table>
+                                <TableCell align="right">
+                                    {playerCharacter.adventure?.title
+                                        ?? `${playerCharacter.adventureCount} adventures`}
+                                </TableCell>
+
+                                <TableCell align="right">
+                                    {playerCharacter.nonPlayerCharacter?.name
+                                        ?? `${playerCharacter.nonPlayerCharacterCount} NPCs`}
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
+                </TableBody>
+            </Table>
+            <Box mt={2}>
+                <TablePagination
+                    component="div"
+                    rowsPerPage={15}
+                    rowsPerPageOptions={[]}
+                    count={pagination?.numberOfResults}
+                    page={page}
+                    onChangePage={handlePageChange}
+                />
+            </Box>
+        </>
     
     ) : <LinearProgress />; // Change for skeleton
 };
