@@ -5,10 +5,20 @@ import { PlayerCharacter } from '../interfaces';
 import { fetchPlayerCharacters } from '../requests';
 
 import { HeadCell } from '../../../shared/interfaces';
+import { isSelected } from '../../../shared/helpers';
 import { SortOrder } from '../../../shared/const';
 import { ApplicationState } from '../../../store';
 
-import { Table, TableHead, TableRow, TableCell, Checkbox, TableSortLabel, LinearProgress } from '@material-ui/core';
+import {
+    Table,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableCell,
+    Checkbox,
+    TableSortLabel,
+    LinearProgress
+} from '@material-ui/core';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
@@ -53,14 +63,14 @@ export const PlayerCharactersTable = (): ReactElement | null => {
 
     const handleSelectAll = (event: ChangeEvent<HTMLInputElement>): void => {
         if (event.target.checked) {
-            setSelected([]);
+            setSelected(
+                (playerCharacters ?? []).map((playerCharacter: PlayerCharacter) => playerCharacter.id)
+            );
 
             return;
         }
 
-        setSelected(
-            (playerCharacters ?? []).map((playerCharacter: PlayerCharacter) => playerCharacter.id)
-        );
+        setSelected([]);
     };
 
     const handleSorting = (newSortingParam: string) => (event: MouseEvent<unknown>): void => {
@@ -87,6 +97,7 @@ export const PlayerCharactersTable = (): ReactElement | null => {
                         <Checkbox
                             checked={selected.length === playerCharacters.length}
                             onChange={handleSelectAll}
+                            color="primary"
                         />
                     </TableCell>
                     {headCells.map((headCell) => (
@@ -111,6 +122,41 @@ export const PlayerCharactersTable = (): ReactElement | null => {
                     ))}
                 </TableRow>
             </TableHead>
+            <TableBody>
+                {playerCharacters.map((playerCharacter, index) => {
+                    const isItemSelected = isSelected(playerCharacter.id, selected);
+                    const labelId = `playerCharacter-table-checkbox-${index}`;
+
+                    return (
+                        <TableRow
+                            hover
+                            role="checkbox"
+                            aria-checked={isItemSelected}
+                            tabIndex={-1}
+                            key={playerCharacter.name}
+                            selected={isItemSelected}
+                        >
+                            <TableCell padding="checkbox">
+                                <Checkbox
+                                    checked={isItemSelected}
+                                    inputProps={{ 'aria-labelledby': labelId }}
+                                />
+                            </TableCell>
+                            <TableCell align="left">
+                                {playerCharacter.name}
+                            </TableCell>
+                            <TableCell align="right">
+                                {playerCharacter.adventure?.title
+                                    ?? `${playerCharacter.adventureCount} adventures`}
+                            </TableCell>
+                            <TableCell align="right">
+                                {playerCharacter.nonPlayerCharacter?.name
+                                    ?? `${playerCharacter.nonPlayerCharacterCount} NPCs`}
+                            </TableCell>
+                        </TableRow>
+                    );
+                })}
+            </TableBody>
         </Table>
     
     ) : <LinearProgress />; // Change for skeleton
