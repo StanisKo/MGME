@@ -60,7 +60,7 @@ export class DataController {
         const { success, message, ...onlyRelevantValues } = response;
 
         store.dispatch(
-            actionCreators.updateStore(
+            actionCreators.update(
                 {
                     type: 'UPDATE_STORE',
                     reducer: page,
@@ -126,7 +126,7 @@ export class DataController {
                 );
 
                 store.dispatch(
-                    actionCreators.updateStore(
+                    actionCreators.update(
                         {
                             type: 'UPDATE_STORE',
                             reducer: page,
@@ -150,7 +150,7 @@ export class DataController {
                 );
 
                 store.dispatch(
-                    actionCreators.updateStore(
+                    actionCreators.update(
                         {
                             type: 'UPDATE_STORE',
                             reducer: page,

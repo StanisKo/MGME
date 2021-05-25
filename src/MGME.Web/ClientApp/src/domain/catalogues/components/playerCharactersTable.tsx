@@ -176,6 +176,6 @@ export const PlayerCharactersTable = (): ReactElement | null => {
             </TableBody>
         </Table>
     
-    ) : <LinearProgress />; // Change for skeleton
+    ) : <LinearProgress />;
 };
 
