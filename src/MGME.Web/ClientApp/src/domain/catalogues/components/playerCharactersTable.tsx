@@ -1,5 +1,5 @@
 import { ReactElement, useState, useEffect, ChangeEvent, MouseEvent } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { PlayerCharacter } from '../interfaces';
 import { fetchPlayerCharacters } from '../requests';
@@ -7,7 +7,9 @@ import { fetchPlayerCharacters } from '../requests';
 import { HeadCell } from '../../../shared/interfaces';
 import { isSelected } from '../../../shared/helpers';
 import { SortOrder } from '../../../shared/const';
+
 import { ApplicationState } from '../../../store';
+import { actionCreators } from '../../../store/shared';
 
 import {
     Table,
@@ -48,6 +50,8 @@ const headCells: HeadCell[] = [
 ];
 
 export const PlayerCharactersTable = (): ReactElement | null => {
+    const dispatch = useDispatch();
+
     const playerCharacters: PlayerCharacter[] | null = useSelector(
         (state: ApplicationState) => state.catalogues?.playerCharacters?.data ?? null
     );
@@ -74,23 +78,50 @@ export const PlayerCharactersTable = (): ReactElement | null => {
     };
 
     const handleSelect = (selectedId: number) => (event: MouseEvent<unknown>): void => {
-        if (selected.includes(selectedId)) {
-            setSelected(
-                selected.filter((id: number) => id !== selectedId)
-            );
+        let newSelected: number[] = [];
 
-            return;
+        if (selected.includes(selectedId)) {
+            newSelected = selected.filter((id: number) => id !== selectedId);
+        }
+        else {
+            newSelected = [...selected, selectedId];
         }
 
-        setSelected(
-            [...selected, selectedId]
+        setSelected(newSelected);
+
+        dispatch(
+            actionCreators.updateStore(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'playerCharacters',
+                    payload: {
+                        selected: newSelected
+                    }
+                }
+            )
         );
     };
 
     const handleSorting = (newSortingParam: string) => (event: MouseEvent<unknown>): void => {
-        const isAsc = orderBy === newSortingParam && order === 'asc';
-        setOrder(isAsc ? 'desc' : 'asc');
+        const wasAscending = orderBy === newSortingParam && order === 'asc';
+
+        setOrder(wasAscending ? 'desc' : 'asc');
+
         setOrderBy(newSortingParam);
+
+        dispatch(
+            actionCreators.updateStore(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'playerCharacters',
+                    payload: {
+                        sorting: `${wasAscending ? '-' : ''}${newSortingParam}`
+                    }
+                }
+            )
+        );
     };
 
     useEffect(() => {

@@ -8,7 +8,9 @@ import { KnownAction } from '../shared';
 export interface CataloguesState {
     playerCharacters: {
         data: PlayerCharacter[],
-        pagination: Pagination
+        pagination: Pagination,
+        selected: number[],
+        sorting: string
     },
 }
 
@@ -29,8 +31,19 @@ export const CataloguesReducer: Reducer<CataloguesState> = (
         case 'UPDATE_STORE':
 
             return {
+
+                // Retain state of other features
                 ...state,
-                [key]: payload as unknown as CataloguesState
+
+                // Here we update relevant feature
+                [key]: {
+
+                    // Retain state of this feature
+                    ...state[key as keyof CataloguesState],
+
+                    // Here we add new things
+                    ...(payload as unknown as CataloguesState)
+                }
             };
 
         default:
