@@ -38,6 +38,10 @@ export class DataController {
     public static async FetchAndSave<TResult>(
         { page, key, url, params }: ReadFromApi
 
+    /*
+    We still might want to return the response for user-friendly error handling,
+    even though we don't anticipate any errors from GET endpoints: it's either there or not
+    */
     ): Promise<void | DataServiceResponse<TResult> | PaginatedDataServiceResponse<TResult>> {
 
         // Check if we got token, otherwise take it
@@ -51,6 +55,7 @@ export class DataController {
 
         const urlToRequest = params ? `${url}/?${qs.stringify(params)}` : url;
 
+        // This could've been typed with unknown, or even any, since the response object would rarely leave this scope
         const response = await request<DataServiceResponse<TResult> | PaginatedDataServiceResponse<TResult>>(
             {
                 url: urlToRequest,
@@ -90,11 +95,10 @@ export class DataController {
     @param body body of the request
     @param page page to refetch data for after request
     @param keys keys in the page under which data will be saved in store
-    */
-    public static async UpdateAndRefetch(
-        { url, method, body, page, keys }: WriteToApi
 
-    ): Promise<void | BaseServiceResponse> {
+    Here we always return response, successfull or not, to inform user what's happening
+    */
+    public static async UpdateAndRefetch({ url, method, body, page, keys }: WriteToApi): Promise<BaseServiceResponse> {
 
         if (!this._token) {
             this._token = store.getState().auth?.token;
