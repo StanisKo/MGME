@@ -8,7 +8,28 @@ import { HeadCell } from '../../../shared/interfaces';
 import { SortOrder } from '../../../shared/const';
 import { ApplicationState } from '../../../store';
 
-import { TableHead, TableRow, TableCell, Checkbox, TableSortLabel, LinearProgress } from '@material-ui/core';
+import { Table, TableHead, TableRow, TableCell, Checkbox, TableSortLabel, LinearProgress } from '@material-ui/core';
+
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        root: {
+            width: '100%'
+        },
+        visuallyHidden: {
+            border: 0,
+            clip: 'rect(0 0 0 0)',
+            height: 1,
+            margin: -1,
+            overflow: 'hidden',
+            padding: 0,
+            position: 'absolute',
+            top: 20,
+            width: 1
+        }
+    })
+);
 
 const headCells: HeadCell[] = [
     { label: 'Name', sorting: 'name', numeric: false },
@@ -26,16 +47,26 @@ export const PlayerCharactersTable = (): ReactElement | null => {
     );
 
     const [order, setOrder] = useState<SortOrder>('asc');
-    const [orderBy, setOrderBy] = useState<keyof PlayerCharacter>('name');
-    // const [selected, setSelected] = useState<number[]>([]);
+    const [orderBy, setOrderBy] = useState<string>('name');
+    const [selected, setSelected] = useState<number[]>([]);
     // const [page, setPage] = useState(0);
 
     const handleSelectAll = (event: ChangeEvent<HTMLInputElement>): void => {
+        if (event.target.checked) {
+            setSelected([]);
 
+            return;
+        }
+
+        setSelected(
+            (playerCharacters ?? []).map((playerCharacter: PlayerCharacter) => playerCharacter.id)
+        );
     };
 
-    const handleSorting = (event: MouseEvent<unknown>): void => {
-        
+    const handleSorting = (newSortingParam: string) => (event: MouseEvent<unknown>): void => {
+        const isAsc = orderBy === newSortingParam && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(newSortingParam);
     };
 
     useEffect(() => {
@@ -46,37 +77,41 @@ export const PlayerCharactersTable = (): ReactElement | null => {
         })();
     }, [isAuthorized, playerCharacters]);
 
+    const { root, visuallyHidden } = useStyles();
+
     return playerCharacters !== null ? (
-        <TableHead>
-            <TableRow>
-                <TableCell padding="checkbox">
-                    <Checkbox
-                        checked={}
-                        onChange={handleSelectAll}
-                    />
-                </TableCell>
-                {headCells.map((headCell) => (
-                    <TableCell
-                        key={headCell.label}
-                        align={headCell.numeric ? 'right' : 'left'}
-                        sortDirection={orderBy === headCell.sorting ? order : false}
-                    >
-                        <TableSortLabel
-                            active={orderBy === headCell.sorting}
-                            direction={orderBy === headCell.sorting ? order : 'asc'}
-                            onClick={handleSorting}
-                        >
-                            {headCell.label}
-                            {orderBy === headCell.sorting ? (
-                                <span className={visuallyHidden}>
-                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                </span>
-                            ) : null}
-                        </TableSortLabel>
+        <Table className={root}>
+            <TableHead>
+                <TableRow>
+                    <TableCell padding="checkbox">
+                        <Checkbox
+                            checked={selected.length === playerCharacters.length}
+                            onChange={handleSelectAll}
+                        />
                     </TableCell>
-                ))}
-            </TableRow>
-        </TableHead>
+                    {headCells.map((headCell) => (
+                        <TableCell
+                            key={headCell.label}
+                            align={headCell.numeric ? 'right' : 'left'}
+                            sortDirection={orderBy === headCell.sorting ? order : false}
+                        >
+                            <TableSortLabel
+                                active={orderBy === headCell.sorting}
+                                direction={orderBy === headCell.sorting ? order : 'asc'}
+                                onClick={handleSorting(headCell.sorting)}
+                            >
+                                {headCell.label}
+                                {orderBy === headCell.sorting ? (
+                                    <span className={visuallyHidden}>
+                                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                    </span>
+                                ) : null}
+                            </TableSortLabel>
+                        </TableCell>
+                    ))}
+                </TableRow>
+            </TableHead>
+        </Table>
     
     ) : <LinearProgress />; // Change for skeleton
 };
