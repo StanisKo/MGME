@@ -1,4 +1,7 @@
 import { ReactElement, useState, ChangeEvent } from 'react';
+import { useSelector } from 'react-redux';
+
+import { ApplicationState } from '../../store';
 
 import { PlayerCharactersTable } from './components/playerCharactersTable';
 
@@ -30,12 +33,23 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
+enum SELECTED_MENU {
+    PLAYER_CHARACTERS = 0,
+    NON_PLAYER_CHARACTERS = 1
+}
+
 export const Catalogues = (): ReactElement => {
-    const [selectedMenu, setSelectedMenu] = useState<number>(0);
+    const selectedEntities = useSelector(
+        (store: ApplicationState) => store.catalogues?.playerCharacters?.selected ?? []
+    );
+
+    const [selectedMenu, setSelectedMenu] = useState<number>(SELECTED_MENU.PLAYER_CHARACTERS);
 
     const handleChange = (event: ChangeEvent<{ value: unknown }>): void => {
         setSelectedMenu(event.target.value as number);
     };
+
+    const nothingSelected = selectedEntities.length === 0;
 
     const { centered, formControl, buttons, deleteButton } = useStyles();
 
@@ -60,6 +74,7 @@ export const Catalogues = (): ReactElement => {
                             variant="outlined"
                             color="primary"
                             size="medium"
+                            disabled={nothingSelected || selectedMenu === SELECTED_MENU.NON_PLAYER_CHARACTERS}
                         >
                             Add to Adventure
                         </Button>
@@ -67,6 +82,7 @@ export const Catalogues = (): ReactElement => {
                             variant="outlined"
                             color="primary"
                             size="medium"
+                            disabled={nothingSelected || selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS}
                         >
                             Add to Character
                         </Button>
@@ -74,6 +90,7 @@ export const Catalogues = (): ReactElement => {
                             variant="outlined"
                             color="primary"
                             size="medium"
+                            disabled={nothingSelected}
                         >
                             Create
                         </Button>
@@ -81,6 +98,7 @@ export const Catalogues = (): ReactElement => {
                             variant="outlined"
                             color="primary"
                             size="medium"
+                            disabled={nothingSelected}
                             className={deleteButton}
                         >
                             Remove
@@ -88,7 +106,7 @@ export const Catalogues = (): ReactElement => {
                     </Grid>
 
                     <Grid item xs={12}>
-                        {selectedMenu === 0 && <PlayerCharactersTable />}
+                        {selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS && <PlayerCharactersTable />}
                     </Grid>
                 </Grid>
             </Paper>

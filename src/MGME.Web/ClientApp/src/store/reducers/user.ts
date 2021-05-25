@@ -14,7 +14,7 @@ export const UserReducer: Reducer<UserState> = (state: UserState | undefined, in
         return {} as UserState;
     }
 
-    const { type, reducer, key, payload } = incomingAction as KnownAction;
+    const { type, reducer, payload } = incomingAction as KnownAction;
 
     if (reducer !== 'user') {
         return state;
@@ -24,8 +24,8 @@ export const UserReducer: Reducer<UserState> = (state: UserState | undefined, in
         case 'UPDATE_STORE':
 
             return {
-                ...state,
-                [key]: { ...payload as unknown as UserState }
+                // We only need to update 1 key/value that is already inside payload...
+                ...(payload as unknown as UserState)
             };
 
         default:
