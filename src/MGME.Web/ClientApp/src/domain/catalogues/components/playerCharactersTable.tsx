@@ -73,6 +73,20 @@ export const PlayerCharactersTable = (): ReactElement | null => {
         setSelected([]);
     };
 
+    const handleSelect = (selectedId: number) => (event: MouseEvent<unknown>): void => {
+        if (selected.includes(selectedId)) {
+            setSelected(
+                selected.filter((id: number) => id !== selectedId)
+            );
+
+            return;
+        }
+
+        setSelected(
+            [...selected, selectedId]
+        );
+    };
+
     const handleSorting = (newSortingParam: string) => (event: MouseEvent<unknown>): void => {
         const isAsc = orderBy === newSortingParam && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -97,7 +111,6 @@ export const PlayerCharactersTable = (): ReactElement | null => {
                         <Checkbox
                             checked={selected.length === playerCharacters.length}
                             onChange={handleSelectAll}
-                            color="primary"
                         />
                     </TableCell>
                     {headCells.map((headCell) => (
@@ -130,6 +143,7 @@ export const PlayerCharactersTable = (): ReactElement | null => {
                     return (
                         <TableRow
                             hover
+                            onClick={handleSelect(playerCharacter.id)}
                             role="checkbox"
                             aria-checked={isItemSelected}
                             tabIndex={-1}
@@ -142,13 +156,16 @@ export const PlayerCharactersTable = (): ReactElement | null => {
                                     inputProps={{ 'aria-labelledby': labelId }}
                                 />
                             </TableCell>
+
                             <TableCell align="left">
                                 {playerCharacter.name}
                             </TableCell>
+
                             <TableCell align="right">
                                 {playerCharacter.adventure?.title
                                     ?? `${playerCharacter.adventureCount} adventures`}
                             </TableCell>
+
                             <TableCell align="right">
                                 {playerCharacter.nonPlayerCharacter?.name
                                     ?? `${playerCharacter.nonPlayerCharacterCount} NPCs`}
