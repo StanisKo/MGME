@@ -171,6 +171,7 @@ export const PlayerCharactersTable = (): ReactElement | null => {
                         <TableCell padding="checkbox">
                             <Checkbox
                                 checked={selected.length === playerCharacters.length}
+                                indeterminate={selected.length > 0 && selected.length < playerCharacters.length}
                                 onChange={handleSelectAll}
                             />
                         </TableCell>
@@ -184,6 +185,7 @@ export const PlayerCharactersTable = (): ReactElement | null => {
                                     active={orderBy === headCell.sorting}
                                     direction={orderBy === headCell.sorting ? order : 'asc'}
                                     onClick={handleSorting(headCell.sorting)}
+                                    style={{ fontWeight: 'bold' }}
                                 >
                                     {headCell.label}
                                     {orderBy === headCell.sorting ? (
@@ -248,6 +250,6 @@ export const PlayerCharactersTable = (): ReactElement | null => {
             </Box>
         </>
     
-    ) : <LinearProgress />; // Change for skeleton
+    ) : <LinearProgress />;
 };
 
