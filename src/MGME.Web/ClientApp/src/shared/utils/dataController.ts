@@ -1,4 +1,10 @@
-import { BaseServiceResponse, DataServiceResponse, ReadFromApi, WriteToApi } from '../interfaces';
+import {
+    BaseServiceResponse,
+    DataServiceResponse,
+    PaginatedDataServiceResponse,
+    ReadFromApi,
+    WriteToApi
+} from '../interfaces';
 
 import { request } from './request';
 
@@ -45,7 +51,7 @@ export class DataController {
 
         const urlToRequest = params ? `${url}/?${qs.stringify(params)}` : url;
 
-        const response = await request<DataServiceResponse<TResult>>(
+        const response = await request<DataServiceResponse<TResult> | PaginatedDataServiceResponse<TResult>>(
             {
                 url: urlToRequest,
                 method: 'GET',
@@ -117,7 +123,7 @@ export class DataController {
                 We type data service response with unknown, since we don't know in advance which endpoints
                 We would like to refetch after update
                 */
-                const response = await request<DataServiceResponse<unknown>>(
+                const response = await request<DataServiceResponse<unknown> | PaginatedDataServiceResponse<unknown>>(
                     {
                         url: this._urlsToRefetch[page][key],
                         method: 'GET',
@@ -125,13 +131,15 @@ export class DataController {
                     }
                 );
 
+                const { success, message, ...onlyRelevantValues } = response;
+
                 store.dispatch(
                     actionCreators.updateStore(
                         {
                             type: 'UPDATE_STORE',
                             reducer: page,
                             key: key,
-                            payload: { data: response.data }
+                            payload: onlyRelevantValues
                         }
                     )
                 );
@@ -141,7 +149,7 @@ export class DataController {
             const urls = Object.keys(this._urlsToRefetch[page]);
 
             for (const key of urls) {
-                const response = await request<DataServiceResponse<unknown>>(
+                const response = await request<DataServiceResponse<unknown> | PaginatedDataServiceResponse<unknown>>(
                     {
                         url: this._urlsToRefetch[page][key],
                         method: 'GET',
@@ -149,13 +157,15 @@ export class DataController {
                     }
                 );
 
+                const { success, message, ...onlyRelevantValues } = response;
+
                 store.dispatch(
                     actionCreators.updateStore(
                         {
                             type: 'UPDATE_STORE',
                             reducer: page,
                             key: key,
-                            payload: { data: response.data }
+                            payload: onlyRelevantValues
                         }
                     )
                 );

@@ -1,9 +1,8 @@
-export interface RequestConfig {
-    url: string;
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE';
-    headers: { [key: string]: string } | null;
-    body?: { [key: string]: unknown } | null;
+export interface BaseEntity {
+    id: number;
 }
+
+/*    ****    */
 
 export interface BaseServiceResponse {
     success: boolean;
@@ -14,20 +13,23 @@ export interface DataServiceResponse<TResult> extends BaseServiceResponse {
     data: TResult;
 }
 
-export interface BaseEntity {
-    id: number;
+export interface PaginatedDataServiceResponse<TResult> extends DataServiceResponse<TResult> {
+    pagination: Pagination;
 }
 
-export interface DecodedToken {
-    nameid: number;
-    unique_name: string;
-    role: string;
-    iat: number;
-    exp: number;
+export interface Pagination {
+    page: number;
+    numberOfPages: number;
+    numberOfResults: number;
 }
 
-export interface UserTokenResponse {
-    accessToken: string;
+/*    ****    */
+
+export interface RequestConfig {
+    url: string;
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+    headers: { [key: string]: string } | null;
+    body?: { [key: string]: unknown } | null;
 }
 
 export interface ReadFromApi {
@@ -45,14 +47,24 @@ export interface WriteToApi {
     keys: string[] | null;
 }
 
+/*    ****    */
+
+export interface DecodedToken {
+    nameid: number;
+    unique_name: string;
+    role: string;
+    iat: number;
+    exp: number;
+}
+
+export interface UserTokenResponse {
+    accessToken: string;
+}
+
+/*    ****    */
+
 export interface HeadCell {
     label: string;
     sorting: string;
     numeric: boolean;
-}
-
-export interface Pagination {
-    page: number;
-    numberOfPages: number;
-    numberOfResults: number;
 }
