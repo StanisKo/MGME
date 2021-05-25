@@ -1,21 +1,20 @@
-import { ReactElement, useEffect } from 'react';
+import { ReactElement, useState, useEffect, ChangeEvent, MouseEvent } from 'react';
 import { useSelector } from 'react-redux';
 
 import { PlayerCharacter } from '../interfaces';
 import { fetchPlayerCharacters } from '../requests';
 
-// import { HeadCell } from '../../../shared/interfaces';
-
+import { HeadCell } from '../../../shared/interfaces';
+import { SortOrder } from '../../../shared/const';
 import { ApplicationState } from '../../../store';
 
-import { LinearProgress } from '@material-ui/core';
+import { TableHead, TableRow, TableCell, Checkbox, TableSortLabel, LinearProgress } from '@material-ui/core';
 
-// Change the response to Adventure if 1 or count of them; same for npcs
-// const headCells: HeadCell[] = [
-//     { label: 'Name', sorting: 'name', numeric: false },
-//     { label: 'Adventure Count', sorting: 'adventure', numeric: true },
-//     { label: 'NPC Count', sorting: 'npc', numeric: true }
-// ];
+const headCells: HeadCell[] = [
+    { label: 'Name', sorting: 'name', numeric: false },
+    { label: 'Adventure', sorting: 'adventure', numeric: true },
+    { label: 'NPC', sorting: 'npc', numeric: true }
+];
 
 export const PlayerCharactersTable = (): ReactElement | null => {
     const playerCharacters: PlayerCharacter[] | null = useSelector(
@@ -26,6 +25,19 @@ export const PlayerCharactersTable = (): ReactElement | null => {
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
     );
 
+    const [order, setOrder] = useState<SortOrder>('asc');
+    const [orderBy, setOrderBy] = useState<keyof PlayerCharacter>('name');
+    // const [selected, setSelected] = useState<number[]>([]);
+    // const [page, setPage] = useState(0);
+
+    const handleSelectAll = (event: ChangeEvent<HTMLInputElement>): void => {
+
+    };
+
+    const handleSorting = (event: MouseEvent<unknown>): void => {
+        
+    };
+
     useEffect(() => {
         (async (): Promise<void> => {
             if (isAuthorized && playerCharacters === null) {
@@ -35,7 +47,37 @@ export const PlayerCharactersTable = (): ReactElement | null => {
     }, [isAuthorized, playerCharacters]);
 
     return playerCharacters !== null ? (
-        <div>{playerCharacters?.length} characters</div>
+        <TableHead>
+            <TableRow>
+                <TableCell padding="checkbox">
+                    <Checkbox
+                        checked={}
+                        onChange={handleSelectAll}
+                    />
+                </TableCell>
+                {headCells.map((headCell) => (
+                    <TableCell
+                        key={headCell.label}
+                        align={headCell.numeric ? 'right' : 'left'}
+                        sortDirection={orderBy === headCell.sorting ? order : false}
+                    >
+                        <TableSortLabel
+                            active={orderBy === headCell.sorting}
+                            direction={orderBy === headCell.sorting ? order : 'asc'}
+                            onClick={handleSorting}
+                        >
+                            {headCell.label}
+                            {orderBy === headCell.sorting ? (
+                                <span className={visuallyHidden}>
+                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                </span>
+                            ) : null}
+                        </TableSortLabel>
+                    </TableCell>
+                ))}
+            </TableRow>
+        </TableHead>
+    
     ) : <LinearProgress />; // Change for skeleton
 };
 
