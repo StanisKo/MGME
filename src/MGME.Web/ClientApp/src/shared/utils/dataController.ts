@@ -24,8 +24,6 @@ export class DataController {
     */
     private static _urlsToRefetch: { [key: string]: { [key: string]: string } } = {};
 
-    private static _token: string;
-
     /**
     Reads data from API, updates the Redux store with new values, saves requested URLs for future refetch
     If request does not need parameters, please provide null
@@ -44,10 +42,11 @@ export class DataController {
     */
     ): Promise<void | DataServiceResponse<TResult> | PaginatedDataServiceResponse<TResult>> {
 
-        // Check if we got token, otherwise take it
-        if (!this._token) {
-            this._token = store.getState().auth?.token;
-        }
+        /*
+        Grab token for every request,
+        since this class doesn't know when token is updated (it is outside of Provider)
+        */
+        const token = store.getState().auth?.token;
 
         if (params && Object.keys(params).length === 0) {
             throw new Error('Parameters object cannot be empty. If you don\'t need params, provide null');
@@ -60,7 +59,7 @@ export class DataController {
             {
                 url: urlToRequest,
                 method: 'GET',
-                headers: { 'Authorization': `Bearer ${this._token}` }
+                headers: { 'Authorization': `Bearer ${token}` }
             }
         );
 
@@ -100,9 +99,7 @@ export class DataController {
     */
     public static async UpdateAndRefetch({ url, method, body, page, keys }: WriteToApi): Promise<BaseServiceResponse> {
 
-        if (!this._token) {
-            this._token = store.getState().auth?.token;
-        }
+        const token = store.getState().auth?.token;
 
         if (keys && keys.length === 0) {
             throw new Error('Keys array cannot be empty');
@@ -113,7 +110,7 @@ export class DataController {
                 url: url,
                 method: method,
                 body: body,
-                headers: { 'Authorization': `Bearer ${this._token}` }
+                headers: { 'Authorization': `Bearer ${token}` }
             }
         );
 
@@ -131,7 +128,7 @@ export class DataController {
                     {
                         url: this._urlsToRefetch[page][key],
                         method: 'GET',
-                        headers: { 'Authorization': `Bearer ${this._token}` }
+                        headers: { 'Authorization': `Bearer ${token}` }
                     }
                 );
 
@@ -157,7 +154,7 @@ export class DataController {
                     {
                         url: this._urlsToRefetch[page][key],
                         method: 'GET',
-                        headers: { 'Authorization': `Bearer ${this._token}` }
+                        headers: { 'Authorization': `Bearer ${token}` }
                     }
                 );
 

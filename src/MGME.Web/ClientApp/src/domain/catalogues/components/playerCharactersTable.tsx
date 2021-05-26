@@ -149,7 +149,7 @@ export const PlayerCharactersTable = (): ReactElement | null => {
         })();
     }, [isAuthorized, playerCharacters]);
 
-    // Request with changed params
+    // Request with params
     useEffect(() => {
         (async (): Promise<void> => {
             if (isAuthorized) {
