@@ -52,7 +52,7 @@ namespace MGME.Core.Interfaces.Repositories
         // Update many-to-one relationship between entities and another entity via linkingProperty
         Task LinkEntitiesAsync(IEnumerable<TEntity> entities, string linkingProperty);
 
-        // Update many-to-many relationship between entities and linkedEntity
+        // Update many-to-many relationship between entities and linkedEntity via linkedCollection
         Task LinkEntitiesAsync(IEnumerable<TEntity> entities, BaseEntity linkedEntity, string linkingCollection);
 
 
@@ -61,7 +61,7 @@ namespace MGME.Core.Interfaces.Repositories
 
         // Delete a collection of entities by their ids (avoiding pre-quering them)
         Task DeleteEntitiesAsync(IEnumerable<int> ids);
-        
+
 
         // Count number of entities in db
         Task <int> GetEntitiesCount();
