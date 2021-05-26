@@ -318,7 +318,7 @@ namespace MGME.Core.Services.PlayerCharacterService
             return response;
         }
 
-        public async Task <BaseServiceResponse> DeletePlayerCharacter(int id)
+        public async Task <BaseServiceResponse> DeletePlayerCharacters(IEnumerable<int> ids)
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
@@ -326,28 +326,19 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             try
             {
-                PlayerCharacter playerCharacterToDelete = await _playerCharacterRepository.GetEntityAsync(
-                    id: id,
-                    predicate: playerCharacter => playerCharacter.UserId == userId
-                );
-
-                if (playerCharacterToDelete == null)
-                {
-                    response.Success = false;
-                    response.Message = "Character doesn't exist";
-
-                    return response;
-                }
-
-                await _playerCharacterRepository.DeleteEntityAsync(playerCharacterToDelete);
+                await _playerCharacterRepository.DeleteEntitiesAsync(ids);
 
                 response.Success = true;
                 response.Message = "Character was successfully deleted";
             }
-            catch (Exception exception)
+            // catch (Exception exception)
+            // {
+            //     response.Success = false;
+            //     response.Message = exception.Message;
+            // }
+            finally
             {
-                response.Success = false;
-                response.Message = exception.Message;
+                
             }
 
             return response;

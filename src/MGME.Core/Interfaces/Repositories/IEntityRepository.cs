@@ -9,7 +9,7 @@ using MGME.Core.Constants;
 
 namespace MGME.Core.Interfaces.Repositories
 {
-    public interface IEntityRepository<TEntity> where TEntity: BaseEntity
+    public interface IEntityRepository<TEntity> where TEntity: BaseEntity, new()
     {
         Task <TEntity> GetEntityAsync(
             int? id = null,
@@ -56,6 +56,8 @@ namespace MGME.Core.Interfaces.Repositories
         Task DeleteEntityAsync(TEntity entity);
 
         Task DeleteEntitiesAsync(List<TEntity> entities);
+
+        Task DeleteEntitiesAsync(IEnumerable<int> ids);
 
         Task <int> GetEntitiesCount();
     }

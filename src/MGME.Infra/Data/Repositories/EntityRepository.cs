@@ -14,7 +14,7 @@ using MGME.Core.Interfaces.Repositories;
 
 namespace MGME.Infra.Data.Repositories
 {
-    public class EntityRepository<TEntity> : IEntityRepository<TEntity> where TEntity: BaseEntity
+    public class EntityRepository<TEntity> : IEntityRepository<TEntity> where TEntity: BaseEntity, new()
     {
         private readonly ApplicationDbContext _database;
 
@@ -266,6 +266,21 @@ namespace MGME.Infra.Data.Repositories
 
         public async Task DeleteEntitiesAsync(List<TEntity> entities)
         {
+            _database.Set<TEntity>().RemoveRange(entities);
+
+            await _database.SaveChangesAsync();
+        }
+
+        public async Task DeleteEntitiesAsync(IEnumerable<int> ids)
+        {
+            /*
+            We create a list of anonymous types to remove
+            in order to avoid querying for objects we want to remove
+            */
+            IEnumerable<TEntity> entities = ids.Select(id => new TEntity { Id = id });
+
+            Console.WriteLine(entities.First() == null);
+
             _database.Set<TEntity>().RemoveRange(entities);
 
             await _database.SaveChangesAsync();

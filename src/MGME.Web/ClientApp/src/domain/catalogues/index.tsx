@@ -5,6 +5,8 @@ import { ApplicationState } from '../../store';
 
 import { PlayerCharactersTable } from '../playerCharacter/components/playerCharactersTable';
 
+import { deletePlayerCharacters } from '../playerCharacter/requests';
+
 import { Paper, Grid, FormControl, Select, MenuItem, Button, Theme } from '@material-ui/core';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
@@ -47,6 +49,10 @@ export const Catalogues = (): ReactElement => {
 
     const handleChange = (event: ChangeEvent<{ value: unknown }>): void => {
         setSelectedMenu(event.target.value as number);
+    };
+
+    const handleDelete = async (): Promise<void> => {
+        await deletePlayerCharacters(selectedEntities);
     };
 
     const nothingSelected = selectedEntities.length === 0;
@@ -99,6 +105,7 @@ export const Catalogues = (): ReactElement => {
                             size="medium"
                             disabled={nothingSelected}
                             className={deleteButton}
+                            onClick={handleDelete}
                         >
                             Remove
                         </Button>
