@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 
 import { ApplicationState } from '../../store';
 
-import { PlayerCharactersTable } from './components/playerCharactersTable';
+import { PlayerCharactersTable } from '../playerCharacter/components/playerCharactersTable';
 
 import { Paper, Grid, FormControl, Select, MenuItem, Button, Theme } from '@material-ui/core';
 
