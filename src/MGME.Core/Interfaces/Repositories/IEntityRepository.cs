@@ -43,19 +43,19 @@ namespace MGME.Core.Interfaces.Repositories
 
         Task AddEntityAsync(TEntity entity);
 
-        Task AddEntitiesAsync(List<TEntity> entities);
+        Task AddEntitiesAsync(IEnumerable<TEntity> entities);
 
         // Updates only specified fields
         Task UpdateEntityAsync(TEntity entity, IEnumerable<string> updatedProperties);
 
-        Task UpdateEntitiesAsync(List<TEntity> entities, IEnumerable<string> updatedProperties);
+        Task UpdateEntitiesAsync(IEnumerable<TEntity> entities, IEnumerable<string> updatedProperties);
 
         // Used to update many-to-many relationship between entity and linkedEntity
         Task LinkEntityAsync(TEntity entity, BaseEntity linkedEntity, string linkedCollection);
 
         Task DeleteEntityAsync(TEntity entity);
 
-        Task DeleteEntitiesAsync(List<TEntity> entities);
+        Task DeleteEntitiesAsync(IEnumerable<TEntity> entities);
 
         Task DeleteEntitiesAsync(IEnumerable<int> ids);
 
