@@ -97,40 +97,13 @@ namespace MGME.Core.Services.UserService
                     return response;
                 }
 
-                /*
-                Here we use reflections, to loop through updated properties
-                and assign their values to the object queried from the database
-
-                If the property is missing from request
-                (we know that since possible fields are nullable and after serialization will be null)
-                we simply skip the update, effectively updating only provided fields
-                */
-                Type typeOfUser = userToUpdate.GetType();
-
-                PropertyInfo[] updatedProperties = updatedUser.GetType().GetProperties();
-
-                // Is used later to let context know which properties to update
-                List<string> propertiesToUpdate = new List<string>();
-
-                foreach (PropertyInfo updatedProperty in updatedProperties)
-                {
-                    if (updatedProperty.GetValue(updatedUser) == null || updatedProperty.Name == "Id")
-                    {
-                        continue;
-                    }
-
-                    PropertyInfo propertyToUpdate = typeOfUser.GetProperty(updatedProperty.Name);
-
-                    propertyToUpdate.SetValue(
-                        userToUpdate,
-                        updatedProperty.GetValue(updatedUser)
-                    );
-
-                    propertiesToUpdate.Add(updatedProperty.Name);
-                }
+                (GetOrUpdateUserDTO userWithUpdates, List<string> propertiesToUpdate) = UpdateVariableNumberOfFields<GetOrUpdateUserDTO>(
+                    userToUpdate,
+                    updatedUser
+                );
 
                 await _repository.UpdateEntityAsync(
-                    _mapper.Map<User>(userToUpdate),
+                    _mapper.Map<User>(userWithUpdates),
                     propertiesToUpdate
                 );
 
