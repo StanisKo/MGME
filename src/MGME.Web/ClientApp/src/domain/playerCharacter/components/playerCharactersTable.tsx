@@ -54,6 +54,10 @@ const headCells: HeadCell[] = [
 export const PlayerCharactersTable = (): ReactElement | null => {
     const dispatch = useDispatch();
 
+    const isAuthorized: boolean = useSelector(
+        (store: ApplicationState) => Boolean(store.auth?.token) ?? false
+    );
+
     const playerCharacters: PlayerCharacter[] | null = useSelector(
         (state: ApplicationState) => state.catalogues?.playerCharacters?.data ?? null
     );
@@ -62,14 +66,10 @@ export const PlayerCharactersTable = (): ReactElement | null => {
         (state: ApplicationState) => state.catalogues?.playerCharacters?.pagination ?? null
     );
 
-    const isAuthorized: boolean = useSelector(
-        (store: ApplicationState) => Boolean(store.auth?.token) ?? false
-    );
-
+    const [page, setPage] = useState(0);
     const [order, setOrder] = useState<SortOrder>('asc');
     const [orderBy, setOrderBy] = useState<string>('name');
     const [selected, setSelected] = useState<number[]>([]);
-    const [page, setPage] = useState(0);
 
     /*
     We dispatch values to store in separate handlers and not on hook, to avoid unnecessary
@@ -161,6 +161,27 @@ export const PlayerCharactersTable = (): ReactElement | null => {
         })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page, order, orderBy]);
+
+    // Default current state every time new dataset comes in, keep it simple
+    useEffect(() => {
+        if (playerCharacters && selected.length > 0) {
+            setSelected([]);
+
+            dispatch(
+                actionCreators.updateStore(
+                    {
+                        type: 'UPDATE_STORE',
+                        reducer: 'catalogues',
+                        key: 'playerCharacters',
+                        payload: {
+                            selected: []
+                        }
+                    }
+                )
+            );
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [playerCharacters]);
 
     const { root, visuallyHidden } = useStyles();
 

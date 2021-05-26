@@ -1,5 +1,5 @@
 import { ReactElement, useState, ChangeEvent } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { ApplicationState } from '../../store';
 
@@ -10,6 +10,7 @@ import { deletePlayerCharacters } from '../playerCharacter/requests';
 import { Paper, Grid, FormControl, Select, MenuItem, Button, Theme } from '@material-ui/core';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
+import { actionCreators } from '../../store/shared';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -41,6 +42,8 @@ enum SELECTED_MENU {
 }
 
 export const Catalogues = (): ReactElement => {
+    const dispatch = useDispatch();
+
     const selectedEntities = useSelector(
         (store: ApplicationState) => store.catalogues?.playerCharacters?.selected ?? []
     );
@@ -53,6 +56,19 @@ export const Catalogues = (): ReactElement => {
 
     const handleDelete = async (): Promise<void> => {
         await deletePlayerCharacters(selectedEntities);
+
+        dispatch(
+            actionCreators.updateStore(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'playerCharacters',
+                    payload: {
+                        selected: []
+                    }
+                }
+            )
+        );
     };
 
     const nothingSelected = selectedEntities.length === 0;
