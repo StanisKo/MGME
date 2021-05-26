@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
@@ -139,11 +138,11 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             bool thereAreNewNonPlayerCharactersToAdd =
                 newPlayerCharacter.NewNonPlayerCharacters != null
-                && newPlayerCharacter.NewNonPlayerCharacters.Any();
+                    && newPlayerCharacter.NewNonPlayerCharacters.Any();
 
             bool thereAreExisitingNonPlayerCharactersToAdd =
                 newPlayerCharacter.ExistingNonPlayerCharacters != null
-                && newPlayerCharacter.ExistingNonPlayerCharacters.Any();
+                    && newPlayerCharacter.ExistingNonPlayerCharacters.Any();
 
             if (!thereAreNewNonPlayerCharactersToAdd && !thereAreExisitingNonPlayerCharactersToAdd)
             {
@@ -179,9 +178,9 @@ namespace MGME.Core.Services.PlayerCharacterService
                 {
                     Expression<Func<NonPlayerCharacter, bool>> predicate =
                         nonPlayerCharacter => nonPlayerCharacter.UserId == userId
-                        && nonPlayerCharacter.Adventures.Count == 0
-                        && nonPlayerCharacter.PlayerCharacterId == null
-                        && newPlayerCharacter.ExistingNonPlayerCharacters.Contains(nonPlayerCharacter.Id);
+                            && nonPlayerCharacter.Adventures.Count == 0
+                                && nonPlayerCharacter.PlayerCharacterId == null
+                                    && newPlayerCharacter.ExistingNonPlayerCharacters.Contains(nonPlayerCharacter.Id);
 
                     nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
                         predicate: predicate
@@ -203,16 +202,16 @@ namespace MGME.Core.Services.PlayerCharacterService
                 // Map DTOs to data models
                 List<Thread> threadsToAdd = newPlayerCharacter.Threads
                     .Select(thread => _mapper.Map<Thread>(thread))
-                    .ToList();
+                        .ToList();
 
                 // Link both collections of Threads and NPCs to current user
                 threadsToAdd = threadsToAdd
                     .Select(thread => { thread.UserId = userId; return thread; })
-                    .ToList();
+                        .ToList();
 
                 nonPlayerCharactersToAdd = nonPlayerCharactersToAdd
                     .Select(nonPlayerCharacter => { nonPlayerCharacter.UserId = userId; return nonPlayerCharacter; })
-                    .ToList();
+                        .ToList();
 
                 // Finally create and write character to db
                 PlayerCharacter characterToAdd = new PlayerCharacter()
