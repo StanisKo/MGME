@@ -1,6 +1,6 @@
 import { Action, Reducer } from 'redux';
 
-import { PlayerCharacter } from '../../domain/catalogues/interfaces';
+import { PlayerCharacter } from '../../domain/playerCharacter/interfaces';
 import { Pagination } from '../../shared/interfaces';
 
 import { KnownAction } from '../shared';
