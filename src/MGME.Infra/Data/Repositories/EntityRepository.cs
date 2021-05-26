@@ -52,9 +52,9 @@ namespace MGME.Infra.Data.Repositories
             // If we query on primary key and also want to filter
             if (predicate != null && id != null)
             {
-                query = query.Where(predicate);
-
-                return await query.SingleOrDefaultAsync(entity => entity.Id == id);
+                return await query
+                    .Where(predicate)
+                        .SingleOrDefaultAsync(entity => entity.Id == id);
             }
 
             // If we query only on filter avoiding primary key
@@ -85,15 +85,18 @@ namespace MGME.Infra.Data.Repositories
             // If we query only on primary key
             if (predicate == null && id != null)
             {
-                return await query.Select(select).SingleOrDefaultAsync(entity => entity.Id == id);
+                return await query
+                    .Select(select)
+                        .SingleOrDefaultAsync(entity => entity.Id == id);
             }
 
             // If we query on primary key and also want to filter
             if (predicate != null && id != null)
             {
-                query = query.Where(predicate);
-
-                return await query.Select(select).SingleOrDefaultAsync(entity => entity.Id == id);
+                return await query
+                    .Where(predicate)
+                        .Select(select)
+                            .SingleOrDefaultAsync(entity => entity.Id == id);
             }
 
             // If we query only on filter avoiding primary key
@@ -132,19 +135,21 @@ namespace MGME.Infra.Data.Repositories
 
                 query = order == SortOrder.ASCENDING
                     ? query.OrderBy(fields.First())
-                    : query.OrderByDescending(fields.First());
+                        : query.OrderByDescending(fields.First());
 
                 for (int i = 0; i < fields.Skip(1).Count(); i++)
                 {
                     query = order == (int)SortOrder.ASCENDING
                         ? (query as IOrderedQueryable<TEntity>).ThenBy(fields.ElementAt(i))
-                        : (query as IOrderedQueryable<TEntity>).ThenByDescending(fields.ElementAt(i));
+                            : (query as IOrderedQueryable<TEntity>).ThenByDescending(fields.ElementAt(i));
                 }
             }
 
             if (page != null)
             {
-                query = query.Skip(((int)page - 1) * DataAccessHelpers.PAGINATE_BY).Take(DataAccessHelpers.PAGINATE_BY);
+                query = query
+                    .Skip(((int)page - 1) * DataAccessHelpers.PAGINATE_BY)
+                        .Take(DataAccessHelpers.PAGINATE_BY);
             }
 
             return await query.ToListAsync();
@@ -183,19 +188,21 @@ namespace MGME.Infra.Data.Repositories
 
                 query = order == SortOrder.ASCENDING
                     ? query.OrderBy(fields.First())
-                    : query.OrderByDescending(fields.First());
+                        : query.OrderByDescending(fields.First());
 
                 for (int i = 0; i < fields.Skip(1).Count(); i++)
                 {
                     query = order == (int)SortOrder.ASCENDING
                         ? (query as IOrderedQueryable<TEntity>).ThenBy(fields.ElementAt(i))
-                        : (query as IOrderedQueryable<TEntity>).ThenByDescending(fields.ElementAt(i));
+                            : (query as IOrderedQueryable<TEntity>).ThenByDescending(fields.ElementAt(i));
                 }
             }
 
             if (page != null)
             {
-                query = query.Skip(((int)page - 1) * DataAccessHelpers.PAGINATE_BY).Take(DataAccessHelpers.PAGINATE_BY);
+                query = query
+                    .Skip(((int)page - 1) * DataAccessHelpers.PAGINATE_BY)
+                        .Take(DataAccessHelpers.PAGINATE_BY);
             }
 
             return await query.Select(select).ToListAsync();
@@ -232,8 +239,7 @@ namespace MGME.Infra.Data.Repositories
                 {
                     _database
                         .Entry(entities.ElementAt(i))
-                            .Property(updatedProperties.ElementAt(j))
-                                .IsModified = true;
+                            .Property(updatedProperties.ElementAt(j)).IsModified = true;
                 }
             }
 
@@ -254,13 +260,6 @@ namespace MGME.Infra.Data.Repositories
         public async Task DeleteEntityAsync(TEntity entity)
         {
             _database.Set<TEntity>().Remove(entity);
-
-            await _database.SaveChangesAsync();
-        }
-
-        public async Task DeleteEntitiesAsync(IEnumerable<TEntity> entities)
-        {
-            _database.Set<TEntity>().RemoveRange(entities);
 
             await _database.SaveChangesAsync();
         }

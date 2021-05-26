@@ -42,10 +42,10 @@ namespace MGME.Core.Interfaces.Repositories
         // Add a single entity
         Task AddEntityAsync(TEntity entity);
 
-        // Updates only specified fields
+        // Updates only specific fields
         Task UpdateEntityAsync(TEntity entity, IEnumerable<string> updatedProperties);
 
-        // Update only specific fields on a collection of entities
+        // Update only specific fields on a collection of entities (used for many-to-one linking)
         Task UpdateEntitiesAsync(IEnumerable<TEntity> entities, IEnumerable<string> updatedProperties);
 
         // Update many-to-many relationship between entity and linkedEntity
@@ -53,9 +53,6 @@ namespace MGME.Core.Interfaces.Repositories
 
         // Delete one entity
         Task DeleteEntityAsync(TEntity entity);
-
-        // Delete a collection of entities
-        Task DeleteEntitiesAsync(IEnumerable<TEntity> entities);
 
         // Delete a collection of entities by their ids (avoiding pre-quering them)
         Task DeleteEntitiesAsync(IEnumerable<int> ids);
