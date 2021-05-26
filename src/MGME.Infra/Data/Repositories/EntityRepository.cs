@@ -273,8 +273,6 @@ namespace MGME.Infra.Data.Repositories
             */
             IEnumerable<TEntity> entities = ids.Select(id => new TEntity { Id = id });
 
-            Console.WriteLine(entities.First() == null);
-
             _database.Set<TEntity>().RemoveRange(entities);
 
             await _database.SaveChangesAsync();
