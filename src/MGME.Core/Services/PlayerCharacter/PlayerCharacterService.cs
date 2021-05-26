@@ -257,7 +257,6 @@ namespace MGME.Core.Services.PlayerCharacterService
                 /*
                 We query for PlayerCharacter directly and not DTO,
                 since at this point in time it only has 3 fields, 2 of which we need to update
-
                 Though, should use DTO when/if model will grow
                 */
                 PlayerCharacter playerCharacterToUpdate = await _playerCharacterRepository.GetEntityAsync(
@@ -273,33 +272,10 @@ namespace MGME.Core.Services.PlayerCharacterService
                     return response;
                 }
 
-                /*
-                We avoid explicitly updating fields, since model can grow in the future and
-                at some point we might want to get rid of Name/Description check above and
-                let front end update variable number of fields
-                */
-                Type typeOfPlayerCharacter = playerCharacterToUpdate.GetType();
-
-                PropertyInfo[] updatedProperties = updatedPlayerCharacter.GetType().GetProperties();
-
-                List<string> propertiesToUpdate = new List<string>();
-
-                foreach (PropertyInfo updatedProperty in updatedProperties)
-                {
-                    if (updatedProperty.GetValue(updatedPlayerCharacter) == null || updatedProperty.Name == "Id")
-                    {
-                        continue;
-                    }
-
-                    PropertyInfo propertyToUpdate = typeOfPlayerCharacter.GetProperty(updatedProperty.Name);
-
-                    propertyToUpdate.SetValue(
-                        playerCharacterToUpdate,
-                        updatedProperty.GetValue(updatedPlayerCharacter)
-                    );
-
-                    propertiesToUpdate.Add(updatedProperty.Name);
-                }
+                (PlayerCharacter playerCharacterWithUpdates, List<string> propertiesToUpdate) = UpdateVariableNumberOfFields<PlayerCharacter>(
+                    playerCharacterToUpdate,
+                    updatedPlayerCharacter
+                );
 
                 await _playerCharacterRepository.UpdateEntityAsync(
                     playerCharacterToUpdate,
