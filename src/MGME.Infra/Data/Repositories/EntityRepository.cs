@@ -30,11 +30,13 @@ namespace MGME.Infra.Data.Repositories
         {
             IQueryable<TEntity> query = _database.Set<TEntity>();
 
+            // Don't track unless explicitly specified
             if (!tracking)
             {
                 query = query.AsNoTracking();
             }
 
+            // Join requested entities
             if (include != null)
             {
                 for (int i = 0; i < include.Count(); i++)
@@ -103,6 +105,7 @@ namespace MGME.Infra.Data.Repositories
             return await query.Where(predicate).Select(select).FirstOrDefaultAsync();
         }
 
+
         public async Task<List<TEntity>> GetEntititesAsync(bool tracking = false,
                                                            Expression<Func<TEntity, bool>> predicate = null,
                                                            IEnumerable<string> include = null,
@@ -131,12 +134,15 @@ namespace MGME.Infra.Data.Repositories
 
             if (orderBy != null)
             {
+                // Parse priority of sorting and order direction
                 (IEnumerable<Expression<Func<TEntity, object>>> fields, SortOrder order) = orderBy;
 
+                // Order by first field in priority
                 query = order == SortOrder.ASCENDING
                     ? query.OrderBy(fields.First())
                         : query.OrderByDescending(fields.First());
 
+                // Order by other fields in the same direction as the first
                 for (int i = 0; i < fields.Skip(1).Count(); i++)
                 {
                     query = order == (int)SortOrder.ASCENDING
@@ -145,6 +151,7 @@ namespace MGME.Infra.Data.Repositories
                 }
             }
 
+            // Paginate
             if (page != null)
             {
                 query = query
@@ -208,6 +215,7 @@ namespace MGME.Infra.Data.Repositories
             return await query.Select(select).ToListAsync();
         }
 
+
         public async Task AddEntityAsync(TEntity entity)
         {
             await _database.Set<TEntity>().AddAsync(entity);
@@ -215,10 +223,13 @@ namespace MGME.Infra.Data.Repositories
             await _database.SaveChangesAsync();
         }
 
+
         public async Task UpdateEntityAsync(TEntity entity, IEnumerable<string> updatedProperties)
         {
+            // Don't change anything in the entity
             _database.Entry(entity).State = EntityState.Unchanged;
 
+            // But the provided fields
             for (int i = 0; i < updatedProperties.Count(); i++)
             {
                 _database
@@ -229,33 +240,40 @@ namespace MGME.Infra.Data.Repositories
             await _database.SaveChangesAsync();
         }
 
-        public async Task UpdateEntitiesAsync(IEnumerable<TEntity> entities, IEnumerable<string> updatedProperties)
+
+        public async Task LinkEntitiesAsync(IEnumerable<TEntity> entities, string linkingProperty)
         {
+            // No changes to the entities we're linking
             for (int i = 0; i < entities.Count(); i++)
             {
                 _database.Set<TEntity>().Attach(entities.ElementAt(i));
 
-                for (int j = 0; j < updatedProperties.Count(); j++)
-                {
-                    _database
-                        .Entry(entities.ElementAt(i))
-                            .Property(updatedProperties.ElementAt(j)).IsModified = true;
-                }
+                // Only change the linking property
+                _database
+                    .Entry(entities.ElementAt(i))
+                        .Property(linkingProperty).IsModified = true;
             }
 
             await _database.SaveChangesAsync();
         }
 
-        public async Task LinkEntityAsync(TEntity entity, BaseEntity linkedEntity, string linkedCollection)
+        public async Task LinkEntitiesAsync(IEnumerable<TEntity> entities, BaseEntity linkedEntity, string linkingCollection)
         {
-            _database.Entry(entity).State = EntityState.Unchanged;
+            // No changes to entities we're linking
+            for (int i = 0; i < entities.Count(); i++)
+            {
+                _database.Entry(entities.ElementAt(i)).State = EntityState.Unchanged;
+            }
 
+            // No changes to the linked entity
             _database.Entry(linkedEntity).State = EntityState.Unchanged;
 
-            _database.Entry(entity).Collection(linkedCollection).IsModified = true;
+            // Only change the collection on the linked entity
+            _database.Entry(linkedEntity).Collection(linkingCollection).IsModified = true;
 
             await _database.SaveChangesAsync();
         }
+
 
         public async Task DeleteEntityAsync(TEntity entity)
         {
@@ -267,7 +285,7 @@ namespace MGME.Infra.Data.Repositories
         public async Task DeleteEntitiesAsync(IEnumerable<int> ids)
         {
             /*
-            We create a list of anonymous types to remove
+            Initialize a collection of entities we want to remove
             in order to avoid querying for objects we want to remove
             */
             IEnumerable<TEntity> entities = ids.Select(id => new TEntity { Id = id });
@@ -276,6 +294,7 @@ namespace MGME.Infra.Data.Repositories
 
             await _database.SaveChangesAsync();
         }
+
 
         public async Task <int> GetEntitiesCount()
         {

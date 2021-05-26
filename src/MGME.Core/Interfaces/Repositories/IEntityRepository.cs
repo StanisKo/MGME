@@ -24,6 +24,7 @@ namespace MGME.Core.Interfaces.Repositories
                                                      IEnumerable<string> include = null,
                                                      Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO;
 
+
         // Get multiple entities
         Task <List<TEntity>> GetEntititesAsync(bool tracking = false,
                                                Expression<Func<TEntity, bool>> predicate = null,
@@ -39,23 +40,28 @@ namespace MGME.Core.Interfaces.Repositories
                                                               int? page = null,
                                                               Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO;
 
+
         // Add a single entity
         Task AddEntityAsync(TEntity entity);
+
 
         // Updates only specific fields
         Task UpdateEntityAsync(TEntity entity, IEnumerable<string> updatedProperties);
 
-        // Update only specific fields on a collection of entities (used for many-to-one linking)
-        Task UpdateEntitiesAsync(IEnumerable<TEntity> entities, IEnumerable<string> updatedProperties);
 
-        // Update many-to-many relationship between entity and linkedEntity
-        Task LinkEntityAsync(TEntity entity, BaseEntity linkedEntity, string linkedCollection);
+        // Update many-to-one relationship between entities and another entity via linkingProperty
+        Task LinkEntitiesAsync(IEnumerable<TEntity> entities, string linkingProperty);
+
+        // Update many-to-many relationship between entities and linkedEntity
+        Task LinkEntitiesAsync(IEnumerable<TEntity> entities, BaseEntity linkedEntity, string linkingCollection);
+
 
         // Delete one entity
         Task DeleteEntityAsync(TEntity entity);
 
         // Delete a collection of entities by their ids (avoiding pre-quering them)
         Task DeleteEntitiesAsync(IEnumerable<int> ids);
+
 
         // Count number of entities in db
         Task <int> GetEntitiesCount();
