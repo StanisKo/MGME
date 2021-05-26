@@ -23,11 +23,10 @@ namespace MGME.Infra.Data.Repositories
             _database = database;
         }
 
-        public async Task <TEntity> GetEntityAsync(
-            int? id = null,
-            bool tracking = false,
-            Expression<Func<TEntity, bool>> predicate = null,
-            IEnumerable<string> include = null)
+        public async Task <TEntity> GetEntityAsync(int? id = null,
+                                                   bool tracking = false,
+                                                   Expression<Func<TEntity, bool>> predicate = null,
+                                                   IEnumerable<string> include = null)
         {
             IQueryable<TEntity> query = _database.Set<TEntity>();
 
@@ -62,12 +61,11 @@ namespace MGME.Infra.Data.Repositories
             return await query.FirstOrDefaultAsync(predicate);
         }
 
-        public async Task <TEntityDTO> GetEntityAsync<TEntityDTO>(
-            int? id = null,
-            bool tracking = false,
-            Expression<Func<TEntity, bool>> predicate = null,
-            IEnumerable<string> include = null,
-            Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO : BaseEntityDTO
+        public async Task <TEntityDTO> GetEntityAsync<TEntityDTO>(int? id = null,
+                                                                  bool tracking = false,
+                                                                  Expression<Func<TEntity, bool>> predicate = null,
+                                                                  IEnumerable<string> include = null,
+                                                                  Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO : BaseEntityDTO
         {
             IQueryable<TEntity> query = _database.Set<TEntity>();
 
@@ -102,12 +100,11 @@ namespace MGME.Infra.Data.Repositories
             return await query.Where(predicate).Select(select).FirstOrDefaultAsync();
         }
 
-        public async Task<List<TEntity>> GetEntititesAsync(
-            bool tracking = false,
-            Expression<Func<TEntity, bool>> predicate = null,
-            IEnumerable<string> include = null,
-            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
-            int? page = null)
+        public async Task<List<TEntity>> GetEntititesAsync(bool tracking = false,
+                                                           Expression<Func<TEntity, bool>> predicate = null,
+                                                           IEnumerable<string> include = null,
+                                                           Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
+                                                           int? page = null)
         {
             IQueryable<TEntity> query = _database.Set<TEntity>();
 
@@ -153,13 +150,12 @@ namespace MGME.Infra.Data.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task <List<TEntityDTO>> GetEntititesAsync<TEntityDTO>(
-            bool tracking = false,
-            Expression<Func<TEntity, bool>> predicate = null,
-            IEnumerable<string> include = null,
-            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
-            int? page = null,
-            Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO
+        public async Task <List<TEntityDTO>> GetEntititesAsync<TEntityDTO>(bool tracking = false,
+                                                                           Expression<Func<TEntity, bool>> predicate = null,
+                                                                           IEnumerable<string> include = null,
+                                                                           Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
+                                                                           int? page = null,
+                                                                           Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO
         {
             IQueryable<TEntity> query = _database.Set<TEntity>();
 
@@ -212,20 +208,15 @@ namespace MGME.Infra.Data.Repositories
             await _database.SaveChangesAsync();
         }
 
-        public async Task AddEntitiesAsync(IEnumerable<TEntity> entites)
-        {
-            await _database.Set<TEntity>().AddRangeAsync(entites);
-
-            await _database.SaveChangesAsync();
-        }
-
         public async Task UpdateEntityAsync(TEntity entity, IEnumerable<string> updatedProperties)
         {
             _database.Entry(entity).State = EntityState.Unchanged;
 
-            foreach (string property in updatedProperties)
+            for (int i = 0; i < updatedProperties.Count(); i++)
             {
-                _database.Entry(entity).Property(property).IsModified = true;
+                _database
+                    .Entry(entity)
+                        .Property(updatedProperties.ElementAt(i)).IsModified = true;
             }
 
             await _database.SaveChangesAsync();
@@ -233,13 +224,16 @@ namespace MGME.Infra.Data.Repositories
 
         public async Task UpdateEntitiesAsync(IEnumerable<TEntity> entities, IEnumerable<string> updatedProperties)
         {
-            foreach (TEntity entity in entities)
+            for (int i = 0; i < entities.Count(); i++)
             {
-                _database.Set<TEntity>().Attach(entity);
+                _database.Set<TEntity>().Attach(entities.ElementAt(i));
 
-                foreach (string property in updatedProperties)
+                for (int j = 0; j < updatedProperties.Count(); j++)
                 {
-                    _database.Entry(entity).Property(property).IsModified = true;
+                    _database
+                        .Entry(entities.ElementAt(i))
+                            .Property(updatedProperties.ElementAt(j))
+                                .IsModified = true;
                 }
             }
 
