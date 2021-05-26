@@ -25,9 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export const MenuBar = (): ReactElement | null => {
     const history = useHistory();
 
-    const userLoggedIn = localStorage.getItem('userLoggedIn');
-
-    // Here we actually depend on the store, since we need dynamic rerender on login
+    // Here we depend on the store, since we need dynamic rerender on login
     const tokenIsAvaialable = useSelector((store: ApplicationState) => store.auth?.token ?? null);
 
     const dispatch = useDispatch();
@@ -81,8 +79,7 @@ export const MenuBar = (): ReactElement | null => {
 
     const { flexGrow } = useStyles();
 
-    // But we still use localStorage to speed up re-renders
-    return userLoggedIn || tokenIsAvaialable ? (
+    return tokenIsAvaialable ? (
         <AppBar position="static" color="primary">
             <Toolbar>
                 <Tabs

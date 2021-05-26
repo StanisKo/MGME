@@ -40,7 +40,7 @@ export const Application = (): ReactElement => {
             const refreshTokenResponse = await refreshToken();
 
             if (refreshTokenResponse.success) {
-                // We put a bool into localStorage for quicker renders between routes
+                // We put a bool into localStorage for quicker renders between public/private routes
                 localStorage.setItem('userLoggedIn', JSON.stringify(true));
 
                 const token = (refreshTokenResponse as DataServiceResponse<UserTokenResponse>).data.accessToken;
