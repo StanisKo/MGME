@@ -20,6 +20,7 @@ namespace MGME.Core.Utils.Sorters
             return base.DetermineSorting(sortingParameter, _playerCharacterSortingOptions);
         }
 
+        // NB: No need to sort on ids as the last resort, since indexes forbid for those entities to have identical names
         private Dictionary<string, List<Expression<Func<PlayerCharacter, object>>>> _playerCharacterSortingOptions = new()
         {
             {
@@ -33,7 +34,6 @@ namespace MGME.Core.Utils.Sorters
                 {
                     playerCharacter => playerCharacter.Threads.Count,
                     playerCharacter => playerCharacter.Threads.FirstOrDefault().Name,
-                    playerCharacter => playerCharacter.Threads.FirstOrDefault().Id
                 }
             },
             {
@@ -41,7 +41,6 @@ namespace MGME.Core.Utils.Sorters
                 {
                     playerCharacter => playerCharacter.Adventures.Count,
                     playerCharacter => playerCharacter.Adventures.FirstOrDefault().Title,
-                    playerCharacter => playerCharacter.Adventures.FirstOrDefault().Id
                 }
             },
             {
@@ -49,7 +48,6 @@ namespace MGME.Core.Utils.Sorters
                 {
                     playerCharacter => playerCharacter.NonPlayerCharacters.Count,
                     playerCharacter => playerCharacter.NonPlayerCharacters.FirstOrDefault().Name,
-                    playerCharacter => playerCharacter.NonPlayerCharacters.FirstOrDefault().Id
                 }
             }
         };
