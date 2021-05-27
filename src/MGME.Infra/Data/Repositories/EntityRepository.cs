@@ -226,7 +226,7 @@ namespace MGME.Infra.Data.Repositories
 
         public async Task UpdateEntityAsync(TEntity entity, IEnumerable<string> updatedProperties)
         {
-            // Don't change anything in the entity
+            // Don't change anything on the entity
             _database.Entry(entity).State = EntityState.Unchanged;
 
             // But the provided fields
@@ -268,7 +268,7 @@ namespace MGME.Infra.Data.Repositories
             // No changes to the linked entity
             _database.Entry(linkedEntity).State = EntityState.Unchanged;
 
-            // Only change the collection on the linked entity
+            // Only change the collection on the linked entity (and thus write to mapping table)
             _database.Entry(linkedEntity).Collection(linkingCollection).IsModified = true;
 
             await _database.SaveChangesAsync();
