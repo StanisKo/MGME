@@ -29,6 +29,14 @@ namespace MGME.Core.Utils.Sorters
                 }
             },
             {
+                "thread", new()
+                {
+                    playerCharacter => playerCharacter.Threads.Count,
+                    playerCharacter => playerCharacter.Threads.FirstOrDefault().Name,
+                    playerCharacter => playerCharacter.Threads.FirstOrDefault().Id
+                }
+            },
+            {
                 "adventure", new()
                 {
                     playerCharacter => playerCharacter.Adventures.Count,

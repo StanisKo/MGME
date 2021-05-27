@@ -13,6 +13,7 @@ using MGME.Core.DTOs;
 using MGME.Core.DTOs.PlayerCharacter;
 using MGME.Core.DTOs.Adventure;
 using MGME.Core.DTOs.NonPlayerCharacter;
+using MGME.Core.DTOs.Thread;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
 using MGME.Core.Utils;
@@ -323,6 +324,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 predicate: playerCharacter => playerCharacter.UserId == userId,
                 include: new[]
                 {
+                    "Threads",
                     "Adventures",
                     "NonPlayerCharacters"
                 },
@@ -330,6 +332,17 @@ namespace MGME.Core.Services.PlayerCharacterService
                 {
                     Id = playerCharacter.Id,
                     Name = playerCharacter.Name,
+
+                    Thread = playerCharacter.Threads.Select(
+                        thread => new GetThreadDTO()
+                        {
+                            Id = thread.Id,
+                            Name = thread.Name
+                        }
+                    ).Where(
+                        thread => playerCharacter.Threads.Count == 1
+                    ).FirstOrDefault(),
+                    ThreadCount = playerCharacter.Threads.Count,
 
                     Adventure = playerCharacter.Adventures.Select(
                         adventure => new GetAdventureDTO()

@@ -47,6 +47,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const headCells: HeadCell[] = [
     { label: 'Name', sorting: 'name', numeric: false },
+    { label: 'Thread', sorting: 'thread', numeric: true },
     { label: 'Adventure', sorting: 'adventure', numeric: true },
     { label: 'NPC', sorting: 'npc', numeric: true }
 ];
@@ -244,6 +245,11 @@ export const PlayerCharactersTable = (): ReactElement | null => {
 
                                 <TableCell align="left">
                                     {playerCharacter.name}
+                                </TableCell>
+
+                                <TableCell align="right">
+                                    {playerCharacter.thread?.name
+                                        ?? `${playerCharacter.threadCount} threads`}
                                 </TableCell>
 
                                 <TableCell align="right">
