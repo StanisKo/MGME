@@ -8,8 +8,6 @@ import { PlayerCharactersTable } from '../playerCharacter/components/playerChara
 import { deletePlayerCharacters } from '../playerCharacter/requests';
 import { fetchNonPlayerCharacters } from '../../shared/requests';
 
-import { NON_PLAYER_CHARACTER_FILTER } from '../../shared/const/enums';
-
 import { Paper, Grid, FormControl, Select, MenuItem, Button, Theme } from '@material-ui/core';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
@@ -75,9 +73,7 @@ export const Catalogues = (): ReactElement => {
     };
 
     const handleCreate = async (): Promise<void> => {
-        const availableNonPlayerCharacters = await fetchNonPlayerCharacters(
-            NON_PLAYER_CHARACTER_FILTER.AVAILABLE
-        );
+        const availableNonPlayerCharacters = await fetchNonPlayerCharacters();
 
         console.log(availableNonPlayerCharacters);
     };
