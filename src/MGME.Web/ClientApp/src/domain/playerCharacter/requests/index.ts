@@ -5,7 +5,7 @@ import { BaseServiceResponse } from '../../../shared/interfaces';
 import { URLBuilder, DataController } from '../../../shared/utils';
 
 export const fetchPlayerCharacters = async (page?: number, sorting?: string): Promise<void> => {
-    await DataController.FetchAndSave<PlayerCharacter>(
+    await DataController.FetchAndSave<PlayerCharacter[]>(
         {
             url: URLBuilder.ReadFrom('playercharacter'),
             // If no page or sorting provided, we use default from controller
