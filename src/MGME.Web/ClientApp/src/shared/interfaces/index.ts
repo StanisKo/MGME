@@ -68,3 +68,10 @@ export interface HeadCell {
     sorting: string;
     numeric: boolean;
 }
+
+/*    **** Entity related interfaces ****    */
+
+export interface AvailableNonPlayerCharacter {
+    id: number;
+    name: string;
+}

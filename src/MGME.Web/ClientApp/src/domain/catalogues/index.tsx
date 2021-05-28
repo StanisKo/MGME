@@ -6,6 +6,9 @@ import { ApplicationState } from '../../store';
 import { PlayerCharactersTable } from '../playerCharacter/components/playerCharactersTable';
 
 import { deletePlayerCharacters } from '../playerCharacter/requests';
+import { fetchNonPlayerCharacters } from '../../shared/requests';
+
+import { NON_PLAYER_CHARACTER_FILTER } from '../../shared/const/enums';
 
 import { Paper, Grid, FormControl, Select, MenuItem, Button, Theme } from '@material-ui/core';
 
@@ -71,6 +74,14 @@ export const Catalogues = (): ReactElement => {
         );
     };
 
+    const handleCreate = async (): Promise<void> => {
+        const availableNonPlayerCharacters = await fetchNonPlayerCharacters(
+            NON_PLAYER_CHARACTER_FILTER.AVAILABLE
+        );
+
+        console.log(availableNonPlayerCharacters);
+    };
+
     const nothingSelected = selectedEntities.length === 0;
 
     const { centered, formControl, buttons, deleteButton } = useStyles();
@@ -112,6 +123,7 @@ export const Catalogues = (): ReactElement => {
                             variant="outlined"
                             color="primary"
                             size="medium"
+                            onClick={handleCreate}
                         >
                             Create
                         </Button>

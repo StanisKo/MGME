@@ -57,6 +57,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                     {
                         Id = nonPlayerCharacter.Id,
                         Name = nonPlayerCharacter.Name,
+
                         PlayerCharacter = weNeedAll && nonPlayerCharacter.PlayerCharacter != null
                             ? new GetPlayerCharacterDTO()
                             {
@@ -64,6 +65,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                                 Name = nonPlayerCharacter.PlayerCharacter.Name
                             }
                             : null,
+
                         AdventureCount = weNeedAll
                             ? nonPlayerCharacter.Adventures.Count
                             : null

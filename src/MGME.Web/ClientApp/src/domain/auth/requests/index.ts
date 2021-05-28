@@ -39,7 +39,7 @@ export const confirmEmailAddress = async (token: string): Promise <BaseServiceRe
 export const logoutUser = async (): Promise<BaseServiceResponse> => {
     return await request<BaseServiceResponse>(
         {
-            url: URLBuilder.WriteTo('auth', 'logout'),
+            url: URLBuilder.ReadFrom('auth', 'logout'),
             method: 'GET',
             headers: null
         }
