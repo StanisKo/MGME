@@ -2,20 +2,20 @@ import { PaginatedDataServiceResponse, AvailableNonPlayerCharacter } from '../in
 
 import { NON_PLAYER_CHARACTER_FILTER } from '../const/enums';
 
-import { URLBuilder, request } from '../utils';
+import { URLBuilder, DataController } from '../utils';
 
-import { store } from '../../store/configureStore';
-
-// We don't want to store this list in store, so simple request is enough
 export const fetchAvailableNonPlayerCharacters = async (
-
+    page?: number
 ): Promise <PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>> => {
 
-    return await request<PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>>(
+    return await DataController.FetchAndSave<AvailableNonPlayerCharacter[]>(
         {
-            url: URLBuilder.ReadFrom(`nonplayercharacter/?filter=${NON_PLAYER_CHARACTER_FILTER.AVAILABLE}`),
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${store.getState().auth?.token}` }
+            url: URLBuilder.ReadFrom('nonplayercharacter'),
+            params: {
+                filter: NON_PLAYER_CHARACTER_FILTER.AVAILABLE,
+                ...( page ? { page: page } : null )
+            },
+            returnResponse: true
         }
-    );
+    ) as PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>;
 };

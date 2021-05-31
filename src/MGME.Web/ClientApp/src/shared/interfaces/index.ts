@@ -33,10 +33,15 @@ export interface RequestConfig {
 }
 
 export interface ReadFromApi {
-    page: string;
-    key: string;
     url: string;
     params: { [key: string]: string | number | boolean | number[] | string[] } | null;
+    page?: string;
+    key?: string;
+    /*
+    We save response to store by default, so other components can access the data
+    Yet, if this flag is provided, we don't, and return response to the caller
+    */
+    returnResponse?: boolean;
 }
 
 export interface WriteToApi {

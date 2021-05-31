@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import {
     BaseServiceResponse,
     DataServiceResponse,
@@ -32,9 +34,10 @@ export class DataController {
     @param key key to save data under
     @param url endpoint
     @param params parameters to encode in URL
+    @param returnResponse optional flag that marks if response is saved to store or returned
     */
     public static async FetchAndSave<TResult>(
-        { page, key, url, params }: ReadFromApi
+        { url, params, page, key, returnResponse }: ReadFromApi
 
     /*
     We still might want to return the response for user-friendly error handling,
@@ -63,24 +66,29 @@ export class DataController {
             }
         );
 
-        if (!response.success) {
+        if (!response.success || returnResponse) {
             return response;
         }
 
         const { success, message, ...onlyRelevantValues } = response;
 
+        /*
+        At this point, if we don't return response, the caller must have provided page and key
+        If not -- that's bad code from the caller :)
+        */
         store.dispatch(
             actionCreators.updateStore(
                 {
                     type: 'UPDATE_STORE',
-                    reducer: page,
-                    key: key,
+                    reducer: page!,
+                    key: key!,
                     payload: onlyRelevantValues
                 }
             )
         );
 
-        this._urlsToRefetch = { ...this._urlsToRefetch, [page]: { ...this._urlsToRefetch[page], [key]: urlToRequest } };
+        // eslint-disable-next-line max-len
+        this._urlsToRefetch = { ...this._urlsToRefetch, [page!]: { ...this._urlsToRefetch[page!], [key!]: urlToRequest } };
     }
 
     /**
