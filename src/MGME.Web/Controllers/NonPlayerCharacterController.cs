@@ -25,9 +25,11 @@ namespace MGME.Web.Controllers
         }
 
         [HttpGet]
-        public async Task <IActionResult> GetAllNonPlayerCharacters([BindRequired, Range((int)NonPlayerCharacterFilter.ALL, (int)NonPlayerCharacterFilter.AVAILABLE), FromQuery] int filter)
+        public async Task <IActionResult> GetAllNonPlayerCharacters([BindRequired, Range((int)NonPlayerCharacterFilter.ALL, (int)NonPlayerCharacterFilter.AVAILABLE), FromQuery] int filter, int? page)
         {
-            DataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>> response = await _nonPlayerCharacterService.GetAllNonPlayerCharacters(filter);
+            PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>> response = await _nonPlayerCharacterService.GetAllNonPlayerCharacters(
+                filter, page ?? 1
+            );
 
             if (response.Success)
             {
