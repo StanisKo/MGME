@@ -7,7 +7,7 @@ import { URLBuilder, request } from '../utils';
 import { store } from '../../store/configureStore';
 
 // We don't want to store this list in store, so simple request is enough
-export const fetchNonPlayerCharacters = async (
+export const fetchAvailableNonPlayerCharacters = async (
 
 ): Promise <PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>> => {
 

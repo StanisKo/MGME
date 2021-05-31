@@ -51,11 +51,14 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             try
             {
-                int numberOfResults = await _playerCharacterRepository.GetEntitiesCount();
+                int numberOfResults = await _playerCharacterRepository.GetEntitiesCount(
+                    playerCharacter => playerCharacter.UserId == userId
+                );
 
                 IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await QueryPlayerCharacters(
                     sortingParameter,
-                    selectedPage
+                    selectedPage,
+                    userId
                 );
 
                 response.Data = playerCharacters;
@@ -316,10 +319,8 @@ namespace MGME.Core.Services.PlayerCharacterService
             return response;
         }
 
-        private async Task <IEnumerable<GetPlayerCharacterListDTO>> QueryPlayerCharacters(string sortingParameter, int selectedPage)
+        private async Task <IEnumerable<GetPlayerCharacterListDTO>> QueryPlayerCharacters(string sortingParameter, int selectedPage, int userId)
         {
-            int userId = GetUserIdFromHttpContext();
-
             IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
                 predicate: playerCharacter => playerCharacter.UserId == userId,
                 include: new[]

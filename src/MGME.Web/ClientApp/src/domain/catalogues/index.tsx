@@ -6,7 +6,7 @@ import { ApplicationState } from '../../store';
 import { PlayerCharactersTable } from '../playerCharacter/components/playerCharactersTable';
 
 import { deletePlayerCharacters } from '../playerCharacter/requests';
-import { fetchNonPlayerCharacters } from '../../shared/requests';
+import { fetchAvailableNonPlayerCharacters } from '../../shared/requests';
 
 import { Paper, Grid, FormControl, Select, MenuItem, Button, Theme } from '@material-ui/core';
 
@@ -73,7 +73,7 @@ export const Catalogues = (): ReactElement => {
     };
 
     const handleCreate = async (): Promise<void> => {
-        const availableNonPlayerCharacters = await fetchNonPlayerCharacters();
+        const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters();
 
         console.log(availableNonPlayerCharacters);
     };
