@@ -56,9 +56,9 @@ namespace MGME.Core.Services.PlayerCharacterService
                 );
 
                 IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await QueryPlayerCharacters(
-                    sortingParameter,
-                    selectedPage,
-                    userId
+                    new Ref<string>(sortingParameter),
+                    new Ref<int>(selectedPage),
+                    new Ref<int>(userId)
                 );
 
                 response.Data = playerCharacters;
@@ -319,10 +319,10 @@ namespace MGME.Core.Services.PlayerCharacterService
             return response;
         }
 
-        private async Task <IEnumerable<GetPlayerCharacterListDTO>> QueryPlayerCharacters(string sortingParameter, int selectedPage, int userId)
+        private async Task <IEnumerable<GetPlayerCharacterListDTO>> QueryPlayerCharacters(Ref<string> sortingParameter, Ref<int> selectedPage, Ref<int> userId)
         {
             IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
-                predicate: playerCharacter => playerCharacter.UserId == userId,
+                predicate: playerCharacter => playerCharacter.UserId == userId.Value,
                 include: new[]
                 {
                     "Threads",
@@ -367,8 +367,8 @@ namespace MGME.Core.Services.PlayerCharacterService
                     ).FirstOrDefault(),
                     NonPlayerCharacterCount = playerCharacter.NonPlayerCharacters.Count
                 },
-                orderBy: _sorter.DetermineSorting(sortingParameter),
-                page: selectedPage
+                orderBy: _sorter.DetermineSorting(sortingParameter.Value),
+                page: selectedPage.Value
             );
 
             return playerCharacters;

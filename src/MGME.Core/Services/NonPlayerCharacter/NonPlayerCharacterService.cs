@@ -45,9 +45,9 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                 );
 
                 IEnumerable<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await QueryNonPlayerCharacters(
-                    weNeedAll,
-                    selectedPage,
-                    userId
+                    new Ref<bool>(weNeedAll),
+                    new Ref<int>(selectedPage),
+                    new Ref<int>(userId)
                 );
 
                 response.Data = nonPlayerCharacters;
@@ -267,19 +267,19 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             return response;
         }
 
-        private async Task <IEnumerable<GetNonPlayerCharacterListDTO>> QueryNonPlayerCharacters(bool weNeedAll, int selectedPage, int userId)
+        private async Task <IEnumerable<GetNonPlayerCharacterListDTO>> QueryNonPlayerCharacters(Ref<bool> weNeedAll, Ref<int> selectedPage, Ref<int> userId)
         {
             Expression<Func<NonPlayerCharacter, bool>> predicate =
-                    nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                    nonPlayerCharacter => nonPlayerCharacter.UserId == userId.Value
                     /*
                     The condition to add NonPlayerCharacter to a PlayerCharacter or an Adventure is the same
                     It shouldn't belong to the PlayerCharacter already
                     */
-                    && weNeedAll ? true : nonPlayerCharacter.PlayerCharacterId == null;
+                    && weNeedAll.Value ? true : nonPlayerCharacter.PlayerCharacterId == null;
 
             IEnumerable<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await _repository.GetEntititesAsync<GetNonPlayerCharacterListDTO>(
                 predicate: predicate,
-                include: weNeedAll
+                include: weNeedAll.Value
                     ? new[] { "PlayerCharacter" }
                     : null,
                 select: nonPlayerCharacter => new GetNonPlayerCharacterListDTO()
@@ -287,7 +287,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                     Id = nonPlayerCharacter.Id,
                     Name = nonPlayerCharacter.Name,
 
-                    PlayerCharacter = weNeedAll && nonPlayerCharacter.PlayerCharacter != null
+                    PlayerCharacter = weNeedAll.Value && nonPlayerCharacter.PlayerCharacter != null
                         ? new GetPlayerCharacterDTO()
                         {
                             Id = nonPlayerCharacter.PlayerCharacter.Id,
@@ -295,10 +295,11 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                         }
                         : null,
 
-                    AdventureCount = weNeedAll
+                    AdventureCount = weNeedAll.Value
                         ? nonPlayerCharacter.Adventures.Count
                         : null
-                }
+                },
+                page: selectedPage.Value
             );
 
             return nonPlayerCharacters;
