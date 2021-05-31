@@ -64,6 +64,6 @@ namespace MGME.Core.Interfaces.Repositories
 
 
         // Count number of entities in db
-        Task <int> GetEntitiesCount(Expression<Func<TEntity, bool>> predicate);
+        Task <int> GetEntitiesCountAsync(Expression<Func<TEntity, bool>> predicate);
     }
 }

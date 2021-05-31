@@ -39,7 +39,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
 
             try
             {
-                int numberOfResults = await _repository.GetEntitiesCount(
+                int numberOfResults = await _repository.GetEntitiesCountAsync(
                     nonPlayerCharacter => nonPlayerCharacter.UserId == userId
                         && weNeedAll ? true : nonPlayerCharacter.PlayerCharacterId == null
                 );

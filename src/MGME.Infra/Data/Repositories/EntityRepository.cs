@@ -296,7 +296,7 @@ namespace MGME.Infra.Data.Repositories
         }
 
 
-        public async Task <int> GetEntitiesCount(Expression<Func<TEntity, bool>> predicate)
+        public async Task <int> GetEntitiesCountAsync(Expression<Func<TEntity, bool>> predicate)
         {
             return await _database.Set<TEntity>().Where(predicate).CountAsync();
         }

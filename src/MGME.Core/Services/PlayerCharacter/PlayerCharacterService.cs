@@ -51,7 +51,7 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             try
             {
-                int numberOfResults = await _playerCharacterRepository.GetEntitiesCount(
+                int numberOfResults = await _playerCharacterRepository.GetEntitiesCountAsync(
                     playerCharacter => playerCharacter.UserId == userId
                 );
 
