@@ -30,10 +30,10 @@ export class DataController {
     Reads data from API, updates the Redux store with new values, saves requested URLs for future refetch
     If request does not need parameters, please provide null
 
-    @param page page to fetch data for
-    @param key key to save data under
     @param url endpoint
     @param params parameters to encode in URL
+    @param page page to fetch data for
+    @param key key to save data under
     @param returnResponse optional flag that marks if response is saved to store or returned
     */
     public static async FetchAndSave<TResult>(
