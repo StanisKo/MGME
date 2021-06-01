@@ -16,9 +16,11 @@ import {
     MenuItem,
     Button,
     Theme,
-    TextField,
-    Box,
-    Typography
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField
 } from '@material-ui/core';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
@@ -44,18 +46,6 @@ const useStyles = makeStyles((theme: Theme) =>
                 borderColor: '#b52828'
             },
             color: '#b52828'
-        },
-        createWindow: {
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            backgroundColor: '#FFF',
-            padding: '1em',
-            borderRadius: '5px'
         }
     })
 );
@@ -74,8 +64,7 @@ export const Catalogues = (): ReactElement => {
 
     const [selectedMenu, setSelectedMenu] = useState<number>(SELECTED_MENU.PLAYER_CHARACTERS);
 
-    // !!!!!!!!!!!!!!!!!!!!USE WHAT YOU USED ON USER PAGE!!!!!!!!!!!!!!!!!!
-    const [creating, setCreating] = useState<boolean>(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
 
     const handleChange = (event: ChangeEvent<{ value: unknown }>): void => {
         setSelectedMenu(event.target.value as number);
@@ -98,17 +87,25 @@ export const Catalogues = (): ReactElement => {
         );
     };
 
+    const handleDialogOpen = (): void => {
+        setDialogOpen(true);
+    };
+    
+    const handleDialogClose = (): void => {
+        setDialogOpen(false);
+    };
+
     const handleCreate = async (): Promise<void> => {
         const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters();
 
         console.log(availableNonPlayerCharacters);
 
-        setCreating(true);
+        setDialogOpen(false);
     };
 
     const nothingSelected = selectedEntities.length === 0;
 
-    const { centered, formControl, buttons, deleteButton, createWindow } = useStyles();
+    const { centered, formControl, buttons, deleteButton } = useStyles();
 
     return (
         <>
@@ -148,7 +145,7 @@ export const Catalogues = (): ReactElement => {
                                 variant="outlined"
                                 color="primary"
                                 size="medium"
-                                onClick={handleCreate}
+                                onClick={handleDialogOpen}
                             >
                                 Create
                             </Button>
@@ -173,13 +170,16 @@ export const Catalogues = (): ReactElement => {
 
             {/* Container for creating PlayerCharacter/NonPlayerCharacter */}
 
-            {creating && (
-                <Box className={createWindow}>
-                    <Box mb={4}>
-                        <Typography component="h1" variant="h5">
-                            {`Create ${selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'Character' : 'NPC'}`}
-                        </Typography>
-                    </Box>
+            <Dialog
+                open={dialogOpen}
+                onClose={handleDialogOpen}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {`Create ${selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'Character' : 'NPC'}`}
+                </DialogTitle>
+                <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
@@ -197,18 +197,17 @@ export const Catalogues = (): ReactElement => {
                                 label="Description"
                             />
                         </Grid>
-
-                        <Grid item xs={12} container justify="flex-end">
-                            <Button
-                                variant="contained"
-                                color="primary"
-                            >
-                                Create
-                            </Button>
-                        </Grid>
                     </Grid>
-                </Box>
-            )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDialogClose} variant="contained" color="secondary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleCreate} variant="contained" color="primary">
+                        Create
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };
