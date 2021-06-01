@@ -7,6 +7,8 @@ import { actionCreators } from '../../store/shared';
 import { PlayerCharactersTable } from '../playerCharacter/components/playerCharactersTable';
 
 import { deletePlayerCharacters } from '../playerCharacter/requests';
+
+import { AvailableNonPlayerCharacter, PaginatedDataServiceResponse } from '../../shared/interfaces';
 import { fetchAvailableNonPlayerCharacters } from '../../shared/requests';
 
 import {
@@ -22,8 +24,17 @@ import {
     DialogContent,
     DialogActions,
     TextField,
-    Typography
+    List,
+    ListItem,
+    ListItemText,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    Typography,
+    LinearProgress
 } from '@material-ui/core';
+
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -31,6 +42,19 @@ import clsx from 'clsx';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
+        root: {
+            '& label.Mui-error': {
+                color: theme.palette.secondary.main
+            },
+            '& .Mui-error': {
+                '& fieldset': {
+                    borderColor: '#077b8a !important'
+                }
+            },
+            '& .MuiFormHelperText-root': {
+                color: theme.palette.secondary.main
+            }
+        },
         centered: {
             display: 'flex',
             justifyContent: 'center'
@@ -58,6 +82,8 @@ enum SELECTED_MENU {
     NON_PLAYER_CHARACTERS = 1
 }
 
+type TData = PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>;
+
 export const Catalogues = (): ReactElement => {
     const dispatch = useDispatch();
 
@@ -67,7 +93,15 @@ export const Catalogues = (): ReactElement => {
 
     const [selectedMenu, setSelectedMenu] = useState<number>(SELECTED_MENU.PLAYER_CHARACTERS);
 
-    const [dialogOpen, setDialogOpen] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+
+    const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<TData>();
+
+    const [name, setName] = useState<string>('');
+    const [nameError, setNameError] = useState<boolean>(false);
+    const [nameHelperText, setNameHelperText] = useState<string>('');
+
+    const allowedToCreate = name && !nameError;
 
     const handleChange = (event: ChangeEvent<{ value: unknown }>): void => {
         setSelectedMenu(event.target.value as number);
@@ -90,7 +124,13 @@ export const Catalogues = (): ReactElement => {
         );
     };
 
-    const handleDialogOpen = (): void => {
+    const handleDialogOpen = async (): Promise<void> => {
+        if (!availableNonPlayerCharacters) {
+            const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters();
+
+            setAvailableNonPlayerCharacters(availableNonPlayerCharacters);
+        }
+
         setDialogOpen(true);
     };
     
@@ -98,17 +138,30 @@ export const Catalogues = (): ReactElement => {
         setDialogOpen(false);
     };
 
+    const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        const value = event.target.value;
+
+        setName(value);
+
+        if (value.length < 1) {
+            setNameError(true);
+            setNameHelperText('Please provide character name');
+        }
+        else {
+            setNameError(false);
+            setNameHelperText('');
+        }
+    };
+
+    console.log(name);
+
     const handleCreate = async (): Promise<void> => {
-        const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters();
-
-        console.log(availableNonPlayerCharacters);
-
         setDialogOpen(false);
     };
 
     const nothingSelected = selectedEntities.length === 0;
 
-    const { centered, formControl, buttons, deleteButton } = useStyles();
+    const { root, centered, formControl, buttons, deleteButton } = useStyles();
 
     return (
         <>
@@ -177,19 +230,21 @@ export const Catalogues = (): ReactElement => {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">
-                    <Typography variant="h5" align="center">
-                        {`Create ${selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'Character' : 'NPC'}`}
-                    </Typography>
+                <DialogTitle id="alert-dialog-title" className={centered}>
+                    {`Create ${selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'Character' : 'NPC'}`}
                 </DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
+                                error={nameError}
+                                helperText={nameHelperText}
                                 variant="outlined"
                                 required
                                 fullWidth
                                 label="Name"
+                                onChange={handleInputChange}
+                                className={root}
                             />
                         </Grid>
 
@@ -200,13 +255,40 @@ export const Catalogues = (): ReactElement => {
                                 label="Description"
                             />
                         </Grid>
+                        <Grid item xs={12}>
+                            {availableNonPlayerCharacters ? (
+                                <Accordion>
+                                    <AccordionSummary
+                                        expandIcon={<ExpandMoreIcon />}
+                                        aria-controls="panel1a-content"
+                                        id="panel1a-header"
+                                    >
+                                        <Typography>
+                                            {/* eslint-disable-next-line max-len */}
+                                            {`Available ${selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'NPCs' : 'Characters'}`}
+                                        </Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <List style={{ width: '100%' }}>
+                                            {availableNonPlayerCharacters.data.map((nonPlayerCharacter, index) => {
+                                                return (
+                                                    <ListItem key={`avaialable-npc-${index}`} button>
+                                                        <ListItemText primary={nonPlayerCharacter.name} />
+                                                    </ListItem>
+                                                );
+                                            })}
+                                        </List>
+                                    </AccordionDetails>
+                                </Accordion>
+                            ) : <LinearProgress />}
+                        </Grid>
                     </Grid>
                 </DialogContent>
                 <DialogActions className={clsx(centered, buttons)}>
                     <Button onClick={handleDialogClose} variant="contained" color="secondary">
                         Cancel
                     </Button>
-                    <Button onClick={handleCreate} variant="contained" color="primary">
+                    <Button onClick={handleCreate} variant="contained" color="primary" disabled={!allowedToCreate}>
                         Create
                     </Button>
                 </DialogActions>
