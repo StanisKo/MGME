@@ -2,6 +2,7 @@ import { ReactElement, useState, ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ApplicationState } from '../../store';
+import { actionCreators } from '../../store/shared';
 
 import { PlayerCharactersTable } from '../playerCharacter/components/playerCharactersTable';
 
@@ -20,11 +21,13 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    TextField
+    TextField,
+    Typography
 } from '@material-ui/core';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { actionCreators } from '../../store/shared';
+
+import clsx from 'clsx';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -168,8 +171,6 @@ export const Catalogues = (): ReactElement => {
                 </Paper>
             </div>
 
-            {/* Container for creating PlayerCharacter/NonPlayerCharacter */}
-
             <Dialog
                 open={dialogOpen}
                 onClose={handleDialogOpen}
@@ -177,7 +178,9 @@ export const Catalogues = (): ReactElement => {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    {`Create ${selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'Character' : 'NPC'}`}
+                    <Typography variant="h5" align="center">
+                        {`Create ${selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'Character' : 'NPC'}`}
+                    </Typography>
                 </DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2}>
@@ -199,7 +202,7 @@ export const Catalogues = (): ReactElement => {
                         </Grid>
                     </Grid>
                 </DialogContent>
-                <DialogActions>
+                <DialogActions className={clsx(centered, buttons)}>
                     <Button onClick={handleDialogClose} variant="contained" color="secondary">
                         Cancel
                     </Button>
