@@ -107,9 +107,9 @@ export const Catalogues = (): ReactElement => {
 
     const [description, setDescription] = useState<string>('');
 
-    console.log(description);
+    const [existingNonPlayerCharactersToAdd, setExistingNonPlayerCharactersToAdd] = useState<number[]>([]);
 
-    const allowedToCreate = name && !nameError;
+    console.log(description);
 
     const handleChange = (event: ChangeEvent<{ value: unknown }>): void => {
         setSelectedMenu(event.target.value as number);
@@ -176,13 +176,30 @@ export const Catalogues = (): ReactElement => {
         }
     };
 
+    // Curry the function to avoid anon functions in the markup
+    const handleAddingExistingNonPlayerCharacter = (id: number) => (): void => {
+        setExistingNonPlayerCharactersToAdd(
+            [...existingNonPlayerCharactersToAdd, id]
+        );
+    };
+
+    console.log(existingNonPlayerCharactersToAdd);
+
     const handleCreate = async (): Promise<void> => {
         setDialogOpen(false);
     };
 
     const nothingSelected = selectedEntities.length === 0;
 
-    const relatedEntities = entityNames[selectedMenu ? selectedMenu + 1 : selectedMenu - 1];
+    const allowedToCreate =
+        name
+        && !nameError
+        && existingNonPlayerCharactersToAdd.length;
+
+    // selectedMenu is not 0 (then it is 1) ? index first value : index second value
+    const relatedEntities = entityNames[
+        selectedMenu ? selectedMenu - 1 : selectedMenu + 1
+    ];
 
     const { root, centered, formControl, buttons, deleteButton } = useStyles();
 
@@ -298,7 +315,12 @@ export const Catalogues = (): ReactElement => {
                                         <List style={{ width: '100%' }}>
                                             {availableNonPlayerCharacters.data.map((nonPlayerCharacter, index) => {
                                                 return (
-                                                    <ListItem key={`avaialable-npc-${index}`} button>
+                                                    <ListItem
+                                                        key={`avaialable-npc-${index}`}
+                                                        button
+                                                        /* eslint-disable-next-line max-len */
+                                                        onClick={handleAddingExistingNonPlayerCharacter(nonPlayerCharacter.id)}
+                                                    >
                                                         <ListItemText primary={nonPlayerCharacter.name} />
                                                     </ListItem>
                                                 );
