@@ -63,11 +63,6 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
             justifyContent: 'center'
         },
-        flexRow: {
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between'
-        },
         formControl: {
             minWidth: 220
         },
@@ -97,6 +92,8 @@ export const Catalogues = (): ReactElement => {
     const selectedEntities = useSelector(
         (store: ApplicationState) => store.catalogues?.playerCharacters?.selected ?? []
     );
+
+    // RETHINK FILTERS! npc available for chars should not be in adventure, while npc available for adv can be in another adv
 
     const [selectedMenu, setSelectedMenu] = useState<number>(SELECTED_MENU.PLAYER_CHARACTERS);
 
@@ -205,7 +202,8 @@ export const Catalogues = (): ReactElement => {
     const handlePageChange = async (event: unknown, newPage: number): Promise<void> => {
         setPage(newPage);
 
-        const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters(page + 1);
+        // We have to add 2 due to async (rethink)
+        const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters(page + 2);
 
         setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
         setPagination(availableNonPlayerCharacters.pagination);
@@ -229,7 +227,7 @@ export const Catalogues = (): ReactElement => {
         selectedMenu ? selectedMenu - 1 : selectedMenu + 1
     ];
 
-    const { root, centered, flexRow, formControl, buttons, deleteButton } = useStyles();
+    const { root, centered, formControl, buttons, deleteButton } = useStyles();
 
     return (
         <>
@@ -335,20 +333,10 @@ export const Catalogues = (): ReactElement => {
                                         aria-controls="panel1a-content"
                                         id="panel1a-header"
                                     >
-                                        <div className={flexRow}>
-                                            <Typography>
-                                                {/* eslint-disable-next-line max-len */}
-                                                {availableNonPlayerCharacters?.length ? `Available ${relatedEntities}s` : `No available ${relatedEntities}s`}
-                                            </Typography>
-                                            <TablePagination
-                                                component="div"
-                                                rowsPerPage={15}
-                                                rowsPerPageOptions={[]}
-                                                count={pagination.numberOfResults}
-                                                page={page}
-                                                onChangePage={handlePageChange}
-                                            />
-                                        </div>
+                                        <Typography>
+                                            {/* eslint-disable-next-line max-len */}
+                                            {availableNonPlayerCharacters?.length ? `Available ${relatedEntities}s` : `No available ${relatedEntities}s`}
+                                        </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                         <List style={{ width: '100%' }}>
@@ -364,6 +352,14 @@ export const Catalogues = (): ReactElement => {
                                                     </ListItem>
                                                 );
                                             })}
+                                            <TablePagination
+                                                component="div"
+                                                rowsPerPage={15}
+                                                rowsPerPageOptions={[]}
+                                                count={pagination.numberOfResults}
+                                                page={page}
+                                                onChangePage={handlePageChange}
+                                            />
                                         </List>
                                     </AccordionDetails>
                                 </Accordion>
