@@ -3,7 +3,9 @@ export enum INPUT_TYPE {
     EMAIL = 1,
     OLD_PASSWORD = 2,
     PASSWORD = 3,
-    CONFRIM_PASSWORD = 4
+    CONFRIM_PASSWORD = 4,
+    ENTITY_NAME = 5,
+    ENTITY_DESCRIPTION = 6
 }
 
 export enum NON_PLAYER_CHARACTER_FILTER {

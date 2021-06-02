@@ -21,3 +21,10 @@ export interface PlayerCharacter extends BaseEntity {
     nonPlayerCharacter: NonPlayerCharacter;
     nonPlayerCharacterCount: number;
 }
+
+export interface AddPlayerCharacter {
+    name: string;
+    threads: { name: string; description: string; }[];
+    newNonPlayerCharacters: { name: string; description: string }[];
+    existingNonPlayerCharacters: number[];
+}

@@ -10,6 +10,7 @@ import { deletePlayerCharacters } from '../playerCharacter/requests';
 
 import { AvailableNonPlayerCharacter, PaginatedDataServiceResponse } from '../../shared/interfaces';
 import { fetchAvailableNonPlayerCharacters } from '../../shared/requests';
+import { INPUT_TYPE } from '../../shared/const';
 
 import { entityNames } from './helpers';
 
@@ -97,11 +98,16 @@ export const Catalogues = (): ReactElement => {
 
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
+    // Will be generic when npc side of catalogues is be ready
     const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<TData>();
 
     const [name, setName] = useState<string>('');
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHelperText, setNameHelperText] = useState<string>('');
+
+    const [description, setDescription] = useState<string>('');
+
+    console.log(description);
 
     const allowedToCreate = name && !nameError;
 
@@ -141,21 +147,34 @@ export const Catalogues = (): ReactElement => {
     };
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
+
         const value = event.target.value;
 
-        setName(value);
+        switch (inputType) {
+            case INPUT_TYPE.ENTITY_NAME:
+                if (value.length < 1) {
+                    setNameError(true);
+                    setNameHelperText('Please provide character name');
 
-        if (value.length < 1) {
-            setNameError(true);
-            setNameHelperText('Please provide character name');
-        }
-        else {
-            setNameError(false);
-            setNameHelperText('');
+                    return;
+                }
+                else {
+                    setName(value);
+
+                    setNameError(false);
+                    setNameHelperText('');
+                }
+
+                break;
+
+            // We don't need to validate description, it's up to the user to provide it or not
+            case INPUT_TYPE.ENTITY_DESCRIPTION:
+                setDescription(value);
+
+                break;
         }
     };
-
-    console.log(name);
 
     const handleCreate = async (): Promise<void> => {
         setDialogOpen(false);
@@ -248,6 +267,7 @@ export const Catalogues = (): ReactElement => {
                                 fullWidth
                                 label="Name"
                                 onChange={handleInputChange}
+                                inputProps={{ inputtype: INPUT_TYPE.ENTITY_NAME }}
                                 className={root}
                             />
                         </Grid>
@@ -257,6 +277,8 @@ export const Catalogues = (): ReactElement => {
                                 variant="outlined"
                                 fullWidth
                                 label="Description"
+                                onChange={handleInputChange}
+                                inputProps={{ inputtype: INPUT_TYPE.ENTITY_DESCRIPTION }}
                             />
                         </Grid>
                         <Grid item xs={12}>
