@@ -11,6 +11,8 @@ import { deletePlayerCharacters } from '../playerCharacter/requests';
 import { AvailableNonPlayerCharacter, PaginatedDataServiceResponse } from '../../shared/interfaces';
 import { fetchAvailableNonPlayerCharacters } from '../../shared/requests';
 
+import { entityNames } from './helpers';
+
 import {
     Paper,
     Grid,
@@ -161,6 +163,8 @@ export const Catalogues = (): ReactElement => {
 
     const nothingSelected = selectedEntities.length === 0;
 
+    const relatedEntities = entityNames[selectedMenu ? selectedMenu + 1 : selectedMenu - 1];
+
     const { root, centered, formControl, buttons, deleteButton } = useStyles();
 
     return (
@@ -231,7 +235,7 @@ export const Catalogues = (): ReactElement => {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title" className={centered}>
-                    {`Create ${selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'Character' : 'NPC'}`}
+                    {`Create ${entityNames[selectedMenu]}`}
                 </DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2}>
@@ -265,7 +269,7 @@ export const Catalogues = (): ReactElement => {
                                     >
                                         <Typography>
                                             {/* eslint-disable-next-line max-len */}
-                                            {`Available ${selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'NPCs' : 'Characters'}`}
+                                            {availableNonPlayerCharacters.data.length ? `Available ${relatedEntities}s` : `No available ${relatedEntities}s`}
                                         </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
