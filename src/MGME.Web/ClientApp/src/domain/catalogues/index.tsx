@@ -8,7 +8,7 @@ import { PlayerCharactersTable } from '../playerCharacter/components/playerChara
 
 import { deletePlayerCharacters } from '../playerCharacter/requests';
 
-import { AvailableNonPlayerCharacter } from '../../shared/interfaces';
+import { AvailableNonPlayerCharacter, Pagination } from '../../shared/interfaces';
 import { fetchAvailableNonPlayerCharacters } from '../../shared/requests';
 import { INPUT_TYPE } from '../../shared/const';
 
@@ -34,7 +34,8 @@ import {
     AccordionSummary,
     AccordionDetails,
     Typography,
-    LinearProgress
+    LinearProgress,
+    TablePagination
 } from '@material-ui/core';
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -61,6 +62,11 @@ const useStyles = makeStyles((theme: Theme) =>
         centered: {
             display: 'flex',
             justifyContent: 'center'
+        },
+        flexRow: {
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between'
         },
         formControl: {
             minWidth: 220
@@ -98,6 +104,10 @@ export const Catalogues = (): ReactElement => {
 
     // Will be generic when npc side of catalogues is be ready
     const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
+
+    // We paginate list of available entities
+    const [pagination, setPagination] = useState<Pagination>({} as Pagination);
+    const [page, setPage] = useState(0);
 
     const [name, setName] = useState<string>('');
     const [nameError, setNameError] = useState<boolean>(false);
@@ -139,6 +149,7 @@ export const Catalogues = (): ReactElement => {
             const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters();
 
             setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
+            setPagination(availableNonPlayerCharacters.pagination);
         }
 
         setDialogOpen(true);
@@ -191,6 +202,15 @@ export const Catalogues = (): ReactElement => {
         );
     };
 
+    const handlePageChange = async (event: unknown, newPage: number): Promise<void> => {
+        setPage(newPage);
+
+        const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters(page + 1);
+
+        setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
+        setPagination(availableNonPlayerCharacters.pagination);
+    };
+
     console.log(existingNonPlayerCharactersToAdd);
 
     const handleCreate = async (): Promise<void> => {
@@ -209,7 +229,7 @@ export const Catalogues = (): ReactElement => {
         selectedMenu ? selectedMenu - 1 : selectedMenu + 1
     ];
 
-    const { root, centered, formControl, buttons, deleteButton } = useStyles();
+    const { root, centered, flexRow, formControl, buttons, deleteButton } = useStyles();
 
     return (
         <>
@@ -315,10 +335,20 @@ export const Catalogues = (): ReactElement => {
                                         aria-controls="panel1a-content"
                                         id="panel1a-header"
                                     >
-                                        <Typography>
-                                            {/* eslint-disable-next-line max-len */}
-                                            {availableNonPlayerCharacters?.length ? `Available ${relatedEntities}s` : `No available ${relatedEntities}s`}
-                                        </Typography>
+                                        <div className={flexRow}>
+                                            <Typography>
+                                                {/* eslint-disable-next-line max-len */}
+                                                {availableNonPlayerCharacters?.length ? `Available ${relatedEntities}s` : `No available ${relatedEntities}s`}
+                                            </Typography>
+                                            <TablePagination
+                                                component="div"
+                                                rowsPerPage={15}
+                                                rowsPerPageOptions={[]}
+                                                count={pagination.numberOfResults}
+                                                page={page}
+                                                onChangePage={handlePageChange}
+                                            />
+                                        </div>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                         <List style={{ width: '100%' }}>
