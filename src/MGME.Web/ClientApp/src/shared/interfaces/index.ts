@@ -23,6 +23,12 @@ export interface Pagination {
     numberOfResults: number;
 }
 
+// Either NonPlayerCharacter or Thread
+export interface NewEntityToAdd {
+    name: string;
+    description: string;
+}
+
 /*    ****    */
 
 export interface RequestConfig {

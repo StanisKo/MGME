@@ -8,7 +8,7 @@ import { PlayerCharactersTable } from '../playerCharacter/components/playerChara
 
 import { deletePlayerCharacters } from '../playerCharacter/requests';
 
-import { AvailableNonPlayerCharacter, PaginatedDataServiceResponse } from '../../shared/interfaces';
+import { AvailableNonPlayerCharacter } from '../../shared/interfaces';
 import { fetchAvailableNonPlayerCharacters } from '../../shared/requests';
 import { INPUT_TYPE } from '../../shared/const';
 
@@ -85,8 +85,6 @@ enum SELECTED_MENU {
     NON_PLAYER_CHARACTERS = 1
 }
 
-type TData = PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>;
-
 export const Catalogues = (): ReactElement => {
     const dispatch = useDispatch();
 
@@ -99,13 +97,17 @@ export const Catalogues = (): ReactElement => {
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
     // Will be generic when npc side of catalogues is be ready
-    const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<TData>();
+    const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
 
     const [name, setName] = useState<string>('');
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHelperText, setNameHelperText] = useState<string>('');
 
     const [description, setDescription] = useState<string>('');
+
+    // const [newThreadsToAdd, setNewThreadsToAdd] = useState<NewEntityToAdd[]>([]);
+
+    // const [newNonPlayerCharactersToAdd, setNewNonPlayerChartersToAdd] = useState<NewEntityToAdd[]>([]);
 
     const [existingNonPlayerCharactersToAdd, setExistingNonPlayerCharactersToAdd] = useState<number[]>([]);
 
@@ -136,7 +138,7 @@ export const Catalogues = (): ReactElement => {
         if (!availableNonPlayerCharacters) {
             const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters();
 
-            setAvailableNonPlayerCharacters(availableNonPlayerCharacters);
+            setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
         }
 
         setDialogOpen(true);
@@ -180,6 +182,12 @@ export const Catalogues = (): ReactElement => {
     const handleAddingExistingNonPlayerCharacter = (id: number) => (): void => {
         setExistingNonPlayerCharactersToAdd(
             [...existingNonPlayerCharactersToAdd, id]
+        );
+
+        setAvailableNonPlayerCharacters(
+            availableNonPlayerCharacters?.filter(
+                nonPlayerCharacter => nonPlayerCharacter.id !== id
+            )
         );
     };
 
@@ -298,6 +306,7 @@ export const Catalogues = (): ReactElement => {
                                 inputProps={{ inputtype: INPUT_TYPE.ENTITY_DESCRIPTION }}
                             />
                         </Grid>
+
                         <Grid item xs={12}>
                             {availableNonPlayerCharacters ? (
                                 <Accordion>
@@ -308,12 +317,12 @@ export const Catalogues = (): ReactElement => {
                                     >
                                         <Typography>
                                             {/* eslint-disable-next-line max-len */}
-                                            {availableNonPlayerCharacters.data.length ? `Available ${relatedEntities}s` : `No available ${relatedEntities}s`}
+                                            {availableNonPlayerCharacters?.length ? `Available ${relatedEntities}s` : `No available ${relatedEntities}s`}
                                         </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                         <List style={{ width: '100%' }}>
-                                            {availableNonPlayerCharacters.data.map((nonPlayerCharacter, index) => {
+                                            {availableNonPlayerCharacters?.map((nonPlayerCharacter, index) => {
                                                 return (
                                                     <ListItem
                                                         key={`avaialable-npc-${index}`}
