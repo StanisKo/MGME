@@ -43,6 +43,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
 import clsx from 'clsx';
+import { NON_PLAYER_CHARACTER_FILTER } from '../../shared/const/enums';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -93,8 +94,6 @@ export const Catalogues = (): ReactElement => {
         (store: ApplicationState) => store.catalogues?.playerCharacters?.selected ?? []
     );
 
-    // RETHINK FILTERS! npc available for chars should not be in adventure, while npc available for adv can be in another adv
-
     const [selectedMenu, setSelectedMenu] = useState<number>(SELECTED_MENU.PLAYER_CHARACTERS);
 
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -143,7 +142,9 @@ export const Catalogues = (): ReactElement => {
 
     const handleDialogOpen = async (): Promise<void> => {
         if (!availableNonPlayerCharacters) {
-            const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters();
+            const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters(
+                NON_PLAYER_CHARACTER_FILTER.AVAILABLE_FOR_PLAYER_CHARACTERS
+            );
 
             setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
             setPagination(availableNonPlayerCharacters.pagination);
@@ -202,8 +203,10 @@ export const Catalogues = (): ReactElement => {
     const handlePageChange = async (event: unknown, newPage: number): Promise<void> => {
         setPage(newPage);
 
-        // We have to add 2 due to async (rethink)
-        const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters(page + 2);
+        const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters(
+            NON_PLAYER_CHARACTER_FILTER.AVAILABLE_FOR_PLAYER_CHARACTERS,
+            newPage + 1
+        );
 
         setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
         setPagination(availableNonPlayerCharacters.pagination);

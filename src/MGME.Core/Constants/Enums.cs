@@ -23,6 +23,7 @@ namespace MGME.Core.Constants
     public enum NonPlayerCharacterFilter
     {
         ALL = 0,
-        AVAILABLE = 1
+        AVAILABLE_FOR_ADVENTURES = 1,
+        AVAILABLE_FOR_PLAYER_CHARACTERS = 2
     }
 }

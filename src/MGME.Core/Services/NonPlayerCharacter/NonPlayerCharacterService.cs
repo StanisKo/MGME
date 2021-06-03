@@ -37,17 +37,49 @@ namespace MGME.Core.Services.NonPlayerCharacterService
 
             bool weNeedAll = filter == (int)NonPlayerCharacterFilter.ALL;
 
+            Expression<Func<NonPlayerCharacter, bool>> predicate;
+
+            switch (filter)
+            {
+                /*
+                NonPlayerCharacters available for Adventures should not
+                belong to other PlayerCharacters (since they can also take part in other adventures)
+                */
+                case ((int)NonPlayerCharacterFilter.AVAILABLE_FOR_ADVENTURES):
+                    predicate =
+                        nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                            && nonPlayerCharacter.PlayerCharacterId == null;
+
+                    break;
+
+                /*
+                NonPlayerCharacters available for PlayerCharacters should not
+                belong to other PlayerCharacters, neither take part in the Adventure
+                */
+                case ((int)NonPlayerCharacterFilter.AVAILABLE_FOR_PLAYER_CHARACTERS):
+                    predicate =
+                        nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                            && nonPlayerCharacter.PlayerCharacterId == null
+                                && nonPlayerCharacter.Adventures.Count == 0;
+
+                    break;
+
+                default:
+                    predicate = nonPlayerCharacter => nonPlayerCharacter.UserId == userId;
+
+                    break;
+            }
+
             try
             {
                 int numberOfResults = await _repository.GetEntitiesCountAsync(
-                    nonPlayerCharacter => nonPlayerCharacter.UserId == userId
-                        && weNeedAll ? true : nonPlayerCharacter.PlayerCharacterId == null
+                    predicate
                 );
 
                 IEnumerable<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await QueryNonPlayerCharacters(
+                    predicate,
                     new Ref<bool>(weNeedAll),
-                    new Ref<int>(selectedPage),
-                    new Ref<int>(userId)
+                    new Ref<int>(selectedPage)
                 );
 
                 response.Data = nonPlayerCharacters;
@@ -267,16 +299,8 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             return response;
         }
 
-        private async Task <IEnumerable<GetNonPlayerCharacterListDTO>> QueryNonPlayerCharacters(Ref<bool> weNeedAll, Ref<int> selectedPage, Ref<int> userId)
+        private async Task <IEnumerable<GetNonPlayerCharacterListDTO>> QueryNonPlayerCharacters(Expression<Func<NonPlayerCharacter, bool>> predicate, Ref<bool> weNeedAll, Ref<int> selectedPage)
         {
-            Expression<Func<NonPlayerCharacter, bool>> predicate =
-                    nonPlayerCharacter => nonPlayerCharacter.UserId == userId.Value
-                    /*
-                    The condition to add NonPlayerCharacter to a PlayerCharacter or an Adventure is the same
-                    It shouldn't belong to the PlayerCharacter already
-                    */
-                    && weNeedAll.Value ? true : nonPlayerCharacter.PlayerCharacterId == null;
-
             IEnumerable<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await _repository.GetEntititesAsync<GetNonPlayerCharacterListDTO>(
                 predicate: predicate,
                 include: weNeedAll.Value

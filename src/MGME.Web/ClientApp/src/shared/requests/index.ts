@@ -5,6 +5,7 @@ import { NON_PLAYER_CHARACTER_FILTER } from '../const/enums';
 import { URLBuilder, DataController } from '../utils';
 
 export const fetchAvailableNonPlayerCharacters = async (
+    filter: NON_PLAYER_CHARACTER_FILTER,
     page?: number
 ): Promise <PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>> => {
 
@@ -12,7 +13,7 @@ export const fetchAvailableNonPlayerCharacters = async (
         {
             url: URLBuilder.ReadFrom('nonplayercharacter'),
             params: {
-                filter: NON_PLAYER_CHARACTER_FILTER.AVAILABLE,
+                filter: filter,
                 ...( page ? { page: page } : null )
             },
             returnResponse: true
