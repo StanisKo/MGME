@@ -8,7 +8,7 @@ import { PlayerCharactersTable } from '../playerCharacter/components/playerChara
 
 import { deletePlayerCharacters } from '../playerCharacter/requests';
 
-import { AvailableNonPlayerCharacter, Pagination } from '../../shared/interfaces';
+import { AvailableNonPlayerCharacter, Pagination, NewEntityToAdd } from '../../shared/interfaces';
 import { fetchAvailableNonPlayerCharacters } from '../../shared/requests';
 import { INPUT_TYPE } from '../../shared/const';
 
@@ -35,7 +35,9 @@ import {
     AccordionDetails,
     Typography,
     LinearProgress,
-    TablePagination
+    TablePagination,
+    InputLabel,
+    FormHelperText
 } from '@material-ui/core';
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -87,6 +89,10 @@ enum SELECTED_MENU {
     NON_PLAYER_CHARACTERS = 1
 }
 
+/*
+TODO: break down into smaller components
+*/
+
 export const Catalogues = (): ReactElement => {
     const dispatch = useDispatch();
 
@@ -111,9 +117,9 @@ export const Catalogues = (): ReactElement => {
 
     const [description, setDescription] = useState<string>('');
 
-    // const [newThreadsToAdd, setNewThreadsToAdd] = useState<NewEntityToAdd[]>([]);
+    const [newThreadsToAdd, setNewThreadsToAdd] = useState<NewEntityToAdd[]>([]);
 
-    // const [newNonPlayerCharactersToAdd, setNewNonPlayerChartersToAdd] = useState<NewEntityToAdd[]>([]);
+    const [newNonPlayerCharactersToAdd, setNewNonPlayerChartersToAdd] = useState<NewEntityToAdd[]>([]);
 
     const [existingNonPlayerCharactersToAdd, setExistingNonPlayerCharactersToAdd] = useState<number[]>([]);
 
@@ -187,6 +193,26 @@ export const Catalogues = (): ReactElement => {
         }
     };
 
+    const handleRemovingNewThreadsToAdd = (event: ChangeEvent<{ value: unknown }>): void => {
+        const threadName = event.target.value as string;
+
+        setNewThreadsToAdd(
+            newThreadsToAdd?.filter(
+                thread => thread.name !== threadName
+            )
+        );
+    };
+
+    const handleRemovingNewNonPlayerCharactersToAdd = (event: ChangeEvent<{ value: unknown }>): void => {
+        const nonPlayerCharacterName = event.target.value as string;
+
+        setNewNonPlayerChartersToAdd(
+            newNonPlayerCharactersToAdd?.filter(
+                nonPlayerCharacter => nonPlayerCharacter.name !== nonPlayerCharacterName
+            )
+        );
+    };
+
     // Curry the function to avoid anon functions in the markup
     const handleAddingExistingNonPlayerCharacter = (id: number) => (): void => {
         setExistingNonPlayerCharactersToAdd(
@@ -212,8 +238,6 @@ export const Catalogues = (): ReactElement => {
         setPagination(availableNonPlayerCharacters.pagination);
     };
 
-    console.log(existingNonPlayerCharactersToAdd);
-
     const handleCreate = async (): Promise<void> => {
         setDialogOpen(false);
     };
@@ -223,6 +247,7 @@ export const Catalogues = (): ReactElement => {
     const allowedToCreate =
         name
         && !nameError
+        && newThreadsToAdd.length
         && existingNonPlayerCharactersToAdd.length;
 
     // selectedMenu is not 0 (then it is 1) ? index first value : index second value
@@ -303,7 +328,7 @@ export const Catalogues = (): ReactElement => {
                     {`Create ${entityNames[selectedMenu]}`}
                 </DialogTitle>
                 <DialogContent>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={4}>
                         <Grid item xs={12}>
                             <TextField
                                 error={nameError}
@@ -326,6 +351,74 @@ export const Catalogues = (): ReactElement => {
                                 onChange={handleInputChange}
                                 inputProps={{ inputtype: INPUT_TYPE.ENTITY_DESCRIPTION }}
                             />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <TextField
+                                variant="outlined"
+                                required
+                                fullWidth
+                                label="Thread Name"
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <TextField
+                                variant="outlined"
+                                fullWidth
+                                label="Thread Description"
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <FormControl className={formControl} style={{ width: '100%' }}>
+                                <InputLabel>Your Threads Here</InputLabel>
+                                <Select
+                                    disabled={!newThreadsToAdd.length}
+                                    onChange={handleRemovingNewThreadsToAdd}
+                                >
+                                    {newThreadsToAdd.map(thread => {
+                                        return (
+                                            <MenuItem>{thread.name}</MenuItem>
+                                        );
+                                    })}
+                                </Select>
+                                <FormHelperText>At least one</FormHelperText>
+                            </FormControl>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <TextField
+                                variant="outlined"
+                                required
+                                fullWidth
+                                label="NPC Name"
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <TextField
+                                variant="outlined"
+                                fullWidth
+                                label="NPC Description"
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <FormControl className={formControl} style={{ width: '100%' }}>
+                                <InputLabel>Your NPCs Here</InputLabel>
+                                <Select
+                                    disabled={!newNonPlayerCharactersToAdd.length}
+                                    onChange={handleRemovingNewNonPlayerCharactersToAdd}
+                                >
+                                    {newNonPlayerCharactersToAdd.map(nonPlayerCharacter => {
+                                        return (
+                                            <MenuItem>{nonPlayerCharacter.name}</MenuItem>
+                                        );
+                                    })}
+                                </Select>
+                                <FormHelperText>At least one</FormHelperText>
+                            </FormControl>
                         </Grid>
 
                         <Grid item xs={12}>
