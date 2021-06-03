@@ -206,6 +206,8 @@ export const Catalogues = (): ReactElement => {
     const handleRemovingNewNonPlayerCharactersToAdd = (event: ChangeEvent<{ value: unknown }>): void => {
         const nonPlayerCharacterName = event.target.value as string;
 
+        console.log(nonPlayerCharacterName);
+
         setNewNonPlayerChartersToAdd(
             newNonPlayerCharactersToAdd?.filter(
                 nonPlayerCharacter => nonPlayerCharacter.name !== nonPlayerCharacterName
@@ -214,7 +216,7 @@ export const Catalogues = (): ReactElement => {
     };
 
     // Curry the function to avoid anon functions in the markup
-    const handleAddingExistingNonPlayerCharacter = (id: number) => (): void => {
+    const handleAddingExistingNonPlayerCharacter = (id: number, name: string) => (): void => {
         setExistingNonPlayerCharactersToAdd(
             [...existingNonPlayerCharactersToAdd, id]
         );
@@ -223,6 +225,14 @@ export const Catalogues = (): ReactElement => {
             availableNonPlayerCharacters?.filter(
                 nonPlayerCharacter => nonPlayerCharacter.id !== id
             )
+        );
+
+        /*
+        We also add exiting nonPlayerCharacters to new
+        so that the user can see all npcs he added/created for that particular char
+        */
+        setNewNonPlayerChartersToAdd(
+            [...newNonPlayerCharactersToAdd, { name: name } as NewEntityToAdd]
         );
     };
 
@@ -442,7 +452,10 @@ export const Catalogues = (): ReactElement => {
                                                         key={`avaialable-npc-${index}`}
                                                         button
                                                         /* eslint-disable-next-line max-len */
-                                                        onClick={handleAddingExistingNonPlayerCharacter(nonPlayerCharacter.id)}
+                                                        onClick={handleAddingExistingNonPlayerCharacter(
+                                                            nonPlayerCharacter.id,
+                                                            nonPlayerCharacter.name
+                                                        )}
                                                     >
                                                         <ListItemText primary={nonPlayerCharacter.name} />
                                                     </ListItem>
