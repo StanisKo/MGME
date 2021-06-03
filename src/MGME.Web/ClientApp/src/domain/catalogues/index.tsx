@@ -206,13 +206,17 @@ export const Catalogues = (): ReactElement => {
     const handleRemovingNewNonPlayerCharactersToAdd = (event: ChangeEvent<{ value: unknown }>): void => {
         const nonPlayerCharacterName = event.target.value as string;
 
-        console.log(nonPlayerCharacterName);
-
         setNewNonPlayerChartersToAdd(
             newNonPlayerCharactersToAdd?.filter(
                 nonPlayerCharacter => nonPlayerCharacter.name !== nonPlayerCharacterName
             )
         );
+
+        /*
+        We also add back available npcs, if any
+        By grabbing them from the store directly
+        Since local collection does not contain them anymore
+        */
     };
 
     // Curry the function to avoid anon functions in the markup
@@ -382,18 +386,30 @@ export const Catalogues = (): ReactElement => {
 
                         <Grid item xs={12}>
                             <FormControl className={formControl} style={{ width: '100%' }}>
-                                <InputLabel>Your Threads Here</InputLabel>
+                                <InputLabel>
+                                    {newThreadsToAdd.length
+                                        ? newThreadsToAdd.length > 1
+                                            ? `${newThreadsToAdd.length} Threads`
+                                            : newThreadsToAdd[0].name
+                                        : 'Your Threads Here'
+                                    }
+                                </InputLabel>
                                 <Select
                                     disabled={!newThreadsToAdd.length}
                                     onChange={handleRemovingNewThreadsToAdd}
                                 >
-                                    {newThreadsToAdd.map(thread => {
+                                    {newThreadsToAdd.map((thread, index) => {
                                         return (
-                                            <MenuItem>{thread.name}</MenuItem>
+                                            <MenuItem
+                                                key={`added-thread-${index}`}
+                                                value={thread.name}
+                                            >
+                                                {thread.name}
+                                            </MenuItem>
                                         );
                                     })}
                                 </Select>
-                                <FormHelperText>At least one</FormHelperText>
+                                <FormHelperText>At least one*</FormHelperText>
                             </FormControl>
                         </Grid>
 
@@ -416,18 +432,31 @@ export const Catalogues = (): ReactElement => {
 
                         <Grid item xs={12}>
                             <FormControl className={formControl} style={{ width: '100%' }}>
-                                <InputLabel>Your NPCs Here</InputLabel>
+                                <InputLabel>
+                                    {newNonPlayerCharactersToAdd.length
+                                        ? newNonPlayerCharactersToAdd.length > 1
+                                            ? `${newNonPlayerCharactersToAdd.length} NPCs`
+                                            : newNonPlayerCharactersToAdd[0].name
+                                        : 'Your NPCs Here'
+                                    }
+                                </InputLabel>
                                 <Select
+                                    value={newNonPlayerCharactersToAdd}
                                     disabled={!newNonPlayerCharactersToAdd.length}
                                     onChange={handleRemovingNewNonPlayerCharactersToAdd}
                                 >
-                                    {newNonPlayerCharactersToAdd.map(nonPlayerCharacter => {
+                                    {newNonPlayerCharactersToAdd.map((nonPlayerCharacter, index) => {
                                         return (
-                                            <MenuItem>{nonPlayerCharacter.name}</MenuItem>
+                                            <MenuItem
+                                                key={`added-npc-${index}`}
+                                                value={nonPlayerCharacter.name}
+                                            >
+                                                {nonPlayerCharacter.name}
+                                            </MenuItem>
                                         );
                                     })}
                                 </Select>
-                                <FormHelperText>At least one</FormHelperText>
+                                <FormHelperText>At least one*</FormHelperText>
                             </FormControl>
                         </Grid>
 
