@@ -9,7 +9,7 @@ import { isSelected } from '../../../shared/helpers';
 import { SortOrder } from '../../../shared/const';
 
 import { ApplicationState } from '../../../store';
-import { actionCreators } from '../../../store/shared';
+import { UpdateStore } from '../../../store/shared';
 
 import {
     Table,
@@ -89,17 +89,15 @@ export const PlayerCharactersTable = (): ReactElement | null => {
 
         setSelected(newSelected);
 
-        dispatch(
-            actionCreators.updateStore(
-                {
-                    type: 'UPDATE_STORE',
-                    reducer: 'catalogues',
-                    key: 'playerCharacters',
-                    payload: {
-                        selected: newSelected
-                    }
+        dispatch<UpdateStore<{ selected: number[] }>>(
+            {
+                type: 'UPDATE_STORE',
+                reducer: 'catalogues',
+                key: 'playerCharacters',
+                payload: {
+                    selected: newSelected
                 }
-            )
+            }
         );
     };
 
@@ -115,17 +113,15 @@ export const PlayerCharactersTable = (): ReactElement | null => {
 
         setSelected(newSelected);
 
-        dispatch(
-            actionCreators.updateStore(
-                {
-                    type: 'UPDATE_STORE',
-                    reducer: 'catalogues',
-                    key: 'playerCharacters',
-                    payload: {
-                        selected: newSelected
-                    }
+        dispatch<UpdateStore<{ selected: number[] }>>(
+            {
+                type: 'UPDATE_STORE',
+                reducer: 'catalogues',
+                key: 'playerCharacters',
+                payload: {
+                    selected: newSelected
                 }
-            )
+            }
         );
     };
 
@@ -168,17 +164,15 @@ export const PlayerCharactersTable = (): ReactElement | null => {
         if (playerCharacters && selected.length > 0) {
             setSelected([]);
 
-            dispatch(
-                actionCreators.updateStore(
-                    {
-                        type: 'UPDATE_STORE',
-                        reducer: 'catalogues',
-                        key: 'playerCharacters',
-                        payload: {
-                            selected: []
-                        }
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'playerCharacters',
+                    payload: {
+                        selected: []
                     }
-                )
+                }
             );
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps

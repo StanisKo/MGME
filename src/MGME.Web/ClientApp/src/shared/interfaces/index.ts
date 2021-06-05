@@ -34,15 +34,23 @@ export interface NewEntityToAdd {
 export interface RequestConfig {
     url: string;
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
-    headers: { [key: string]: string } | null;
-    body?: { [key: string]: unknown } | null;
+    headers?: { [key: string]: string };
+    body?: { [key: string]: unknown };
 }
 
 export interface ReadFromApi {
     url: string;
-    params: { [key: string]: string | number | boolean | number[] | string[] } | null;
+
+    // We don't need params sometimes
+    params?: { [key: string]: string | number | boolean | number[] | string[] };
+
+    /*
+    If we return reponse, no need to specify page and key
+    As they are only needed to save data to store
+    */
     page?: string;
     key?: string;
+
     /*
     We save response to store by default, so other components can access the data
     Yet, if this flag is provided, we don't, and return response to the caller
@@ -53,9 +61,15 @@ export interface ReadFromApi {
 export interface WriteToApi {
     url: string;
     method: 'POST' | 'PUT' | 'DELETE';
-    body: { [key: string]: string | number | boolean | number[] } | null;
+
+    // Body is optional, since there are some edge cases when we use interface, but do need values (e.g., deleting user)
+    body?: { [key: string]: string | number | boolean | number[] };
+
+    // Required, since after updates we want to refetch
     page: string;
-    keys: string[] | null;
+
+    // Optional, in case if we want to refetch every URL saved for that page
+    keys?: string[] | null;
 }
 
 /*    ****    */

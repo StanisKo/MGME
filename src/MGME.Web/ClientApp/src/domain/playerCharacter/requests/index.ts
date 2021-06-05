@@ -9,8 +9,7 @@ export const fetchPlayerCharacters = async (page?: number, sorting?: string): Pr
         {
             url: URLBuilder.ReadFrom('playercharacter'),
             // If no page or sorting provided, we use default from controller
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            params: !page && !sorting ? null : { page: page!, sorting: sorting! },
+            ...(!page && !sorting ? null : { page: page, sorting: sorting }),
             page: 'catalogues',
             key: 'playerCharacters'
         }
@@ -26,5 +25,5 @@ export const deletePlayerCharacters = async (ids: number[]): Promise<BaseService
             page: 'catalogues',
             keys: ['playerCharacters']
         }
-    );
+    ) as BaseServiceResponse;
 };

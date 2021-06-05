@@ -9,7 +9,7 @@ export const fetchAvailableNonPlayerCharacters = async (
     page?: number
 ): Promise <PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>> => {
 
-    return await DataController.FetchAndSave<AvailableNonPlayerCharacter[]>(
+    return await DataController.FetchAndSave<PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>>(
         {
             url: URLBuilder.ReadFrom('nonplayercharacter'),
             params: {

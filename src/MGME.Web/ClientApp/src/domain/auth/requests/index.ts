@@ -19,7 +19,6 @@ export const loginOrRegisterUser = async (
         {
             url: URLBuilder.WriteTo('auth', action),
             method: 'POST',
-            headers: null,
             body: body
         }
     );
@@ -30,7 +29,6 @@ export const confirmEmailAddress = async (token: string): Promise <BaseServiceRe
         {
             url: URLBuilder.WriteTo('auth', 'confirm'),
             method: 'POST',
-            headers: null,
             body: { token: token }
         }
     );
@@ -40,8 +38,7 @@ export const logoutUser = async (): Promise<BaseServiceResponse> => {
     return await request<BaseServiceResponse>(
         {
             url: URLBuilder.ReadFrom('auth', 'logout'),
-            method: 'GET',
-            headers: null
+            method: 'GET'
         }
     );
 };
@@ -50,8 +47,7 @@ export const refreshToken = async (): Promise <DataServiceResponse<UserTokenResp
     return await request<DataServiceResponse<UserTokenResponse>>(
         {
             url: URLBuilder.ReadFrom('auth', 'refresh-token'),
-            method: 'GET',
-            headers: null
+            method: 'GET'
         }
     );
 };

@@ -2,7 +2,7 @@ import { ReactElement, useState, ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ApplicationState } from '../../store';
-import { actionCreators } from '../../store/shared';
+import { UpdateStore } from '../../store/shared';
 
 import { PlayerCharactersTable } from '../playerCharacter/components/playerCharactersTable';
 
@@ -132,17 +132,15 @@ export const Catalogues = (): ReactElement => {
     const handleDelete = async (): Promise<void> => {
         await deletePlayerCharacters(selectedEntities);
 
-        dispatch(
-            actionCreators.updateStore(
-                {
-                    type: 'UPDATE_STORE',
-                    reducer: 'catalogues',
-                    key: 'playerCharacters',
-                    payload: {
-                        selected: []
-                    }
+        dispatch<UpdateStore<{ selected: number[] }>>(
+            {
+                type: 'UPDATE_STORE',
+                reducer: 'catalogues',
+                key: 'playerCharacters',
+                payload: {
+                    selected: []
                 }
-            )
+            }
         );
     };
 

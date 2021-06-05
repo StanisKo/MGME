@@ -1,6 +1,10 @@
 import { Action, Reducer } from 'redux';
 
-import { KnownAction } from '../shared';
+import { User } from '../../domain/user/interfaces';
+
+import { DataServiceResponse } from '../../shared/interfaces';
+
+import { UpdateStore } from '../shared';
 
 export interface UserState {
     data: {
@@ -14,7 +18,7 @@ export const UserReducer: Reducer<UserState> = (state: UserState | undefined, in
         return {} as UserState;
     }
 
-    const { type, reducer, payload } = incomingAction as KnownAction;
+    const { type, reducer, payload } = incomingAction as UpdateStore<DataServiceResponse<User>>;
 
     if (reducer !== 'user') {
         return state;
@@ -25,7 +29,7 @@ export const UserReducer: Reducer<UserState> = (state: UserState | undefined, in
 
             return {
                 // We only need to update 1 key/value that is already inside payload...
-                ...(payload as unknown as UserState)
+                ...payload
             };
 
         default:

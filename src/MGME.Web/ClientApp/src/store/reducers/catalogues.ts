@@ -1,9 +1,9 @@
 import { Action, Reducer } from 'redux';
 
 import { PlayerCharacter } from '../../domain/playerCharacter/interfaces';
-import { Pagination } from '../../shared/interfaces';
+import { PaginatedDataServiceResponse, Pagination } from '../../shared/interfaces';
 
-import { KnownAction } from '../shared';
+import { UpdateStore } from '../shared';
 
 export interface CataloguesState {
     playerCharacters: {
@@ -21,7 +21,8 @@ export const CataloguesReducer: Reducer<CataloguesState> = (
         return {} as CataloguesState;
     }
 
-    const { type, reducer, key, payload } = incomingAction as KnownAction;
+    const { type, reducer, key, payload } =
+        incomingAction as UpdateStore<PaginatedDataServiceResponse<PlayerCharacter[]>>;
 
     if (reducer !== 'catalogues') {
         return state;
