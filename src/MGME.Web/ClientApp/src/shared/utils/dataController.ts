@@ -1,17 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import {
-    BaseServiceResponse,
-    DataServiceResponse,
-    PaginatedDataServiceResponse,
-    ReadFromApi,
-    WriteToApi
-} from '../interfaces';
+import { ReadFromApi, WriteToApi } from '../interfaces';
 
 import { request } from './request';
 
 import { store } from '../../store/configureStore';
-import { actionCreators } from '../../store/shared';
+import { UpdateStore } from '../../store/shared';
 
 import qs from 'qs';
 
@@ -40,10 +34,10 @@ export class DataController {
         { url, params, page, key, returnResponse }: ReadFromApi
 
     /*
-    We still might want to return the response for user-friendly error handling,
-    even though we don't anticipate any errors from GET endpoints: it's either there or not
+    We either save data into store and return nothing,
+    Or return structure specified by the caller (or error, if any)
     */
-    ): Promise<void | DataServiceResponse<TResult> | PaginatedDataServiceResponse<TResult>> {
+    ): Promise<void | TResult | Error> {
 
         /*
         Grab token for every request,
@@ -52,13 +46,14 @@ export class DataController {
         const token = store.getState().auth?.token;
 
         if (params && Object.keys(params).length === 0) {
-            throw new Error('Parameters object cannot be empty. If you don\'t need params, provide null');
+            throw new Error(
+                'Parameters object cannot be empty. If you don\'t need params, omit the argument'
+            );
         }
 
         const urlToRequest = params ? `${url}/?${qs.stringify(params)}` : url;
 
-        // This could've been typed with unknown, or even any, since the response object would rarely leave this scope
-        const response = await request<DataServiceResponse<TResult> | PaginatedDataServiceResponse<TResult>>(
+        const response = await request<TResult>(
             {
                 url: urlToRequest,
                 method: 'GET',
@@ -66,37 +61,35 @@ export class DataController {
             }
         );
 
-        if (!response.success || returnResponse) {
+        if (returnResponse || response instanceof(Error)) {
             return response;
         }
 
-        const { success, message, ...onlyRelevantValues } = response;
-
         /*
-        At this point, if we don't return response, the caller must have provided page and key
-        If not -- that's bad code from the caller :)
+        At this point, if we don't return response and there is no error
+        the caller must have provided page and key
         */
-        store.dispatch(
-            actionCreators.updateStore(
-                {
-                    type: 'UPDATE_STORE',
-                    reducer: page!,
-                    key: key!,
-                    payload: onlyRelevantValues
-                }
-            )
+        if (!page || !key) {
+            throw new Error(
+                'You need page and key to save to store'
+            );
+        }
+
+        store.dispatch<UpdateStore<TResult>>(
+            {
+                type: 'UPDATE_STORE',
+                reducer: page,
+                key: key,
+                payload: response
+            }
         );
 
-        // eslint-disable-next-line max-len
-        this._urlsToRefetch = { ...this._urlsToRefetch, [page!]: { ...this._urlsToRefetch[page!], [key!]: urlToRequest } };
+        this._urlsToRefetch = { ...this._urlsToRefetch, [page]: { ...this._urlsToRefetch[page], [key]: urlToRequest } };
     }
 
     /**
     Makes a POST/PUT/DELETE request, refetches data from the API, updates the store with new values
-    
-    By default, refetches all urls saved for this page
-    If you only need one or several specific urls, please provide array of keys to refetch for, otherwise null
-    
+
     @param url endpoint
     @param method http method
     @param body body of the request
@@ -104,16 +97,20 @@ export class DataController {
     @param keys keys in the page under which data will be saved in store
 
     Here we always return response, successfull or not, to inform user what's happening
+
+    We don't know in advance what every (potential) service might return after update, except when something went wrong
     */
-    public static async UpdateAndRefetch({ url, method, body, page, keys }: WriteToApi): Promise<BaseServiceResponse> {
+    public static async UpdateAndRefetch({ url, method, body, page, keys }: WriteToApi): Promise<unknown | Error> {
 
         const token = store.getState().auth?.token;
 
         if (keys && keys.length === 0) {
-            throw new Error('Keys array cannot be empty');
+            throw new Error(
+                'Keys array cannot be empty. If you want to refetch all URLs for this page, omit the argument'
+            );
         }
 
-        const response = await request<BaseServiceResponse>(
+        const response = await request<unknown>(
             {
                 url: url,
                 method: method,
@@ -122,63 +119,45 @@ export class DataController {
             }
         );
 
-        if (!response.success) {
+        if (response instanceof(Error)) {
             return response;
         }
 
-        if (keys && keys.length > 0) {
-            for (const key of keys) {
-                /*
-                We type data service response with unknown, since we don't know in advance which endpoints
-                We would like to refetch after update
-                */
-                const response = await request<DataServiceResponse<unknown> | PaginatedDataServiceResponse<unknown>>(
-                    {
-                        url: this._urlsToRefetch[page][key],
-                        method: 'GET',
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    }
-                );
+        // We received keys ? Refetch all urls by that key : refetch all urls for that page
+        const requests = (keys && keys.length ? keys : Object.keys(this._urlsToRefetch[page])).map(key => {
 
-                const { success, message, ...onlyRelevantValues } = response;
+            // Dispatch all requests
+            return request<unknown>(
+                {
+                    url: this._urlsToRefetch[page][key],
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
 
-                store.dispatch(
-                    actionCreators.updateStore(
-                        {
-                            type: 'UPDATE_STORE',
-                            reducer: page,
-                            key: key,
-                            payload: onlyRelevantValues
-                        }
-                    )
-                );
-            }
-        }
-        else {
-            const urls = Object.keys(this._urlsToRefetch[page]);
+            // When finished, return the result of each under relevant key
+            ).then(response => {
+                return { [key]: response };
+            });
 
-            for (const key of urls) {
-                const response = await request<DataServiceResponse<unknown> | PaginatedDataServiceResponse<unknown>>(
-                    {
-                        url: this._urlsToRefetch[page][key],
-                        method: 'GET',
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    }
-                );
+        });
 
-                const { success, message, ...onlyRelevantValues } = response;
+        /*
+        Wait for all responses
+        In such way, script can proceed to creating new requests before the results of previous are received
+        */
+        const responses = Promise.all(requests);
 
-                store.dispatch(
-                    actionCreators.updateStore(
-                        {
-                            type: 'UPDATE_STORE',
-                            reducer: page,
-                            key: key,
-                            payload: onlyRelevantValues
-                        }
-                    )
-                );
-            }
+        // We finally save all fresh responses by the same keys
+        for (const [key, response] of Object.entries(responses)) {
+
+            store.dispatch<UpdateStore<unknown>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: page,
+                    key: key,
+                    payload: response
+                }
+            );
         }
 
         return response;

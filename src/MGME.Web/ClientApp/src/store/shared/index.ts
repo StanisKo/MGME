@@ -1,4 +1,3 @@
-import { actionCreators, KnownAction } from './actionsCreators';
+import { UpdateStore } from './actionTypes';
 
-export { actionCreators };
-export type { KnownAction };
+export type { UpdateStore };
