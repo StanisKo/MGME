@@ -3,15 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { ApplicationState, UpdateStore } from '../../store';
 
-import { PlayerCharactersTable } from '../playerCharacter/components/playerCharactersTable';
+import { entityNames } from './helpers';
 
+import { PlayerCharactersTable } from '../playerCharacter/components/playerCharactersTable';
 import { deletePlayerCharacters } from '../playerCharacter/requests';
 
+import { INPUT_TYPE, NON_PLAYER_CHARACTER_FILTER } from '../../shared/const';
 import { AvailableNonPlayerCharacter, Pagination, NewEntityToAdd } from '../../shared/interfaces';
 import { fetchAvailableNonPlayerCharacters } from '../../shared/requests';
-import { INPUT_TYPE } from '../../shared/const';
-
-import { entityNames } from './helpers';
 
 import {
     Paper,
@@ -44,7 +43,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
 import clsx from 'clsx';
-import { NON_PLAYER_CHARACTER_FILTER } from '../../shared/const/enums';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

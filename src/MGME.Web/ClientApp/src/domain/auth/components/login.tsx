@@ -11,16 +11,16 @@ import {
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import { LoginUser } from '../../../store';
+
 import { MODE, modeNames } from '../helpers';
 import { loginOrRegisterUser } from '../requests';
-import { INPUT_TYPE } from '../../../shared/const';
+
+import { INPUT_TYPE, ROUTES } from '../../../shared/const';
+import { BaseServiceResponse, DataServiceResponse, UserTokenResponse, DecodedToken } from '../../../shared/interfaces';
+import { Alert } from '../../../shared/components';
 import { validEmailFormat, validPasswordFormat } from '../../../shared/helpers';
 
-import { ROUTES } from '../../../shared/const';
-import { Alert } from '../../../shared/components';
-import { BaseServiceResponse, DataServiceResponse, UserTokenResponse, DecodedToken } from '../../../shared/interfaces';
-
-import { LoginUser } from '../../../store';
 
 import { Container, Button, TextField, Grid, Box, Typography, Link, Snackbar } from '@material-ui/core';
 

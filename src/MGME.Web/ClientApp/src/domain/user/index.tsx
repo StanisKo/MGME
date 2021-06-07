@@ -11,8 +11,9 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import { ApplicationState, LogoutUser } from '../../store';
+
 import { User } from './interfaces';
-import { ApplicationState } from '../../store';
 
 import { getUser, updateUser, changePassword, deleteUser } from './requests';
 
@@ -20,8 +21,6 @@ import { Alert } from '../../shared/components';
 import { ROUTES, INPUT_TYPE } from '../../shared/const';
 import { BaseServiceResponse } from '../../shared/interfaces';
 import { validEmailFormat, validPasswordFormat } from '../../shared/helpers';
-
-import { LogoutUser } from '../../store';
 
 import {
     Button,

@@ -2,8 +2,7 @@ import { ReactElement, useEffect, useState } from 'react';
 import { Router, Switch, Redirect } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
-import { store } from './store';
-import { LoginUser, LogoutUser, UpdateToken } from './store';
+import { store, LoginUser, LogoutUser, UpdateToken } from './store';
 
 import { DataServiceResponse, UserTokenResponse, DecodedToken } from './shared/interfaces';
 

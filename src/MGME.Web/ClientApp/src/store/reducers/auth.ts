@@ -1,6 +1,6 @@
 import { Action, Reducer } from 'redux';
 
-import { LoginUser, UpdateToken, LogoutUser } from '../actionTypes';
+import { LoginUser, UpdateToken, LogoutUser } from '../';
 
 export interface AuthState {
     token: string;
