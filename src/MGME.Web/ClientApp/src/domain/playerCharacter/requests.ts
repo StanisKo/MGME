@@ -1,8 +1,8 @@
-import { PlayerCharacter } from '../interfaces';
+import { PlayerCharacter } from './interfaces';
 
-import { BaseServiceResponse, ReadFromApi } from '../../../shared/interfaces';
+import { BaseServiceResponse, ReadFromApi } from '../../shared/interfaces';
 
-import { URLBuilder, DataController } from '../../../shared/utils';
+import { URLBuilder, DataController } from '../../shared/utils';
 
 export const fetchPlayerCharacters = async (page?: number, sorting?: string): Promise<void> => {
     const params: ReadFromApi['params'] = {};

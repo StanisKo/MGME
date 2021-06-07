@@ -1,4 +1,4 @@
-import { BaseEntity } from '../../../shared/interfaces';
+import { BaseEntity } from '../../shared/interfaces';
 
 interface Thread extends BaseEntity {
     name: string;
