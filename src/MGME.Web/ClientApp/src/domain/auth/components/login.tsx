@@ -20,7 +20,7 @@ import { ROUTES } from '../../../shared/const';
 import { Alert } from '../../../shared/components';
 import { BaseServiceResponse, DataServiceResponse, UserTokenResponse, DecodedToken } from '../../../shared/interfaces';
 
-import { LoginUser } from '../../../store/reducers/auth';
+import { LoginUser } from '../../../store';
 
 import { Container, Button, TextField, Grid, Box, Typography, Link, Snackbar } from '@material-ui/core';
 

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { logoutUser } from '../../domain/auth/requests';
 
-import { LogoutUser } from '../../store/reducers/auth';
+import { LogoutUser } from '../../store';
 
 import { AppBar, Toolbar, Tabs, Tab, IconButton, Menu, MenuItem, Theme } from '@material-ui/core';
 

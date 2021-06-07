@@ -10,3 +10,24 @@ export interface UpdateStore<TPayload> {
     payload: TPayload;
 }
 
+// Auth related action types:
+
+export interface LoginUser {
+    type: 'LOGIN_USER';
+    payload: {
+        token: string;
+        userRole: string;
+    }
+}
+
+export interface UpdateToken {
+    type: 'UPDATE_TOKEN';
+    payload: {
+        token: string;
+    }
+}
+
+export interface LogoutUser {
+    type: 'LOGOUT_USER'
+}
+

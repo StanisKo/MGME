@@ -4,7 +4,7 @@ import { AuthState, AuthReducer } from './reducers/auth';
 import { UserState, UserReducer } from './reducers/user';
 import { CataloguesState, CataloguesReducer } from './reducers/catalogues';
 
-import { UpdateStore } from './actionTypes';
+import { UpdateStore, LoginUser, UpdateToken, LogoutUser } from './actionTypes';
 
 // Shape of the store
 interface ApplicationState {
@@ -35,9 +35,12 @@ const configureStore = (initialState?: ApplicationState): Store => {
     );
 };
 
-// We export store directly in order to access JWT outside of components
+/*
+We export store directly in order to access it and dispatch to
+From components that are outside of Provider
+*/
 export const store = configureStore();
 
 // We export types to work with store
-export type { ApplicationState, UpdateStore };
+export type { ApplicationState, UpdateStore, LoginUser, UpdateToken, LogoutUser };
 

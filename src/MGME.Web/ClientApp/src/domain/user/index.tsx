@@ -21,7 +21,7 @@ import { ROUTES, INPUT_TYPE } from '../../shared/const';
 import { BaseServiceResponse } from '../../shared/interfaces';
 import { validEmailFormat, validPasswordFormat } from '../../shared/helpers';
 
-import { LogoutUser } from '../../store/reducers/auth';
+import { LogoutUser } from '../../store';
 
 import {
     Button,

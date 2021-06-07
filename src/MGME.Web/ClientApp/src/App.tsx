@@ -3,7 +3,7 @@ import { Router, Switch, Redirect } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
 import { store } from './store';
-import { LoginUser, LogoutUser, UpdateToken } from './store/reducers/auth';
+import { LoginUser, LogoutUser, UpdateToken } from './store';
 
 import { DataServiceResponse, UserTokenResponse, DecodedToken } from './shared/interfaces';
 

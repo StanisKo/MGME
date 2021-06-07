@@ -1,5 +1,7 @@
 import { Action, Reducer } from 'redux';
 
+import { LoginUser, UpdateToken, LogoutUser } from '../actionTypes';
+
 export interface AuthState {
     token: string;
     userRole: string;
@@ -9,28 +11,7 @@ export interface AuthState {
 On init, we also parse user role and save it along the token
 
 Afterwards, we update the token every time it's about to expire
-
-NOTE:
 */
-
-export interface LoginUser {
-    type: 'LOGIN_USER';
-    payload: {
-        token: string;
-        userRole: string;
-    }
-}
-
-export interface UpdateToken {
-    type: 'UPDATE_TOKEN';
-    payload: {
-        token: string;
-    }
-}
-
-export interface LogoutUser {
-    type: 'LOGOUT_USER'
-}
 
 type KnownAction = LoginUser | UpdateToken | LogoutUser;
 
