@@ -1,7 +1,6 @@
 import { Action, Reducer } from 'redux';
 
 import { User } from '../../domain/user/interfaces';
-
 import { DataServiceResponse } from '../../shared/interfaces';
 
 import { UpdateStore } from '../';

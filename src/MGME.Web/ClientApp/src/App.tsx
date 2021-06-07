@@ -3,7 +3,7 @@ import { Router, Switch, Redirect } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
 import { store } from './store';
-import { authActionCreators } from './store/reducers/auth';
+import { LoginUser, LogoutUser, UpdateToken } from './store/reducers/auth';
 
 import { DataServiceResponse, UserTokenResponse, DecodedToken } from './shared/interfaces';
 
@@ -55,16 +55,14 @@ export const Application = (): ReactElement => {
                 );
 
                 // We access store directly since scope is outside of Provider
-                store.dispatch(
-                    authActionCreators.loginUser(
-                        {
-                            type: 'LOGIN_USER',
-                            payload: {
-                                token: token,
-                                userRole: decoded.role
-                            }
+                store.dispatch<LoginUser>(
+                    {
+                        type: 'LOGIN_USER',
+                        payload: {
+                            token: token,
+                            userRole: decoded.role
                         }
-                    )
+                    }
                 );
             }
             else {
@@ -79,12 +77,10 @@ export const Application = (): ReactElement => {
                     localStorage.removeItem('userLoggedIn');
 
                     // We also clear out store since menu render depends on it
-                    store.dispatch(
-                        authActionCreators.logoutUser(
-                            {
-                                type: 'LOGOUT_USER'
-                            }
-                        )
+                    store.dispatch<LogoutUser>(
+                        {
+                            type: 'LOGOUT_USER'
+                        }
                     );
 
                     history.push(ROUTES.LOGIN);
@@ -104,15 +100,13 @@ export const Application = (): ReactElement => {
                 if (refreshTokenResponse.success) {
                     const token = (refreshTokenResponse as DataServiceResponse<UserTokenResponse>).data.accessToken;
 
-                    store.dispatch(
-                        authActionCreators.updateToken(
-                            {
-                                type: 'UPDATE_TOKEN',
-                                payload: {
-                                    token: token
-                                }
+                    store.dispatch<UpdateToken>(
+                        {
+                            type: 'UPDATE_TOKEN',
+                            payload: {
+                                token: token
                             }
-                        )
+                        }
                     );
                 }
             }, accessTokenExpiresIn);

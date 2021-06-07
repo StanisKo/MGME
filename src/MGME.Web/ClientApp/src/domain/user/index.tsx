@@ -21,7 +21,7 @@ import { ROUTES, INPUT_TYPE } from '../../shared/const';
 import { BaseServiceResponse } from '../../shared/interfaces';
 import { validEmailFormat, validPasswordFormat } from '../../shared/helpers';
 
-import { authActionCreators } from '../../store/reducers/auth';
+import { LogoutUser } from '../../store/reducers/auth';
 
 import {
     Button,
@@ -331,12 +331,10 @@ export const UserProfile = (): ReactElement | null => {
             localStorage.removeItem('userRegisteredBefore');
 
             // We also clear out store since menu render depends on it
-            dispatch(
-                authActionCreators.logoutUser(
-                    {
-                        type: 'LOGOUT_USER'
-                    }
-                )
+            dispatch<LogoutUser>(
+                {
+                    type: 'LOGOUT_USER'
+                }
             );
 
             history.push(ROUTES.LOGIN);

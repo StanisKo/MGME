@@ -20,7 +20,7 @@ import { ROUTES } from '../../../shared/const';
 import { Alert } from '../../../shared/components';
 import { BaseServiceResponse, DataServiceResponse, UserTokenResponse, DecodedToken } from '../../../shared/interfaces';
 
-import { authActionCreators } from '../../../store/reducers/auth';
+import { LoginUser } from '../../../store/reducers/auth';
 
 import { Container, Button, TextField, Grid, Box, Typography, Link, Snackbar } from '@material-ui/core';
 
@@ -210,16 +210,14 @@ export const Login = (): ReactElement => {
 
                 const decoded = jwt_decode(token) as DecodedToken;
 
-                dispatch(
-                    authActionCreators.loginUser(
-                        {
-                            type: 'LOGIN_USER',
-                            payload: {
-                                token: token,
-                                userRole: decoded.role
-                            }
+                dispatch<LoginUser>(
+                    {
+                        type: 'LOGIN_USER',
+                        payload: {
+                            token: token,
+                            userRole: decoded.role
                         }
-                    )
+                    }
                 );
 
                 history.push(ROUTES.CATALOGUES);
