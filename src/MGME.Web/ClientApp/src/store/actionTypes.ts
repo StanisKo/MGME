@@ -11,7 +11,6 @@ export interface UpdateStore<TPayload> {
 }
 
 // Auth related action types:
-
 export interface LoginUser {
     type: 'LOGIN_USER';
     payload: {

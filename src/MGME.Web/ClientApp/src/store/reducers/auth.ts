@@ -7,12 +7,6 @@ export interface AuthState {
     userRole: string;
 }
 
-/*
-On init, we also parse user role and save it along the token
-
-Afterwards, we update the token every time it's about to expire
-*/
-
 type KnownAction = LoginUser | UpdateToken | LogoutUser;
 
 export const AuthReducer: Reducer<AuthState> = (state: AuthState | undefined, incomingAction: Action): AuthState => {
