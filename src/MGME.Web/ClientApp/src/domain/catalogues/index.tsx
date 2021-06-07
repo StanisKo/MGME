@@ -3,14 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { ApplicationState, UpdateStore } from '../../store';
 
-import { entityNames } from './helpers';
-
-import { PlayerCharactersTable } from '../playerCharacter/components/playerCharactersTable';
+import { PlayerCharactersTable } from '../playerCharacter/components';
 import { deletePlayerCharacters } from '../playerCharacter/requests';
 
-import { INPUT_TYPE, NON_PLAYER_CHARACTER_FILTER } from '../../shared/const';
 import { AvailableNonPlayerCharacter, Pagination, NewEntityToAdd } from '../../shared/interfaces';
 import { fetchAvailableNonPlayerCharacters } from '../../shared/requests';
+import { INPUT_TYPE, NON_PLAYER_CHARACTER_FILTER } from '../../shared/const';
+
+import { entityNames } from './helpers';
 
 import {
     Paper,
@@ -88,6 +88,9 @@ enum SELECTED_MENU {
 
 /*
 TODO: break down into smaller components
+
+1. Finish with creating character logic and request
+2. Move creation window into separate component
 */
 
 export const Catalogues = (): ReactElement => {

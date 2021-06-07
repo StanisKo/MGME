@@ -3,9 +3,9 @@ import { useHistory } from 'react-router-dom';
 
 import { confirmEmailAddress } from '../requests';
 
-import { ROUTES } from '../../../shared/const';
-import { Alert } from '../../../shared/components';
 import { BaseServiceResponse } from '../../../shared/interfaces';
+import { Alert } from '../../../shared/components';
+import { ROUTES } from '../../../shared/const';
 
 import { Container, Box, Typography, Snackbar, Grid, CardMedia } from '@material-ui/core';
 

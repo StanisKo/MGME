@@ -13,12 +13,18 @@ import { useHistory } from 'react-router-dom';
 
 import { LoginUser } from '../../../store';
 
-import { MODE, modeNames } from '../helpers';
 import { loginOrRegisterUser } from '../requests';
+import { MODE, modeNames } from '../helpers';
 
-import { INPUT_TYPE, ROUTES } from '../../../shared/const';
-import { BaseServiceResponse, DataServiceResponse, UserTokenResponse, DecodedToken } from '../../../shared/interfaces';
+import {
+    BaseServiceResponse,
+    DataServiceResponse,
+    UserTokenResponse,
+    DecodedToken
+} from '../../../shared/interfaces';
+
 import { Alert } from '../../../shared/components';
+import { INPUT_TYPE, ROUTES } from '../../../shared/const';
 import { validEmailFormat, validPasswordFormat } from '../../../shared/helpers';
 
 

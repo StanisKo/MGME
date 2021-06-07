@@ -1,5 +1,5 @@
-import { URLBuilder, request } from '../../shared/utils/';
 import { BaseServiceResponse, DataServiceResponse, UserTokenResponse } from '../../shared/interfaces';
+import { URLBuilder, request } from '../../shared/utils/';
 
 import { MODE } from './helpers';
 

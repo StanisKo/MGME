@@ -1,14 +1,14 @@
 import { ReactElement, useState, useEffect, ChangeEvent, MouseEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
+import { ApplicationState, UpdateStore } from '../../../store';
+
 import { PlayerCharacter } from '../interfaces';
 import { fetchPlayerCharacters } from '../requests';
 
 import { HeadCell, Pagination } from '../../../shared/interfaces';
-import { isSelected } from '../../../shared/helpers';
 import { SortOrder } from '../../../shared/const';
-
-import { ApplicationState, UpdateStore } from '../../../store';
+import { isSelected } from '../../../shared/helpers';
 
 import {
     Table,
@@ -148,7 +148,7 @@ export const PlayerCharactersTable = (): ReactElement | null => {
     // Request with params
     useEffect(() => {
         (async (): Promise<void> => {
-            if (isAuthorized) {
+            if (isAuthorized && playerCharacters !== null) {
                 await fetchPlayerCharacters(
                     page + 1,
                     `${order === 'asc' ? '' : '-'}${orderBy}`
