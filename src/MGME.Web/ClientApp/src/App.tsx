@@ -7,8 +7,7 @@ import { actionCreators } from './store/reducers/auth';
 
 import { DataServiceResponse, UserTokenResponse, DecodedToken } from './shared/interfaces';
 
-import { MenuBar } from './shared/components/menu';
-import { PublicRoute, PrivateRoute } from './shared/components/routes';
+import { PublicRoute, PrivateRoute, MenuBar } from './shared/components';
 
 import { ROUTES } from './shared/const';
 import { history } from './shared/utils';

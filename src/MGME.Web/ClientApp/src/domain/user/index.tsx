@@ -16,7 +16,7 @@ import { ApplicationState } from '../../store';
 
 import { getUser, updateUser, changePassword, deleteUser } from './requests';
 
-import { Alert } from '../../shared/components/alert';
+import { Alert } from '../../shared/components';
 import { ROUTES, INPUT_TYPE } from '../../shared/const';
 import { BaseServiceResponse } from '../../shared/interfaces';
 import { validEmailFormat, validPasswordFormat } from '../../shared/helpers';
