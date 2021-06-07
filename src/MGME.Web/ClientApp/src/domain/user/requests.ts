@@ -1,6 +1,6 @@
-import { User } from '../interfaces';
-import { URLBuilder, DataController } from '../../../shared/utils';
-import { BaseServiceResponse, DataServiceResponse } from '../../../shared/interfaces';
+import { User } from './interfaces';
+import { URLBuilder, DataController } from '../../shared/utils';
+import { BaseServiceResponse, DataServiceResponse } from '../../shared/interfaces';
 
 interface UpdateUserProps {
     name?: string;
