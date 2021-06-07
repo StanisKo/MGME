@@ -3,7 +3,7 @@ import { Action, Reducer } from 'redux';
 import { PlayerCharacter } from '../../domain/playerCharacter/interfaces';
 import { PaginatedDataServiceResponse, Pagination } from '../../shared/interfaces';
 
-import { UpdateStore } from '../shared';
+import { UpdateStore } from '../';
 
 export interface CataloguesState {
     playerCharacters: {

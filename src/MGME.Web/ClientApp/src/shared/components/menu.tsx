@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { logoutUser } from '../../domain/auth/requests';
 
-import { actionCreators } from '../../store/reducers/auth';
+import { authActionCreators } from '../../store/reducers/auth';
 
 import { AppBar, Toolbar, Tabs, Tab, IconButton, Menu, MenuItem, Theme } from '@material-ui/core';
 
@@ -68,7 +68,7 @@ export const MenuBar = (): ReactElement | null => {
 
             // We also clear out store since menu render depends on it
             dispatch(
-                actionCreators.logoutUser(
+                authActionCreators.logoutUser(
                     {
                         type: 'LOGOUT_USER'
                     }

@@ -2,8 +2,8 @@ import { ReactElement, useEffect, useState } from 'react';
 import { Router, Switch, Redirect } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
-import { store } from './store/configureStore';
-import { actionCreators } from './store/reducers/auth';
+import { store } from './store';
+import { authActionCreators } from './store/reducers/auth';
 
 import { DataServiceResponse, UserTokenResponse, DecodedToken } from './shared/interfaces';
 
@@ -56,7 +56,7 @@ export const Application = (): ReactElement => {
 
                 // We access store directly since scope is outside of Provider
                 store.dispatch(
-                    actionCreators.loginUser(
+                    authActionCreators.loginUser(
                         {
                             type: 'LOGIN_USER',
                             payload: {
@@ -80,7 +80,7 @@ export const Application = (): ReactElement => {
 
                     // We also clear out store since menu render depends on it
                     store.dispatch(
-                        actionCreators.logoutUser(
+                        authActionCreators.logoutUser(
                             {
                                 type: 'LOGOUT_USER'
                             }
@@ -105,7 +105,7 @@ export const Application = (): ReactElement => {
                     const token = (refreshTokenResponse as DataServiceResponse<UserTokenResponse>).data.accessToken;
 
                     store.dispatch(
-                        actionCreators.updateToken(
+                        authActionCreators.updateToken(
                             {
                                 type: 'UPDATE_TOKEN',
                                 payload: {

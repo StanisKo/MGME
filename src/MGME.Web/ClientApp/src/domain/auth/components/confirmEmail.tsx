@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { confirmEmailAddress } from '../requests';
 
 import { ROUTES } from '../../../shared/const';
-import { Alert } from '../../../shared/components/alert';
+import { Alert } from '../../../shared/components';
 import { BaseServiceResponse } from '../../../shared/interfaces';
 
 import { Container, Box, Typography, Snackbar, Grid, CardMedia } from '@material-ui/core';

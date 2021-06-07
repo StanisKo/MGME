@@ -21,7 +21,7 @@ import { ROUTES, INPUT_TYPE } from '../../shared/const';
 import { BaseServiceResponse } from '../../shared/interfaces';
 import { validEmailFormat, validPasswordFormat } from '../../shared/helpers';
 
-import { actionCreators } from '../../store/reducers/auth';
+import { authActionCreators } from '../../store/reducers/auth';
 
 import {
     Button,
@@ -332,7 +332,7 @@ export const UserProfile = (): ReactElement | null => {
 
             // We also clear out store since menu render depends on it
             dispatch(
-                actionCreators.logoutUser(
+                authActionCreators.logoutUser(
                     {
                         type: 'LOGOUT_USER'
                     }

@@ -4,7 +4,7 @@ import { User } from '../../domain/user/interfaces';
 
 import { DataServiceResponse } from '../../shared/interfaces';
 
-import { UpdateStore } from '../shared';
+import { UpdateStore } from '../';
 
 export interface UserState {
     data: {

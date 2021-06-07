@@ -32,7 +32,7 @@ interface LogoutUser {
 
 type KnownAction = LoginUser | UpdateToken | LogoutUser;
 
-export const actionCreators = {
+export const authActionCreators = {
     loginUser: ({ type, payload }: LoginUser): LoginUser => ({
         type: type,
         payload: {

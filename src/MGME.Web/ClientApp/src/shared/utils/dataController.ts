@@ -4,8 +4,7 @@ import { ReadFromApi, WriteToApi } from '../interfaces';
 
 import { request } from './request';
 
-import { store } from '../../store/configureStore';
-import { UpdateStore } from '../../store/shared';
+import { store, UpdateStore } from '../../store';
 
 import qs from 'qs';
 

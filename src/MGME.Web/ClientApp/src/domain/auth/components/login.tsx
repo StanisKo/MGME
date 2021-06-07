@@ -17,10 +17,10 @@ import { INPUT_TYPE } from '../../../shared/const';
 import { validEmailFormat, validPasswordFormat } from '../../../shared/helpers';
 
 import { ROUTES } from '../../../shared/const';
-import { Alert } from '../../../shared/components/alert';
+import { Alert } from '../../../shared/components';
 import { BaseServiceResponse, DataServiceResponse, UserTokenResponse, DecodedToken } from '../../../shared/interfaces';
 
-import { actionCreators } from '../../../store/reducers/auth';
+import { authActionCreators } from '../../../store/reducers/auth';
 
 import { Container, Button, TextField, Grid, Box, Typography, Link, Snackbar } from '@material-ui/core';
 
@@ -211,7 +211,7 @@ export const Login = (): ReactElement => {
                 const decoded = jwt_decode(token) as DecodedToken;
 
                 dispatch(
-                    actionCreators.loginUser(
+                    authActionCreators.loginUser(
                         {
                             type: 'LOGIN_USER',
                             payload: {

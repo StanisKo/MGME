@@ -1,8 +1,7 @@
 import { ReactElement, useState, ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ApplicationState } from '../../store';
-import { UpdateStore } from '../../store/shared';
+import { ApplicationState, UpdateStore } from '../../store';
 
 import { PlayerCharactersTable } from '../playerCharacter/components/playerCharactersTable';
 

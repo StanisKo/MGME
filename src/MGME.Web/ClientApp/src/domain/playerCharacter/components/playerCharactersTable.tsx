@@ -8,8 +8,7 @@ import { HeadCell, Pagination } from '../../../shared/interfaces';
 import { isSelected } from '../../../shared/helpers';
 import { SortOrder } from '../../../shared/const';
 
-import { ApplicationState } from '../../../store';
-import { UpdateStore } from '../../../store/shared';
+import { ApplicationState, UpdateStore } from '../../../store';
 
 import {
     Table,
