@@ -1,3 +1,4 @@
 import { PlayerCharactersTable } from './playerCharactersTable';
+import { CreatePlayerCharacterModal } from './createPlayerCharacterModal';
 
-export { PlayerCharactersTable };
+export { PlayerCharactersTable, CreatePlayerCharacterModal };

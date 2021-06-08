@@ -41,6 +41,6 @@ From components that are outside of Provider
 */
 export const store = configureStore();
 
-// We export types to work with store
+// We export types to work with store from inside components
 export type { ApplicationState, UpdateStore, LoginUser, UpdateToken, LogoutUser };
 
