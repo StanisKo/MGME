@@ -60,13 +60,6 @@ enum SELECTED_MENU {
     NON_PLAYER_CHARACTERS = 1
 }
 
-/*
-TODO: break down into smaller components
-
-1. Finish with creating character logic and request
-2. Move creation window into separate component
-*/
-
 export const Catalogues = (): ReactElement => {
     const dispatch = useDispatch();
 

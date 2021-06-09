@@ -10,11 +10,6 @@ import {
     DialogContent,
     Grid,
     TextField,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    FormHelperText,
     Accordion,
     AccordionSummary,
     AccordionDetails,
@@ -108,22 +103,18 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         }
     };
 
-    const handleRemovingNewThreadsToAdd = (event: ChangeEvent<{ value: unknown }>): void => {
-        const threadName = event.target.value as string;
-
+    const handleRemovingNewThreadsToAdd = (name: string) => (): void => {
         setNewThreadsToAdd(
             newThreadsToAdd?.filter(
-                thread => thread.name !== threadName
+                thread => thread.name !== name
             )
         );
     };
 
-    const handleRemovingNewNonPlayerCharactersToAdd = (event: ChangeEvent<{ value: unknown }>): void => {
-        const nonPlayerCharacterName = event.target.value as string;
-
+    const handleRemovingNewNonPlayerCharactersToAdd = (name: string) => (): void => {
         setNewNonPlayerChartersToAdd(
             newNonPlayerCharactersToAdd?.filter(
-                nonPlayerCharacter => nonPlayerCharacter.name !== nonPlayerCharacterName
+                nonPlayerCharacter => nonPlayerCharacter.name !== name
             )
         );
 
@@ -134,7 +125,6 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         */
     };
 
-    // Curry the function to avoid anon functions in the markup
     const handleAddingExistingNonPlayerCharacter = (id: number, name: string) => (): void => {
         setExistingNonPlayerCharactersToAdd(
             [...existingNonPlayerCharactersToAdd, id]
@@ -246,32 +236,36 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                     </Grid>
 
                     <Grid item xs={12}>
-                        <FormControl className={classes.formControl} style={{ width: '100%' }}>
-                            <InputLabel>
-                                {newThreadsToAdd.length
-                                    ? newThreadsToAdd.length > 1
-                                        ? `${newThreadsToAdd.length} Threads`
-                                        : newThreadsToAdd[0].name
-                                    : 'Your Threads Here'
-                                }
-                            </InputLabel>
-                            <Select
-                                disabled={!newThreadsToAdd.length}
-                                onChange={handleRemovingNewThreadsToAdd}
+                        <Accordion
+                            disabled={newThreadsToAdd.length === 0}
+                            expanded={newThreadsToAdd.length > 0}
+                        >
+                            <AccordionSummary
+                                aria-controls="newThreads-content"
+                                id="newThreads-header"
                             >
-                                {newThreadsToAdd.map((thread, index) => {
-                                    return (
-                                        <MenuItem
-                                            key={`added-thread-${index}`}
-                                            value={thread.name}
-                                        >
-                                            {thread.name}
-                                        </MenuItem>
-                                    );
-                                })}
-                            </Select>
-                            <FormHelperText>At least one*</FormHelperText>
-                        </FormControl>
+                                <Typography>
+                                    Your Threads
+                                </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <List style={{ width: '100%' }}>
+                                    {newThreadsToAdd.map((thread, index) => {
+                                        return (
+                                            <ListItem
+                                                key={`new-thread-${index}`}
+                                                button
+                                                onClick={handleRemovingNewThreadsToAdd(
+                                                    thread.name
+                                                )}
+                                            >
+                                                <ListItemText primary={thread.name} />
+                                            </ListItem>
+                                        );
+                                    })}
+                                </List>
+                            </AccordionDetails>
+                        </Accordion>
                     </Grid>
 
                     <Grid item xs={12}>
@@ -292,33 +286,36 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                     </Grid>
 
                     <Grid item xs={12}>
-                        <FormControl className={classes.formControl} style={{ width: '100%' }}>
-                            <InputLabel>
-                                {newNonPlayerCharactersToAdd.length
-                                    ? newNonPlayerCharactersToAdd.length > 1
-                                        ? `${newNonPlayerCharactersToAdd.length} NPCs`
-                                        : newNonPlayerCharactersToAdd[0].name
-                                    : 'Your NPCs Here'
-                                }
-                            </InputLabel>
-                            <Select
-                                value={newNonPlayerCharactersToAdd}
-                                disabled={!newNonPlayerCharactersToAdd.length}
-                                onChange={handleRemovingNewNonPlayerCharactersToAdd}
+                        <Accordion
+                            disabled={newNonPlayerCharactersToAdd.length === 0}
+                            expanded={newNonPlayerCharactersToAdd.length > 0}
+                        >
+                            <AccordionSummary
+                                aria-controls="newNonPlayerCharacters-content"
+                                id="newNonPlayerCharacters-header"
                             >
-                                {newNonPlayerCharactersToAdd.map((nonPlayerCharacter, index) => {
-                                    return (
-                                        <MenuItem
-                                            key={`added-npc-${index}`}
-                                            value={nonPlayerCharacter.name}
-                                        >
-                                            {nonPlayerCharacter.name}
-                                        </MenuItem>
-                                    );
-                                })}
-                            </Select>
-                            <FormHelperText>At least one*</FormHelperText>
-                        </FormControl>
+                                <Typography>
+                                    Your NPCs
+                                </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <List style={{ width: '100%' }}>
+                                    {newNonPlayerCharactersToAdd.map((nonPlayerCharacter, index) => {
+                                        return (
+                                            <ListItem
+                                                key={`new-npc-${index}`}
+                                                button
+                                                onClick={handleRemovingNewNonPlayerCharactersToAdd(
+                                                    nonPlayerCharacter.name
+                                                )}
+                                            >
+                                                <ListItemText primary={nonPlayerCharacter.name} />
+                                            </ListItem>
+                                        );
+                                    })}
+                                </List>
+                            </AccordionDetails>
+                        </Accordion>
                     </Grid>
 
                     <Grid item xs={12}>
@@ -326,8 +323,8 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                             <Accordion>
                                 <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel1a-content"
-                                    id="panel1a-header"
+                                    aria-controls="availableNonPlayerCharacters-content"
+                                    id="availableNonPlayerCharacters-header"
                                 >
                                     <Typography>
                                         {availableNonPlayerCharacters?.length ? 'Available NPCs' : 'No available NPCs'}
@@ -340,7 +337,6 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                                                 <ListItem
                                                     key={`avaialable-npc-${index}`}
                                                     button
-                                                    /* eslint-disable-next-line max-len */
                                                     onClick={handleAddingExistingNonPlayerCharacter(
                                                         nonPlayerCharacter.id,
                                                         nonPlayerCharacter.name
@@ -354,7 +350,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                                             component="div"
                                             rowsPerPage={15}
                                             rowsPerPageOptions={[]}
-                                            count={pagination.numberOfResults}
+                                            count={pagination?.numberOfResults ?? 0}
                                             page={page}
                                             onChangePage={handlePageChange}
                                         />
