@@ -55,7 +55,7 @@ interface Props {
 export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props): ReactElement => {
     const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
 
-    const [availableNonPlayerCharactersToDisplay, setAvailableNonPlayerCharactersToDisplay]
+    const [displayedAvailableNonPlayerCharacters, setDisplayedAvailableNonPlayerCharacters]
         = useState<AvailableNonPlayerCharacter[]>();
 
     const [name, setName] = useState<string>('');
@@ -64,11 +64,14 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
 
     const [description, setDescription] = useState<string>('');
 
+    const [threadsToAdd, seThreadsToAdd] = useState<NewEntityToAdd[]>([]);
+
+    // const [newNonPlayerCharactersToAdd, setNewNonPlayerChartersToAdd] = useState<NewEntityToAdd[]>([]);
+
     console.log(description);
 
-    const [newThreadsToAdd, setNewThreadsToAdd] = useState<NewEntityToAdd[]>([]);
-
-    const [newNonPlayerCharactersToAdd, setNewNonPlayerChartersToAdd] = useState<NewEntityToAdd[]>([]);
+    const [displayedNonPlayerCharactersToAdd, setDisplayedNonPlayerCharactersToAdd] =
+        useState<NewEntityToAdd[]>([]);
 
     const [existingNonPlayerCharactersToAdd, setExistingNonPlayerCharactersToAdd] = useState<number[]>([]);
 
@@ -106,17 +109,17 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         }
     };
 
-    const handleRemovingNewThreadsToAdd = (name: string) => (): void => {
-        setNewThreadsToAdd(
-            newThreadsToAdd?.filter(
+    const handleRemovingthreadsToAdd = (name: string) => (): void => {
+        seThreadsToAdd(
+            threadsToAdd?.filter(
                 thread => thread.name !== name
             )
         );
     };
 
     const handleRemovingNewNonPlayerCharactersToAdd = (name: string) => (): void => {
-        setNewNonPlayerChartersToAdd(
-            newNonPlayerCharactersToAdd?.filter(
+        setDisplayedNonPlayerCharactersToAdd(
+            displayedNonPlayerCharactersToAdd?.filter(
                 nonPlayerCharacter => nonPlayerCharacter.name !== name
             )
         );
@@ -125,10 +128,10 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
             nonPlayerCharacter => nonPlayerCharacter.name === name
         );
 
-        if (availableNonPlayerCharactersToDisplay) {
-            setAvailableNonPlayerCharactersToDisplay(
+        if (displayedAvailableNonPlayerCharacters) {
+            setDisplayedAvailableNonPlayerCharacters(
                 [
-                    ...availableNonPlayerCharactersToDisplay,
+                    ...displayedAvailableNonPlayerCharacters,
                     // We know it's there, otherwise list wouldn't render in the first place
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     availableNonPlayerCharacterToAddBack!
@@ -138,22 +141,24 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
     };
 
     const handleAddingExistingNonPlayerCharacter = (id: number, name: string) => (): void => {
+        // Add id that is sent to the server
         setExistingNonPlayerCharactersToAdd(
             [...existingNonPlayerCharactersToAdd, id]
         );
 
-        setAvailableNonPlayerCharactersToDisplay(
+        // Add name that is displayed in ui
+        setDisplayedNonPlayerCharactersToAdd(
+            [
+                ...displayedNonPlayerCharactersToAdd,
+                { name: name } as NewEntityToAdd
+            ]
+        );
+
+        // Remove npc from list of displayed available npcs
+        setDisplayedAvailableNonPlayerCharacters(
             availableNonPlayerCharacters?.filter(
                 nonPlayerCharacter => nonPlayerCharacter.id !== id
             )
-        );
-
-        /*
-        We also add exiting nonPlayerCharacters to new
-        so that the user can see all npcs he added/created for that character
-        */
-        setNewNonPlayerChartersToAdd(
-            [...newNonPlayerCharactersToAdd, { name: name } as NewEntityToAdd]
         );
     };
 
@@ -168,7 +173,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
         setPagination(availableNonPlayerCharacters.pagination);
 
-        setAvailableNonPlayerCharactersToDisplay(availableNonPlayerCharacters.data);
+        setDisplayedAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
     };
 
     const handleCreate = async (): Promise<void> => {
@@ -178,7 +183,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
     const allowedToCreate =
         name
         && !nameError
-        && newThreadsToAdd.length
+        && threadsToAdd.length
         && existingNonPlayerCharactersToAdd.length;
 
     useEffect(() => {
@@ -191,7 +196,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                 setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
                 setPagination(availableNonPlayerCharacters.pagination);
 
-                setAvailableNonPlayerCharactersToDisplay(availableNonPlayerCharacters.data);
+                setDisplayedAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
             }
         })();
     });
@@ -253,8 +258,8 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
 
                     <Grid item xs={12}>
                         <Accordion
-                            disabled={newThreadsToAdd.length === 0}
-                            expanded={newThreadsToAdd.length > 0}
+                            disabled={threadsToAdd.length === 0}
+                            expanded={threadsToAdd.length > 0}
                         >
                             <AccordionSummary
                                 aria-controls="newThreads-content"
@@ -266,12 +271,12 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                             </AccordionSummary>
                             <AccordionDetails>
                                 <List style={{ width: '100%' }}>
-                                    {newThreadsToAdd.map((thread, index) => {
+                                    {threadsToAdd.map((thread, index) => {
                                         return (
                                             <ListItem
                                                 key={`new-thread-${index}`}
                                                 button
-                                                onClick={handleRemovingNewThreadsToAdd(
+                                                onClick={handleRemovingthreadsToAdd(
                                                     thread.name
                                                 )}
                                             >
@@ -303,8 +308,8 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
 
                     <Grid item xs={12}>
                         <Accordion
-                            disabled={newNonPlayerCharactersToAdd.length === 0}
-                            expanded={newNonPlayerCharactersToAdd.length > 0}
+                            disabled={displayedNonPlayerCharactersToAdd.length === 0}
+                            expanded={displayedNonPlayerCharactersToAdd.length > 0}
                         >
                             <AccordionSummary
                                 aria-controls="newNonPlayerCharacters-content"
@@ -316,7 +321,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                             </AccordionSummary>
                             <AccordionDetails>
                                 <List style={{ width: '100%' }}>
-                                    {newNonPlayerCharactersToAdd.map((nonPlayerCharacter, index) => {
+                                    {displayedNonPlayerCharactersToAdd.map((nonPlayerCharacter, index) => {
                                         return (
                                             <ListItem
                                                 key={`new-npc-${index}`}
@@ -343,7 +348,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                                     id="availableNonPlayerCharacters-header"
                                 >
                                     <Typography>
-                                        {availableNonPlayerCharactersToDisplay?.length
+                                        {displayedAvailableNonPlayerCharacters?.length
                                             ? 'Available NPCs'
                                             : 'No available NPCs'
                                         }
@@ -351,7 +356,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <List style={{ width: '100%' }}>
-                                        {availableNonPlayerCharactersToDisplay?.map((nonPlayerCharacter, index) => {
+                                        {displayedAvailableNonPlayerCharacters?.map((nonPlayerCharacter, index) => {
                                             return (
                                                 <ListItem
                                                     key={`avaialable-npc-${index}`}
