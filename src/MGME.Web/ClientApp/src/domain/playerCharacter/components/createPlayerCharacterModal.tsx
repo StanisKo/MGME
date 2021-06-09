@@ -55,6 +55,9 @@ interface Props {
 export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props): ReactElement => {
     const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
 
+    const [availableNonPlayerCharactersToDisplay, setAvailableNonPlayerCharactersToDisplay]
+        = useState<AvailableNonPlayerCharacter[]>();
+
     const [name, setName] = useState<string>('');
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHelperText, setNameHelperText] = useState<string>('');
@@ -118,11 +121,20 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
             )
         );
 
-        /*
-        We also add back available npcs, if any
-        By grabbing them from the store directly
-        Since local collection does not contain them anymore
-        */
+        const availableNonPlayerCharacterToAddBack = availableNonPlayerCharacters?.find(
+            nonPlayerCharacter => nonPlayerCharacter.name === name
+        );
+
+        if (availableNonPlayerCharactersToDisplay) {
+            setAvailableNonPlayerCharactersToDisplay(
+                [
+                    ...availableNonPlayerCharactersToDisplay,
+                    // We know it's there, otherwise list wouldn't render in the first place
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    availableNonPlayerCharacterToAddBack!
+                ]
+            );
+        }
     };
 
     const handleAddingExistingNonPlayerCharacter = (id: number, name: string) => (): void => {
@@ -130,7 +142,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
             [...existingNonPlayerCharactersToAdd, id]
         );
 
-        setAvailableNonPlayerCharacters(
+        setAvailableNonPlayerCharactersToDisplay(
             availableNonPlayerCharacters?.filter(
                 nonPlayerCharacter => nonPlayerCharacter.id !== id
             )
@@ -138,7 +150,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
 
         /*
         We also add exiting nonPlayerCharacters to new
-        so that the user can see all npcs he added/created for that particular char
+        so that the user can see all npcs he added/created for that character
         */
         setNewNonPlayerChartersToAdd(
             [...newNonPlayerCharactersToAdd, { name: name } as NewEntityToAdd]
@@ -155,6 +167,8 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
 
         setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
         setPagination(availableNonPlayerCharacters.pagination);
+
+        setAvailableNonPlayerCharactersToDisplay(availableNonPlayerCharacters.data);
     };
 
     const handleCreate = async (): Promise<void> => {
@@ -176,6 +190,8 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
     
                 setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
                 setPagination(availableNonPlayerCharacters.pagination);
+
+                setAvailableNonPlayerCharactersToDisplay(availableNonPlayerCharacters.data);
             }
         })();
     });
@@ -327,12 +343,15 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                                     id="availableNonPlayerCharacters-header"
                                 >
                                     <Typography>
-                                        {availableNonPlayerCharacters?.length ? 'Available NPCs' : 'No available NPCs'}
+                                        {availableNonPlayerCharactersToDisplay?.length
+                                            ? 'Available NPCs'
+                                            : 'No available NPCs'
+                                        }
                                     </Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <List style={{ width: '100%' }}>
-                                        {availableNonPlayerCharacters?.map((nonPlayerCharacter, index) => {
+                                        {availableNonPlayerCharactersToDisplay?.map((nonPlayerCharacter, index) => {
                                             return (
                                                 <ListItem
                                                     key={`avaialable-npc-${index}`}
