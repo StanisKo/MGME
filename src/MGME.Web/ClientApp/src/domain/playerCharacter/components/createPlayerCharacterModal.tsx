@@ -63,11 +63,15 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
 
     const [description, setDescription] = useState<string>('');
 
+    const [threadName, setThreadName] = useState<string>('');
+    const [threadDescription, setThreadDescription] = useState<string>('');
+
     const [threadsToAdd, seThreadsToAdd] = useState<NewEntityToAdd[]>([]);
 
-    // const [newNonPlayerCharactersToAdd, setNewNonPlayerChartersToAdd] = useState<NewEntityToAdd[]>([]);
+    const [nonPlayerCharacterName, setNonPlayerCharacterName] = useState<string>('');
+    const [nonPlayerCharacterDescription, setNonPlayerCharacterDescription] = useState<string>('');
 
-    console.log(description);
+    // const [newNonPlayerCharactersToAdd, setNewNonPlayerChartersToAdd] = useState<NewEntityToAdd[]>([]);
 
     const [displayedNonPlayerCharactersToAdd, setDisplayedNonPlayerCharactersToAdd] =
         useState<NewEntityToAdd[]>([]);
@@ -101,6 +105,27 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                 setDescription(value);
 
                 break;
+
+            case INPUT_TYPE.THREAD_NAME:
+                setThreadName(value);
+
+                break;
+
+            case INPUT_TYPE.THREAD_DESCRIPTION:
+                setThreadDescription(value);
+
+                break;
+
+            case INPUT_TYPE.NON_PLAYER_CHARACTER_NAME:
+                setNonPlayerCharacterName(value);
+
+                break;
+
+            case INPUT_TYPE.NON_PLAYER_CHARACTER_DESCRIPTION:
+                setNonPlayerCharacterDescription(value);
+
+                break;
+
         }
     };
 
@@ -225,6 +250,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                             required
                             fullWidth
                             label="Thread Name"
+                            inputProps={{ inputtype: INPUT_TYPE.THREAD_NAME }}
                         />
                     </Grid>
 
@@ -233,7 +259,14 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                             variant="outlined"
                             fullWidth
                             label="Thread Description"
+                            inputProps={{ inputtype: INPUT_TYPE.THREAD_DESCRIPTION }}
                         />
+                    </Grid>
+
+                    <Grid item container xs={12} justify="flex-end">
+                        <Button variant="contained" color="secondary" disabled={!threadName}>
+                            Add
+                        </Button>
                     </Grid>
 
                     <Grid item xs={12}>
@@ -275,6 +308,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                             required
                             fullWidth
                             label="NPC Name"
+                            inputProps={{ inputtype: INPUT_TYPE.NON_PLAYER_CHARACTER_NAME }}
                         />
                     </Grid>
 
@@ -283,7 +317,14 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                             variant="outlined"
                             fullWidth
                             label="NPC Description"
+                            inputProps={{ inputtype: INPUT_TYPE.NON_PLAYER_CHARACTER_DESCRIPTION }}
                         />
+                    </Grid>
+
+                    <Grid item container xs={12} justify="flex-end">
+                        <Button variant="contained" color="secondary" disabled={!nonPlayerCharacterName}>
+                            Add
+                        </Button>
                     </Grid>
 
                     <Grid item xs={12}>
@@ -321,7 +362,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
 
                     <Grid item xs={12}>
                         {availableNonPlayerCharacters ? (
-                            <Accordion disabled={displayedAvailableNonPlayerCharacters?.length === 0}>
+                            <Accordion>
                                 <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
                                     aria-controls="availableNonPlayerCharacters-content"
