@@ -331,7 +331,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                         ? nonPlayerCharacter.Adventures.Count
                         : null
                 },
-                page: selectedPage.Value
+                page: selectedPage?.Value ?? null
             );
 
             return nonPlayerCharacters;
