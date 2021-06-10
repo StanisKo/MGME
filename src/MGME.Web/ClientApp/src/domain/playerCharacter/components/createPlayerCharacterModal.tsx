@@ -73,7 +73,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
     const [nonPlayerCharacterName, setNonPlayerCharacterName] = useState<string>('');
     const [nonPlayerCharacterDescription, setNonPlayerCharacterDescription] = useState<string>('');
 
-    const [newNonPlayerCharactersToAdd, setNewNonPlayerChartersToAdd] = useState<NewEntityToAdd[]>([]);
+    const [newNonPlayerCharactersToAdd, setNewNonPlayerCharactersToAdd] = useState<NewEntityToAdd[]>([]);
 
     const [displayedNonPlayerCharactersToAdd, setDisplayedNonPlayerCharactersToAdd] =
         useState<NewEntityToAdd[]>([]);
@@ -155,7 +155,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         );
 
         // Set what we send
-        setNewNonPlayerChartersToAdd(
+        setNewNonPlayerCharactersToAdd(
             [
                 ...newNonPlayerCharactersToAdd,
                 { name: nonPlayerCharacterName, description: nonPlayerCharacterDescription } as NewEntityToAdd
@@ -176,10 +176,10 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
             nonPlayerCharacter => nonPlayerCharacter.name === name
         );
 
-        if (displayedAvailableNonPlayerCharacters) {
+        if (availableNonPlayerCharacterToAddBack) {
             setDisplayedAvailableNonPlayerCharacters(
                 [
-                    ...displayedAvailableNonPlayerCharacters,
+                    ...displayedAvailableNonPlayerCharacters as AvailableNonPlayerCharacter[],
                     // We know it's there
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     availableNonPlayerCharacterToAddBack!
@@ -190,7 +190,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         }
 
         // Otherwise it is freshly created NPC -- remove it
-        setNewNonPlayerChartersToAdd(
+        setNewNonPlayerCharactersToAdd(
             newNonPlayerCharactersToAdd.filter(
                 nonPlayerCharacter => nonPlayerCharacter.name !== name
             )
