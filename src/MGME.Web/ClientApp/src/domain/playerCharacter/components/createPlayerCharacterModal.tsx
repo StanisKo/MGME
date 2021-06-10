@@ -63,15 +63,17 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
 
     const [description, setDescription] = useState<string>('');
 
+    console.log(description);
+
     const [threadName, setThreadName] = useState<string>('');
     const [threadDescription, setThreadDescription] = useState<string>('');
 
-    const [threadsToAdd, seThreadsToAdd] = useState<NewEntityToAdd[]>([]);
+    const [threadsToAdd, setThreadsToAdd] = useState<NewEntityToAdd[]>([]);
 
     const [nonPlayerCharacterName, setNonPlayerCharacterName] = useState<string>('');
     const [nonPlayerCharacterDescription, setNonPlayerCharacterDescription] = useState<string>('');
 
-    // const [newNonPlayerCharactersToAdd, setNewNonPlayerChartersToAdd] = useState<NewEntityToAdd[]>([]);
+    const [newNonPlayerCharactersToAdd, setNewNonPlayerChartersToAdd] = useState<NewEntityToAdd[]>([]);
 
     const [displayedNonPlayerCharactersToAdd, setDisplayedNonPlayerCharactersToAdd] =
         useState<NewEntityToAdd[]>([]);
@@ -129,35 +131,36 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         }
     };
 
-    const handleRemovingthreadsToAdd = (name: string) => (): void => {
-        seThreadsToAdd(
+    const handleAddingThreads = (): void => {
+        setThreadsToAdd(
+            [...threadsToAdd, { name: threadName, description: threadDescription } as NewEntityToAdd ]
+        );
+    };
+
+    const handleRemovingThreads = (name: string) => (): void => {
+        setThreadsToAdd(
             threadsToAdd?.filter(
                 thread => thread.name !== name
             )
         );
     };
 
-    const handleRemovingNewNonPlayerCharactersToAdd = (name: string) => (): void => {
+    const handleAddingNewNonPlayerCharacters = (): void => {
+        // Set what we show
         setDisplayedNonPlayerCharactersToAdd(
-            displayedNonPlayerCharactersToAdd?.filter(
-                nonPlayerCharacter => nonPlayerCharacter.name !== name
-            )
+            [
+                ...displayedNonPlayerCharactersToAdd,
+                { name: nonPlayerCharacterName, description: nonPlayerCharacterDescription } as NewEntityToAdd
+            ]
         );
 
-        const availableNonPlayerCharacterToAddBack = availableNonPlayerCharacters?.find(
-            nonPlayerCharacter => nonPlayerCharacter.name === name
+        // Set what we send
+        setNewNonPlayerChartersToAdd(
+            [
+                ...newNonPlayerCharactersToAdd,
+                { name: nonPlayerCharacterName, description: nonPlayerCharacterDescription } as NewEntityToAdd
+            ]
         );
-
-        if (displayedAvailableNonPlayerCharacters) {
-            setDisplayedAvailableNonPlayerCharacters(
-                [
-                    ...displayedAvailableNonPlayerCharacters,
-                    // We know it's there, otherwise list wouldn't render in the first place
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    availableNonPlayerCharacterToAddBack!
-                ]
-            );
-        }
     };
 
     const handleAddingExistingNonPlayerCharacter = (id: number, name: string) => (): void => {
@@ -178,6 +181,41 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         setDisplayedAvailableNonPlayerCharacters(
             availableNonPlayerCharacters?.filter(
                 nonPlayerCharacter => nonPlayerCharacter.id !== id
+            )
+        );
+    };
+
+    const handleRemovingNewNonPlayerCharacters = (name: string) => (): void => {
+        // Remove from what we show
+        setDisplayedNonPlayerCharactersToAdd(
+            displayedNonPlayerCharactersToAdd?.filter(
+                nonPlayerCharacter => nonPlayerCharacter.name !== name
+            )
+        );
+
+
+        // If it is one of the available NPCs, add it back
+        const availableNonPlayerCharacterToAddBack = availableNonPlayerCharacters?.find(
+            nonPlayerCharacter => nonPlayerCharacter.name === name
+        );
+
+        if (displayedAvailableNonPlayerCharacters) {
+            setDisplayedAvailableNonPlayerCharacters(
+                [
+                    ...displayedAvailableNonPlayerCharacters,
+                    // We know it's there, otherwise list wouldn't render in the first place
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    availableNonPlayerCharacterToAddBack!
+                ]
+            );
+
+            return;
+        }
+
+        // Otherwise it is freshly created NPC -- remove it
+        setNewNonPlayerChartersToAdd(
+            newNonPlayerCharactersToAdd.filter(
+                nonPlayerCharacter => nonPlayerCharacter.name !== name
             )
         );
     };
@@ -250,6 +288,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                             required
                             fullWidth
                             label="Thread Name"
+                            onChange={handleInputChange}
                             inputProps={{ inputtype: INPUT_TYPE.THREAD_NAME }}
                         />
                     </Grid>
@@ -259,12 +298,18 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                             variant="outlined"
                             fullWidth
                             label="Thread Description"
+                            onChange={handleInputChange}
                             inputProps={{ inputtype: INPUT_TYPE.THREAD_DESCRIPTION }}
                         />
                     </Grid>
 
                     <Grid item container xs={12} justify="flex-end">
-                        <Button variant="contained" color="secondary" disabled={!threadName}>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            disabled={!threadName}
+                            onClick={handleAddingThreads}
+                        >
                             Add
                         </Button>
                     </Grid>
@@ -289,7 +334,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                                             <ListItem
                                                 key={`new-thread-${index}`}
                                                 button
-                                                onClick={handleRemovingthreadsToAdd(
+                                                onClick={handleRemovingThreads(
                                                     thread.name
                                                 )}
                                             >
@@ -308,6 +353,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                             required
                             fullWidth
                             label="NPC Name"
+                            onChange={handleInputChange}
                             inputProps={{ inputtype: INPUT_TYPE.NON_PLAYER_CHARACTER_NAME }}
                         />
                     </Grid>
@@ -317,12 +363,18 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                             variant="outlined"
                             fullWidth
                             label="NPC Description"
+                            onChange={handleInputChange}
                             inputProps={{ inputtype: INPUT_TYPE.NON_PLAYER_CHARACTER_DESCRIPTION }}
                         />
                     </Grid>
 
                     <Grid item container xs={12} justify="flex-end">
-                        <Button variant="contained" color="secondary" disabled={!nonPlayerCharacterName}>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            disabled={!nonPlayerCharacterName}
+                            onClick={handleAddingNewNonPlayerCharacters}
+                        >
                             Add
                         </Button>
                     </Grid>
@@ -347,7 +399,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                                             <ListItem
                                                 key={`new-npc-${index}`}
                                                 button
-                                                onClick={handleRemovingNewNonPlayerCharactersToAdd(
+                                                onClick={handleRemovingNewNonPlayerCharacters(
                                                     nonPlayerCharacter.name
                                                 )}
                                             >
