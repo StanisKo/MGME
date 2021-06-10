@@ -1,6 +1,6 @@
 import { ReactElement, useState, useEffect, ChangeEvent } from 'react';
 
-import { AvailableNonPlayerCharacter, Pagination, NewEntityToAdd } from '../../../shared/interfaces';
+import { AvailableNonPlayerCharacter, NewEntityToAdd } from '../../../shared/interfaces';
 import { fetchAvailableNonPlayerCharacters } from '../../../shared/requests';
 import { INPUT_TYPE, NON_PLAYER_CHARACTER_FILTER } from '../../../shared/const';
 
@@ -16,7 +16,6 @@ import {
     List,
     ListItem,
     ListItemText,
-    TablePagination,
     LinearProgress,
     DialogActions,
     Button,
@@ -74,10 +73,6 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         useState<NewEntityToAdd[]>([]);
 
     const [existingNonPlayerCharactersToAdd, setExistingNonPlayerCharactersToAdd] = useState<number[]>([]);
-
-    // We paginate list of available entities
-    const [pagination, setPagination] = useState<Pagination>({} as Pagination);
-    const [page, setPage] = useState(0);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
@@ -162,20 +157,6 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         );
     };
 
-    const handlePageChange = async (event: unknown, newPage: number): Promise<void> => {
-        setPage(newPage);
-
-        const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters(
-            NON_PLAYER_CHARACTER_FILTER.AVAILABLE_FOR_PLAYER_CHARACTERS,
-            newPage + 1
-        );
-
-        setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
-        setPagination(availableNonPlayerCharacters.pagination);
-
-        setDisplayedAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
-    };
-
     const handleCreate = async (): Promise<void> => {
         handleDialogClose();
     };
@@ -192,9 +173,8 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                 const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters(
                     NON_PLAYER_CHARACTER_FILTER.AVAILABLE_FOR_PLAYER_CHARACTERS
                 );
-    
+
                 setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
-                setPagination(availableNonPlayerCharacters.pagination);
 
                 setDisplayedAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
             }
@@ -341,7 +321,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
 
                     <Grid item xs={12}>
                         {availableNonPlayerCharacters ? (
-                            <Accordion>
+                            <Accordion disabled={displayedAvailableNonPlayerCharacters?.length === 0}>
                                 <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
                                     aria-controls="availableNonPlayerCharacters-content"
@@ -370,14 +350,6 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                                                 </ListItem>
                                             );
                                         })}
-                                        <TablePagination
-                                            component="div"
-                                            rowsPerPage={15}
-                                            rowsPerPageOptions={[]}
-                                            count={pagination?.numberOfResults ?? 0}
-                                            page={page}
-                                            onChangePage={handlePageChange}
-                                        />
                                     </List>
                                 </AccordionDetails>
                             </Accordion>

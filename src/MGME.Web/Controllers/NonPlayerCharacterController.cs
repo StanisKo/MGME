@@ -35,7 +35,7 @@ namespace MGME.Web.Controllers
         )
         {
             PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>> response = await _nonPlayerCharacterService.GetAllNonPlayerCharacters(
-                filter, page ?? 1
+                filter, page
             );
 
             if (response.Success)

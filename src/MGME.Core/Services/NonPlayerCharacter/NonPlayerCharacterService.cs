@@ -29,7 +29,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             _repository = repository;
         }
 
-        public async Task <PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter, int selectedPage)
+        public async Task <PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter, int? selectedPage)
         {
             PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>> response = new PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>>();
 
@@ -72,21 +72,29 @@ namespace MGME.Core.Services.NonPlayerCharacterService
 
             try
             {
-                int numberOfResults = await _repository.GetEntitiesCountAsync(
-                    predicate
-                );
+                int? numberOfResults = null;
+
+                if (selectedPage != null)
+                {
+                    numberOfResults = await _repository.GetEntitiesCountAsync(
+                        predicate
+                    );
+                }
 
                 IEnumerable<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await QueryNonPlayerCharacters(
                     predicate,
                     new Ref<bool>(weNeedAll),
-                    new Ref<int>(selectedPage)
+                    selectedPage != null ? new Ref<int>((int)selectedPage) : null
                 );
 
                 response.Data = nonPlayerCharacters;
 
-                response.Pagination.Page = selectedPage;
-                response.Pagination.NumberOfResults = numberOfResults;
-                response.Pagination.NumberOfPages = DataAccessHelpers.GetNumberOfPages(numberOfResults);
+                if (selectedPage != null)
+                {
+                    response.Pagination.Page = selectedPage;
+                    response.Pagination.NumberOfResults = numberOfResults;
+                    response.Pagination.NumberOfPages = DataAccessHelpers.GetNumberOfPages((int)numberOfResults);
+                }
 
                 response.Success = true;
             }
