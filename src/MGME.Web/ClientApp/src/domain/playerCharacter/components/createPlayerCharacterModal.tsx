@@ -163,6 +163,40 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         );
     };
 
+    const handleRemovingNewNonPlayerCharacters = (name: string) => (): void => {
+        // Remove from what we show
+        setDisplayedNonPlayerCharactersToAdd(
+            displayedNonPlayerCharactersToAdd.filter(
+                nonPlayerCharacter => nonPlayerCharacter.name !== name
+            )
+        );
+
+        // If it is one of the available NPCs, add it back
+        const availableNonPlayerCharacterToAddBack = availableNonPlayerCharacters?.find(
+            nonPlayerCharacter => nonPlayerCharacter.name === name
+        );
+
+        if (displayedAvailableNonPlayerCharacters) {
+            setDisplayedAvailableNonPlayerCharacters(
+                [
+                    ...displayedAvailableNonPlayerCharacters,
+                    // We know it's there
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    availableNonPlayerCharacterToAddBack!
+                ]
+            );
+
+            return;
+        }
+
+        // Otherwise it is freshly created NPC -- remove it
+        setNewNonPlayerChartersToAdd(
+            newNonPlayerCharactersToAdd.filter(
+                nonPlayerCharacter => nonPlayerCharacter.name !== name
+            )
+        );
+    };
+
     const handleAddingExistingNonPlayerCharacter = (id: number, name: string) => (): void => {
         // Add id that is sent to the server
         setExistingNonPlayerCharactersToAdd(
@@ -181,41 +215,6 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         setDisplayedAvailableNonPlayerCharacters(
             availableNonPlayerCharacters?.filter(
                 nonPlayerCharacter => nonPlayerCharacter.id !== id
-            )
-        );
-    };
-
-    const handleRemovingNewNonPlayerCharacters = (name: string) => (): void => {
-        // Remove from what we show
-        setDisplayedNonPlayerCharactersToAdd(
-            displayedNonPlayerCharactersToAdd?.filter(
-                nonPlayerCharacter => nonPlayerCharacter.name !== name
-            )
-        );
-
-
-        // If it is one of the available NPCs, add it back
-        const availableNonPlayerCharacterToAddBack = availableNonPlayerCharacters?.find(
-            nonPlayerCharacter => nonPlayerCharacter.name === name
-        );
-
-        if (displayedAvailableNonPlayerCharacters) {
-            setDisplayedAvailableNonPlayerCharacters(
-                [
-                    ...displayedAvailableNonPlayerCharacters,
-                    // We know it's there, otherwise list wouldn't render in the first place
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    availableNonPlayerCharacterToAddBack!
-                ]
-            );
-
-            return;
-        }
-
-        // Otherwise it is freshly created NPC -- remove it
-        setNewNonPlayerChartersToAdd(
-            newNonPlayerCharactersToAdd.filter(
-                nonPlayerCharacter => nonPlayerCharacter.name !== name
             )
         );
     };
