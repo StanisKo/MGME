@@ -1,5 +1,7 @@
 import { ReactElement, useState, useEffect, ChangeEvent } from 'react';
 
+import { createPlayerCharacter } from '../requests';
+
 import { AvailableNonPlayerCharacter, NewEntityToAdd } from '../../../shared/interfaces';
 import { fetchAvailableNonPlayerCharacters } from '../../../shared/requests';
 import { INPUT_TYPE, NON_PLAYER_CHARACTER_FILTER } from '../../../shared/const';
@@ -268,6 +270,16 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
     };
 
     const handleCreate = async (): Promise<void> => {
+        await createPlayerCharacter(
+            {
+                name: name,
+                description: description,
+                threads: threadsToAdd,
+                newNonPlayerCharacters: newNonPlayerCharactersToAdd,
+                existingNonPlayerCharacters: existingNonPlayerCharactersToAdd
+            }
+        );
+
         handleDialogClose();
     };
 
@@ -275,7 +287,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         name
         && !nameError
         && threadsToAdd.length
-        && existingNonPlayerCharactersToAdd.length;
+        && (existingNonPlayerCharactersToAdd.length || newNonPlayerCharactersToAdd.length);
 
     useEffect(() => {
         (async (): Promise<void> => {

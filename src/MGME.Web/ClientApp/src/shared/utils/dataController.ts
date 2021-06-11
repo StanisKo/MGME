@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { ReadFromApi, WriteToApi } from '../interfaces';
+import { BaseServiceResponse, ReadFromApi, WriteToApi } from '../interfaces';
 
 import { request } from './request';
 
@@ -96,10 +96,9 @@ export class DataController {
     @param keys keys in the page under which data will be saved in store
 
     Here we always return response, successfull or not, to inform user what's happening
-
-    We don't know in advance what every (potential) service might return after update, except when something went wrong
     */
-    public static async UpdateAndRefetch({ url, method, body, page, keys }: WriteToApi): Promise<unknown | Error> {
+    public static async UpdateAndRefetch(
+        { url, method, body, page, keys }: WriteToApi): Promise<BaseServiceResponse | Error> {
 
         const token = store.getState().auth?.token;
 
@@ -109,7 +108,7 @@ export class DataController {
             );
         }
 
-        const response = await request<unknown>(
+        const response = await request<BaseServiceResponse>(
             {
                 url: url,
                 method: method,

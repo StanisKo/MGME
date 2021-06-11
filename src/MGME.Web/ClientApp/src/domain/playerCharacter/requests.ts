@@ -1,8 +1,16 @@
 import { PlayerCharacter } from './interfaces';
 
-import { BaseServiceResponse, ReadFromApi } from '../../shared/interfaces';
+import { BaseServiceResponse, NewEntityToAdd, ReadFromApi } from '../../shared/interfaces';
 
 import { URLBuilder, DataController } from '../../shared/utils';
+
+interface CreateCharacterParams {
+    name: string;
+    description: string;
+    threads: NewEntityToAdd[];
+    existingNonPlayerCharacters: number[];
+    newNonPlayerCharacters: NewEntityToAdd[];
+}
 
 export const fetchPlayerCharacters = async (page?: number, sorting?: string): Promise<void> => {
     const params: ReadFromApi['params'] = {};
@@ -25,7 +33,7 @@ export const fetchPlayerCharacters = async (page?: number, sorting?: string): Pr
     );
 };
 
-export const deletePlayerCharacters = async (ids: number[]): Promise<BaseServiceResponse> => {
+export const deletePlayerCharacters = async (ids: number[]): Promise<BaseServiceResponse | Error> => {
     return await DataController.UpdateAndRefetch(
         {
             url: URLBuilder.WriteTo('playercharacter', 'delete'),
@@ -34,5 +42,17 @@ export const deletePlayerCharacters = async (ids: number[]): Promise<BaseService
             page: 'catalogues',
             keys: ['playerCharacters']
         }
-    ) as BaseServiceResponse;
+    );
+};
+
+export const createPlayerCharacter = async (params: CreateCharacterParams): Promise<BaseServiceResponse | Error> => {
+    return await DataController.UpdateAndRefetch(
+        {
+            url: URLBuilder.WriteTo('playercharacter', 'add'),
+            method: 'POST',
+            body: params,
+            page: 'catalogues',
+            keys: ['playerCharacters']
+        }
+    );
 };

@@ -63,7 +63,7 @@ export interface WriteToApi {
     method: 'POST' | 'PUT' | 'DELETE';
 
     // Body is optional, since there are some edge cases when we use interface, but do need values (e.g., deleting user)
-    body?: { [key: string]: string | number | boolean | number[] };
+    body?: { [key: string]: string | number | boolean | number[] | unknown[] };
 
     // Required, since after updates we want to refetch
     page: string;
