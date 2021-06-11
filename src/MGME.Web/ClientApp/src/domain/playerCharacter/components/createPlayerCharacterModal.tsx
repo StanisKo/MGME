@@ -74,6 +74,9 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
     const [threadsToAdd, setThreadsToAdd] = useState<NewEntityToAdd[]>([]);
 
     const [nonPlayerCharacterName, setNonPlayerCharacterName] = useState<string>('');
+    const [nonPlayerCharacterError, setNonPlayerCharacterError] = useState<boolean>(false);
+    const [nonPlayerCharacterHelperText, setNonPlayerCharacterHelperText] = useState<string>('');
+
     const [nonPlayerCharacterDescription, setNonPlayerCharacterDescription] = useState<string>('');
 
     const [newNonPlayerCharactersToAdd, setNewNonPlayerCharactersToAdd] = useState<NewEntityToAdd[]>([]);
@@ -138,11 +141,21 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
             case INPUT_TYPE.NON_PLAYER_CHARACTER_NAME:
                 setNonPlayerCharacterName(value);
 
-                // const nonPlayerCharacterAlreadyExists = displayedNonPlayerCharactersToAdd.map(
-                //     nonPlayerCharacter => nonPlayerCharacter.name
-                // ).includes(
-                //     value.trim()
-                // );
+                const nonPlayerCharacterAlreadyExists = displayedNonPlayerCharactersToAdd.map(
+                    nonPlayerCharacter => nonPlayerCharacter.name
+                ).includes(
+                    value.trim()
+                );
+
+                if (nonPlayerCharacterAlreadyExists) {
+                    setNonPlayerCharacterError(true);
+                    setNonPlayerCharacterHelperText('Such NPC already exists');
+
+                    break;
+                }
+
+                setNonPlayerCharacterError(false);
+                setNonPlayerCharacterHelperText('');
 
                 break;
 
@@ -389,6 +402,8 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                     <Grid item xs={12}>
                         <TextField
                             value={nonPlayerCharacterName}
+                            error={nonPlayerCharacterError}
+                            helperText={nonPlayerCharacterHelperText}
                             variant="outlined"
                             required
                             fullWidth
@@ -414,7 +429,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                         <Button
                             variant="contained"
                             color="secondary"
-                            disabled={!nonPlayerCharacterName}
+                            disabled={!nonPlayerCharacterName || nonPlayerCharacterError}
                             onClick={handleAddingNewNonPlayerCharacters}
                         >
                             Add
