@@ -98,6 +98,8 @@ namespace MGME.Infra.Data
 
             /* Thread */
 
+            // Is this necessary? What if multiple characters want to have same threads?
+            // Threads should be unique for characters, not users
             modelBuilder.Entity<Thread>().HasIndex(
                 thread => new { thread.UserId, thread.Name }
             ).IsUnique();

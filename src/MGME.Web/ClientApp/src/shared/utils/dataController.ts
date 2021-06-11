@@ -121,6 +121,8 @@ export class DataController {
             return response;
         }
 
+        // This doesn't work and have to be looked into
+
         // We received keys ? Refetch all urls by that key : refetch all urls for that page
         const requests = (keys && keys.length ? keys : Object.keys(this._urlsToRefetch[page])).map(key => {
 

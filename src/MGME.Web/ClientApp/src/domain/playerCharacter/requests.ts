@@ -4,7 +4,12 @@ import { BaseServiceResponse, NewEntityToAdd, ReadFromApi } from '../../shared/i
 
 import { URLBuilder, DataController } from '../../shared/utils';
 
-interface CreateCharacterParams {
+/*
+We use type and not interface to benefit
+from required strong typing on calling the function
+but not be contstraint by index signature of 'body' param on WriteToApi interface
+*/
+type CreateCharacterParams = {
     name: string;
     description: string;
     threads: NewEntityToAdd[];
