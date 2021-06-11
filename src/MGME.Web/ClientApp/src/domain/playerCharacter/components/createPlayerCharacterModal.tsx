@@ -66,6 +66,9 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
     console.log(description);
 
     const [threadName, setThreadName] = useState<string>('');
+    const [threadError, setThreadError] = useState<boolean>(false);
+    const [threadHelperText, setThreadHelperText] = useState<string>('');
+
     const [threadDescription, setThreadDescription] = useState<string>('');
 
     const [threadsToAdd, setThreadsToAdd] = useState<NewEntityToAdd[]>([]);
@@ -111,6 +114,20 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
             case INPUT_TYPE.THREAD_NAME:
                 setThreadName(value);
 
+                const threadAlreadyExists = threadsToAdd.map(thread => thread.name).includes(
+                    value.trim()
+                );
+
+                if (threadAlreadyExists) {
+                    setThreadError(true);
+                    setThreadHelperText('Such thread already exists');
+
+                    break;
+                }
+
+                setThreadError(false);
+                setThreadHelperText('');
+
                 break;
 
             case INPUT_TYPE.THREAD_DESCRIPTION:
@@ -120,6 +137,12 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
 
             case INPUT_TYPE.NON_PLAYER_CHARACTER_NAME:
                 setNonPlayerCharacterName(value);
+
+                // const nonPlayerCharacterAlreadyExists = displayedNonPlayerCharactersToAdd.map(
+                //     nonPlayerCharacter => nonPlayerCharacter.name
+                // ).includes(
+                //     value.trim()
+                // );
 
                 break;
 
@@ -135,6 +158,12 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
         setThreadsToAdd(
             [...threadsToAdd, { name: threadName, description: threadDescription } as NewEntityToAdd ]
         );
+
+        setThreadName('');
+
+        if (threadDescription) {
+            setThreadDescription('');
+        }
     };
 
     const handleRemovingThreads = (name: string) => (): void => {
@@ -161,6 +190,12 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                 { name: nonPlayerCharacterName, description: nonPlayerCharacterDescription } as NewEntityToAdd
             ]
         );
+
+        setNonPlayerCharacterName('');
+
+        if (nonPlayerCharacterDescription) {
+            setNonPlayerCharacterDescription('');
+        }
     };
 
     const handleRemovingNewNonPlayerCharacters = (name: string) => (): void => {
@@ -283,17 +318,22 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
 
                     <Grid item xs={12}>
                         <TextField
+                            value={threadName}
+                            error={threadError}
+                            helperText={threadHelperText}
                             variant="outlined"
                             required
                             fullWidth
                             label="Thread Name"
                             onChange={handleInputChange}
                             inputProps={{ inputtype: INPUT_TYPE.THREAD_NAME }}
+                            className={root}
                         />
                     </Grid>
 
                     <Grid item xs={12}>
                         <TextField
+                            value={threadDescription}
                             variant="outlined"
                             fullWidth
                             label="Thread Description"
@@ -306,7 +346,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
                         <Button
                             variant="contained"
                             color="secondary"
-                            disabled={!threadName}
+                            disabled={!threadName || threadError}
                             onClick={handleAddingThreads}
                         >
                             Add
@@ -348,17 +388,20 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
 
                     <Grid item xs={12}>
                         <TextField
+                            value={nonPlayerCharacterName}
                             variant="outlined"
                             required
                             fullWidth
                             label="NPC Name"
                             onChange={handleInputChange}
                             inputProps={{ inputtype: INPUT_TYPE.NON_PLAYER_CHARACTER_NAME }}
+                            className={root}
                         />
                     </Grid>
 
                     <Grid item xs={12}>
                         <TextField
+                            value={nonPlayerCharacterDescription}
                             variant="outlined"
                             fullWidth
                             label="NPC Description"
