@@ -208,11 +208,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                     .Select(thread => _mapper.Map<Thread>(thread))
                         .ToList();
 
-                // Link both collections of Threads and NPCs to current user
-                threadsToAdd = threadsToAdd
-                    .Select(thread => { thread.UserId = userId; return thread; })
-                        .ToList();
-
+                // Link NonPlayerCharacters to current user
                 nonPlayerCharactersToAdd = nonPlayerCharactersToAdd
                     .Select(nonPlayerCharacter => { nonPlayerCharacter.UserId = userId; return nonPlayerCharacter; })
                         .ToList();
