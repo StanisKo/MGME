@@ -121,10 +121,10 @@ export class DataController {
             return response;
         }
 
-        // This doesn't work and have to be looked into
+        // We received keys ? Refetch all urls by that keys : refetch all urls for that page
+        const keysToRefetch = keys && keys.length ? keys : Object.keys(this._urlsToRefetch[page]);
 
-        // We received keys ? Refetch all urls by that key : refetch all urls for that page
-        const requests = (keys && keys.length ? keys : Object.keys(this._urlsToRefetch[page])).map(key => {
+        const requests = keysToRefetch.map(key => {
 
             // Dispatch all requests
             return request<unknown>(
@@ -133,29 +133,24 @@ export class DataController {
                     method: 'GET',
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
-
-            // When finished, return the result of each under relevant key
-            ).then(response => {
-                return { [key]: response };
-            });
-
+            );
         });
 
         /*
         Wait for all responses
         In such way, script can proceed to creating new requests before the results of previous are received
         */
-        const responses = Promise.all(requests);
+        const responses = await Promise.all(requests);
 
         // We finally save all fresh responses by the same keys
-        for (const [key, response] of Object.entries(responses)) {
+        for (let i = 0; i < responses.length; i++) {
 
             store.dispatch<UpdateStore<unknown>>(
                 {
                     type: 'UPDATE_STORE',
                     reducer: page,
-                    key: key,
-                    payload: response
+                    key: keysToRefetch[i],
+                    payload: responses[i]
                 }
             );
         }

@@ -65,8 +65,6 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
 
     const [description, setDescription] = useState<string>('');
 
-    console.log(description);
-
     const [threadName, setThreadName] = useState<string>('');
     const [threadError, setThreadError] = useState<boolean>(false);
     const [threadHelperText, setThreadHelperText] = useState<string>('');
