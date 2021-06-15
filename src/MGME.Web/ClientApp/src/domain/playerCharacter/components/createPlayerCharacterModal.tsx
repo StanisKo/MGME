@@ -259,10 +259,16 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
             ]
         );
 
-        // Remove npc from list of displayed available npcs
+        /*
+        Remove npc from list of displayed available npcs:
+
+        First, we filter out the collection of available npcs by id
+        But then also check, that new collection does not contain names that were already added before
+        */
         setDisplayedAvailableNonPlayerCharacters(
             availableNonPlayerCharacters?.filter(
-                nonPlayerCharacter => nonPlayerCharacter.id !== id
+                nonPlayerCharacter => nonPlayerCharacter.id !== id &&
+                    !displayedNonPlayerCharactersToAdd.map(entity => entity.name).includes(nonPlayerCharacter.name)
             )
         );
     };
