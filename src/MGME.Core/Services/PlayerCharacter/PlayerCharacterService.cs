@@ -225,21 +225,11 @@ namespace MGME.Core.Services.PlayerCharacterService
                             predicate: predicate
                         );
 
-                    // We query back for the id of PlayerCharacter that we added
-                    BaseEntityDTO playerCharacter = await _playerCharacterRepository.GetEntityAsync<BaseEntityDTO>(
-                        predicate: playerCharacter => playerCharacter.Name.ToLower() == newPlayerCharacter.Name.ToLower(),
-
-                        select: playerCharacter => new BaseEntityDTO()
-                        {
-                            Id = playerCharacter.Id
-                        }
-                    );
-
                     // We link existing NonPlayerCharacter to our new PlayerCharacter
                     existingNonPlayerCharacters = existingNonPlayerCharacters.Select(
                         nonPlayerCharacter =>
                         {
-                            nonPlayerCharacter.PlayerCharacterId = playerCharacter.Id;
+                            nonPlayerCharacter.PlayerCharacterId = characterToAdd.Id;
 
                             return nonPlayerCharacter;
                         }
