@@ -166,7 +166,41 @@ namespace MGME.Core.Services.PlayerCharacterService
                 (Though, we would use their own services when PlayerCharacter is already created)
                 */
 
-                List<NonPlayerCharacter> nonPlayerCharactersToAdd = new List<NonPlayerCharacter>();
+                List<NonPlayerCharacter> newNonPlayerCharactersToAdd = new List<NonPlayerCharacter>();
+
+                if (thereAreNewNonPlayerCharactersToAdd)
+                {
+                    // Map NonPlayerCharacter DTOs to data models and link to current user
+                    newNonPlayerCharactersToAdd = newPlayerCharacter.NewNonPlayerCharacters.Select(
+                        nonPlayerCharacter =>
+                        {
+                            NonPlayerCharacter nonPlayerCharacterDM = _mapper.Map<NonPlayerCharacter>(
+                                nonPlayerCharacter
+                            );
+
+                            nonPlayerCharacterDM.UserId = userId;
+
+                            return nonPlayerCharacterDM;
+                        }
+                    ).ToList();
+                }
+
+                // Map Thread DTOs to data models
+                List<Thread> threadsToAdd = newPlayerCharacter.Threads.Select(
+                    thread => _mapper.Map<Thread>(thread)
+                ).ToList();
+
+                // Finally create and write character to db
+                PlayerCharacter characterToAdd = new PlayerCharacter()
+                {
+                    Name = newPlayerCharacter.Name,
+                    Description = newPlayerCharacter.Description,
+                    NonPlayerCharacters = newNonPlayerCharactersToAdd,
+                    Threads = threadsToAdd,
+                    UserId = userId
+                };
+
+                await _playerCharacterRepository.AddEntityAsync(characterToAdd);
 
                 /*
                 Get existing NPCs
@@ -186,44 +220,36 @@ namespace MGME.Core.Services.PlayerCharacterService
                                 && nonPlayerCharacter.PlayerCharacterId == null
                                     && newPlayerCharacter.ExistingNonPlayerCharacters.Contains(nonPlayerCharacter.Id);
 
-                    nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
-                        predicate: predicate
+                    IEnumerable<NonPlayerCharacter> existingNonPlayerCharacters =
+                        await _nonPlayerCharacterRepository.GetEntititesAsync(
+                            predicate: predicate
+                        );
+
+                    // We query back for the id of PlayerCharacter that we added
+                    BaseEntityDTO playerCharacter = await _playerCharacterRepository.GetEntityAsync<BaseEntityDTO>(
+                        predicate: playerCharacter => playerCharacter.Name.ToLower() == newPlayerCharacter.Name.ToLower(),
+
+                        select: playerCharacter => new BaseEntityDTO()
+                        {
+                            Id = playerCharacter.Id
+                        }
+                    );
+
+                    // We link existing NonPlayerCharacter to our new PlayerCharacter
+                    existingNonPlayerCharacters = existingNonPlayerCharacters.Select(
+                        nonPlayerCharacter =>
+                        {
+                            nonPlayerCharacter.PlayerCharacterId = playerCharacter.Id;
+
+                            return nonPlayerCharacter;
+                        }
+                    );
+
+                    await _nonPlayerCharacterRepository.LinkEntitiesAsync(
+                        existingNonPlayerCharacters,
+                        "PlayerCharacterId"
                     );
                 }
-
-                // Map DTOs to data models and add to pool of all NPCs to add
-                if (thereAreNewNonPlayerCharactersToAdd)
-                {
-                    // We don't need List<T> here
-                    IEnumerable<NonPlayerCharacter> newNonPlayerCharactersToAdd =
-                        newPlayerCharacter.NewNonPlayerCharacters.Select(
-                            nonPlayerCharacter => _mapper.Map<NonPlayerCharacter>(nonPlayerCharacter)
-                    );
-
-                    nonPlayerCharactersToAdd.AddRange(newNonPlayerCharactersToAdd);
-                }
-
-                // Map DTOs to data models
-                List<Thread> threadsToAdd = newPlayerCharacter.Threads
-                    .Select(thread => _mapper.Map<Thread>(thread))
-                        .ToList();
-
-                // Link NonPlayerCharacters to current user
-                nonPlayerCharactersToAdd = nonPlayerCharactersToAdd
-                    .Select(nonPlayerCharacter => { nonPlayerCharacter.UserId = userId; return nonPlayerCharacter; })
-                        .ToList();
-
-                // Finally create and write character to db
-                PlayerCharacter characterToAdd = new PlayerCharacter()
-                {
-                    Name = newPlayerCharacter.Name,
-                    Description = newPlayerCharacter.Description,
-                    NonPlayerCharacters = nonPlayerCharactersToAdd,
-                    Threads = threadsToAdd,
-                    UserId = userId
-                };
-
-                await _playerCharacterRepository.AddEntityAsync(characterToAdd);
 
                 response.Success = true;
                 response.Message = "Character was successfully added";
