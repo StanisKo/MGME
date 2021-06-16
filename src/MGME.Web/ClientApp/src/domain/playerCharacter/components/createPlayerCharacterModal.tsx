@@ -288,7 +288,7 @@ export const CreatePlayerCharacterModal = ({
             }
         );
 
-        if (response instanceof(Error) === false) {
+        if (response.success) {
             setResponseMessage(response.message);
 
             setOpenSnackBar(true);

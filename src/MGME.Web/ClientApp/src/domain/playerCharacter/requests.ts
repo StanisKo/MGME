@@ -38,7 +38,7 @@ export const fetchPlayerCharacters = async (page?: number, sorting?: string): Pr
     );
 };
 
-export const deletePlayerCharacters = async (ids: number[]): Promise<BaseServiceResponse | Error> => {
+export const deletePlayerCharacters = async (ids: number[]): Promise<BaseServiceResponse> => {
     return await DataController.UpdateAndRefetch(
         {
             url: URLBuilder.WriteTo('playercharacter', 'delete'),
@@ -50,7 +50,7 @@ export const deletePlayerCharacters = async (ids: number[]): Promise<BaseService
     );
 };
 
-export const createPlayerCharacter = async (params: CreateCharacterParams): Promise<BaseServiceResponse | Error> => {
+export const createPlayerCharacter = async (params: CreateCharacterParams): Promise<BaseServiceResponse> => {
     return await DataController.UpdateAndRefetch(
         {
             url: URLBuilder.WriteTo('playercharacter', 'add'),

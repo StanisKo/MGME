@@ -85,7 +85,7 @@ export const Catalogues = (): ReactElement => {
     const handleDelete = async (): Promise<void> => {
         const response = await deletePlayerCharacters(selectedEntities);
 
-        if (response instanceof(Error) === false) {
+        if (response.success) {
             setResponseMessage(response.message);
 
             setOpenSnackbar(true);

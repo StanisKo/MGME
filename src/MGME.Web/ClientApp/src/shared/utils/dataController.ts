@@ -36,7 +36,7 @@ export class DataController {
     We either save data into store and return nothing,
     Or return structure specified by the caller (or error, if any)
     */
-    ): Promise<void | TResult | Error> {
+    ): Promise<void | TResult> {
 
         /*
         Grab token for every request,
@@ -60,7 +60,7 @@ export class DataController {
             }
         );
 
-        if (returnResponse || response instanceof(Error)) {
+        if (returnResponse) {
             return response;
         }
 
@@ -98,7 +98,7 @@ export class DataController {
     Here we always return response, successfull or not, to inform user what's happening
     */
     public static async UpdateAndRefetch(
-        { url, method, body, page, keys }: WriteToApi): Promise<BaseServiceResponse | Error> {
+        { url, method, body, page, keys }: WriteToApi): Promise<BaseServiceResponse> {
 
         const token = store.getState().auth?.token;
 
@@ -117,7 +117,7 @@ export class DataController {
             }
         );
 
-        if (response instanceof(Error)) {
+        if (!response.success) {
             return response;
         }
 
