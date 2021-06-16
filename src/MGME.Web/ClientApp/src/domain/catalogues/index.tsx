@@ -1,4 +1,4 @@
-import { ReactElement, useState, ChangeEvent } from 'react';
+import { ReactElement, useState, ChangeEvent, SyntheticEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ApplicationState, UpdateStore } from '../../store';
@@ -13,8 +13,11 @@ import {
     Select,
     MenuItem,
     Button,
+    Snackbar,
     Theme
 } from '@material-ui/core';
+
+import { Alert } from '../../shared/components';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -71,12 +74,20 @@ export const Catalogues = (): ReactElement => {
 
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
+    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+
+    const [responseMessage, setResponseMessage] = useState<string>('');
+
     const handleChange = (event: ChangeEvent<{ value: unknown }>): void => {
         setSelectedMenu(event.target.value as number);
     };
 
     const handleDelete = async (): Promise<void> => {
-        await deletePlayerCharacters(selectedEntities);
+        const response = await deletePlayerCharacters(selectedEntities);
+
+        if (response instanceof(Error) === false) {
+            setResponseMessage(response.message);
+        }
 
         dispatch<UpdateStore<{ selected: number[] }>>(
             {
@@ -88,6 +99,8 @@ export const Catalogues = (): ReactElement => {
                 }
             }
         );
+
+        setOpenSnackbar(true);
     };
 
     const handleDialogOpen = (): void => {
@@ -96,6 +109,14 @@ export const Catalogues = (): ReactElement => {
 
     const handleDialogClose = (): void => {
         setDialogOpen(false);
+    };
+
+    const handleSnackbarClose = (event?: SyntheticEvent, reason?: string): void => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenSnackbar(false);
     };
 
     const nothingSelected = selectedEntities.length === 0;
@@ -170,6 +191,15 @@ export const Catalogues = (): ReactElement => {
                     classes={classes as unknown as { [key: string]: string }}
                 />
             )}
+
+            <Snackbar open={openSnackbar} onClose={handleSnackbarClose}>
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity="success"
+                >
+                    {responseMessage}
+                </Alert>
+            </Snackbar>
         </>
     );
 };

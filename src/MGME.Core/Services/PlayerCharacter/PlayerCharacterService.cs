@@ -319,8 +319,12 @@ namespace MGME.Core.Services.PlayerCharacterService
             {
                 await _playerCharacterRepository.DeleteEntitiesAsync(ids);
 
+                (char suffix, string verb) args = (
+                    ids.Count() > 1 ? ('s', "were") : ('\0', "was")
+                );
+
                 response.Success = true;
-                response.Message = "Characters were successfully deleted";
+                response.Message = $"Character{args.suffix} {args.verb} successfully deleted";
             }
             catch (Exception exception)
             {
