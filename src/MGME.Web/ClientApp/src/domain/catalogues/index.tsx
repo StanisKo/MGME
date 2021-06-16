@@ -87,20 +87,20 @@ export const Catalogues = (): ReactElement => {
 
         if (response instanceof(Error) === false) {
             setResponseMessage(response.message);
-        }
 
-        dispatch<UpdateStore<{ selected: number[] }>>(
-            {
-                type: 'UPDATE_STORE',
-                reducer: 'catalogues',
-                key: 'playerCharacters',
-                payload: {
-                    selected: []
+            setOpenSnackbar(true);
+
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'playerCharacters',
+                    payload: {
+                        selected: []
+                    }
                 }
-            }
-        );
-
-        setOpenSnackbar(true);
+            );
+        }
     };
 
     const handleDialogOpen = (): void => {
@@ -189,6 +189,8 @@ export const Catalogues = (): ReactElement => {
                 <CreatePlayerCharacterModal
                     handleDialogClose={handleDialogClose}
                     classes={classes as unknown as { [key: string]: string }}
+                    setResponseMessage={setResponseMessage}
+                    setOpenSnackBar={setOpenSnackbar}
                 />
             )}
 

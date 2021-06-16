@@ -1,4 +1,4 @@
-import { ReactElement, useState, useEffect, ChangeEvent } from 'react';
+import { ReactElement, useState, useEffect, ChangeEvent, Dispatch, SetStateAction } from 'react';
 
 import { createPlayerCharacter } from '../requests';
 
@@ -51,9 +51,13 @@ const useStyles = makeStyles((theme: Theme) =>
 interface Props {
     handleDialogClose: () => void;
     classes: { [key: string]: string };
+    setResponseMessage: Dispatch<SetStateAction<string>>;
+    setOpenSnackBar: Dispatch<SetStateAction<boolean>>;
 }
 
-export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props): ReactElement => {
+export const CreatePlayerCharacterModal = ({
+    handleDialogClose, classes, setResponseMessage, setOpenSnackBar }: Props): ReactElement => {
+
     const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
 
     const [displayedAvailableNonPlayerCharacters, setDisplayedAvailableNonPlayerCharacters]
@@ -274,7 +278,7 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
     };
 
     const handleCreate = async (): Promise<void> => {
-        await createPlayerCharacter(
+        const response = await createPlayerCharacter(
             {
                 name: name,
                 description: description,
@@ -284,7 +288,13 @@ export const CreatePlayerCharacterModal = ({ handleDialogClose, classes }: Props
             }
         );
 
-        handleDialogClose();
+        if (response instanceof(Error) === false) {
+            setResponseMessage(response.message);
+
+            setOpenSnackBar(true);
+
+            handleDialogClose();
+        }
     };
 
     const allowedToCreate =
