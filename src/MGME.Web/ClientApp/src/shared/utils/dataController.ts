@@ -34,7 +34,7 @@ export class DataController {
 
     /*
     We either save data into store and return nothing,
-    Or return structure specified by the caller (or error, if any)
+    Or return structure specified by the caller (or error, if response !== 200)
     */
     ): Promise<void | TResult> {
 

@@ -295,6 +295,12 @@ namespace MGME.Infra.Data.Repositories
             await _database.SaveChangesAsync();
         }
 
+        public async Task <bool> CheckIfEntityExistsAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _database.Set<TEntity>().AnyAsync(
+                predicate
+            );
+        }
 
         public async Task <int> GetEntitiesCountAsync(Expression<Func<TEntity, bool>> predicate)
         {

@@ -165,6 +165,17 @@ namespace MGME.Core.Services.PlayerCharacterService
                 since it is faster than sepearating these transactions into their own services
                 (Though, we would use their own services when PlayerCharacter is already created)
                 */
+                bool playerCharacterExists = await _playerCharacterRepository.CheckIfEntityExistsAsync(
+                    playerCharacter => playerCharacter.Name == newPlayerCharacter.Name
+                );
+
+                if (playerCharacterExists)
+                {
+                    response.Success = false;
+                    response.Message = "Character already exists";
+
+                    return response;
+                }
 
                 List<NonPlayerCharacter> newNonPlayerCharactersToAdd = new List<NonPlayerCharacter>();
 

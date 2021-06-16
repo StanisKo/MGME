@@ -63,6 +63,10 @@ namespace MGME.Core.Interfaces.Repositories
         Task DeleteEntitiesAsync(IEnumerable<int> ids);
 
 
+        // Check if entity exists based on predicate
+        Task <bool> CheckIfEntityExistsAsync(Expression<Func<TEntity, bool>> predicate);
+
+
         // Count number of entities in db
         Task <int> GetEntitiesCountAsync(Expression<Func<TEntity, bool>> predicate);
     }
