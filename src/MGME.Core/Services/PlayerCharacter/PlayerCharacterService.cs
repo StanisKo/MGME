@@ -160,11 +160,6 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             try
             {
-                /*
-                We add initial NPCs and Threads to a PlayerCharacter here,
-                since it is faster than sepearating these transactions into their own services
-                (Though, we would use their own services when PlayerCharacter is already created)
-                */
                 bool playerCharacterExists = await _playerCharacterRepository.CheckIfEntityExistsAsync(
                     playerCharacter => playerCharacter.Name == newPlayerCharacter.Name
                 );
@@ -176,6 +171,33 @@ namespace MGME.Core.Services.PlayerCharacterService
 
                     return response;
                 }
+
+                // Check if at least one new NonPlayerCharacter exists
+                Expression<Func<NonPlayerCharacter, bool>> nonPlayerCharacterNamePredicate =
+                    existingNonPlayerCharacter => newPlayerCharacter.NewNonPlayerCharacters
+                        .Select(
+                        newNonPlayerCharacter => newNonPlayerCharacter.Name
+                    ).Contains(
+                        existingNonPlayerCharacter.Name
+                    );
+
+                bool nonPlayerCharacterAlreadyExists = await _nonPlayerCharacterRepository.CheckIfEntityExistsAsync(
+                    nonPlayerCharacterNamePredicate
+                );
+
+                if (nonPlayerCharacterAlreadyExists)
+                {
+                    response.Success = false;
+                    response.Message = "NPC already exists";
+
+                    return response;
+                }
+
+                /*
+                We add initial NPCs and Threads to a PlayerCharacter here,
+                since it is faster than sepearating these transactions into their own services
+                (Though, we would use their own services when PlayerCharacter is already created)
+                */
 
                 List<NonPlayerCharacter> newNonPlayerCharactersToAdd = new List<NonPlayerCharacter>();
 
