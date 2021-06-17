@@ -1,8 +1,13 @@
 import { ReactElement, useState, useEffect, ChangeEvent, Dispatch, SetStateAction } from 'react';
+import { useSelector } from 'react-redux';
+
+import { ApplicationState } from '../../../store';
+
+import { PlayerCharacter } from '../interfaces';
 
 import { createPlayerCharacter } from '../requests';
 
-import { AvailableNonPlayerCharacter, NewEntityToAdd } from '../../../shared/interfaces';
+import { AvailableNonPlayerCharacter, BaseServiceResponse, NewEntityToAdd } from '../../../shared/interfaces';
 import { fetchAvailableNonPlayerCharacters } from '../../../shared/requests';
 import { INPUT_TYPE, NON_PLAYER_CHARACTER_FILTER } from '../../../shared/const';
 
@@ -51,12 +56,16 @@ const useStyles = makeStyles((theme: Theme) =>
 interface Props {
     handleDialogClose: () => void;
     classes: { [key: string]: string };
-    setResponseMessage: Dispatch<SetStateAction<string>>;
+    setResponse: Dispatch<SetStateAction<BaseServiceResponse>>;
     setOpenSnackBar: Dispatch<SetStateAction<boolean>>;
 }
 
 export const CreatePlayerCharacterModal = ({
-    handleDialogClose, classes, setResponseMessage, setOpenSnackBar }: Props): ReactElement => {
+    handleDialogClose, classes, setResponse, setOpenSnackBar }: Props): ReactElement => {
+
+    const playerCharacters: PlayerCharacter[] | null = useSelector(
+        (state: ApplicationState) => state.catalogues?.playerCharacters?.data ?? null
+    );
 
     const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
 
@@ -95,20 +104,32 @@ export const CreatePlayerCharacterModal = ({
 
         const value = event.target.value;
 
+        /*
+        TODO: move array operations outside of swith case
+        */
         switch (inputType) {
             case INPUT_TYPE.ENTITY_NAME:
                 if (value.length < 1) {
                     setNameError(true);
                     setNameHelperText('Please provide character name');
 
-                    return;
+                    break;
                 }
-                else {
-                    setName(value);
 
-                    setNameError(false);
-                    setNameHelperText('');
+                // This doesn't cover character names outside of what is currently displayed on the page
+                const playerCharacterNames = playerCharacters?.map(playerCharacter => playerCharacter.name);
+
+                if (playerCharacterNames?.includes(value)) {
+                    setNameError(true);
+                    setNameHelperText('Character with such name already exists');
+
+                    break;
                 }
+
+                setName(value);
+
+                setNameError(false);
+                setNameHelperText('');
 
                 break;
 
@@ -308,11 +329,11 @@ export const CreatePlayerCharacterModal = ({
             }
         );
 
+        setResponse(response);
+
+        setOpenSnackBar(true);
+
         if (response.success) {
-            setResponseMessage(response.message);
-
-            setOpenSnackBar(true);
-
             handleDialogClose();
         }
     };

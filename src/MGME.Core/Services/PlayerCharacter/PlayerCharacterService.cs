@@ -167,7 +167,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 if (playerCharacterExists)
                 {
                     response.Success = false;
-                    response.Message = "Character already exists";
+                    response.Message = "Character with such name already exists";
 
                     return response;
                 }
@@ -185,10 +185,11 @@ namespace MGME.Core.Services.PlayerCharacterService
                     nonPlayerCharacterNamePredicate
                 );
 
+                // If so, it belongs to someone else, or takes part in adventure; otherwise client denies the request
                 if (nonPlayerCharacterAlreadyExists)
                 {
                     response.Success = false;
-                    response.Message = "NPC already exists";
+                    response.Message = "NPC with such name either already belongs to another character, or takes part in adventure";
 
                     return response;
                 }

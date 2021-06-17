@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { ApplicationState, UpdateStore } from '../../store';
 
+import { BaseServiceResponse } from '../../shared/interfaces';
+
 import { PlayerCharactersTable, CreatePlayerCharacterModal } from '../playerCharacter/components';
 import { deletePlayerCharacters } from '../playerCharacter/requests';
 
@@ -76,7 +78,7 @@ export const Catalogues = (): ReactElement => {
 
     const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
 
-    const [responseMessage, setResponseMessage] = useState<string>('');
+    const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
 
     const handleChange = (event: ChangeEvent<{ value: unknown }>): void => {
         setSelectedMenu(event.target.value as number);
@@ -85,11 +87,11 @@ export const Catalogues = (): ReactElement => {
     const handleDelete = async (): Promise<void> => {
         const response = await deletePlayerCharacters(selectedEntities);
 
+        setResponse(response);
+
+        setOpenSnackbar(true);
+
         if (response.success) {
-            setResponseMessage(response.message);
-
-            setOpenSnackbar(true);
-
             dispatch<UpdateStore<{ selected: number[] }>>(
                 {
                     type: 'UPDATE_STORE',
@@ -189,7 +191,7 @@ export const Catalogues = (): ReactElement => {
                 <CreatePlayerCharacterModal
                     handleDialogClose={handleDialogClose}
                     classes={classes as unknown as { [key: string]: string }}
-                    setResponseMessage={setResponseMessage}
+                    setResponse={setResponse}
                     setOpenSnackBar={setOpenSnackbar}
                 />
             )}
@@ -197,9 +199,9 @@ export const Catalogues = (): ReactElement => {
             <Snackbar open={openSnackbar} onClose={handleSnackbarClose}>
                 <Alert
                     onClose={handleSnackbarClose}
-                    severity="success"
+                    severity={response.success ? 'success' : 'warning'}
                 >
-                    {responseMessage}
+                    {response.message}
                 </Alert>
             </Snackbar>
         </>
