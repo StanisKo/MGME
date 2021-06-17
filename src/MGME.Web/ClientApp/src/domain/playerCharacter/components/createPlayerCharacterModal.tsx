@@ -145,9 +145,29 @@ export const CreatePlayerCharacterModal = ({
             case INPUT_TYPE.NON_PLAYER_CHARACTER_NAME:
                 setNonPlayerCharacterName(value);
 
-                const nonPlayerCharacterAlreadyExists = displayedNonPlayerCharactersToAdd.map(
+                /*
+                Check if provided name is already taken by some of the available npcs,
+                or by those that were added manually before
+
+                This doesn't cover for such name belonging to an npc in adventure, or that is
+                linked to another character, yet it still adds to better UX
+
+                (If such name is already taked by unavailable npc, api will return 400)
+                */
+                const namesOfAvailableNonPlayerCharacters = availableNonPlayerCharacters?.map(
                     nonPlayerCharacter => nonPlayerCharacter.name
-                ).includes(
+                );
+
+                const namesOfDisplayedNonPlayerCharactersToAdd = displayedNonPlayerCharactersToAdd.map(
+                    nonPlayerCharacter => nonPlayerCharacter.name
+                );
+
+                const poolOfNamesToCheckAgainst = [
+                    ...namesOfAvailableNonPlayerCharacters ?? [],
+                    ...namesOfDisplayedNonPlayerCharactersToAdd
+                ];
+
+                const nonPlayerCharacterAlreadyExists = poolOfNamesToCheckAgainst.includes(
                     value.trim()
                 );
 
