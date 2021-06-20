@@ -189,7 +189,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 if (nonPlayerCharacterAlreadyExists)
                 {
                     response.Success = false;
-                    response.Message = "NPC with such name either already belongs to another character, or takes part in adventure";
+                    response.Message = "One of the new NPCs either already belongs to another character, or takes part in adventure";
 
                     return response;
                 }
