@@ -99,14 +99,16 @@ export const CreatePlayerCharacterModal = ({
 
     const [existingNonPlayerCharactersToAdd, setExistingNonPlayerCharactersToAdd] = useState<number[]>([]);
 
+    // Variables that take part in validation
+    const [playerCharacterNames, setPlayerCharacterNames] = useState<string[]>([]);
+
+    const [nonPlayerCharacterNames, setNonPlayerCharacterNames] = useState<string[]>([]);
+
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
 
         const value = event.target.value;
 
-        /*
-        TODO: move array operations outside of swith case
-        */
         switch (inputType) {
             case INPUT_TYPE.ENTITY_NAME:
                 if (value.length < 1) {
@@ -117,9 +119,7 @@ export const CreatePlayerCharacterModal = ({
                 }
 
                 // This doesn't cover character names outside of what is currently displayed on the page
-                const playerCharacterNames = playerCharacters?.map(playerCharacter => playerCharacter.name);
-
-                if (playerCharacterNames?.includes(value)) {
+                if (playerCharacterNames?.includes(value.trim())) {
                     setNameError(true);
                     setNameHelperText('Character with such name already exists');
 
@@ -175,20 +175,7 @@ export const CreatePlayerCharacterModal = ({
 
                 (If such name is already taked by unavailable npc, api will return 400)
                 */
-                const namesOfAvailableNonPlayerCharacters = availableNonPlayerCharacters?.map(
-                    nonPlayerCharacter => nonPlayerCharacter.name
-                );
-
-                const namesOfDisplayedNonPlayerCharactersToAdd = displayedNonPlayerCharactersToAdd.map(
-                    nonPlayerCharacter => nonPlayerCharacter.name
-                );
-
-                const poolOfNamesToCheckAgainst = [
-                    ...namesOfAvailableNonPlayerCharacters ?? [],
-                    ...namesOfDisplayedNonPlayerCharactersToAdd
-                ];
-
-                const nonPlayerCharacterAlreadyExists = poolOfNamesToCheckAgainst.includes(
+                const nonPlayerCharacterAlreadyExists = nonPlayerCharacterNames.includes(
                     value.trim()
                 );
 
@@ -357,6 +344,39 @@ export const CreatePlayerCharacterModal = ({
             }
         })();
     });
+
+    useEffect(() => {
+        if (playerCharacters) {
+            setPlayerCharacterNames(
+                playerCharacters?.map(playerCharacter => playerCharacter.name)
+            );
+        }
+    }, [playerCharacters]);
+
+    useEffect(() => {
+        if (availableNonPlayerCharacters && displayedNonPlayerCharactersToAdd) {
+
+            const namesOfAvailableNonPlayerCharacters = availableNonPlayerCharacters?.map(
+                nonPlayerCharacter => nonPlayerCharacter.name
+            );
+
+            const namesOfDisplayedNonPlayerCharactersToAdd = displayedNonPlayerCharactersToAdd.map(
+                nonPlayerCharacter => nonPlayerCharacter.name
+            );
+
+            const poolOfNamesToCheckAgainst = new Set(
+                [
+                    ...namesOfAvailableNonPlayerCharacters,
+                    ...namesOfDisplayedNonPlayerCharactersToAdd
+                ]
+            );
+
+            setNonPlayerCharacterNames(
+                Array.from(poolOfNamesToCheckAgainst)
+            );
+        }
+
+    }, [availableNonPlayerCharacters, displayedNonPlayerCharactersToAdd]);
 
     const { root } = useStyles();
 
