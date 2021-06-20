@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 using MGME.Core.DTOs;
 using MGME.Core.DTOs.PlayerCharacter;
@@ -23,16 +22,18 @@ namespace MGME.Web.Controllers
         }
 
         [HttpGet]
-        public async Task <IActionResult> GetAllPlayerCharacters()
+        public async Task <IActionResult> GetAllPlayerCharacters([FromQuery] string sorting, int? page)
         {
-            DataServiceResponse<List<GetPlayerCharacterListDTO>> response = await _playerCharacterService.GetAllPlayerCharacters();
+            DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = await _playerCharacterService.GetAllPlayerCharacters(
+                sorting ?? "name", page ?? 1
+            );
 
             if (response.Success)
             {
                 return Ok(response);
             }
 
-            return NotFound(response);
+            return BadRequest(response);
         }
 
         [HttpGet("{id}")]
@@ -75,9 +76,11 @@ namespace MGME.Web.Controllers
         }
 
         [HttpDelete("Delete")]
-        public async Task <IActionResult> DeletePlayerCharacter([BindRequired, FromQuery] int id)
+        public async Task <IActionResult> DeletePlayerCharacter(DeletePlayerCharactersDTO playerCharactersToDelete)
         {
-            BaseServiceResponse response = await _playerCharacterService.DeletePlayerCharacter(id);
+            BaseServiceResponse response = await _playerCharacterService.DeletePlayerCharacters(
+                playerCharactersToDelete.Ids
+            );
 
             if (response.Success)
             {

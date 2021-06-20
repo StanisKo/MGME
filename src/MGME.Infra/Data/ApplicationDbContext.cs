@@ -98,12 +98,21 @@ namespace MGME.Infra.Data
 
             /* Thread */
 
+            /*
+            Threads are unique within the context of one PlayerCharacter
+            or one Adventure, but can repeat accross those entities
+            */
+
             modelBuilder.Entity<Thread>().HasIndex(
-                thread => new { thread.UserId, thread.Name }
+                thread => new { thread.PlayerCharacterId, thread.Name }
+            ).IsUnique();
+
+            modelBuilder.Entity<Thread>().HasIndex(
+                thread => new { thread.AdventureId, thread.Name }
             ).IsUnique();
 
             /*
-            We explicitly configure relations for Threads as well
+            We explicitly configure relations for Threads
             Since we want Cascade delete behavior even in case of
             nullable foreign keys:
 
@@ -113,11 +122,6 @@ namespace MGME.Infra.Data
             If Adventure is deleted, so are its Threads, even those
             that were taken from PlayerCharacter(s)
             */
-
-            modelBuilder.Entity<Thread>()
-                .HasOne(thread => thread.User)
-                .WithMany(user => user.Threads)
-                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Thread>()
                 .HasOne(thread => thread.PlayerCharacter)

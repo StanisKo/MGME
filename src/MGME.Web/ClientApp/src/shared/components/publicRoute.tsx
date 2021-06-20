@@ -1,7 +1,7 @@
 import { FunctionComponent, ReactElement } from 'react';
 import { Route, Redirect } from 'react-router-dom';
 
-import { ROUTES } from '../../const';
+import { ROUTES } from '../const';
 
 interface Props {
     component: FunctionComponent<{ [key: string]: unknown }>;
@@ -20,7 +20,7 @@ export const PublicRoute = ({component: FunctionComponent, restricted, ...props}
     */
     return (
         <Route {...props} render={(props): ReactElement => (userLoggedIn && restricted
-            ? <Redirect to={ROUTES.ITEM_ONE} />
+            ? <Redirect to={ROUTES.CATALOGUES} />
             : <FunctionComponent {...props} />
         )} />
     );

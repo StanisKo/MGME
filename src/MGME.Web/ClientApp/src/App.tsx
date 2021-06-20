@@ -2,13 +2,11 @@ import { ReactElement, useEffect, useState } from 'react';
 import { Router, Switch, Redirect } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
-import { store } from './store/configureStore';
-import { actionCreators } from './store/reducers/auth';
+import { store, LoginUser, LogoutUser, UpdateToken } from './store';
 
 import { DataServiceResponse, UserTokenResponse, DecodedToken } from './shared/interfaces';
 
-import { MenuBar } from './shared/components/menu';
-import { PublicRoute, PrivateRoute } from './shared/components/routes';
+import { PublicRoute, PrivateRoute, MenuBar } from './shared/components';
 
 import { ROUTES } from './shared/const';
 import { history } from './shared/utils';
@@ -18,9 +16,8 @@ import { refreshToken } from './domain/auth/requests';
 import { Login, ConfirmEmail } from './domain/auth';
 import { UserProfile } from './domain/user';
 
-import { ItemOne } from './domain/itemOne';
-import { ItemTwo } from './domain/itemTwo';
-import { ItemThree } from './domain/itemThree';
+import { Catalogues } from './domain/catalogues';
+import { Adventures } from './domain/adventures';
 
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
 
@@ -41,7 +38,7 @@ export const Application = (): ReactElement => {
             const refreshTokenResponse = await refreshToken();
 
             if (refreshTokenResponse.success) {
-                // We put a bool into localStorage for quicker renders between routes
+                // We put a bool into localStorage for quicker renders between public/private routes
                 localStorage.setItem('userLoggedIn', JSON.stringify(true));
 
                 const token = (refreshTokenResponse as DataServiceResponse<UserTokenResponse>).data.accessToken;
@@ -57,16 +54,14 @@ export const Application = (): ReactElement => {
                 );
 
                 // We access store directly since scope is outside of Provider
-                store.dispatch(
-                    actionCreators.loginUser(
-                        {
-                            type: 'LOGIN_USER',
-                            payload: {
-                                token: token,
-                                userRole: decoded.role
-                            }
+                store.dispatch<LoginUser>(
+                    {
+                        type: 'LOGIN_USER',
+                        payload: {
+                            token: token,
+                            userRole: decoded.role
                         }
-                    )
+                    }
                 );
             }
             else {
@@ -81,12 +76,10 @@ export const Application = (): ReactElement => {
                     localStorage.removeItem('userLoggedIn');
 
                     // We also clear out store since menu render depends on it
-                    store.dispatch(
-                        actionCreators.logoutUser(
-                            {
-                                type: 'LOGOUT_USER'
-                            }
-                        )
+                    store.dispatch<LogoutUser>(
+                        {
+                            type: 'LOGOUT_USER'
+                        }
                     );
 
                     history.push(ROUTES.LOGIN);
@@ -106,15 +99,13 @@ export const Application = (): ReactElement => {
                 if (refreshTokenResponse.success) {
                     const token = (refreshTokenResponse as DataServiceResponse<UserTokenResponse>).data.accessToken;
 
-                    store.dispatch(
-                        actionCreators.updateToken(
-                            {
-                                type: 'UPDATE_TOKEN',
-                                payload: {
-                                    token: token
-                                }
+                    store.dispatch<UpdateToken>(
+                        {
+                            type: 'UPDATE_TOKEN',
+                            payload: {
+                                token: token
                             }
-                        )
+                        }
                     );
                 }
             }, accessTokenExpiresIn);
@@ -134,9 +125,8 @@ export const Application = (): ReactElement => {
                         <PublicRoute restricted={true} component={ConfirmEmail} path={ROUTES.CONFIRM_EMAIL} />
 
                         <PrivateRoute component={UserProfile} path={ROUTES.USER_PROFILE} />
-                        <PrivateRoute component={ItemOne} path={ROUTES.ITEM_ONE} />
-                        <PrivateRoute component={ItemTwo} path={ROUTES.ITEM_TWO} />
-                        <PrivateRoute component={ItemThree} path={ROUTES.ITEM_THREE} />
+                        <PrivateRoute component={Catalogues} path={ROUTES.CATALOGUES} />
+                        <PrivateRoute component={Adventures} path={ROUTES.ADVENTURES} />
                     </Switch>
                 </Router>
             </ThemeProvider>

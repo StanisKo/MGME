@@ -5,8 +5,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-using AutoMapper;
-
 using Microsoft.AspNetCore.Http;
 
 using MGME.Core.Entities;
@@ -17,6 +15,7 @@ using MGME.Core.DTOs.Adventure;
 using MGME.Core.DTOs.NonPlayerCharacter;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
+using MGME.Core.Utils;
 
 namespace MGME.Core.Services.NonPlayerCharacterService
 {
@@ -24,62 +23,80 @@ namespace MGME.Core.Services.NonPlayerCharacterService
     {
         private readonly IEntityRepository<NonPlayerCharacter> _repository;
 
-        private readonly IMapper _mapper;
-
         public NonPlayerCharacterService(IEntityRepository<NonPlayerCharacter> repository,
-                                         IMapper mapper,
                                          IHttpContextAccessor httpContextAccessor): base(httpContextAccessor)
         {
             _repository = repository;
-            _mapper = mapper;
         }
 
-        public async Task <DataServiceResponse<List<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter)
+        public async Task <PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter, int? selectedPage)
         {
-            DataServiceResponse<List<GetNonPlayerCharacterListDTO>> response = new DataServiceResponse<List<GetNonPlayerCharacterListDTO>>();
+            PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>> response = new PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>>();
 
             int userId = GetUserIdFromHttpContext();
 
             bool weNeedAll = filter == (int)NonPlayerCharacterFilter.ALL;
 
-            bool weNeedOnlyAvailable = !weNeedAll;
+            Expression<Func<NonPlayerCharacter, bool>> predicate;
+
+            switch (filter)
+            {
+                /*
+                NonPlayerCharacters available for Adventures should not
+                belong to other PlayerCharacters (since they can also take part in other adventures)
+                */
+                case ((int)NonPlayerCharacterFilter.AVAILABLE_FOR_ADVENTURES):
+                    predicate =
+                        nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                            && nonPlayerCharacter.PlayerCharacterId == null;
+
+                    break;
+
+                /*
+                NonPlayerCharacters available for PlayerCharacters should not
+                belong to other PlayerCharacters, neither take part in the Adventure
+                */
+                case ((int)NonPlayerCharacterFilter.AVAILABLE_FOR_PLAYER_CHARACTERS):
+                    predicate =
+                        nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                            && nonPlayerCharacter.PlayerCharacterId == null
+                                && nonPlayerCharacter.Adventures.Count == 0;
+
+                    break;
+
+                default:
+                    predicate = nonPlayerCharacter => nonPlayerCharacter.UserId == userId;
+
+                    break;
+            }
 
             try
             {
-                Expression<Func<NonPlayerCharacter, bool>> predicate =
-                    nonPlayerCharacter => nonPlayerCharacter.UserId == userId
-                    /*
-                    The condition to add NonPlayerCharacter to a PlayerCharacter or an Adventure is the same
-                    It shouldn't belong to the PlayerCharacter already
-                    */
-                    && weNeedOnlyAvailable ? nonPlayerCharacter.PlayerCharacterId == null : true;
+                int? numberOfResults = null;
 
-                List<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await _repository.GetEntititesAsync<GetNonPlayerCharacterListDTO>(
-                    predicate: predicate,
-                    include: weNeedAll
-                        ? new[] { "PlayerCharacter" }
-                        : null,
-                    select: nonPlayerCharacter => new GetNonPlayerCharacterListDTO()
-                    {
-                        Id = nonPlayerCharacter.Id,
-                        Name = nonPlayerCharacter.Name,
-                        PlayerCharacter = weNeedAll && nonPlayerCharacter.PlayerCharacter != null
-                            ? new GetPlayerCharacterDTO()
-                            {
-                                Id = nonPlayerCharacter.PlayerCharacter.Id,
-                                Name = nonPlayerCharacter.PlayerCharacter.Name
-                            }
-                            : null,
-                        AdventureCount = weNeedAll
-                            ? nonPlayerCharacter.Adventures.Count
-                            : null
-                    }
+                if (selectedPage != null)
+                {
+                    numberOfResults = await _repository.GetEntitiesCountAsync(
+                        predicate
+                    );
+                }
+
+                IEnumerable<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await QueryNonPlayerCharacters(
+                    predicate,
+                    new Ref<bool>(weNeedAll),
+                    selectedPage != null ? new Ref<int>((int)selectedPage) : null
                 );
 
                 response.Data = nonPlayerCharacters;
-                response.Success = true;
-                response.Message = nonPlayerCharacters.Count == 0 ? "No NPCs exist yet" : null;
 
+                if (selectedPage != null)
+                {
+                    response.Pagination.Page = selectedPage;
+                    response.Pagination.NumberOfResults = numberOfResults;
+                    response.Pagination.NumberOfPages = DataAccessHelpers.GetNumberOfPages((int)numberOfResults);
+                }
+
+                response.Success = true;
             }
             catch (Exception exception)
             {
@@ -288,6 +305,36 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             }
 
             return response;
+        }
+
+        private async Task <IEnumerable<GetNonPlayerCharacterListDTO>> QueryNonPlayerCharacters(Expression<Func<NonPlayerCharacter, bool>> predicate, Ref<bool> weNeedAll, Ref<int> selectedPage)
+        {
+            IEnumerable<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await _repository.GetEntititesAsync<GetNonPlayerCharacterListDTO>(
+                predicate: predicate,
+                include: weNeedAll.Value
+                    ? new[] { "PlayerCharacter" }
+                    : null,
+                select: nonPlayerCharacter => new GetNonPlayerCharacterListDTO()
+                {
+                    Id = nonPlayerCharacter.Id,
+                    Name = nonPlayerCharacter.Name,
+
+                    PlayerCharacter = weNeedAll.Value && nonPlayerCharacter.PlayerCharacter != null
+                        ? new GetPlayerCharacterDTO()
+                        {
+                            Id = nonPlayerCharacter.PlayerCharacter.Id,
+                            Name = nonPlayerCharacter.PlayerCharacter.Name
+                        }
+                        : null,
+
+                    AdventureCount = weNeedAll.Value
+                        ? nonPlayerCharacter.Adventures.Count
+                        : null
+                },
+                page: selectedPage?.Value ?? null
+            );
+
+            return nonPlayerCharacters;
         }
     }
 }

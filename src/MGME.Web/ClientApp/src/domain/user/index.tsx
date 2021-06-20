@@ -11,17 +11,16 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import { ApplicationState, LogoutUser } from '../../store';
+
 import { User } from './interfaces';
-import { ApplicationState } from '../../store';
 
 import { getUser, updateUser, changePassword, deleteUser } from './requests';
 
-import { ROUTES } from '../../shared/const';
-import { Alert } from '../../shared/components/alert';
 import { BaseServiceResponse } from '../../shared/interfaces';
-import { INPUT_TYPE, validEmailFormat, validPasswordFormat } from '../../shared/helpers';
-
-import { actionCreators } from '../../store/reducers/auth';
+import { Alert } from '../../shared/components';
+import { ROUTES, INPUT_TYPE } from '../../shared/const';
+import { validEmailFormat, validPasswordFormat } from '../../shared/helpers';
 
 import {
     Button,
@@ -331,12 +330,10 @@ export const UserProfile = (): ReactElement | null => {
             localStorage.removeItem('userRegisteredBefore');
 
             // We also clear out store since menu render depends on it
-            dispatch(
-                actionCreators.logoutUser(
-                    {
-                        type: 'LOGOUT_USER'
-                    }
-                )
+            dispatch<LogoutUser>(
+                {
+                    type: 'LOGOUT_USER'
+                }
             );
 
             history.push(ROUTES.LOGIN);
@@ -346,11 +343,11 @@ export const UserProfile = (): ReactElement | null => {
 
     useEffect(() => {
         (async (): Promise<void> => {
-            if (isAuthorized) {
+            if (isAuthorized && user === null) {
                 await getUser();
             }
         })();
-    }, [isAuthorized]);
+    }, [isAuthorized, user]);
 
     useEffect(() => {
         if (user !== null) {

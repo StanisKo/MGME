@@ -11,15 +11,22 @@ import {
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { MODE, modeNames } from '../helpers';
+import { LoginUser } from '../../../store';
+
 import { loginOrRegisterUser } from '../requests';
-import { INPUT_TYPE, validEmailFormat, validPasswordFormat } from '../../../shared/helpers';
+import { MODE, modeNames } from '../helpers';
 
-import { ROUTES } from '../../../shared/const';
-import { Alert } from '../../../shared/components/alert';
-import { BaseServiceResponse, DataServiceResponse, UserTokenResponse, DecodedToken } from '../../../shared/interfaces';
+import {
+    BaseServiceResponse,
+    DataServiceResponse,
+    UserTokenResponse,
+    DecodedToken
+} from '../../../shared/interfaces';
 
-import { actionCreators } from '../../../store/reducers/auth';
+import { Alert } from '../../../shared/components';
+import { INPUT_TYPE, ROUTES } from '../../../shared/const';
+import { validEmailFormat, validPasswordFormat } from '../../../shared/helpers';
+
 
 import { Container, Button, TextField, Grid, Box, Typography, Link, Snackbar } from '@material-ui/core';
 
@@ -209,19 +216,17 @@ export const Login = (): ReactElement => {
 
                 const decoded = jwt_decode(token) as DecodedToken;
 
-                dispatch(
-                    actionCreators.loginUser(
-                        {
-                            type: 'LOGIN_USER',
-                            payload: {
-                                token: token,
-                                userRole: decoded.role
-                            }
+                dispatch<LoginUser>(
+                    {
+                        type: 'LOGIN_USER',
+                        payload: {
+                            token: token,
+                            userRole: decoded.role
                         }
-                    )
+                    }
                 );
 
-                history.push(ROUTES.ITEM_ONE);
+                history.push(ROUTES.CATALOGUES);
 
                 return;
             }

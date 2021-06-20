@@ -1,7 +1,7 @@
-import { URLBuilder, request } from '../../../shared/utils/';
-import { BaseServiceResponse, DataServiceResponse, UserTokenResponse } from '../../../shared/interfaces';
+import { BaseServiceResponse, DataServiceResponse, UserTokenResponse } from '../../shared/interfaces';
+import { URLBuilder, request } from '../../shared/utils/';
 
-import { MODE } from '../helpers';
+import { MODE } from './helpers';
 
 /*
 We don't use DataController here, since we don't need to rely on JWT for these requests;
@@ -19,7 +19,6 @@ export const loginOrRegisterUser = async (
         {
             url: URLBuilder.WriteTo('auth', action),
             method: 'POST',
-            headers: null,
             body: body
         }
     );
@@ -30,7 +29,6 @@ export const confirmEmailAddress = async (token: string): Promise <BaseServiceRe
         {
             url: URLBuilder.WriteTo('auth', 'confirm'),
             method: 'POST',
-            headers: null,
             body: { token: token }
         }
     );
@@ -39,9 +37,8 @@ export const confirmEmailAddress = async (token: string): Promise <BaseServiceRe
 export const logoutUser = async (): Promise<BaseServiceResponse> => {
     return await request<BaseServiceResponse>(
         {
-            url: URLBuilder.WriteTo('auth', 'logout'),
-            method: 'GET',
-            headers: null
+            url: URLBuilder.ReadFrom('auth', 'logout'),
+            method: 'GET'
         }
     );
 };
@@ -50,8 +47,7 @@ export const refreshToken = async (): Promise <DataServiceResponse<UserTokenResp
     return await request<DataServiceResponse<UserTokenResponse>>(
         {
             url: URLBuilder.ReadFrom('auth', 'refresh-token'),
-            method: 'GET',
-            headers: null
+            method: 'GET'
         }
     );
 };

@@ -8,7 +8,7 @@ namespace MGME.Core.Interfaces.Services
 {
     public interface INonPlayerCharacterService
     {
-        Task <DataServiceResponse<List<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter);
+        Task <PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter, int? selectedPage);
 
         Task <DataServiceResponse<GetNonPlayerCharacterDetailDTO>> GetNonPlayerCharacter(int id);
 

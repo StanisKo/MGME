@@ -1,7 +1,7 @@
 import { FunctionComponent, ReactElement } from 'react';
 import { Route, Redirect } from 'react-router-dom';
 
-import { ROUTES } from '../../const';
+import { ROUTES } from '../const';
 
 interface Props {
     component: FunctionComponent<{ [key: string]: unknown }>;

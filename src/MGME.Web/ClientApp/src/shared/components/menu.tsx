@@ -2,17 +2,17 @@ import { ReactElement, useState, ChangeEvent, MouseEvent } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { logoutUser } from '../../../domain/auth/requests';
+import { logoutUser } from '../../domain/auth/requests';
 
-import { actionCreators } from '../../../store/reducers/auth';
+import { LogoutUser } from '../../store';
 
 import { AppBar, Toolbar, Tabs, Tab, IconButton, Menu, MenuItem, Theme } from '@material-ui/core';
 
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { ApplicationState } from '../../../store';
-import { ROUTES } from '../../const';
+import { ApplicationState } from '../../store';
+import { ROUTES } from '../const';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -25,14 +25,12 @@ const useStyles = makeStyles((theme: Theme) =>
 export const MenuBar = (): ReactElement | null => {
     const history = useHistory();
 
-    const userLoggedIn = localStorage.getItem('userLoggedIn');
-
-    // Here we actually depend on the store, since we need dynamic rerender on login
+    // Here we depend on the store, since we need dynamic rerender on login
     const tokenIsAvaialable = useSelector((store: ApplicationState) => store.auth?.token ?? null);
 
     const dispatch = useDispatch();
 
-    const activeMenu = [ROUTES.ITEM_ONE, ROUTES.ITEM_TWO, ROUTES.ITEM_THREE].indexOf(
+    const activeMenu = [ROUTES.CATALOGUES, ROUTES.ADVENTURES].indexOf(
         history.location.pathname
     );
 
@@ -69,20 +67,17 @@ export const MenuBar = (): ReactElement | null => {
             setAnchorEl(null);
 
             // We also clear out store since menu render depends on it
-            dispatch(
-                actionCreators.logoutUser(
-                    {
-                        type: 'LOGOUT_USER'
-                    }
-                )
+            dispatch<LogoutUser>(
+                {
+                    type: 'LOGOUT_USER'
+                }
             );
         })();
     };
 
     const { flexGrow } = useStyles();
 
-    // But we still use localStorage to speed up re-renders
-    return userLoggedIn || tokenIsAvaialable ? (
+    return tokenIsAvaialable ? (
         <AppBar position="static" color="primary">
             <Toolbar>
                 <Tabs
@@ -94,21 +89,15 @@ export const MenuBar = (): ReactElement | null => {
                     indicatorColor="secondary"
                 >
                     <Tab
-                        label="Item One"
+                        label="Catalogues"
                         component={Link}
-                        to={ROUTES.ITEM_ONE}
+                        to={ROUTES.CATALOGUES}
                         disableRipple={true}
                     />
                     <Tab
-                        label="Item Two"
+                        label="Adventures"
                         component={Link}
-                        to={ROUTES.ITEM_TWO}
-                        disableRipple={true}
-                    />
-                    <Tab
-                        label="Item Three"
-                        component={Link}
-                        to={ROUTES.ITEM_THREE}
+                        to={ROUTES.ADVENTURES}
                         disableRipple={true}
                     />
                 </Tabs>

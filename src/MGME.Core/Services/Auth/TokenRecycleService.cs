@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -89,7 +90,9 @@ namespace MGME.Core.Services.AuthService
 
                     if (expiredTokens.Count > 0)
                     {
-                        await tokenRepository.DeleteEntitiesAsync(expiredTokens);
+                        await tokenRepository.DeleteEntitiesAsync(
+                            expiredTokens.Select(token => token.Id)
+                        );
                     }
                 }
 
