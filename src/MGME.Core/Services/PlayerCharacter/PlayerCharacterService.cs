@@ -140,13 +140,9 @@ namespace MGME.Core.Services.PlayerCharacterService
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
-            bool thereAreNewNonPlayerCharactersToAdd =
-                newPlayerCharacter.NewNonPlayerCharacters != null
-                    && newPlayerCharacter.NewNonPlayerCharacters.Any();
+            bool thereAreNewNonPlayerCharactersToAdd = newPlayerCharacter?.NewNonPlayerCharacters.Any() == true;
 
-            bool thereAreExisitingNonPlayerCharactersToAdd =
-                newPlayerCharacter.ExistingNonPlayerCharacters != null
-                    && newPlayerCharacter.ExistingNonPlayerCharacters.Any();
+            bool thereAreExisitingNonPlayerCharactersToAdd = newPlayerCharacter?.ExistingNonPlayerCharacters.Any() == true;
 
             if (!thereAreNewNonPlayerCharactersToAdd && !thereAreExisitingNonPlayerCharactersToAdd)
             {
@@ -173,11 +169,12 @@ namespace MGME.Core.Services.PlayerCharacterService
                 }
 
                 // Check if at least one new NonPlayerCharacter already exists
-                Expression<Func<NonPlayerCharacter, bool>> nonPlayerCharacterNamePredicate =
-
-                    existingNonPlayerCharacter => newPlayerCharacter.NewNonPlayerCharacters.Select(
+                IEnumerable<string> newNonPlayerCharacterNames = newPlayerCharacter.NewNonPlayerCharacters.Select(
                         newNonPlayerCharacter => newNonPlayerCharacter.Name
-                    ).Contains(
+                );
+
+                Expression<Func<NonPlayerCharacter, bool>> nonPlayerCharacterNamePredicate =
+                    existingNonPlayerCharacter => newNonPlayerCharacterNames.Contains(
                         existingNonPlayerCharacter.Name
                     );
 
@@ -185,7 +182,6 @@ namespace MGME.Core.Services.PlayerCharacterService
                     nonPlayerCharacterNamePredicate
                 );
 
-                // If so, it belongs to someone else, or takes part in adventure; otherwise client denies the request
                 if (nonPlayerCharacterAlreadyExists)
                 {
                     response.Success = false;
@@ -208,13 +204,13 @@ namespace MGME.Core.Services.PlayerCharacterService
                     newNonPlayerCharactersToAdd = newPlayerCharacter.NewNonPlayerCharacters.Select(
                         nonPlayerCharacter =>
                         {
-                            NonPlayerCharacter nonPlayerCharacterDM = _mapper.Map<NonPlayerCharacter>(
+                            NonPlayerCharacter nonPlayerCharacterDataModel = _mapper.Map<NonPlayerCharacter>(
                                 nonPlayerCharacter
                             );
 
-                            nonPlayerCharacterDM.UserId = userId;
+                            nonPlayerCharacterDataModel.UserId = userId;
 
-                            return nonPlayerCharacterDM;
+                            return nonPlayerCharacterDataModel;
                         }
                     ).ToList();
                 }
