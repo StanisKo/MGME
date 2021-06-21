@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -20,9 +21,23 @@ namespace MGME.Core.Services.AdventureService
             _adventureRepository = adventureRepository;
         }
 
-        public Task <BaseServiceResponse> AddAdventure(AddAdventureDTO newAdventure)
+        public async Task <BaseServiceResponse> AddAdventure(AddAdventureDTO newAdventure)
         {
-            throw new System.NotImplementedException();
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
     }
 }
