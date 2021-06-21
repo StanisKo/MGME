@@ -20,16 +20,20 @@ namespace MGME.Core.Services.AdventureService
     {
         private readonly IEntityRepository<Adventure> _adventureRepository;
 
+        private readonly IEntityRepository<PlayerCharacter> _playerCharacterRepository;
+
         private readonly IEntityRepository<NonPlayerCharacter> _nonPlayerCharacterRepository;
 
         private readonly IMapper _mapper;
 
         public AdventureService(IEntityRepository<Adventure> adventureRepository,
+                                IEntityRepository<PlayerCharacter> playerCharacterRepository,
                                 IEntityRepository<NonPlayerCharacter> nonPlayerCharacterRepository,
                                 IMapper mapper,
                                 IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _adventureRepository = adventureRepository;
+            _playerCharacterRepository = playerCharacterRepository;
             _nonPlayerCharacterRepository = nonPlayerCharacterRepository;
             _mapper = mapper;
         }
@@ -67,6 +71,11 @@ namespace MGME.Core.Services.AdventureService
                 }
 
                 // Check if at least one new NonPlayerCharacter already exists
+
+                // TODO: this is wrong;
+                // User shouldn't be able to add npcs that belong to characters
+                // But should be able to add npcs that take part in other adventures
+                // !!! NOTE: !!!
                 IEnumerable<string> newNonPlayerCharacterNames = newAdventure.NewNonPlayerCharacters.Select(
                         newNonPlayerCharacter => newNonPlayerCharacter.Name
                 );
@@ -120,6 +129,12 @@ namespace MGME.Core.Services.AdventureService
                     Threads = threadsToAdd,
                     UserId = userId
                 };
+
+                await _adventureRepository.AddEntityAsync(adventureToAdd);
+
+                // Add player characters as many-to-many
+
+                // Add non player characters as one-to-many
             }
             catch (Exception exception)
             {
