@@ -71,31 +71,31 @@ namespace MGME.Core.Services.AdventureService
                     return response;
                 }
 
-                // Check if at least one new NonPlayerCharacter with such name already exists
-                IEnumerable<string> newNonPlayerCharacterNames = newAdventure.NewNonPlayerCharacters.Select(
-                        newNonPlayerCharacter => newNonPlayerCharacter.Name
-                );
-
-                Expression<Func<NonPlayerCharacter, bool>> nonPlayerCharacterNamePredicate =
-                    existingNonPlayerCharacter => existingNonPlayerCharacter.UserId == userId
-                            && newNonPlayerCharacterNames.Contains(existingNonPlayerCharacter.Name);
-
-                bool nonPlayerCharacterAlreadyExists = await _nonPlayerCharacterRepository.CheckIfEntityExistsAsync(
-                    nonPlayerCharacterNamePredicate
-                );
-
-                if (nonPlayerCharacterAlreadyExists)
-                {
-                    response.Success = false;
-                    response.Message = "One of the new NPCs already exists";
-
-                    return response;
-                }
-
                 List<NonPlayerCharacter> newNonPlayerCharactersToAdd = new List<NonPlayerCharacter>();
 
                 if (thereAreNewNonPlayerCharactersToAdd)
                 {
+                    // Check if at least one new NonPlayerCharacter with such name already exists
+                    IEnumerable<string> newNonPlayerCharacterNames = newAdventure.NewNonPlayerCharacters.Select(
+                            newNonPlayerCharacter => newNonPlayerCharacter.Name
+                    );
+
+                    Expression<Func<NonPlayerCharacter, bool>> nonPlayerCharacterNamePredicate =
+                        existingNonPlayerCharacter => existingNonPlayerCharacter.UserId == userId
+                                && newNonPlayerCharacterNames.Contains(existingNonPlayerCharacter.Name);
+
+                    bool nonPlayerCharacterAlreadyExists = await _nonPlayerCharacterRepository.CheckIfEntityExistsAsync(
+                        nonPlayerCharacterNamePredicate
+                    );
+
+                    if (nonPlayerCharacterAlreadyExists)
+                    {
+                        response.Success = false;
+                        response.Message = "One of the new NPCs already exists";
+
+                        return response;
+                    }
+                
                     // Map NonPlayerCharacter DTOs to data models and link to current user
                     newNonPlayerCharactersToAdd = newAdventure.NewNonPlayerCharacters.Select(
                         nonPlayerCharacter =>
@@ -128,13 +128,13 @@ namespace MGME.Core.Services.AdventureService
                 await _adventureRepository.AddEntityAsync(adventureToAdd);
 
                 // Add player characters
-                IEnumerable<PlayerCharacter> playerCharactersToAdd = await _playerCharacterRepository.GetEntititesAsync(
+                IEnumerable<PlayerCharacter> playerCharacters = await _playerCharacterRepository.GetEntititesAsync(
                     predicate: playerCharacter => playerCharacter.UserId == userId
                         && newAdventure.PlayerCharacters.Contains(playerCharacter.Id)
                 );
 
                 await _playerCharacterRepository.LinkEntitiesAsync(
-                        playerCharactersToAdd,
+                        playerCharacters,
                         adventureToAdd,
                         "Adventures"
                     );
