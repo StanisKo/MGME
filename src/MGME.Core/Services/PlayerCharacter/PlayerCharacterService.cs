@@ -140,9 +140,9 @@ namespace MGME.Core.Services.PlayerCharacterService
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
-            bool thereAreNewNonPlayerCharactersToAdd = newPlayerCharacter?.NewNonPlayerCharacters.Any() == true;
+            bool thereAreNewNonPlayerCharactersToAdd = newPlayerCharacter.NewNonPlayerCharacters?.Any() == true;
 
-            bool thereAreExisitingNonPlayerCharactersToAdd = newPlayerCharacter?.ExistingNonPlayerCharacters.Any() == true;
+            bool thereAreExisitingNonPlayerCharactersToAdd = newPlayerCharacter.ExistingNonPlayerCharacters?.Any() == true;
 
             if (!thereAreNewNonPlayerCharactersToAdd && !thereAreExisitingNonPlayerCharactersToAdd)
             {
@@ -186,7 +186,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 if (nonPlayerCharacterAlreadyExists)
                 {
                     response.Success = false;
-                    response.Message = "One of the new NPCs either already belongs to another character, or takes part in adventure";
+                    response.Message = "One of the new NPCs already exists";
 
                     return response;
                 }
