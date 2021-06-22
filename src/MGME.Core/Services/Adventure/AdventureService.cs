@@ -59,7 +59,8 @@ namespace MGME.Core.Services.AdventureService
             try
             {
                 bool adventureExists = await _adventureRepository.CheckIfEntityExistsAsync(
-                    adventure => adventure.Title.ToLower() == newAdventure.Title.ToLower()
+                    adventure => adventure.UserId == userId
+                        && adventure.Title.ToLower() == newAdventure.Title.ToLower()
                 );
 
                 if (adventureExists)
@@ -70,32 +71,20 @@ namespace MGME.Core.Services.AdventureService
                     return response;
                 }
 
-                // Check if at least one new NonPlayerCharacter already exists
-
-                // TODO: this is wrong;
-                // User shouldn't be able to add npcs that belong to characters
-                // But should be able to add npcs that take part in other adventures
-                // !!! NOTE: !!!
+                // Check if at least one new NonPlayerCharacter belongs to a PlayerCharacter
                 IEnumerable<string> newNonPlayerCharacterNames = newAdventure.NewNonPlayerCharacters.Select(
                         newNonPlayerCharacter => newNonPlayerCharacter.Name
                 );
 
-                Expression<Func<NonPlayerCharacter, bool>> nonPlayerCharacterNamePredicate =
-                    existingNonPlayerCharacter => newNonPlayerCharacterNames.Contains(
-                        existingNonPlayerCharacter.Name
-                    );
+                
 
-                bool nonPlayerCharacterAlreadyExists = await _nonPlayerCharacterRepository.CheckIfEntityExistsAsync(
-                    nonPlayerCharacterNamePredicate
-                );
+                // if (nonPlayerCharacterAlreadyExists)
+                // {
+                //     response.Success = false;
+                //     response.Message = "One of the new NPCs either already takes part in another adventure, or belongs to a character";
 
-                if (nonPlayerCharacterAlreadyExists)
-                {
-                    response.Success = false;
-                    response.Message = "One of the new NPCs either already takes part in another adventure, or belongs to a character";
-
-                    return response;
-                }
+                //     return response;
+                // }
 
                 List<NonPlayerCharacter> newNonPlayerCharactersToAdd = new List<NonPlayerCharacter>();
 

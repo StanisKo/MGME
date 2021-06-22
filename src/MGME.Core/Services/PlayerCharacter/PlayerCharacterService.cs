@@ -156,8 +156,10 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             try
             {
+                // Check if player character with such name already exists for this user
                 bool playerCharacterExists = await _playerCharacterRepository.CheckIfEntityExistsAsync(
-                    playerCharacter => playerCharacter.Name.ToLower() == newPlayerCharacter.Name.ToLower()
+                    playerCharacter => playerCharacter.UserId == userId
+                        && playerCharacter.Name.ToLower() == newPlayerCharacter.Name.ToLower()
                 );
 
                 if (playerCharacterExists)
@@ -168,15 +170,14 @@ namespace MGME.Core.Services.PlayerCharacterService
                     return response;
                 }
 
-                // Check if at least one new NonPlayerCharacter already exists
+                // Check if at least one new NonPlayerCharacter with such name already exists for this user
                 IEnumerable<string> newNonPlayerCharacterNames = newPlayerCharacter.NewNonPlayerCharacters.Select(
                         newNonPlayerCharacter => newNonPlayerCharacter.Name
                 );
 
                 Expression<Func<NonPlayerCharacter, bool>> nonPlayerCharacterNamePredicate =
-                    existingNonPlayerCharacter => newNonPlayerCharacterNames.Contains(
-                        existingNonPlayerCharacter.Name
-                    );
+                    existingNonPlayerCharacter => existingNonPlayerCharacter.UserId == userId
+                        && newNonPlayerCharacterNames.Contains(existingNonPlayerCharacter.Name);
 
                 bool nonPlayerCharacterAlreadyExists = await _nonPlayerCharacterRepository.CheckIfEntityExistsAsync(
                     nonPlayerCharacterNamePredicate
