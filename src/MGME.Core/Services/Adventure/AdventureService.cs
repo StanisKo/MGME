@@ -140,9 +140,9 @@ namespace MGME.Core.Services.AdventureService
                 and simply write to it directly
                 */
 
-                // TODO: parameterize AsSplitQuery(): https://docs.microsoft.com/en-us/ef/core/querying/single-split-queries
                 Adventure addedAdventure = await _adventureRepository.GetEntityAsync(
                     tracking: true,
+                    splitQuery: true,
                     predicate: adventure => adventure.UserId == userId && adventure.Title == newAdventure.Title,
                     include: new[]
                     {

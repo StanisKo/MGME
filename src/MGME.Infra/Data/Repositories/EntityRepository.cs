@@ -25,6 +25,7 @@ namespace MGME.Infra.Data.Repositories
 
         public async Task <TEntity> GetEntityAsync(int? id = null,
                                                    bool tracking = false,
+                                                   bool splitQuery = false,
                                                    Expression<Func<TEntity, bool>> predicate = null,
                                                    IEnumerable<string> include = null)
         {
@@ -43,6 +44,12 @@ namespace MGME.Infra.Data.Repositories
                 {
                     query = query.Include(include.ElementAt(i));
                 }
+            }
+
+            // Split query if explicitly requested
+            if (splitQuery)
+            {
+                query = query.AsSplitQuery();
             }
 
             // If we query only on primary key

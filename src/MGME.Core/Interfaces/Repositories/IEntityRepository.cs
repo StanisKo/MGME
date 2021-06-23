@@ -11,9 +11,15 @@ namespace MGME.Core.Interfaces.Repositories
 {
     public interface IEntityRepository<TEntity> where TEntity: BaseEntity, new()
     {
-        // Get a single entity
+        /*
+        Get a single entity
+
+        On the contrary to other methods, splits the query based on param,
+        since splitting, yet, was not necessary when using other methods
+        */
         Task <TEntity> GetEntityAsync(int? id = null,
                                       bool tracking = false,
+                                      bool splitQuery = false,
                                       Expression<Func<TEntity, bool>> predicate = null,
                                       IEnumerable<string> include = null);
 
