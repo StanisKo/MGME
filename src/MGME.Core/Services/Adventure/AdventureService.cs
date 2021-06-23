@@ -133,9 +133,29 @@ namespace MGME.Core.Services.AdventureService
                         && newAdventure.PlayerCharacters.Contains(playerCharacter.Id)
                 );
 
+                /*
+                We query added adventure back to add PlayerCharacters and possible existing NonPlayerCharacters
+
+                NOTE: If mapping table was defined explicitly, we could've avoided this query
+                and simply write to it directly
+                */
+
+                // TODO: parameterize AsSplitQuery(): https://docs.microsoft.com/en-us/ef/core/querying/single-split-queries
+                Adventure addedAdventure = await _adventureRepository.GetEntityAsync(
+                    tracking: true,
+                    predicate: adventure => adventure.UserId == userId && adventure.Title == newAdventure.Title,
+                    include: new[]
+                    {
+                        "PlayerCharacters",
+                        "NonPlayerCharacters"
+                    }
+                );
+
+                addedAdventure.PlayerCharacters = playerCharacters.ToList();
+
                 await _playerCharacterRepository.LinkEntitiesAsync(
                         playerCharacters,
-                        adventureToAdd,
+                        addedAdventure,
                         "PlayerCharacters"
                     );
 
@@ -162,10 +182,12 @@ namespace MGME.Core.Services.AdventureService
                             predicate: predicate
                         );
 
+                    addedAdventure.NonPlayerCharacters = existingNonPlayerCharacters.ToList();
+
                     // We link existing NonPlayerCharacter to our new Adventure
                     await _nonPlayerCharacterRepository.LinkEntitiesAsync(
                         existingNonPlayerCharacters,
-                        adventureToAdd,
+                        addedAdventure,
                         "NonPlayerCharacters"
                     );
                 }
