@@ -133,13 +133,7 @@ namespace MGME.Core.Services.AdventureService
                         && newAdventure.PlayerCharacters.Contains(playerCharacter.Id)
                 );
 
-                /*
-                We query added adventure back to add PlayerCharacters and possible existing NonPlayerCharacters
-
-                NOTE: If mapping table was defined explicitly, we could've avoided this query
-                and simply write to it directly
-                */
-
+                // We query added adventure back to add PlayerCharacters and possible existing NonPlayerCharacters
                 Adventure addedAdventure = await _adventureRepository.GetEntityAsync(
                     tracking: true,
                     splitQuery: true,
