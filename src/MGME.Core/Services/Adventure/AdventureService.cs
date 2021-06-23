@@ -136,7 +136,7 @@ namespace MGME.Core.Services.AdventureService
                 await _playerCharacterRepository.LinkEntitiesAsync(
                         playerCharacters,
                         adventureToAdd,
-                        "Adventures"
+                        "PlayerCharacters"
                     );
 
                 /*
@@ -166,9 +166,12 @@ namespace MGME.Core.Services.AdventureService
                     await _nonPlayerCharacterRepository.LinkEntitiesAsync(
                         existingNonPlayerCharacters,
                         adventureToAdd,
-                        "Adventures"
+                        "NonPlayerCharacters"
                     );
                 }
+
+                response.Success = true;
+                response.Message = "Adventure was successfully added";
             }
             catch (Exception exception)
             {
