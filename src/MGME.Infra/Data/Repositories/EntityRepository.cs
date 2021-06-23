@@ -71,17 +71,11 @@ namespace MGME.Infra.Data.Repositories
         }
 
         public async Task <TEntityDTO> GetEntityAsync<TEntityDTO>(int? id = null,
-                                                                  bool tracking = false,
                                                                   Expression<Func<TEntity, bool>> predicate = null,
                                                                   IEnumerable<string> include = null,
                                                                   Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO : BaseEntityDTO
         {
-            IQueryable<TEntity> query = _database.Set<TEntity>();
-
-            if (!tracking)
-            {
-                query = query.AsNoTracking();
-            }
+            IQueryable<TEntity> query = _database.Set<TEntity>().AsNoTracking();
 
             if (include != null)
             {
@@ -113,18 +107,12 @@ namespace MGME.Infra.Data.Repositories
         }
 
 
-        public async Task<List<TEntity>> GetEntititesAsync(bool tracking = false,
-                                                           Expression<Func<TEntity, bool>> predicate = null,
+        public async Task<List<TEntity>> GetEntititesAsync(Expression<Func<TEntity, bool>> predicate = null,
                                                            IEnumerable<string> include = null,
                                                            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
                                                            int? page = null)
         {
-            IQueryable<TEntity> query = _database.Set<TEntity>();
-
-            if (!tracking)
-            {
-                query = query.AsNoTracking();
-            }
+            IQueryable<TEntity> query = _database.Set<TEntity>().AsNoTracking();
 
             if (include != null)
             {
@@ -169,19 +157,13 @@ namespace MGME.Infra.Data.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task <List<TEntityDTO>> GetEntititesAsync<TEntityDTO>(bool tracking = false,
-                                                                           Expression<Func<TEntity, bool>> predicate = null,
+        public async Task <List<TEntityDTO>> GetEntititesAsync<TEntityDTO>(Expression<Func<TEntity, bool>> predicate = null,
                                                                            IEnumerable<string> include = null,
                                                                            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
                                                                            int? page = null,
                                                                            Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO
         {
             IQueryable<TEntity> query = _database.Set<TEntity>();
-
-            if (!tracking)
-            {
-                query = query.AsNoTracking();
-            }
 
             if (include != null)
             {

@@ -14,8 +14,9 @@ namespace MGME.Core.Interfaces.Repositories
         /*
         Get a single entity
 
-        On the contrary to other methods, splits the query based on param,
-        since splitting, yet, was not necessary when using other methods
+        On the contrary to other methods, might enable tracking and split the query
+        if explicitly requested by the caller: used when modifying many-to-many relationships
+        and querying related collections with include without select
         */
         Task <TEntity> GetEntityAsync(int? id = null,
                                       bool tracking = false,
@@ -25,22 +26,19 @@ namespace MGME.Core.Interfaces.Repositories
 
         // For when we need to select only some columns
         Task <TEntityDTO> GetEntityAsync<TEntityDTO>(int? id = null,
-                                                     bool tracking = false,
                                                      Expression<Func<TEntity, bool>> predicate = null,
                                                      IEnumerable<string> include = null,
                                                      Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO;
 
 
         // Get multiple entities
-        Task <List<TEntity>> GetEntititesAsync(bool tracking = false,
-                                               Expression<Func<TEntity, bool>> predicate = null,
+        Task <List<TEntity>> GetEntititesAsync(Expression<Func<TEntity, bool>> predicate = null,
                                                IEnumerable<string> include = null,
                                                Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
                                                int? page = null);
 
         // For when we need to select only some columns
-        Task <List<TEntityDTO>> GetEntititesAsync<TEntityDTO>(bool tracking = false,
-                                                              Expression<Func<TEntity, bool>> predicate = null,
+        Task <List<TEntityDTO>> GetEntititesAsync<TEntityDTO>(Expression<Func<TEntity, bool>> predicate = null,
                                                               IEnumerable<string> include = null,
                                                               Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
                                                               int? page = null,
