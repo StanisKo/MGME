@@ -242,6 +242,35 @@ namespace MGME.Core.Services.AdventureService
             return response;
         }
 
+        public async Task <BaseServiceResponse> AddToAdventure(AddToAdventureDTO ids)
+        {
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            bool thereArePlayerCharactersToAdd = ids.PlayerCharacters?.Any() == true;
+
+            bool thereAreNonPlayerCharactersToAdd = ids.NonPlayerCharacters?.Any() == true;
+
+            if (!thereArePlayerCharactersToAdd && !thereAreNonPlayerCharactersToAdd)
+            {
+                response.Success = false;
+                response.Message = "At least one character or one npc id has to be provided";
+
+                return response;
+            }
+
+            try
+            {
+
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
+        }
+
         private async Task <IEnumerable<GetAdventureListDTO>> QueryAdventures(Ref<string> sortingParameter, Ref<int> selectedPage, Ref<int> userId)
         {
             IEnumerable<GetAdventureListDTO> adventures = await _adventureRepository.GetEntititesAsync<GetAdventureListDTO>(
