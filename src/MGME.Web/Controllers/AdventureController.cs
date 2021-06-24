@@ -48,5 +48,18 @@ namespace MGME.Web.Controllers
 
             return BadRequest(response);
         }
+
+        [HttpPost("AddTo")]
+        public async Task <IActionResult> AddToAdventure(AddToAdventureDTO ids)
+        {
+            BaseServiceResponse response = await _adventureService.AddToAdventure(ids);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
     }
 }

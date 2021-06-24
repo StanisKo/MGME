@@ -264,7 +264,14 @@ namespace MGME.Core.Services.AdventureService
             {
                 Adventure adventureToAddTo = await _adventureRepository.GetEntityAsync(
                     id: ids.Adventure,
-                    predicate: adventure => adventure.UserId == userId
+                    predicate: adventure => adventure.UserId == userId,
+                    tracking: true,
+                    splitQuery: true,
+                    include: new[]
+                    {
+                        "PlayerCharacters",
+                        "NonPlayerCharacters"
+                    }
                 );
 
                 if (adventureToAddTo == null)
@@ -277,14 +284,21 @@ namespace MGME.Core.Services.AdventureService
 
                 if (thereArePlayerCharactersToAdd)
                 {
-                    ICollection<PlayerCharacter> playerCharactersToAdd = await _playerCharacterRepository.GetEntititesAsync(
-                        predicate: playerCharacter => playerCharacter.UserId == userId
-                            && ids.PlayerCharacters.Contains(playerCharacter.Id)
+                    Expression<Func<PlayerCharacter, bool>> predicate =
+                        playerCharacter => playerCharacter.UserId == userId
+                            && ids.PlayerCharacters.Contains(playerCharacter.Id);
+
+                    IEnumerable<PlayerCharacter> playerCharactersToAdd = await _playerCharacterRepository.GetEntititesAsync(
+                        tracking: true,
+                        predicate: predicate
                     );
 
-                    adventureToAddTo.PlayerCharacters.ToList().AddRange(
-                        playerCharactersToAdd
-                    );
+                    for (int i = 0; i < playerCharactersToAdd.Count(); i++)
+                    {
+                        adventureToAddTo.PlayerCharacters.Add(
+                            playerCharactersToAdd.ElementAt(i)
+                        );
+                    }
 
                     await _playerCharacterRepository.LinkEntitiesAsync(
                         playerCharactersToAdd,
@@ -296,10 +310,14 @@ namespace MGME.Core.Services.AdventureService
                 response.Success = true;
                 response.Message = $"{(thereArePlayerCharactersToAdd ? "Characters" : "NPCs")} were successfully added";
             }
-            catch (Exception exception)
+            // catch (Exception exception)
+            // {
+            //     response.Success = false;
+            //     response.Message = exception.Message;
+            // }
+            finally
             {
-                response.Success = false;
-                response.Message = exception.Message;
+
             }
 
             return response;

@@ -107,12 +107,18 @@ namespace MGME.Infra.Data.Repositories
         }
 
 
-        public async Task<List<TEntity>> GetEntititesAsync(Expression<Func<TEntity, bool>> predicate = null,
+        public async Task<List<TEntity>> GetEntititesAsync(bool tracking = false,
+                                                           Expression<Func<TEntity, bool>> predicate = null,
                                                            IEnumerable<string> include = null,
                                                            Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
                                                            int? page = null)
         {
-            IQueryable<TEntity> query = _database.Set<TEntity>().AsNoTracking();
+            IQueryable<TEntity> query = _database.Set<TEntity>();
+
+            if (!tracking)
+            {
+                query = query.AsNoTracking();
+            }
 
             if (include != null)
             {

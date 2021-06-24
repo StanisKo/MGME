@@ -11,13 +11,7 @@ namespace MGME.Core.Interfaces.Repositories
 {
     public interface IEntityRepository<TEntity> where TEntity: BaseEntity, new()
     {
-        /*
-        Get a single entity
-
-        On the contrary to other methods, might enable tracking and split the query
-        if explicitly requested by the caller: used when modifying many-to-many relationships
-        and querying related collections with include without select
-        */
+        // Get a single entity
         Task <TEntity> GetEntityAsync(int? id = null,
                                       bool tracking = false,
                                       bool splitQuery = false,
@@ -32,7 +26,8 @@ namespace MGME.Core.Interfaces.Repositories
 
 
         // Get multiple entities
-        Task <List<TEntity>> GetEntititesAsync(Expression<Func<TEntity, bool>> predicate = null,
+        Task <List<TEntity>> GetEntititesAsync(bool tracking = false,
+                                               Expression<Func<TEntity, bool>> predicate = null,
                                                IEnumerable<string> include = null,
                                                Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
                                                int? page = null);
