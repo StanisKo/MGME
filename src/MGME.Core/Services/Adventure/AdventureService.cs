@@ -284,16 +284,16 @@ namespace MGME.Core.Services.AdventureService
 
                 if (thereArePlayerCharactersToAdd)
                 {
-                    bool providedCharactersAlreadyInThisAdventure = adventureToAddTo.PlayerCharacters.Select(
+                    IEnumerable<int> matches = adventureToAddTo.PlayerCharacters.Select(
                         playerCharacter => playerCharacter.Id
                     ).Intersect(
                         ids.PlayerCharacters
-                    ).Any();
+                    );
 
-                    if (providedCharactersAlreadyInThisAdventure)
+                    if (matches.Any())
                     {
                         IEnumerable<string> names = adventureToAddTo.PlayerCharacters.Where(
-                            playerCharacter => ids.PlayerCharacters.Contains(playerCharacter.Id)
+                            playerCharacter => matches.Contains(playerCharacter.Id)
                         ).Select(
                             playerCharacter => playerCharacter.Name
                         );
@@ -331,14 +331,10 @@ namespace MGME.Core.Services.AdventureService
                 response.Success = true;
                 response.Message = $"{(thereArePlayerCharactersToAdd ? "Characters" : "NPCs")} were successfully added";
             }
-            // catch (Exception exception)
-            // {
-            //     response.Success = false;
-            //     response.Message = exception.Message;
-            // }
-            finally
+            catch (Exception exception)
             {
-
+                response.Success = false;
+                response.Message = exception.Message;
             }
 
             return response;
