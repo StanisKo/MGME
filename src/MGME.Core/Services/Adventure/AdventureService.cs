@@ -38,6 +38,25 @@ namespace MGME.Core.Services.AdventureService
             _mapper = mapper;
         }
 
+        public async Task <PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>>> GetAllAdventures(string sorting, int? page)
+        {
+            PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>> response = new PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>>();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
+        }
+
         public async Task <BaseServiceResponse> AddAdventure(AddAdventureDTO newAdventure)
         {
             BaseServiceResponse response = new BaseServiceResponse();
