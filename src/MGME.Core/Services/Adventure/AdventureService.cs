@@ -258,9 +258,43 @@ namespace MGME.Core.Services.AdventureService
                 return response;
             }
 
+            int userId = GetUserIdFromHttpContext();
+
             try
             {
+                Adventure adventureToAddTo = await _adventureRepository.GetEntityAsync(
+                    id: ids.Adventure,
+                    predicate: adventure => adventure.UserId == userId
+                );
 
+                if (adventureToAddTo == null)
+                {
+                    response.Success = false;
+                    response.Message = "Adventure doesn't exist";
+
+                    return response;
+                }
+
+                if (thereArePlayerCharactersToAdd)
+                {
+                    ICollection<PlayerCharacter> playerCharactersToAdd = await _playerCharacterRepository.GetEntititesAsync(
+                        predicate: playerCharacter => playerCharacter.UserId == userId
+                            && ids.PlayerCharacters.Contains(playerCharacter.Id)
+                    );
+
+                    adventureToAddTo.PlayerCharacters.ToList().AddRange(
+                        playerCharactersToAdd
+                    );
+
+                    await _playerCharacterRepository.LinkEntitiesAsync(
+                        playerCharactersToAdd,
+                        adventureToAddTo,
+                        "PlayerCharacters"
+                    );
+                }
+
+                response.Success = true;
+                response.Message = $"{(thereArePlayerCharactersToAdd ? "Characters" : "NPCs")} were successfully added";
             }
             catch (Exception exception)
             {
