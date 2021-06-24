@@ -276,6 +276,8 @@ namespace MGME.Core.Services.AdventureService
                 orderBy: "dummy",
                 page: selectedPage.Value
             );
+
+            return adventures;
         }
     }
 }
