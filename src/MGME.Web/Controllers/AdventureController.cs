@@ -21,6 +21,21 @@ namespace MGME.Web.Controllers
             _adventureService = adventureService;
         }
 
+        [HttpGet]
+        public async Task <IActionResult> GetAllPlayerCharacters([FromQuery] string sorting, int? page)
+        {
+            PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>> response = await _adventureService.GetAllAdventures(
+                sorting ?? "title", page ?? 1
+            );
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return BadRequest(response);
+        }
+
         [HttpPost("Add")]
         public async Task <IActionResult> AddAventure(AddAdventureDTO newAdventure)
         {
