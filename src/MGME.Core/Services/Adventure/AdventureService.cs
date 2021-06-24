@@ -284,6 +284,27 @@ namespace MGME.Core.Services.AdventureService
 
                 if (thereArePlayerCharactersToAdd)
                 {
+                    bool providedCharactersAlreadyInThisAdventure = adventureToAddTo.PlayerCharacters.Select(
+                        playerCharacter => playerCharacter.Id
+                    ).Intersect(
+                        ids.PlayerCharacters
+                    ).Any();
+
+                    if (providedCharactersAlreadyInThisAdventure)
+                    {
+                        IEnumerable<string> names = adventureToAddTo.PlayerCharacters.Where(
+                            playerCharacter => ids.PlayerCharacters.Contains(playerCharacter.Id)
+                        ).Select(
+                            playerCharacter => playerCharacter.Name
+                        );
+
+                        response.Success = false;
+                        response.Message = $"{String.Join(", ", names)} already added to {adventureToAddTo.Title}";
+
+                        return response;
+                    }
+
+
                     Expression<Func<PlayerCharacter, bool>> predicate =
                         playerCharacter => playerCharacter.UserId == userId
                             && ids.PlayerCharacters.Contains(playerCharacter.Id);
