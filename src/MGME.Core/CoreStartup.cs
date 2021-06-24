@@ -40,6 +40,8 @@ namespace MGME.Core
             services.AddScoped<INonPlayerCharacterService, NonPlayerCharacterService>();
 
             services.AddScoped<IAdventureService, AdventureService>();
+
+            services.AddScoped<AdventureSorter>();
         }
     }
 }

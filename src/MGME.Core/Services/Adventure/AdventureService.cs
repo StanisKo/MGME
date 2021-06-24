@@ -17,6 +17,7 @@ using MGME.Core.DTOs.NonPlayerCharacter;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
 using MGME.Core.Utils;
+using MGME.Core.Utils.Sorters;
 
 namespace MGME.Core.Services.AdventureService
 {
@@ -30,19 +31,23 @@ namespace MGME.Core.Services.AdventureService
 
         private readonly IMapper _mapper;
 
+        private readonly AdventureSorter _sorter;
+
         public AdventureService(IEntityRepository<Adventure> adventureRepository,
                                 IEntityRepository<PlayerCharacter> playerCharacterRepository,
                                 IEntityRepository<NonPlayerCharacter> nonPlayerCharacterRepository,
                                 IMapper mapper,
+                                AdventureSorter sorter,
                                 IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _adventureRepository = adventureRepository;
             _playerCharacterRepository = playerCharacterRepository;
             _nonPlayerCharacterRepository = nonPlayerCharacterRepository;
             _mapper = mapper;
+            _sorter = sorter;
         }
 
-        public async Task <PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>>> GetAllAdventures(string sorting, int? page)
+        public async Task <PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>>> GetAllAdventures(string sortingParameter, int selectedPage)
         {
             PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>> response = new PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>>();
 
@@ -54,7 +59,19 @@ namespace MGME.Core.Services.AdventureService
                     adventure => adventure.UserId == userId
                 );
 
+                IEnumerable<GetAdventureListDTO> adventures = await QueryAdventures(
+                    new Ref<string>(sortingParameter),
+                    new Ref<int>(selectedPage),
+                    new Ref<int>(userId)
+                );
 
+                response.Data = adventures;
+
+                response.Pagination.Page = selectedPage;
+                response.Pagination.NumberOfResults = numberOfResults;
+                response.Pagination.NumberOfPages = DataAccessHelpers.GetNumberOfPages(numberOfResults);
+
+                response.Success = true;
             }
             catch (Exception exception)
             {
@@ -273,7 +290,7 @@ namespace MGME.Core.Services.AdventureService
                     ).FirstOrDefault(),
                     NonPlayerCharacterCount = adventure.NonPlayerCharacters.Count,
                 },
-                orderBy: "dummy",
+                orderBy: _sorter.DetermineSorting(sortingParameter.Value),
                 page: selectedPage.Value
             );
 
