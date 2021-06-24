@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
 using System.Collections.Generic;
 
 using AutoMapper;
@@ -10,9 +11,12 @@ using Microsoft.AspNetCore.Http;
 using MGME.Core.Entities;
 using MGME.Core.DTOs;
 using MGME.Core.DTOs.Adventure;
+using MGME.Core.DTOs.Thread;
+using MGME.Core.DTOs.PlayerCharacter;
+using MGME.Core.DTOs.NonPlayerCharacter;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
-using System.Linq.Expressions;
+using MGME.Core.Utils;
 
 namespace MGME.Core.Services.AdventureService
 {
@@ -46,6 +50,10 @@ namespace MGME.Core.Services.AdventureService
 
             try
             {
+                int numberOfResults = await _adventureRepository.GetEntitiesCountAsync(
+                    adventure => adventure.UserId == userId
+                );
+
 
             }
             catch (Exception exception)
@@ -215,6 +223,59 @@ namespace MGME.Core.Services.AdventureService
             }
 
             return response;
+        }
+
+        private async Task <IEnumerable<GetAdventureListDTO>> QueryAdventures(Ref<string> sortingParameter, Ref<int> selectedPage, Ref<int> userId)
+        {
+            IEnumerable<GetAdventureListDTO> adventures = await _adventureRepository.GetEntititesAsync<GetAdventureListDTO>(
+                predicate: adventure => adventure.UserId == userId.Value,
+                include: new[]
+                {
+                    "Threads",
+                    "PlayerCharacters",
+                    "NonPlayerCharacters"
+                },
+                select: adventure => new GetAdventureListDTO()
+                {
+                    Id = adventure.Id,
+                    Title = adventure.Title,
+
+                    Thread = adventure.Threads.Select(
+                        thread => new GetThreadDTO()
+                        {
+                            Id = thread.Id,
+                            Name = thread.Name
+                        }
+                    ).Where(
+                        thread => adventure.Threads.Count == 1
+                    ).FirstOrDefault(),
+                    ThreadCount = adventure.Threads.Count,
+
+                    PlayerCharacter = adventure.PlayerCharacters.Select(
+                        playerCharacter => new GetPlayerCharacterDTO()
+                        {
+                            Id = playerCharacter.Id,
+                            Name = playerCharacter.Name
+                        }
+                    ).Where(
+                        playerCharacter => adventure.PlayerCharacters.Count == 1
+                    ).FirstOrDefault(),
+                    PlayerCharacterCount = adventure.PlayerCharacters.Count,
+
+                    NonPlayerCharacter = adventure.NonPlayerCharacters.Select(
+                        nonPlayerCharacter => new GetNonPlayerCharacterDTO()
+                        {
+                            Id = nonPlayerCharacter.Id,
+                            Name = nonPlayerCharacter.Name
+                        }
+                    ).Where(
+                        nonPlayerCharacter => adventure.NonPlayerCharacters.Count == 1
+                    ).FirstOrDefault(),
+                    NonPlayerCharacterCount = adventure.NonPlayerCharacters.Count,
+                },
+                orderBy: "dummy",
+                page: selectedPage.Value
+            );
         }
     }
 }

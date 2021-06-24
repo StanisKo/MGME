@@ -4,7 +4,7 @@ using MGME.Core.DTOs.NonPlayerCharacter;
 
 namespace MGME.Core.DTOs.Adventure
 {
-    public class GetAdventureListDTO
+    public class GetAdventureListDTO : BaseEntityDTO
     {
         public string Title { get; set; }
 
@@ -19,5 +19,7 @@ namespace MGME.Core.DTOs.Adventure
         public GetNonPlayerCharacterDTO NonPlayerCharacter { get; set; }
 
         public int NonPlayerCharacterCount { get; set; }
+
+        public int SceneCount { get; set; }
     }
 }
