@@ -139,7 +139,7 @@ namespace MGME.Core.Services.AdventureService
 
                         return response;
                     }
-                
+
                     // Map NonPlayerCharacter DTOs to data models and link to current user
                     newNonPlayerCharactersToAdd = newAdventure.NewNonPlayerCharacters.Select(
                         nonPlayerCharacter =>
@@ -171,12 +171,6 @@ namespace MGME.Core.Services.AdventureService
 
                 await _adventureRepository.AddEntityAsync(adventureToAdd);
 
-                // Add player characters
-                IEnumerable<PlayerCharacter> playerCharacters = await _playerCharacterRepository.GetEntititesAsync(
-                    predicate: playerCharacter => playerCharacter.UserId == userId
-                        && newAdventure.PlayerCharacters.Contains(playerCharacter.Id)
-                );
-
                 // We query added adventure back to add PlayerCharacters and possible existing NonPlayerCharacters
                 Adventure addedAdventure = await _adventureRepository.GetEntityAsync(
                     tracking: true,
@@ -187,6 +181,12 @@ namespace MGME.Core.Services.AdventureService
                         "PlayerCharacters",
                         "NonPlayerCharacters"
                     }
+                );
+
+                // Add player characters
+                IEnumerable<PlayerCharacter> playerCharacters = await _playerCharacterRepository.GetEntititesAsync(
+                    predicate: playerCharacter => playerCharacter.UserId == userId
+                        && newAdventure.PlayerCharacters.Contains(playerCharacter.Id)
                 );
 
                 addedAdventure.PlayerCharacters = playerCharacters.ToList();
