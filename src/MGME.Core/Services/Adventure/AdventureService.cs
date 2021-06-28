@@ -299,7 +299,7 @@ namespace MGME.Core.Services.AdventureService
                         );
 
                         response.Success = false;
-                        response.Message = $"{String.Join(", ", names)} already added to {adventureToAddTo.Title}";
+                        response.Message = $"{String.Join(", ", names)} already added to \"{adventureToAddTo.Title}\"";
 
                         return response;
                     }
