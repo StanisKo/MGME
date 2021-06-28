@@ -70,8 +70,12 @@ enum SELECTED_MENU {
 export const Catalogues = (): ReactElement => {
     const dispatch = useDispatch();
 
-    const selectedEntities = useSelector(
+    const selectedPlayerCharacters = useSelector(
         (store: ApplicationState) => store.catalogues?.playerCharacters?.selected ?? []
+    );
+
+    const selectedNonPlayerCharacters = useSelector(
+        (store: ApplicationState) => store.catalogues?.nonPlayerCharacters?.selected ?? []
     );
 
     const [selectedMenu, setSelectedMenu] = useState<number>(SELECTED_MENU.PLAYER_CHARACTERS);
@@ -87,7 +91,8 @@ export const Catalogues = (): ReactElement => {
     };
 
     const handleDelete = async (): Promise<void> => {
-        const response = await deletePlayerCharacters(selectedEntities);
+        // Condition this one
+        const response = await deletePlayerCharacters(selectedPlayerCharacters);
 
         setResponse(response);
 
@@ -123,7 +128,9 @@ export const Catalogues = (): ReactElement => {
         setOpenSnackbar(false);
     };
 
-    const nothingSelected = selectedEntities.length === 0;
+    const nothingSelected = selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS
+        ? selectedPlayerCharacters.length === 0
+        : selectedNonPlayerCharacters.length === 0;
 
     // Rest are also shared by creation modal
     const { deleteButton, ...classes } = useStyles();
@@ -150,7 +157,7 @@ export const Catalogues = (): ReactElement => {
                                 variant="outlined"
                                 color="primary"
                                 size="medium"
-                                disabled={nothingSelected || selectedMenu === SELECTED_MENU.NON_PLAYER_CHARACTERS}
+                                disabled={nothingSelected}
                             >
                                 Add to Adventure
                             </Button>

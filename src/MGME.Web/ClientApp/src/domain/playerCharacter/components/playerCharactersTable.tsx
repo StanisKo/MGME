@@ -270,7 +270,7 @@ export const PlayerCharactersTable = (): ReactElement => {
                 />
             </Box>
         </>
-    
+
     ) : <LinearProgress />;
 };
 

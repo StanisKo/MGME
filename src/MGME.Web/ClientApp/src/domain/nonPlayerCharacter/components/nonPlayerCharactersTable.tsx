@@ -260,6 +260,6 @@ export const NonPlayerCharactersTable = (): ReactElement => {
                 />
             </Box>
         </>
-    
+
     ) : <LinearProgress />;
 };
