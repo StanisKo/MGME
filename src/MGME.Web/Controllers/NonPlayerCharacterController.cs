@@ -33,10 +33,10 @@ namespace MGME.Web.Controllers
                 (int)NonPlayerCharacterFilter.AVAILABLE_FOR_PLAYER_CHARACTERS
             ),
             FromQuery
-            ] int filter, int? page)
+            ] int filter, string sorting, int? page)
         {
             PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>> response = await _nonPlayerCharacterService.GetAllNonPlayerCharacters(
-                filter, page
+                filter, sorting ?? "name", page
             );
 
             if (response.Success)

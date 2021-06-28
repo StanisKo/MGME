@@ -39,6 +39,8 @@ namespace MGME.Core
 
             services.AddScoped<INonPlayerCharacterService, NonPlayerCharacterService>();
 
+            services.AddScoped<NonPlayerCharacterSorter>();
+
             services.AddScoped<IAdventureService, AdventureService>();
 
             services.AddScoped<AdventureSorter>();
