@@ -1,6 +1,11 @@
 import { PlayerCharacter } from './interfaces';
 
-import { BaseServiceResponse, NewEntityToAdd, ReadFromApi } from '../../shared/interfaces';
+import {
+    BaseServiceResponse,
+    NewEntityToAdd,
+    PaginatedDataServiceResponse,
+    ReadFromApi
+} from '../../shared/interfaces';
 
 import { URLBuilder, DataController } from '../../shared/utils';
 
@@ -28,7 +33,7 @@ export const fetchPlayerCharacters = async (page?: number, sorting?: string): Pr
         params['sorting'] = sorting;
     }
 
-    await DataController.FetchAndSave<PlayerCharacter[]>(
+    await DataController.FetchAndSave<PaginatedDataServiceResponse<PlayerCharacter[]>>(
         {
             url: URLBuilder.ReadFrom('playercharacter'),
             ...(Object.keys(params).length > 0 ? { params: { ...params } } : null),

@@ -1,26 +1,31 @@
-// import { NonPlayerCharacter } from './interfaces';
+import { NonPlayerCharacter } from './interfaces';
 
-// import { PaginatedDataServiceResponse } from '../../shared/interfaces';
+import { NON_PLAYER_CHARACTER_FILTER } from '../../shared/const/enums';
 
-// import { URLBuilder, DataController } from '../../shared/utils';
+import { PaginatedDataServiceResponse, ReadFromApi } from '../../shared/interfaces';
 
-// export const fetchNonPlayerCharacters = async (page?: number, sorting?: string): Promise<void> => {
-//     const params: ReadFromApi['params'] = {};
+import { URLBuilder, DataController } from '../../shared/utils';
 
-//     if (page) {
-//         params['page'] = page;
-//     }
+export const fetchNonPlayerCharacters = async (page?: number, sorting?: string): Promise<void> => {
+    const params: ReadFromApi['params'] = {};
 
-//     if (sorting) {
-//         params['sorting'] = sorting;
-//     }
+    if (page) {
+        params['page'] = page;
+    }
 
-//     await DataController.FetchAndSave<NonPlayerCharacter[]>(
-//         {
-//             url: URLBuilder.ReadFrom('playercharacter'),
-//             ...(Object.keys(params).length > 0 ? { params: { ...params } } : null),
-//             page: 'catalogues',
-//             key: 'playerCharacters'
-//         }
-//     );
-// };
+    if (sorting) {
+        params['sorting'] = sorting;
+    }
+
+    await DataController.FetchAndSave<PaginatedDataServiceResponse<NonPlayerCharacter[]>>(
+        {
+            url: URLBuilder.ReadFrom('nonplayercharacter'),
+            params: {
+                filter: NON_PLAYER_CHARACTER_FILTER.ALL,
+                ...(Object.keys(params).length > 0 ? params : null)
+            },
+            page: 'catalogues',
+            key: 'nonPlayerCharacters'
+        }
+    );
+};

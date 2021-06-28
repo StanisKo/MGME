@@ -1,6 +1,7 @@
 import { Action, Reducer } from 'redux';
 
 import { PlayerCharacter } from '../../domain/playerCharacter/interfaces';
+import { NonPlayerCharacter } from '../../domain/nonPlayerCharacter/interfaces';
 import { PaginatedDataServiceResponse, Pagination } from '../../shared/interfaces';
 
 import { UpdateStore } from '../';
@@ -12,6 +13,13 @@ export interface CataloguesState {
         selected: number[],
         sorting: string
     },
+
+    nonPlayerCharacters: {
+        data: NonPlayerCharacter[],
+        pagination: Pagination,
+        selected: number[],
+        sorting: string
+    }
 }
 
 export const CataloguesReducer: Reducer<CataloguesState> = (
