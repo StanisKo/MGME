@@ -51,7 +51,7 @@ const headCells: HeadCell[] = [
     { label: 'NPC', sorting: 'npc', numeric: true }
 ];
 
-export const PlayerCharactersTable = (): ReactElement | null => {
+export const PlayerCharactersTable = (): ReactElement => {
     const dispatch = useDispatch();
 
     const isAuthorized: boolean = useSelector(

@@ -50,7 +50,7 @@ const headCells: HeadCell[] = [
     { label: 'Character', sorting: 'character', numeric: true }
 ];
 
-export const NonPlayerCharactersTable = (): ReactElement | null => {
+export const NonPlayerCharactersTable = (): ReactElement => {
     const dispatch = useDispatch();
 
     const isAuthorized: boolean = useSelector(
@@ -154,7 +154,112 @@ export const NonPlayerCharactersTable = (): ReactElement | null => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page, order, orderBy]);
 
-    return (
-        <div>NPC Table</div>
-    );
+    // Default current state every time new dataset comes in, keep it simple
+    useEffect(() => {
+        if (nonPlayerCharacters && selected.length > 0) {
+            setSelected([]);
+
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'nonPlayerCharacters',
+                    payload: {
+                        selected: []
+                    }
+                }
+            );
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [nonPlayerCharacters]);
+
+    const { root, visuallyHidden } = useStyles();
+
+    return nonPlayerCharacters !== null && pagination !== null ? (
+        <>
+            <Table className={root}>
+                <TableHead>
+                    <TableRow>
+                        <TableCell padding="checkbox">
+                            <Checkbox
+                                checked={selected.length === nonPlayerCharacters.length}
+                                indeterminate={selected.length > 0 && selected.length < nonPlayerCharacters.length}
+                                onChange={handleSelectAll}
+                            />
+                        </TableCell>
+                        {headCells.map((headCell) => (
+                            <TableCell
+                                key={headCell.label}
+                                align={headCell.numeric ? 'right' : 'left'}
+                                sortDirection={orderBy === headCell.sorting ? order : false}
+                            >
+                                <TableSortLabel
+                                    active={orderBy === headCell.sorting}
+                                    direction={orderBy === headCell.sorting ? order : 'asc'}
+                                    onClick={handleSorting(headCell.sorting)}
+                                    style={{ fontWeight: 'bold' }}
+                                >
+                                    {headCell.label}
+                                    {orderBy === headCell.sorting ? (
+                                        <span className={visuallyHidden}>
+                                            {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                        </span>
+                                    ) : null}
+                                </TableSortLabel>
+                            </TableCell>
+                        ))}
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {nonPlayerCharacters.map((nonPlayerCharacter, index) => {
+                        const isItemSelected = isSelected(nonPlayerCharacter.id, selected);
+                        const labelId = `nonPlayerCharacter-table-checkbox-${index}`;
+
+                        return (
+                            <TableRow
+                                hover
+                                onClick={handleSelect(nonPlayerCharacter.id)}
+                                role="checkbox"
+                                aria-checked={isItemSelected}
+                                tabIndex={-1}
+                                key={nonPlayerCharacter.name}
+                                selected={isItemSelected}
+                            >
+                                <TableCell padding="checkbox">
+                                    <Checkbox
+                                        checked={isItemSelected}
+                                        inputProps={{ 'aria-labelledby': labelId }}
+                                    />
+                                </TableCell>
+
+                                <TableCell align="left">
+                                    {nonPlayerCharacter.name}
+                                </TableCell>
+
+                                <TableCell align="right">
+                                    {nonPlayerCharacter.adventure?.title
+                                        ?? `${nonPlayerCharacter.adventureCount} adventures`}
+                                </TableCell>
+
+                                <TableCell align="right">
+                                    {nonPlayerCharacter.playerCharacter?.name ?? 'No Character'}
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
+                </TableBody>
+            </Table>
+            <Box mt={2}>
+                <TablePagination
+                    component="div"
+                    rowsPerPage={15}
+                    rowsPerPageOptions={[]}
+                    count={pagination?.numberOfResults}
+                    page={page}
+                    onChangePage={handlePageChange}
+                />
+            </Box>
+        </>
+    
+    ) : <LinearProgress />;
 };
