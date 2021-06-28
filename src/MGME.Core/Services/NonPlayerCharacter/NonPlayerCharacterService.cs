@@ -312,7 +312,11 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             IEnumerable<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await _repository.GetEntititesAsync<GetNonPlayerCharacterListDTO>(
                 predicate: predicate,
                 include: weNeedAll.Value
-                    ? new[] { "PlayerCharacter" }
+                    ? new[]
+                    {
+                        "PlayerCharacter",
+                        "Adventure"
+                    }
                     : null,
                 select: nonPlayerCharacter => new GetNonPlayerCharacterListDTO()
                 {
@@ -324,6 +328,14 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                         {
                             Id = nonPlayerCharacter.PlayerCharacter.Id,
                             Name = nonPlayerCharacter.PlayerCharacter.Name
+                        }
+                        : null,
+
+                    Adventure = weNeedAll.Value && nonPlayerCharacter.Adventures.Count == 1
+                        ? new GetAdventureDTO()
+                        {
+                            Id = nonPlayerCharacter.Adventures.FirstOrDefault().Id,
+                            Title = nonPlayerCharacter.Adventures.FirstOrDefault().Title
                         }
                         : null,
 
