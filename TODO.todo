@@ -1,1 +1,2 @@
-Refactor to target-typed constructor invocation expression where possible
+Refactor to target-typed constructor invocation expression where possible (C#)
+Use react-router's generatePath() instead of custom URLBuilder class

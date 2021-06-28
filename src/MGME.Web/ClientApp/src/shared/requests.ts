@@ -13,8 +13,7 @@ export const fetchAvailableNonPlayerCharacters = async (
         {
             url: URLBuilder.ReadFrom('nonplayercharacter'),
             params: {
-                filter: filter,
-                ...( page ? { page: page } : null )
+                filter: filter
             },
             returnResponse: true
         }

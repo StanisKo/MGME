@@ -1,9 +1,3 @@
-export interface BaseEntity {
-    id: number;
-}
-
-/*    ****    */
-
 export interface BaseServiceResponse {
     success: boolean;
     message: string;
@@ -95,6 +89,26 @@ export interface HeadCell {
 }
 
 /*    **** Entity related interfaces ****    */
+
+export interface BaseEntity {
+    id: number;
+}
+
+export interface RelatedThread extends BaseEntity {
+    name: string;
+}
+
+export interface RelatedAdventure extends BaseEntity {
+    title: string;
+}
+
+export interface RelatedPlayerCharacter extends BaseEntity {
+    name: string;
+}
+
+export interface RelatedNonPlayerCharacter extends BaseEntity {
+    name: string;
+}
 
 export interface AvailableNonPlayerCharacter {
     id: number;
