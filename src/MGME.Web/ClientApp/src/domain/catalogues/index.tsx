@@ -8,6 +8,8 @@ import { BaseServiceResponse } from '../../shared/interfaces';
 import { PlayerCharactersTable, CreatePlayerCharacterModal } from '../playerCharacter/components';
 import { deletePlayerCharacters } from '../playerCharacter/requests';
 
+import { NonPlayerCharactersTable } from '../nonPlayerCharacter/components';
+
 import {
     Paper,
     Grid,
@@ -182,6 +184,7 @@ export const Catalogues = (): ReactElement => {
 
                         <Grid item xs={12}>
                             {selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS && <PlayerCharactersTable />}
+                            {selectedMenu === SELECTED_MENU.NON_PLAYER_CHARACTERS && <NonPlayerCharactersTable />}
                         </Grid>
                     </Grid>
                 </Paper>
