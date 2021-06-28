@@ -354,6 +354,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                         ? nonPlayerCharacter.Adventures.Count
                         : null
                 },
+                orderBy: _sorter.DetermineSorting(sortingParameter.Value),
                 page: selectedPage?.Value ?? null
             );
 
