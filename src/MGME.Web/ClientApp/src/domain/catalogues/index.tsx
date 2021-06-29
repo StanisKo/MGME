@@ -24,6 +24,7 @@ import {
 import { Alert } from '../../shared/components';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
+import { addToAdventure } from '../../shared/requests';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -112,6 +113,37 @@ export const Catalogues = (): ReactElement => {
         }
     };
 
+    const handleAddToAdventure = async (): Promise<void> => {
+        const key = selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'playerCharacters' : 'nonPlayerCharacters';
+
+        // hardcode id for testing purposes
+        const response = await addToAdventure(
+            {
+                adventure: 21,
+                playerCharacters: selectedPlayerCharacters,
+                nonPlayerCharacters: selectedNonPlayerCharacters,
+                keys: [key]
+            }
+        );
+
+        setResponse(response);
+
+        setOpenSnackbar(true);
+
+        if (response.success) {
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: key,
+                    payload: {
+                        selected: []
+                    }
+                }
+            );
+        }
+    };
+
     const handleDialogOpen = (): void => {
         setDialogOpen(true);
     };
@@ -158,6 +190,7 @@ export const Catalogues = (): ReactElement => {
                                 color="primary"
                                 size="medium"
                                 disabled={nothingSelected}
+                                onClick={handleAddToAdventure}
                             >
                                 Add to Adventure
                             </Button>
