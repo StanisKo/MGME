@@ -328,7 +328,56 @@ namespace MGME.Core.Services.AdventureService
                     );
                 }
 
+                // Refactor into a generic method
+                if (thereAreNonPlayerCharactersToAdd)
+                {
+                    IEnumerable<int> matches = adventureToAddTo.NonPlayerCharacters.Select(
+                        nonPlayerCharacter => nonPlayerCharacter.Id
+                    ).Intersect(
+                        ids.NonPlayerCharacters
+                    );
+
+                    if (matches.Any())
+                    {
+                        IEnumerable<string> names = adventureToAddTo.NonPlayerCharacters.Where(
+                            nonPlayerCharacter => matches.Contains(nonPlayerCharacter.Id)
+                        ).Select(
+                            nonPlayerCharacter => nonPlayerCharacter.Name
+                        );
+
+                        response.Success = false;
+                        response.Message = $"{String.Join(", ", names)} already added to \"{adventureToAddTo.Title}\"";
+
+                        return response;
+                    }
+
+
+                    Expression<Func<NonPlayerCharacter, bool>> predicate =
+                        nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                            && ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id);
+
+                    IEnumerable<NonPlayerCharacter> nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
+                        tracking: true,
+                        predicate: predicate
+                    );
+
+                    for (int i = 0; i < nonPlayerCharactersToAdd.Count(); i++)
+                    {
+                        adventureToAddTo.NonPlayerCharacters.Add(
+                            nonPlayerCharactersToAdd.ElementAt(i)
+                        );
+                    }
+
+                    await _nonPlayerCharacterRepository.LinkEntitiesAsync(
+                        nonPlayerCharactersToAdd,
+                        adventureToAddTo,
+                        "PlayerCharacters"
+                    );
+                }
+
                 response.Success = true;
+
+                // We never add PlayerCharacters and NonPlayerCharacters together at once
                 response.Message = $"{(thereArePlayerCharactersToAdd ? "Characters" : "NPCs")} were successfully added";
             }
             catch (Exception exception)
