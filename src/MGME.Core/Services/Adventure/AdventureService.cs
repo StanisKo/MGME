@@ -285,23 +285,73 @@ namespace MGME.Core.Services.AdventureService
 
                 if (thereArePlayerCharactersToAdd)
                 {
-                    await AddEntitiesToAdventure<PlayerCharacter>(
-                        ids,
+                    bool providedNamesAlreadyUsed = CheckForMatches<PlayerCharacter>(ids, adventureToAddTo, response);
+
+                    if (providedNamesAlreadyUsed)
+                    {
+                        // Response is populated from private method ^^^
+                        return response;
+                    }
+
+                    Expression<Func<PlayerCharacter, bool>> predicate =
+                        playerCharacter => playerCharacter.UserId == userId
+                            && ids.PlayerCharacters.Contains(playerCharacter.Id);
+
+                    IEnumerable<PlayerCharacter> playerCharactersToAdd = await _playerCharacterRepository.GetEntititesAsync(
+                        tracking: true,
+                        predicate: predicate
+                    );
+
+                    for (int i = 0; i < playerCharactersToAdd.Count(); i++)
+                    {
+                        adventureToAddTo.PlayerCharacters.Add(
+                            playerCharactersToAdd.ElementAt(i)
+                        );
+                    }
+
+                    await _playerCharacterRepository.LinkEntitiesAsync(
+                        playerCharactersToAdd,
                         adventureToAddTo,
-                        response,
-                        new Ref<int>(userId)
+                        "PlayerCharacters"
                     );
                 }
 
                 if (thereAreNonPlayerCharactersToAdd)
                 {
-                    await AddEntitiesToAdventure<NonPlayerCharacter>(
-                        ids,
+                    bool providedNamesAlreadyUsed = CheckForMatches<NonPlayerCharacter>(ids, adventureToAddTo, response);
+
+                    if (providedNamesAlreadyUsed)
+                    {
+                        return response;
+                    }
+
+                    Expression<Func<NonPlayerCharacter, bool>> predicate =
+                        nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                            && ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id);
+
+                    IEnumerable<NonPlayerCharacter> nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
+                        tracking: true,
+                        predicate: predicate
+                    );
+
+                    for (int i = 0; i < nonPlayerCharactersToAdd.Count(); i++)
+                    {
+                        adventureToAddTo.NonPlayerCharacters.Add(
+                            nonPlayerCharactersToAdd.ElementAt(i)
+                        );
+                    }
+
+                    await _nonPlayerCharacterRepository.LinkEntitiesAsync(
+                        nonPlayerCharactersToAdd,
                         adventureToAddTo,
-                        response,
-                        new Ref<int>(userId)
+                        "NonPlayerCharacters"
                     );
                 }
+
+                response.Success = true;
+
+                // We never add PlayerCharacters and NonPlayerCharacters together at once
+                response.Message = $"{(thereArePlayerCharactersToAdd ? "Characters" : "NPCs")} were successfully added";
             }
             catch (Exception exception)
             {
@@ -367,7 +417,7 @@ namespace MGME.Core.Services.AdventureService
             return adventures;
         }
 
-        private async Task AddEntitiesToAdventure<TEntity>(AddToAdventureDTO ids, Adventure adventureToAddTo, BaseServiceResponse response, Ref<int> userId) where TEntity: BaseEntity
+        private bool CheckForMatches<TEntity>(AddToAdventureDTO ids, Adventure adventureToAddTo, BaseServiceResponse response) where TEntity: BaseEntity
         {
             Type typeOfDTO = ids.GetType();
             Type typeOfModel = adventureToAddTo.GetType();
@@ -388,9 +438,9 @@ namespace MGME.Core.Services.AdventureService
 
             IEnumerable<TEntity> relevantEntities = (relevantCollectionOnModel.GetValue(adventureToAddTo) as IEnumerable<TEntity>);
 
-            IEnumerable<int> providedIds = relevantCollectionOnDTO.GetValue(ids) as IEnumerable<int>;
-
-            IEnumerable<int> matches = relevantEntities.Select(entity => entity.Id).Intersect(providedIds);
+            IEnumerable<int> matches = relevantEntities.Select(entity => entity.Id).Intersect(
+                relevantCollectionOnDTO.GetValue(ids) as IEnumerable<int>
+            );
 
             if (matches.Any())
             {
@@ -407,68 +457,14 @@ namespace MGME.Core.Services.AdventureService
                         }
                     );
 
+                // We modify response in this private method to at least here keep things DRY
                 response.Success = false;
                 response.Message = $"{String.Join(", ", names)} already added to \"{adventureToAddTo.Title}\"";
 
-                return;
+                return true;
             }
 
-            /*
-            TODO: would be nice to make this generic for DRY purposes too
-            */
-            if (typeof(TEntity) == typeof(PlayerCharacter))
-            {
-                Expression<Func<PlayerCharacter, bool>> predicate =
-                    playerCharacter => playerCharacter.UserId == userId.Value
-                        && ids.PlayerCharacters.Contains(playerCharacter.Id);
-
-                IEnumerable<PlayerCharacter> playerCharactersToAdd = await _playerCharacterRepository.GetEntititesAsync(
-                    tracking: true,
-                    predicate: predicate
-                );
-
-                for (int i = 0; i < playerCharactersToAdd.Count(); i++)
-                {
-                    adventureToAddTo.PlayerCharacters.Add(
-                        playerCharactersToAdd.ElementAt(i)
-                    );
-                }
-
-                await _playerCharacterRepository.LinkEntitiesAsync(
-                    playerCharactersToAdd,
-                    adventureToAddTo,
-                    "PlayerCharacters"
-                );
-            }
-            else
-            {
-                Expression<Func<NonPlayerCharacter, bool>> predicate =
-                    nonPlayerCharacter => nonPlayerCharacter.UserId == userId.Value
-                        && ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id);
-
-                IEnumerable<NonPlayerCharacter> nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
-                    tracking: true,
-                    predicate: predicate
-                );
-
-                for (int i = 0; i < nonPlayerCharactersToAdd.Count(); i++)
-                {
-                    adventureToAddTo.NonPlayerCharacters.Add(
-                        nonPlayerCharactersToAdd.ElementAt(i)
-                    );
-                }
-
-                await _nonPlayerCharacterRepository.LinkEntitiesAsync(
-                    nonPlayerCharactersToAdd,
-                    adventureToAddTo,
-                    "NonPlayerCharacters"
-                );
-            }
-
-            response.Success = true;
-
-            // We never add PlayerCharacters and NonPlayerCharacters together at once
-            response.Message = $"{(typeof(TEntity) == typeof(PlayerCharacter) ? "Characters" : "NPCs")} were successfully added";
+            return false;
         }
     }
 }
