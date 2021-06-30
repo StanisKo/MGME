@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Collections.Generic;
@@ -284,6 +285,8 @@ namespace MGME.Core.Services.AdventureService
 
                 if (thereArePlayerCharactersToAdd)
                 {
+                    await AddEntitiesToAdventure<PlayerCharacter>(ids, adventureToAddTo, response);
+
                     IEnumerable<int> matches = adventureToAddTo.PlayerCharacters.Select(
                         playerCharacter => playerCharacter.Id
                     ).Intersect(
@@ -444,30 +447,54 @@ namespace MGME.Core.Services.AdventureService
             return adventures;
         }
 
-        private async Task AddEntitiesToAdventure<TEntity>(Adventure adventureToAddTo, AddToAdventureDTO ids)
+        private async Task AddEntitiesToAdventure<TEntity>(AddToAdventureDTO ids, Adventure adventureToAddTo, BaseServiceResponse response)
         {
-            IEnumerable<int> matchAgainst, matchSource, match;
+            Type typeOfDTO = ids.GetType();
+            Type typeOfModel = adventureToAddTo.GetType();
+
+            PropertyInfo relevantCollectionOnDTO;
+            PropertyInfo relevantCollectionOnModel;
 
             if (typeof(TEntity) == typeof(PlayerCharacter))
             {
-                matchAgainst = adventureToAddTo.PlayerCharacters.Select(
-                    playerCharacter => playerCharacter.Id
-                );
-
-                matchSource = ids.PlayerCharacters;
+                relevantCollectionOnDTO = typeOfDTO.GetProperty("PlayerCharacters");
+                relevantCollectionOnModel = typeOfModel.GetProperty("PlayerCharacters");
             }
             else
             {
-                matchAgainst = adventureToAddTo.NonPlayerCharacters.Select(
-                    nonPlayerCharacter => nonPlayerCharacter.Id
-                );
-
-                matchSource = ids.NonPlayerCharacters;
+                relevantCollectionOnDTO = typeOfDTO.GetProperty("NonPlayerCharacters");
+                relevantCollectionOnModel = typeOfModel.GetProperty("NonPlayerCharacters");
             }
 
-            match = matchAgainst.Intersect(matchSource);
+            IEnumerable<int> matches = (relevantCollectionOnModel.GetValue(adventureToAddTo) as IEnumerable<BaseEntity>)
+                .Select(
+                    entity => entity.Id
+                ).Intersect(
+                    relevantCollectionOnDTO.GetValue(ids) as IEnumerable<int>
+                );
 
-            
+            if (matches.Any())
+            {
+                IEnumerable<string> names = (relevantCollectionOnModel.GetValue(adventureToAddTo) as IEnumerable<BaseEntity>)
+                    .Where(
+                        entity => matches.Contains(entity.Id)
+                    ).Select(
+                        entity =>
+                        {
+                            Type typeOfEntity = entity.GetType();
+
+                            PropertyInfo entityName = typeOfEntity.GetProperty("Name");
+
+                            return entityName.GetValue(entity) as string;
+                        }
+                    );
+
+                response.Success = false;
+                response.Message = $"{String.Join(", ", names)} already added to \"{adventureToAddTo.Title}\"";
+
+                return;
+            }
+
         }
     }
 }
