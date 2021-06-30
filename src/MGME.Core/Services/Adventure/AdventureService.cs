@@ -415,8 +415,6 @@ namespace MGME.Core.Services.AdventureService
                 return;
             }
 
-            PropertyInfo userIdFromModel = typeOfModel.GetProperty("UserId");
-
             // How can we refactor this block?
             if (typeof(TEntity) == typeof(PlayerCharacter))
             {
