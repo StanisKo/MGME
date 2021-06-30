@@ -443,5 +443,31 @@ namespace MGME.Core.Services.AdventureService
 
             return adventures;
         }
+
+        private async Task AddEntitiesToAdventure<TEntity>(Adventure adventureToAddTo, AddToAdventureDTO ids)
+        {
+            IEnumerable<int> matchAgainst, matchSource, match;
+
+            if (typeof(TEntity) == typeof(PlayerCharacter))
+            {
+                matchAgainst = adventureToAddTo.PlayerCharacters.Select(
+                    playerCharacter => playerCharacter.Id
+                );
+
+                matchSource = ids.PlayerCharacters;
+            }
+            else
+            {
+                matchAgainst = adventureToAddTo.NonPlayerCharacters.Select(
+                    nonPlayerCharacter => nonPlayerCharacter.Id
+                );
+
+                matchSource = ids.NonPlayerCharacters;
+            }
+
+            match = matchAgainst.Intersect(matchSource);
+
+            
+        }
     }
 }
