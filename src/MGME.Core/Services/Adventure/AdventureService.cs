@@ -388,11 +388,9 @@ namespace MGME.Core.Services.AdventureService
 
             IEnumerable<TEntity> relevantEntities = (relevantCollectionOnModel.GetValue(adventureToAddTo) as IEnumerable<TEntity>);
 
-            IEnumerable<int> matches = relevantEntities.Select(
-                    entity => entity.Id
-                ).Intersect(
-                    relevantCollectionOnDTO.GetValue(ids) as IEnumerable<int>
-                );
+            IEnumerable<int> providedIds = relevantCollectionOnDTO.GetValue(ids) as IEnumerable<int>;
+
+            IEnumerable<int> matches = relevantEntities.Select(entity => entity.Id).Intersect(providedIds);
 
             if (matches.Any())
             {
@@ -415,7 +413,9 @@ namespace MGME.Core.Services.AdventureService
                 return;
             }
 
-            // How can we refactor this block?
+            /*
+            TODO: would be nice to make this generic for DRY purposes too
+            */
             if (typeof(TEntity) == typeof(PlayerCharacter))
             {
                 Expression<Func<PlayerCharacter, bool>> predicate =
