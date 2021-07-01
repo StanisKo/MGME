@@ -109,8 +109,3 @@ export interface RelatedPlayerCharacter extends BaseEntity {
 export interface RelatedNonPlayerCharacter extends BaseEntity {
     name: string;
 }
-
-export interface AvailableNonPlayerCharacter {
-    id: number;
-    name: string;
-}

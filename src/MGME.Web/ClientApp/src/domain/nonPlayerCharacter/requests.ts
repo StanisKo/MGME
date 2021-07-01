@@ -1,4 +1,4 @@
-import { NonPlayerCharacter } from './interfaces';
+import { NonPlayerCharacter, AvailableNonPlayerCharacter } from './interfaces';
 
 import { NON_PLAYER_CHARACTER_FILTER } from '../../shared/const/enums';
 
@@ -30,4 +30,19 @@ export const fetchNonPlayerCharacters = async (page?: number, sorting?: string):
             key: 'nonPlayerCharacters'
         }
     );
+};
+
+export const fetchAvailableNonPlayerCharacters = async (
+    filter: NON_PLAYER_CHARACTER_FILTER
+): Promise <PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>> => {
+
+    return await DataController.FetchAndSave<PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>>(
+        {
+            url: URLBuilder.ReadFrom('nonplayercharacter'),
+            params: {
+                filter: filter
+            },
+            returnResponse: true
+        }
+    ) as PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>;
 };

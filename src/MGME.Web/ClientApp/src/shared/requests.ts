@@ -1,6 +1,4 @@
-import { PaginatedDataServiceResponse, AvailableNonPlayerCharacter, BaseServiceResponse } from './interfaces';
-
-import { NON_PLAYER_CHARACTER_FILTER } from './const/enums';
+import { PaginatedDataServiceResponse, BaseServiceResponse } from './interfaces';
 
 import { URLBuilder, DataController } from './utils';
 
@@ -14,26 +12,6 @@ interface AddToAdventureParams {
 /*
 TODO: implement request and think of DDD - does this file even needed?
 */
-
-/*
-Available NPCs range from available for PlayerCharacters and Avaialable for Adventures
-
-Used on creating PlayerCharacters and creating Adventures
-*/
-export const fetchAvailableNonPlayerCharacters = async (
-    filter: NON_PLAYER_CHARACTER_FILTER
-): Promise <PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>> => {
-
-    return await DataController.FetchAndSave<PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>>(
-        {
-            url: URLBuilder.ReadFrom('nonplayercharacter'),
-            params: {
-                filter: filter
-            },
-            returnResponse: true
-        }
-    ) as PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>;
-};
 
 // Used for both adding PlayerCharacters and NPCs
 export const addToAdventure = async (

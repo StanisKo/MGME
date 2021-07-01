@@ -6,3 +6,7 @@ export interface NonPlayerCharacter extends BaseEntity {
     adventure: RelatedAdventure;
     adventureCount: number;
 }
+
+export interface AvailableNonPlayerCharacter extends BaseEntity {
+    name: string;
+}
