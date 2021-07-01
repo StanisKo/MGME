@@ -10,6 +10,8 @@ import { deletePlayerCharacters } from '../playerCharacter/requests';
 
 import { NonPlayerCharactersTable } from '../nonPlayerCharacter/components';
 
+import { AdventuresToAddToTable } from '../adventures/components';
+
 import {
     Paper,
     Grid,
@@ -25,7 +27,7 @@ import { Alert } from '../../shared/components';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
-import { addToAdventure } from '../adventures/requests';
+import { fetchAdventures } from '../adventures/requests';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -88,8 +90,12 @@ export const Catalogues = (): ReactElement => {
 
     const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
 
+    const [displayAdventures, setDisplayAdventures] = useState<boolean>(false);
+
     const handleChange = (event: ChangeEvent<{ value: unknown }>): void => {
         setSelectedMenu(event.target.value as number);
+
+        setDisplayAdventures(false);
     };
 
     const handleDelete = async (): Promise<void> => {
@@ -114,36 +120,42 @@ export const Catalogues = (): ReactElement => {
         }
     };
 
-    const handleAddToAdventure = async (): Promise<void> => {
-        const key = selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'playerCharacters' : 'nonPlayerCharacters';
+    const handleRequestAdventuresToAddTo = async (): Promise<void> => {
+        await fetchAdventures('catalogues');
 
-        // hardcode id for testing purposes
-        const response = await addToAdventure(
-            {
-                adventure: 21,
-                playerCharacters: selectedPlayerCharacters,
-                nonPlayerCharacters: selectedNonPlayerCharacters,
-                keys: [key]
-            }
-        );
-
-        setResponse(response);
-
-        setOpenSnackbar(true);
-
-        if (response.success) {
-            dispatch<UpdateStore<{ selected: number[] }>>(
-                {
-                    type: 'UPDATE_STORE',
-                    reducer: 'catalogues',
-                    key: key,
-                    payload: {
-                        selected: []
-                    }
-                }
-            );
-        }
+        setDisplayAdventures(true);
     };
+
+    // const handleAddToAdventure = async (): Promise<void> => {
+    //     const key = selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'playerCharacters' : 'nonPlayerCharacters';
+
+    //     // hardcode id for testing purposes
+    //     const response = await addToAdventure(
+    //         {
+    //             adventure: 21,
+    //             playerCharacters: selectedPlayerCharacters,
+    //             nonPlayerCharacters: selectedNonPlayerCharacters,
+    //             keys: [key]
+    //         }
+    //     );
+
+    //     setResponse(response);
+
+    //     setOpenSnackbar(true);
+
+    //     if (response.success) {
+    //         dispatch<UpdateStore<{ selected: number[] }>>(
+    //             {
+    //                 type: 'UPDATE_STORE',
+    //                 reducer: 'catalogues',
+    //                 key: key,
+    //                 payload: {
+    //                     selected: []
+    //                 }
+    //             }
+    //         );
+    //     }
+    // };
 
     const handleDialogOpen = (): void => {
         setDialogOpen(true);
@@ -191,7 +203,7 @@ export const Catalogues = (): ReactElement => {
                                 color="primary"
                                 size="medium"
                                 disabled={nothingSelected}
-                                onClick={handleAddToAdventure}
+                                onClick={handleRequestAdventuresToAddTo}
                             >
                                 Add to Adventure
                             </Button>
@@ -227,6 +239,12 @@ export const Catalogues = (): ReactElement => {
                             {selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS && <PlayerCharactersTable />}
                             {selectedMenu === SELECTED_MENU.NON_PLAYER_CHARACTERS && <NonPlayerCharactersTable />}
                         </Grid>
+
+                        {displayAdventures && (
+                            <Grid item xs={12}>
+                                <AdventuresToAddToTable />
+                            </Grid>
+                        )}
                     </Grid>
                 </Paper>
             </div>

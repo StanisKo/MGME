@@ -28,7 +28,9 @@ export const addToAdventure = async (
 };
 
 /*
-
+We parametrize the page, since we might need to different datasets at the same point in time:
+One on catalogues, from where user can add entities to adventures
+Another on the actual list of adventures
 */
 export const fetchAdventures = async (page: string): Promise<void> => {
     await DataController.FetchAndSave<PaginatedDataServiceResponse<unknown[]>>(
