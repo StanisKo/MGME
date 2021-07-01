@@ -17,11 +17,6 @@ export interface Pagination {
     numberOfResults: number;
 }
 
-export interface NewEntityToAdd {
-    name: string;
-    description: string;
-}
-
 /*    ****    */
 
 export interface RequestConfig {
@@ -87,12 +82,13 @@ export interface HeadCell {
     numeric: boolean;
 }
 
-/*    **** Entity related interfaces ****    */
+/*    ****    */
 
 export interface BaseEntity {
     id: number;
 }
 
-export interface RelatedThread extends BaseEntity {
+export interface NewEntityToAdd {
     name: string;
+    description: string;
 }
