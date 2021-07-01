@@ -62,7 +62,7 @@ export const NonPlayerCharactersTable = (): ReactElement => {
     );
 
     const pagination: Pagination | null = useSelector(
-        (state: ApplicationState) => state.catalogues?.playerCharacters?.pagination ?? null
+        (state: ApplicationState) => state.catalogues?.nonPlayerCharacters?.pagination ?? null
     );
 
     const [page, setPage] = useState(0);
