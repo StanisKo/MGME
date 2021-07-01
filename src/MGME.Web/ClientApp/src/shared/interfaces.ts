@@ -96,7 +96,3 @@ export interface BaseEntity {
 export interface RelatedThread extends BaseEntity {
     name: string;
 }
-
-export interface RelatedAdventure extends BaseEntity {
-    title: string;
-}
