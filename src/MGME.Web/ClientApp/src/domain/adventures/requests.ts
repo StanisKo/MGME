@@ -1,6 +1,6 @@
-import { PaginatedDataServiceResponse, BaseServiceResponse } from './interfaces';
+import { BaseServiceResponse, PaginatedDataServiceResponse } from '../../shared/interfaces';
 
-import { URLBuilder, DataController } from './utils';
+import { URLBuilder, DataController } from '../../shared/utils';
 
 interface AddToAdventureParams {
     adventure: number;
@@ -9,11 +9,6 @@ interface AddToAdventureParams {
     keys: string[];
 }
 
-/*
-TODO: implement request and think of DDD - does this file even needed?
-*/
-
-// Used for both adding PlayerCharacters and NPCs
 export const addToAdventure = async (
     { adventure, playerCharacters, nonPlayerCharacters, keys }: AddToAdventureParams): Promise<BaseServiceResponse> => {
 
@@ -41,4 +36,3 @@ export const fetchAdventures = async (): Promise<void> => {
         }
     );
 };
-

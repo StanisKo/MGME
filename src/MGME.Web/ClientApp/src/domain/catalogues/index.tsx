@@ -24,7 +24,8 @@ import {
 import { Alert } from '../../shared/components';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { addToAdventure } from '../../shared/requests';
+
+import { addToAdventure } from '../adventures/requests';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
