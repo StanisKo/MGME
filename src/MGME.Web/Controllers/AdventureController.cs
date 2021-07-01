@@ -22,7 +22,7 @@ namespace MGME.Web.Controllers
         }
 
         [HttpGet]
-        public async Task <IActionResult> GetAllPlayerCharacters([FromQuery] string sorting, int? page)
+        public async Task <IActionResult> GetAllAdventures([FromQuery] string sorting, int? page)
         {
             PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>> response = await _adventureService.GetAllAdventures(
                 sorting ?? "title", page ?? 1

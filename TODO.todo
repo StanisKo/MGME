@@ -1,2 +1,3 @@
-Refactor to target-typed constructor invocation expression where possible (C#)
-Use react-router's generatePath() instead of custom URLBuilder class
+BE: Refactor to target-typed constructor invocation expression where possible (C#)
+FE: Use react-router's generatePath() instead of custom URLBuilder class
+FE: Think of DDD -- should shared requests live under ./shared or in the relevant domain folders

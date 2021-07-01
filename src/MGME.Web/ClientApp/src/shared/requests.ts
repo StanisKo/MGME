@@ -11,6 +11,15 @@ interface AddToAdventureParams {
     keys: string[];
 }
 
+/*
+TODO: implement request and think of DDD - does this file even needed?
+*/
+
+/*
+Available NPCs range from available for PlayerCharacters and Avaialable for Adventures
+
+Used on creating PlayerCharacters and creating Adventures
+*/
 export const fetchAvailableNonPlayerCharacters = async (
     filter: NON_PLAYER_CHARACTER_FILTER
 ): Promise <PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>> => {
@@ -26,6 +35,7 @@ export const fetchAvailableNonPlayerCharacters = async (
     ) as PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>;
 };
 
+// Used for both adding PlayerCharacters and NPCs
 export const addToAdventure = async (
     { adventure, playerCharacters, nonPlayerCharacters, keys }: AddToAdventureParams): Promise<BaseServiceResponse> => {
 
@@ -40,6 +50,16 @@ export const addToAdventure = async (
             },
             page: 'catalogues',
             keys: keys
+        }
+    );
+};
+
+export const fetchAdventures = async (): Promise<void> => {
+    await DataController.FetchAndSave<PaginatedDataServiceResponse<unknown[]>>(
+        {
+            url: URLBuilder.ReadFrom('adventure'),
+            page: 'catalogues',
+            key: 'adventures'
         }
     );
 };
