@@ -27,11 +27,14 @@ export const addToAdventure = async (
     );
 };
 
-export const fetchAdventures = async (): Promise<void> => {
+/*
+
+*/
+export const fetchAdventures = async (page: string): Promise<void> => {
     await DataController.FetchAndSave<PaginatedDataServiceResponse<unknown[]>>(
         {
             url: URLBuilder.ReadFrom('adventure'),
-            page: 'catalogues',
+            page: page,
             key: 'adventures'
         }
     );

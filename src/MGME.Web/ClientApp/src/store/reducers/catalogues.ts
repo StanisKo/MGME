@@ -10,15 +10,19 @@ export interface CataloguesState {
     playerCharacters: {
         data: PlayerCharacter[],
         pagination: Pagination,
-        selected: number[],
-        sorting: string
+        selected: number[]
     },
 
     nonPlayerCharacters: {
         data: NonPlayerCharacter[],
         pagination: Pagination,
-        selected: number[],
-        sorting: string
+        selected: number[]
+    },
+
+    adventures: {
+        data: NonPlayerCharacter[],
+        pagination: Pagination,
+        selected: number
     }
 }
 
