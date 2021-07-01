@@ -1,4 +1,6 @@
-import { BaseEntity, RelatedThread, RelatedAdventure, RelatedNonPlayerCharacter } from '../../shared/interfaces';
+import { BaseEntity, RelatedThread, RelatedAdventure } from '../../shared/interfaces';
+
+import { RelatedNonPlayerCharacter } from '../nonPlayerCharacter/interfaces';
 
 export interface PlayerCharacter extends BaseEntity {
     name: string;
@@ -8,4 +10,8 @@ export interface PlayerCharacter extends BaseEntity {
     adventureCount: number;
     nonPlayerCharacter: RelatedNonPlayerCharacter;
     nonPlayerCharacterCount: number;
+}
+
+export interface RelatedPlayerCharacter extends BaseEntity {
+    name: string;
 }

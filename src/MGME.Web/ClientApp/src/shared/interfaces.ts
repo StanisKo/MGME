@@ -17,7 +17,6 @@ export interface Pagination {
     numberOfResults: number;
 }
 
-// Either NonPlayerCharacter or Thread
 export interface NewEntityToAdd {
     name: string;
     description: string;
@@ -100,12 +99,4 @@ export interface RelatedThread extends BaseEntity {
 
 export interface RelatedAdventure extends BaseEntity {
     title: string;
-}
-
-export interface RelatedPlayerCharacter extends BaseEntity {
-    name: string;
-}
-
-export interface RelatedNonPlayerCharacter extends BaseEntity {
-    name: string;
 }
