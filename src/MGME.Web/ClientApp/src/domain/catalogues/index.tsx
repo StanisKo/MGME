@@ -221,18 +221,6 @@ export const Catalogues = (): ReactElement => {
     useEffect(() => {
         if (nothingSelected) {
             setDisplayAdventures(false);
-
-            // Also bring store in sync with UI
-            dispatch<UpdateStore<{ selected: number }>>(
-                {
-                    type: 'UPDATE_STORE',
-                    reducer: 'catalogues',
-                    key: 'adventures',
-                    payload: {
-                        selected: 0
-                    }
-                }
-            );
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPlayerCharacters, selectedNonPlayerCharacters]);

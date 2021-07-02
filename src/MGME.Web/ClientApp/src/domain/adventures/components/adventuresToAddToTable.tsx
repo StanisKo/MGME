@@ -66,6 +66,14 @@ export const AdventuresToAddToTable = (): ReactElement => {
         (state: ApplicationState) => state.catalogues?.adventures?.pagination ?? null
     );
 
+    const selectedPlayerCharacters = useSelector(
+        (store: ApplicationState) => store.catalogues?.playerCharacters?.selected ?? []
+    );
+
+    const selectedNonPlayerCharacters = useSelector(
+        (store: ApplicationState) => store.catalogues?.nonPlayerCharacters?.selected ?? []
+    );
+
     const [page, setPage] = useState(0);
     const [order, setOrder] = useState<SortOrder>('asc');
     const [orderBy, setOrderBy] = useState<string>('title');
@@ -139,6 +147,22 @@ export const AdventuresToAddToTable = (): ReactElement => {
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [adventures]);
+
+    useEffect(() => {
+        if (selectedPlayerCharacters.length === 0 && selectedNonPlayerCharacters.length === 0) {
+            dispatch<UpdateStore<{ selected: number }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'adventures',
+                    payload: {
+                        selected: 0
+                    }
+                }
+            );
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedPlayerCharacters, selectedNonPlayerCharacters]);
 
     const { root, visuallyHidden } = useStyles();
 
