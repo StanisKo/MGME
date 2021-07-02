@@ -1,4 +1,4 @@
-import { ReactElement, useState, ChangeEvent, SyntheticEvent } from 'react';
+import { ReactElement, useState, ChangeEvent, SyntheticEvent, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ApplicationState, UpdateStore } from '../../store';
@@ -180,6 +180,13 @@ export const Catalogues = (): ReactElement => {
 
         setOpenSnackbar(false);
     };
+
+    useEffect(() => {
+        if (nothingSelected) {
+            setDisplayAdventures(false);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedPlayerCharacters, selectedNonPlayerCharacters]);
 
     const nothingSelected = selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS
         ? selectedPlayerCharacters.length === 0
