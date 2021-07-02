@@ -290,15 +290,34 @@ export const Catalogues = (): ReactElement => {
                             <Grid item xs={12}>
                                 <Divider />
                                 <AdventuresToAddToTable />
-                                <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    size="medium"
-                                    disabled={!selectedAdventure}
-                                    onClick={handleAddToAdventure}
+                                <Grid
+                                    item
+                                    container
+                                    xs={12}
+                                    alignItems="center"
+                                    justify="flex-end"
+                                    className={classes.buttons}
+                                    style={{ marginTop: '2em' }}
                                 >
-                                        Add
-                                </Button>
+                                    <Button
+                                        variant="outlined"
+                                        color="secondary"
+                                        size="medium"
+                                        disabled={!selectedAdventure}
+                                        onClick={handleAddToAdventure}
+                                    >
+                                            Cancel
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        color="primary"
+                                        size="medium"
+                                        disabled={!selectedAdventure}
+                                        onClick={handleAddToAdventure}
+                                    >
+                                            Add
+                                    </Button>
+                                </Grid>
                             </Grid>
                         )}
                     </Grid>

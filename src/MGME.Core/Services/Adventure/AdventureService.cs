@@ -436,7 +436,8 @@ namespace MGME.Core.Services.AdventureService
                 relevantCollectionOnModel = typeOfModel.GetProperty("NonPlayerCharacters");
             }
 
-            IEnumerable<TEntity> relevantEntities = (relevantCollectionOnModel.GetValue(adventureToAddTo) as IEnumerable<TEntity>);
+            IEnumerable<TEntity> relevantEntities =
+                (relevantCollectionOnModel.GetValue(adventureToAddTo) as IEnumerable<TEntity>);
 
             IEnumerable<int> matches = relevantEntities.Select(entity => entity.Id).Intersect(
                 relevantCollectionOnDTO.GetValue(ids) as IEnumerable<int>
