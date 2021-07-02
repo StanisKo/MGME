@@ -16,7 +16,7 @@ export interface Adventure extends BaseEntity {
     threadCount: number;
     playerCharacter: RelatedPlayerCharacter;
     playerCharacterCount: number;
-    nonPlayerCharacer: RelatedNonPlayerCharacter;
+    nonPlayerCharacter: RelatedNonPlayerCharacter;
     nonPlayerCharacterCount: number;
     sceneCount: number;
 }

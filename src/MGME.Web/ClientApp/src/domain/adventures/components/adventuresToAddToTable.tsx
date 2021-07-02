@@ -1,13 +1,14 @@
-import { ReactElement, useState, useEffect, ChangeEvent, MouseEvent } from 'react';
+import { ReactElement, useState, useEffect, MouseEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { ApplicationState, UpdateStore } from '../../../store';
 
 import { Adventure } from '../interfaces';
 
+import { fetchAdventures } from '../requests';
+
 import { HeadCell, Pagination } from '../../../shared/interfaces';
 import { SortOrder } from '../../../shared/const';
-import { isSelected } from '../../../shared/helpers';
 
 import {
     Table,
@@ -15,11 +16,11 @@ import {
     TableBody,
     TableRow,
     TableCell,
-    Checkbox,
     TableSortLabel,
     TablePagination,
     LinearProgress,
-    Box
+    Box,
+    Radio
 } from '@material-ui/core';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -44,9 +45,10 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const headCells: HeadCell[] = [
-    { label: 'Name', sorting: 'name', numeric: false },
-    { label: 'Adventure', sorting: 'adventure', numeric: true },
-    { label: 'Character', sorting: 'character', numeric: true }
+    { label: 'Title', sorting: 'title', numeric: false },
+    { label: 'Thread', sorting: 'thread', numeric: true },
+    { label: 'Character', sorting: 'character', numeric: true },
+    { label: 'NPC', sorting: 'npc', numeric: true }
 ];
 
 export const AdventuresToAddToTable = (): ReactElement => {
@@ -56,7 +58,7 @@ export const AdventuresToAddToTable = (): ReactElement => {
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
     );
 
-    const nonPlayerCharacters: Adventure[] | null = useSelector(
+    const adventures: Adventure[] | null = useSelector(
         (state: ApplicationState) => state.catalogues?.adventures?.data ?? null
     );
 
@@ -67,53 +69,18 @@ export const AdventuresToAddToTable = (): ReactElement => {
     const [page, setPage] = useState(0);
     const [order, setOrder] = useState<SortOrder>('asc');
     const [orderBy, setOrderBy] = useState<string>('name');
-    const [selected, setSelected] = useState<number[]>([]);
-
-    const handleSelectAll = (event: ChangeEvent<HTMLInputElement>): void => {
-        let newSelected: number[] = [];
-
-        if (event.target.checked) {
-            newSelected = (nonPlayerCharacters ?? []).map(
-                (nonPlayerCharacter: NonPlayerCharacter) => nonPlayerCharacter.id
-            );
-        }
-        else {
-            newSelected = [];
-        }
-
-        setSelected(newSelected);
-
-        dispatch<UpdateStore<{ selected: number[] }>>(
-            {
-                type: 'UPDATE_STORE',
-                reducer: 'catalogues',
-                key: 'nonPlayerCharacters',
-                payload: {
-                    selected: newSelected
-                }
-            }
-        );
-    };
+    const [selected, setSelected] = useState<number>(0);
 
     const handleSelect = (selectedId: number) => (event: MouseEvent<unknown>): void => {
-        let newSelected: number[] = [];
+        setSelected(selectedId);
 
-        if (selected.includes(selectedId)) {
-            newSelected = selected.filter((id: number) => id !== selectedId);
-        }
-        else {
-            newSelected = [...selected, selectedId];
-        }
-
-        setSelected(newSelected);
-
-        dispatch<UpdateStore<{ selected: number[] }>>(
+        dispatch<UpdateStore<{ selected: number }>>(
             {
                 type: 'UPDATE_STORE',
                 reducer: 'catalogues',
-                key: 'nonPlayerCharacters',
+                key: 'adventures',
                 payload: {
-                    selected: newSelected
+                    selected: selectedId
                 }
             }
         );
@@ -134,17 +101,18 @@ export const AdventuresToAddToTable = (): ReactElement => {
     // Initial request
     useEffect(() => {
         (async (): Promise<void> => {
-            if (isAuthorized && nonPlayerCharacters === null) {
-                await fetchNonPlayerCharacters();
+            if (isAuthorized && adventures === null) {
+                await fetchAdventures('catalogues');
             }
         })();
-    }, [isAuthorized, nonPlayerCharacters]);
+    }, [isAuthorized, adventures]);
 
     // Request with params
     useEffect(() => {
         (async (): Promise<void> => {
-            if (isAuthorized && nonPlayerCharacters !== null) {
-                await fetchNonPlayerCharacters(
+            if (isAuthorized && adventures !== null) {
+                await fetchAdventures(
+                    'catalogues',
                     page + 1,
                     `${order === 'asc' ? '' : '-'}${orderBy}`
                 );
@@ -155,37 +123,31 @@ export const AdventuresToAddToTable = (): ReactElement => {
 
     // Default current state every time new dataset comes in, keep it simple
     useEffect(() => {
-        if (nonPlayerCharacters && selected.length > 0) {
-            setSelected([]);
+        if (adventures && selected > 0) {
+            setSelected(0);
 
-            dispatch<UpdateStore<{ selected: number[] }>>(
+            dispatch<UpdateStore<{ selected: number }>>(
                 {
                     type: 'UPDATE_STORE',
                     reducer: 'catalogues',
-                    key: 'nonPlayerCharacters',
+                    key: 'adventures',
                     payload: {
-                        selected: []
+                        selected: 0
                     }
                 }
             );
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [nonPlayerCharacters]);
+    }, [adventures]);
 
     const { root, visuallyHidden } = useStyles();
 
-    return nonPlayerCharacters !== null && pagination !== null ? (
+    return adventures !== null && pagination !== null ? (
         <>
             <Table className={root}>
                 <TableHead>
                     <TableRow>
-                        <TableCell padding="checkbox">
-                            <Checkbox
-                                checked={selected.length === nonPlayerCharacters.length}
-                                indeterminate={selected.length > 0 && selected.length < nonPlayerCharacters.length}
-                                onChange={handleSelectAll}
-                            />
-                        </TableCell>
+                        <TableCell padding="checkbox" />
                         {headCells.map((headCell) => (
                             <TableCell
                                 key={headCell.label}
@@ -210,38 +172,44 @@ export const AdventuresToAddToTable = (): ReactElement => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {nonPlayerCharacters.map((nonPlayerCharacter, index) => {
-                        const isItemSelected = isSelected(nonPlayerCharacter.id, selected);
-                        const labelId = `nonPlayerCharacter-table-checkbox-${index}`;
+                    {adventures.map((adventure, index) => {
+                        const isItemSelected = selected === adventure.id;
+                        const labelId = `adventure-table-checkbox-${index}`;
 
                         return (
                             <TableRow
                                 hover
-                                onClick={handleSelect(nonPlayerCharacter.id)}
+                                onClick={handleSelect(adventure.id)}
                                 role="checkbox"
                                 aria-checked={isItemSelected}
                                 tabIndex={-1}
-                                key={nonPlayerCharacter.name}
+                                key={adventure.title}
                                 selected={isItemSelected}
                             >
                                 <TableCell padding="checkbox">
-                                    <Checkbox
+                                    <Radio
                                         checked={isItemSelected}
                                         inputProps={{ 'aria-labelledby': labelId }}
                                     />
                                 </TableCell>
 
                                 <TableCell align="left">
-                                    {nonPlayerCharacter.name}
+                                    {adventure.title}
                                 </TableCell>
 
                                 <TableCell align="right">
-                                    {nonPlayerCharacter.adventure?.title
-                                        ?? `${nonPlayerCharacter.adventureCount} adventures`}
+                                    {adventure.thread?.name
+                                        ?? `${adventure.threadCount} threads`}
                                 </TableCell>
 
                                 <TableCell align="right">
-                                    {nonPlayerCharacter.playerCharacter?.name ?? 'No Character'}
+                                    {adventure.playerCharacter?.name
+                                        ?? `${adventure.playerCharacterCount} Characters`}
+                                </TableCell>
+
+                                <TableCell align="right">
+                                    {adventure.nonPlayerCharacter?.name
+                                        ?? `${adventure.nonPlayerCharacterCount} NPCs`}
                                 </TableCell>
                             </TableRow>
                         );

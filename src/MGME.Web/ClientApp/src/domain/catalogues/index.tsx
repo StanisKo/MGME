@@ -27,8 +27,6 @@ import { Alert } from '../../shared/components';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
-import { fetchAdventures } from '../adventures/requests';
-
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -121,8 +119,6 @@ export const Catalogues = (): ReactElement => {
     };
 
     const handleRequestAdventuresToAddTo = async (): Promise<void> => {
-        await fetchAdventures('catalogues');
-
         setDisplayAdventures(true);
     };
 
