@@ -251,7 +251,7 @@ export const Catalogues = (): ReactElement => {
                                 color="primary"
                                 size="medium"
                                 onClick={handleDialogOpen}
-                                disabled={displayAdventures}
+                                disabled={!nothingSelected || displayAdventures}
                             >
                                 Create
                             </Button>
