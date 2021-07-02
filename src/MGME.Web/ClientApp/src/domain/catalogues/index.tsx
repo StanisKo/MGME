@@ -94,6 +94,17 @@ export const Catalogues = (): ReactElement => {
     const handleChange = (event: ChangeEvent<{ value: unknown }>): void => {
         setSelectedMenu(event.target.value as number);
 
+        dispatch<UpdateStore<{ selected: number[] }>>(
+            {
+                type: 'UPDATE_STORE',
+                reducer: 'catalogues',
+                key: selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'playerCharacters' : 'nonPlayerCharacters',
+                payload: {
+                    selected: []
+                }
+            }
+        );
+
         setDisplayAdventures(false);
     };
 
