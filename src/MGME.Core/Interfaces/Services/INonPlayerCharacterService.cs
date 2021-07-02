@@ -16,6 +16,6 @@ namespace MGME.Core.Interfaces.Services
 
         Task <BaseServiceResponse> UpdateNonPlayerCharacter(UpdateNonPlayerCharacterDTO updatedNonPlayerCharacter);
 
-        Task <BaseServiceResponse> DeleteNonPlayerCharacter(int id);
+        Task <BaseServiceResponse> DeleteNonPlayerCharacter(IEnumerable<int> ids);
     }
 }

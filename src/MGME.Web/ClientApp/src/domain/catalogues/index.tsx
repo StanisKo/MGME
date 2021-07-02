@@ -9,6 +9,7 @@ import { PlayerCharactersTable, CreatePlayerCharacterModal } from '../playerChar
 import { deletePlayerCharacters } from '../playerCharacter/requests';
 
 import { NonPlayerCharactersTable } from '../nonPlayerCharacter/components';
+import { deleteNonPlayerCharacters } from '../nonPlayerCharacter/requests';
 
 import { AdventuresToAddToTable } from '../adventures/components';
 
@@ -115,8 +116,11 @@ export const Catalogues = (): ReactElement => {
     };
 
     const handleDelete = async (): Promise<void> => {
-        // Condition this one
-        const response = await deletePlayerCharacters(selectedPlayerCharacters);
+        const itsPlayerCharacters = selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS;
+
+        const response = itsPlayerCharacters
+            ? await deletePlayerCharacters(selectedPlayerCharacters)
+            : await deleteNonPlayerCharacters(selectedNonPlayerCharacters);
 
         setResponse(response);
 
@@ -127,7 +131,7 @@ export const Catalogues = (): ReactElement => {
                 {
                     type: 'UPDATE_STORE',
                     reducer: 'catalogues',
-                    key: 'playerCharacters',
+                    key: itsPlayerCharacters ? 'playerCharacters' : 'nonPlayerCharacters',
                     payload: {
                         selected: []
                     }

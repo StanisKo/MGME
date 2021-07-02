@@ -2,7 +2,7 @@ import { NonPlayerCharacter, AvailableNonPlayerCharacter } from './interfaces';
 
 import { NON_PLAYER_CHARACTER_FILTER } from '../../shared/const/enums';
 
-import { PaginatedDataServiceResponse, ReadFromApi } from '../../shared/interfaces';
+import { PaginatedDataServiceResponse, BaseServiceResponse, ReadFromApi } from '../../shared/interfaces';
 
 import { URLBuilder, DataController } from '../../shared/utils';
 
@@ -45,4 +45,16 @@ export const fetchAvailableNonPlayerCharacters = async (
             returnResponse: true
         }
     ) as PaginatedDataServiceResponse<AvailableNonPlayerCharacter[]>;
+};
+
+export const deleteNonPlayerCharacters = async (ids: number[]): Promise<BaseServiceResponse> => {
+    return await DataController.UpdateAndRefetch(
+        {
+            url: URLBuilder.WriteTo('nonplayercharacter', 'delete'),
+            method: 'DELETE',
+            body: { ids: ids },
+            page: 'catalogues',
+            keys: ['nonPlayerCharacters']
+        }
+    );
 };

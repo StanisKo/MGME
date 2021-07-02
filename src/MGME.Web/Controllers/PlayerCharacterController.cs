@@ -76,7 +76,7 @@ namespace MGME.Web.Controllers
         }
 
         [HttpDelete("Delete")]
-        public async Task <IActionResult> DeletePlayerCharacter(DeletePlayerCharactersDTO playerCharactersToDelete)
+        public async Task <IActionResult> DeletePlayerCharacter(EntitiesToDelete playerCharactersToDelete)
         {
             BaseServiceResponse response = await _playerCharacterService.DeletePlayerCharacters(
                 playerCharactersToDelete.Ids

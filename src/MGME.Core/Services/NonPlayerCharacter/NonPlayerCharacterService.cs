@@ -273,7 +273,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             return response;
         }
 
-        public async Task <BaseServiceResponse> DeleteNonPlayerCharacter(int id)
+        public async Task <BaseServiceResponse> DeleteNonPlayerCharacter(IEnumerable<int> ids)
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
@@ -281,20 +281,14 @@ namespace MGME.Core.Services.NonPlayerCharacterService
 
             try
             {
-                NonPlayerCharacter nonPlayerCharacterToDelete = await _repository.GetEntityAsync(
-                    id: id,
-                    predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                await _repository.DeleteEntitiesAsync(ids);
+
+                (char suffix, string verb) args = (
+                    ids.Count() > 1 ? ('s', "were") : ('\0', "was")
                 );
 
-                if (nonPlayerCharacterToDelete == null)
-                {
-                    response.Success = false;
-                    response.Message = "NPC doesn't exist";
-
-                    return response;
-                }
-
-                await _repository.DeleteEntityAsync(nonPlayerCharacterToDelete);
+                response.Success = true;
+                response.Message = $"NPC{args.suffix} {args.verb} successfully deleted";
 
                 response.Success = true;
                 response.Message = "NPC was successfully deleted";

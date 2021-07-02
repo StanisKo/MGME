@@ -87,9 +87,11 @@ namespace MGME.Web.Controllers
         }
 
         [HttpDelete("Delete")]
-        public async Task <IActionResult> DeleteNonPlayerCharacter([BindRequired, FromQuery] int id)
+        public async Task <IActionResult> DeleteNonPlayerCharacter(EntitiesToDelete nonPlayerCharactersToDelete)
         {
-            BaseServiceResponse response = await _nonPlayerCharacterService.DeleteNonPlayerCharacter(id);
+            BaseServiceResponse response = await _nonPlayerCharacterService.DeleteNonPlayerCharacter(
+                nonPlayerCharactersToDelete.Ids
+            );
 
             if (response.Success)
             {
