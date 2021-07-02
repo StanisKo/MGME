@@ -12,6 +12,8 @@ import { NonPlayerCharactersTable } from '../nonPlayerCharacter/components';
 
 import { AdventuresToAddToTable } from '../adventures/components';
 
+import { addToAdventure } from '../adventures/requests';
+
 import {
     Paper,
     Grid,
@@ -138,36 +140,48 @@ export const Catalogues = (): ReactElement => {
         setDisplayAdventures(true);
     };
 
-    // const handleAddToAdventure = async (): Promise<void> => {
-    //     const key = selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'playerCharacters' : 'nonPlayerCharacters';
+    const handleAddToAdventure = async (): Promise<void> => {
+        const key = selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'playerCharacters' : 'nonPlayerCharacters';
 
-    //     // hardcode id for testing purposes
-    //     const response = await addToAdventure(
-    //         {
-    //             adventure: 21,
-    //             playerCharacters: selectedPlayerCharacters,
-    //             nonPlayerCharacters: selectedNonPlayerCharacters,
-    //             keys: [key]
-    //         }
-    //     );
+        // We know value is there, otherwise handler wouldn't be called in the first place
+        const response = await addToAdventure(
+            {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                adventure: selectedAdventure!,
+                playerCharacters: selectedPlayerCharacters,
+                nonPlayerCharacters: selectedNonPlayerCharacters,
+                keys: [key]
+            }
+        );
 
-    //     setResponse(response);
+        setResponse(response);
 
-    //     setOpenSnackbar(true);
+        setOpenSnackbar(true);
 
-    //     if (response.success) {
-    //         dispatch<UpdateStore<{ selected: number[] }>>(
-    //             {
-    //                 type: 'UPDATE_STORE',
-    //                 reducer: 'catalogues',
-    //                 key: key,
-    //                 payload: {
-    //                     selected: []
-    //                 }
-    //             }
-    //         );
-    //     }
-    // };
+        if (response.success) {
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: key,
+                    payload: {
+                        selected: []
+                    }
+                }
+            );
+
+            dispatch<UpdateStore<{ selected: number }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'adventures',
+                    payload: {
+                        selected: 0
+                    }
+                }
+            );
+        }
+    };
 
     const handleDialogOpen = (): void => {
         setDialogOpen(true);
@@ -281,6 +295,7 @@ export const Catalogues = (): ReactElement => {
                                     color="primary"
                                     size="medium"
                                     disabled={!selectedAdventure}
+                                    onClick={handleAddToAdventure}
                                 >
                                         Add
                                 </Button>
