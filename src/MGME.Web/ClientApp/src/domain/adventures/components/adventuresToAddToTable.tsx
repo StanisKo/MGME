@@ -68,7 +68,7 @@ export const AdventuresToAddToTable = (): ReactElement => {
 
     const [page, setPage] = useState(0);
     const [order, setOrder] = useState<SortOrder>('asc');
-    const [orderBy, setOrderBy] = useState<string>('name');
+    const [orderBy, setOrderBy] = useState<string>('title');
     const [selected, setSelected] = useState<number>(0);
 
     const handleSelect = (selectedId: number) => (event: MouseEvent<unknown>): void => {
