@@ -143,7 +143,7 @@ export const AdventuresToAddToTable = (): ReactElement => {
     const { root, visuallyHidden } = useStyles();
 
     return adventures !== null && pagination !== null ? (
-        <>
+        <Box mt={2}>
             <Table className={root}>
                 <TableHead>
                     <TableRow>
@@ -226,7 +226,7 @@ export const AdventuresToAddToTable = (): ReactElement => {
                     onChangePage={handlePageChange}
                 />
             </Box>
-        </>
+        </Box>
 
     ) : <LinearProgress />;
 };

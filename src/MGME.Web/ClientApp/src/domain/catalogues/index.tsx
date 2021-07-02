@@ -20,7 +20,8 @@ import {
     MenuItem,
     Button,
     Snackbar,
-    Theme
+    Theme,
+    Divider
 } from '@material-ui/core';
 
 import { Alert } from '../../shared/components';
@@ -238,6 +239,7 @@ export const Catalogues = (): ReactElement => {
 
                         {displayAdventures && (
                             <Grid item xs={12}>
+                                <Divider />
                                 <AdventuresToAddToTable />
                             </Grid>
                         )}
