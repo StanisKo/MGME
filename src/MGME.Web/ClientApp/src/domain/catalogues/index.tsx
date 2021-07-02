@@ -217,7 +217,7 @@ export const Catalogues = (): ReactElement => {
                                 variant="outlined"
                                 color="primary"
                                 size="medium"
-                                disabled={nothingSelected}
+                                disabled={nothingSelected || displayAdventures}
                                 onClick={handleRequestAdventuresToAddTo}
                             >
                                 Add to Adventure
@@ -235,6 +235,7 @@ export const Catalogues = (): ReactElement => {
                                 color="primary"
                                 size="medium"
                                 onClick={handleDialogOpen}
+                                disabled={displayAdventures}
                             >
                                 Create
                             </Button>
@@ -242,7 +243,7 @@ export const Catalogues = (): ReactElement => {
                                 variant="outlined"
                                 color="primary"
                                 size="medium"
-                                disabled={nothingSelected}
+                                disabled={nothingSelected || displayAdventures}
                                 className={deleteButton}
                                 onClick={handleDelete}
                             >
