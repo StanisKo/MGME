@@ -360,6 +360,38 @@ namespace MGME.Core.Services.PlayerCharacterService
             return response;
         }
 
+        public async Task <BaseServiceResponse> AddToPlayerCharacter(AddToPlayerCharacterDTO ids)
+        {
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                // Actually query the character
+                bool playerCharacterExists = await _playerCharacterRepository.CheckIfEntityExistsAsync(
+                    playerCharacter => playerCharacter.UserId == userId && playerCharacter.Id == ids.PlayerCharacter
+                );
+
+                if (!playerCharacterExists)
+                {
+                    response.Success = false;
+                    response.Message = "Character doesn't exist";
+
+                    return response;
+                }
+
+
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
+        }
+
         private async Task <IEnumerable<GetPlayerCharacterListDTO>> QueryPlayerCharacters(Ref<string> sortingParameter, Ref<int> selectedPage, Ref<int> userId)
         {
             IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
