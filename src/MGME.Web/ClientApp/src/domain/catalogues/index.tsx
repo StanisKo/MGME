@@ -183,6 +183,21 @@ export const Catalogues = (): ReactElement => {
         }
     };
 
+    const handleCancelAddToAdventure = (): void => {
+        setDisplayAdventures(false);
+
+        dispatch<UpdateStore<{ selected: number }>>(
+            {
+                type: 'UPDATE_STORE',
+                reducer: 'catalogues',
+                key: 'adventures',
+                payload: {
+                    selected: 0
+                }
+            }
+        );
+    };
+
     const handleDialogOpen = (): void => {
         setDialogOpen(true);
     };
@@ -304,7 +319,7 @@ export const Catalogues = (): ReactElement => {
                                         color="secondary"
                                         size="medium"
                                         disabled={!selectedAdventure}
-                                        onClick={handleAddToAdventure}
+                                        onClick={handleCancelAddToAdventure}
                                     >
                                             Cancel
                                     </Button>
