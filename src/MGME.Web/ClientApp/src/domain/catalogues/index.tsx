@@ -81,6 +81,10 @@ export const Catalogues = (): ReactElement => {
         (store: ApplicationState) => store.catalogues?.nonPlayerCharacters?.selected ?? []
     );
 
+    const selectedAdventure = useSelector(
+        (store: ApplicationState) => store.catalogues?.adventures?.selected
+    );
+
     const [selectedMenu, setSelectedMenu] = useState<number>(SELECTED_MENU.PLAYER_CHARACTERS);
 
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -184,6 +188,18 @@ export const Catalogues = (): ReactElement => {
     useEffect(() => {
         if (nothingSelected) {
             setDisplayAdventures(false);
+
+            // Also bring store in sync with UI
+            dispatch<UpdateStore<{ selected: number }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'adventures',
+                    payload: {
+                        selected: 0
+                    }
+                }
+            );
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPlayerCharacters, selectedNonPlayerCharacters]);
@@ -260,6 +276,14 @@ export const Catalogues = (): ReactElement => {
                             <Grid item xs={12}>
                                 <Divider />
                                 <AdventuresToAddToTable />
+                                <Button
+                                    variant="outlined"
+                                    color="primary"
+                                    size="medium"
+                                    disabled={!selectedAdventure}
+                                >
+                                        Add
+                                </Button>
                             </Grid>
                         )}
                     </Grid>
