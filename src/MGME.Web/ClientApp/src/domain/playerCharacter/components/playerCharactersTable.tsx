@@ -7,7 +7,7 @@ import { PlayerCharacter } from '../interfaces';
 import { fetchPlayerCharacters } from '../requests';
 
 import { HeadCell, Pagination } from '../../../shared/interfaces';
-import { SortOrder } from '../../../shared/const';
+import { SortOrder, PLAYER_CHARACTER_TABLE_DISPLAY_MODE } from '../../../shared/const';
 import { isSelected } from '../../../shared/helpers';
 
 import {
@@ -44,6 +44,10 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
+interface PlayerCharacterTableProps {
+    mode: PLAYER_CHARACTER_TABLE_DISPLAY_MODE
+}
+
 const headCells: HeadCell[] = [
     { label: 'Name', sorting: 'name', numeric: false },
     { label: 'Thread', sorting: 'thread', numeric: true },
@@ -51,8 +55,10 @@ const headCells: HeadCell[] = [
     { label: 'NPC', sorting: 'npc', numeric: true }
 ];
 
-export const PlayerCharactersTable = (): ReactElement => {
+export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): ReactElement => {
     const dispatch = useDispatch();
+
+    console.log(mode);
 
     const isAuthorized: boolean = useSelector(
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false

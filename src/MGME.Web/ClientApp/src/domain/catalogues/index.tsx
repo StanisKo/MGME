@@ -27,6 +27,7 @@ import {
 } from '@material-ui/core';
 
 import { Alert } from '../../shared/components';
+import { PLAYER_CHARACTER_TABLE_DISPLAY_MODE } from '../../shared/const';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -316,7 +317,10 @@ export const Catalogues = (): ReactElement => {
                         </Grid>
 
                         <Grid item xs={12}>
-                            {selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS && <PlayerCharactersTable />}
+                            {selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS && (
+                                <PlayerCharactersTable mode={PLAYER_CHARACTER_TABLE_DISPLAY_MODE.TO_SHOW} />
+                            )}
+
                             {selectedMenu === SELECTED_MENU.NON_PLAYER_CHARACTERS && <NonPlayerCharactersTable />}
                         </Grid>
 
