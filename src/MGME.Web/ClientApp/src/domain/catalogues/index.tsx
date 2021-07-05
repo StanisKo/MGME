@@ -202,6 +202,7 @@ export const Catalogues = (): ReactElement => {
     };
 
     const handleAddToPlayerCharacter = async (): Promise<void> => {
+        // Temp hardcode
         const response = await addToPlayerCharacter(
             {
                 playerCharacter: 86,

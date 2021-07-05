@@ -391,20 +391,22 @@ namespace MGME.Core.Services.PlayerCharacterService
                         && ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id)
                 );
 
-                /*
-                We also check if provided npcs already belong to provided character
-                On the front end, but it never hurts to double check here again
-                */
-                bool nonPlayerCharacterAlreadyBelongsToCharacter = playerCharacterToAddTo.NonPlayerCharacters.Select(
+                IEnumerable<int> matches = playerCharacterToAddTo.NonPlayerCharacters.Select(
                     nonPlayerCharacter => nonPlayerCharacter.Id
                 ).Intersect(
                     ids.NonPlayerCharacters
-                ).Any();
+                );
 
-                if (nonPlayerCharacterAlreadyBelongsToCharacter)
+                if (matches.Any())
                 {
+                    IEnumerable<string> names = playerCharacterToAddTo.NonPlayerCharacters.Where(
+                        nonPlayerCharacter => matches.Contains(nonPlayerCharacter.Id)
+                    ).Select(
+                        nonPlayerCharacter => nonPlayerCharacter.Name
+                    );
+
                     response.Success = false;
-                    response.Message = "One of the NPCs already belongs to this Character";
+                    response.Message = $"{String.Join(", ", names)} already added to \"{playerCharacterToAddTo.Name}\"";
 
                     return response;
                 }
