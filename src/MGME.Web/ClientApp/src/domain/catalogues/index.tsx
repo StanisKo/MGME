@@ -6,13 +6,12 @@ import { ApplicationState, UpdateStore } from '../../store';
 import { BaseServiceResponse } from '../../shared/interfaces';
 
 import { PlayerCharactersTable, CreatePlayerCharacterModal } from '../playerCharacter/components';
-import { deletePlayerCharacters } from '../playerCharacter/requests';
+import { deletePlayerCharacters, addToPlayerCharacter } from '../playerCharacter/requests';
 
 import { NonPlayerCharactersTable } from '../nonPlayerCharacter/components';
 import { deleteNonPlayerCharacters } from '../nonPlayerCharacter/requests';
 
 import { AdventuresToAddToTable } from '../adventures/components';
-
 import { addToAdventure } from '../adventures/requests';
 
 import {
@@ -202,6 +201,32 @@ export const Catalogues = (): ReactElement => {
         );
     };
 
+    const handleAddToPlayerCharacter = async (): Promise<void> => {
+        const response = await addToPlayerCharacter(
+            {
+                playerCharacter: 86,
+                nonPlayerCharacters: [94]
+            }
+        );
+
+        setResponse(response);
+
+        setOpenSnackbar(true);
+
+        if (response.success) {
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'nonPlayerCharacters',
+                    payload: {
+                        selected: []
+                    }
+                }
+            );
+        }
+    };
+
     const handleDialogOpen = (): void => {
         setDialogOpen(true);
     };
@@ -264,6 +289,7 @@ export const Catalogues = (): ReactElement => {
                                 color="primary"
                                 size="medium"
                                 disabled={nothingSelected || selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS}
+                                onClick={handleAddToPlayerCharacter}
                             >
                                 Add to Character
                             </Button>

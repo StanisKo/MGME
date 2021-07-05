@@ -370,7 +370,12 @@ namespace MGME.Core.Services.PlayerCharacterService
             {
                 PlayerCharacter playerCharacterToAddTo = await _playerCharacterRepository.GetEntityAsync(
                     id: ids.PlayerCharacter,
-                    predicate: playerCharacter => playerCharacter.UserId == userId
+                    predicate: playerCharacter => playerCharacter.UserId == userId,
+                    tracking: true,
+                    include: new[]
+                    {
+                        "NonPlayerCharacters"
+                    }
                 );
 
                 if (playerCharacterToAddTo == null)
@@ -385,6 +390,36 @@ namespace MGME.Core.Services.PlayerCharacterService
                     predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId
                         && ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id)
                 );
+
+                /*
+                We also check if provided npcs already belong to provided character
+                On the front end, but it never hurts to double check here again
+                */
+                bool nonPlayerCharacterAlreadyBelongsToCharacter = playerCharacterToAddTo.NonPlayerCharacters.Select(
+                    nonPlayerCharacter => nonPlayerCharacter.Id
+                ).Intersect(
+                    ids.NonPlayerCharacters
+                ).Any();
+
+                if (nonPlayerCharacterAlreadyBelongsToCharacter)
+                {
+                    response.Success = false;
+                    response.Message = "One of the NPCs already belongs to this Character";
+
+                    return response;
+                }
+
+                bool nonPlayerCharacterAlreadyTaken = nonPlayerCharactersToAdd.Any(
+                    nonPlayerCharacter => nonPlayerCharacter.PlayerCharacterId != null
+                );
+
+                if (nonPlayerCharacterAlreadyTaken)
+                {
+                    response.Success = false;
+                    response.Message = "One of the NPCs already belongs to another Character";
+
+                    return response;
+                }
 
                 for (int i  = 0; i < nonPlayerCharactersToAdd.Count(); i++)
                 {

@@ -89,5 +89,20 @@ namespace MGME.Web.Controllers
 
             return NotFound(response);
         }
+
+        [HttpPost("AddTo")]
+        public async Task <IActionResult> AddToPlayerCharacter(AddToPlayerCharacterDTO ids)
+        {
+            BaseServiceResponse response = await _playerCharacterService.AddToPlayerCharacter(
+                ids
+            );
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
     }
 }

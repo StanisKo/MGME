@@ -22,6 +22,11 @@ type CreateCharacterParams = {
     newNonPlayerCharacters: NewEntityToAdd[];
 }
 
+type AddToPlayerCharacterParams = {
+    playerCharacter: number;
+    nonPlayerCharacters: number[];
+}
+
 export const fetchPlayerCharacters = async (page?: number, sorting?: string): Promise<void> => {
     const params: ReadFromApi['params'] = {};
 
@@ -63,6 +68,18 @@ export const createPlayerCharacter = async (params: CreateCharacterParams): Prom
             body: params,
             page: 'catalogues',
             keys: ['playerCharacters']
+        }
+    );
+};
+
+export const addToPlayerCharacter = async (params: AddToPlayerCharacterParams): Promise<BaseServiceResponse> => {
+    return await DataController.UpdateAndRefetch(
+        {
+            url: URLBuilder.WriteTo('playerCharacter', 'addto'),
+            method: 'POST',
+            body: params,
+            page: 'catalogues',
+            keys: ['nonPlayerCharacters']
         }
     );
 };
