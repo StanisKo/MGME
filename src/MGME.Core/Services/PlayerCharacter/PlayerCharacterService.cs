@@ -368,12 +368,12 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             try
             {
-                // Actually query the character
-                bool playerCharacterExists = await _playerCharacterRepository.CheckIfEntityExistsAsync(
-                    playerCharacter => playerCharacter.UserId == userId && playerCharacter.Id == ids.PlayerCharacter
+                PlayerCharacter playerCharacterToAddTo = await _playerCharacterRepository.GetEntityAsync(
+                    id: ids.PlayerCharacter,
+                    predicate: playerCharacter => playerCharacter.UserId == userId
                 );
 
-                if (!playerCharacterExists)
+                if (playerCharacterToAddTo == null)
                 {
                     response.Success = false;
                     response.Message = "Character doesn't exist";
@@ -381,6 +381,30 @@ namespace MGME.Core.Services.PlayerCharacterService
                     return response;
                 }
 
+                IEnumerable<NonPlayerCharacter> nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
+                    predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                        && ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id)
+                );
+
+                for (int i  = 0; i < nonPlayerCharactersToAdd.Count(); i++)
+                {
+                    playerCharacterToAddTo.NonPlayerCharacters.Add(
+                        nonPlayerCharactersToAdd.ElementAt(i)
+                    );
+                }
+
+                await _nonPlayerCharacterRepository.LinkEntitiesAsync(
+                    nonPlayerCharactersToAdd,
+                    playerCharacterToAddTo,
+                    "NonPlayerCharacters"
+                );
+
+                (char suffix, string verb) args = (
+                    nonPlayerCharactersToAdd.Count() > 1 ? ('s', "were") : ('\0', "was")
+                );
+
+                response.Success = true;
+                response.Message = $"NPC{args.suffix} {args.verb} successfully added";
 
             }
             catch (Exception exception)
