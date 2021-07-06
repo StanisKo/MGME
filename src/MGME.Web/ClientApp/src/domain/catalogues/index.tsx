@@ -302,7 +302,7 @@ export const Catalogues = (): ReactElement => {
                                 variant="outlined"
                                 color="primary"
                                 size="medium"
-                                disabled={nothingSelected || displayAdventures}
+                                disabled={nothingSelected || displayAdventures || displayCharactersToAddTo}
                                 onClick={handleRequestAdventuresToAddTo}
                             >
                                 Add to Adventure
@@ -311,7 +311,12 @@ export const Catalogues = (): ReactElement => {
                                 variant="outlined"
                                 color="primary"
                                 size="medium"
-                                disabled={nothingSelected || selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS}
+                                disabled={
+                                    nothingSelected
+                                        || selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS
+                                            || displayAdventures
+                                                || displayCharactersToAddTo
+                                }
                                 onClick={handleRequestCharactersToAddTo}
                             >
                                 Add to Character
@@ -321,7 +326,7 @@ export const Catalogues = (): ReactElement => {
                                 color="primary"
                                 size="medium"
                                 onClick={handleDialogOpen}
-                                disabled={!nothingSelected || displayAdventures}
+                                disabled={!nothingSelected}
                             >
                                 Create
                             </Button>
@@ -329,7 +334,7 @@ export const Catalogues = (): ReactElement => {
                                 variant="outlined"
                                 color="primary"
                                 size="medium"
-                                disabled={nothingSelected || displayAdventures}
+                                disabled={nothingSelected || displayAdventures || displayCharactersToAddTo}
                                 className={deleteButton}
                                 onClick={handleDelete}
                             >
