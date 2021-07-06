@@ -76,11 +76,6 @@ enum SELECTED_MENU {
 export const Catalogues = (): ReactElement => {
     const dispatch = useDispatch();
 
-    /*
-    TODO: regression test and make sure to default values on pagination and sorting
-    (access params from here)
-    */
-
     const [selectedMenu, setSelectedMenu] = useState<number>(SELECTED_MENU.PLAYER_CHARACTERS);
 
     /*
@@ -246,6 +241,21 @@ export const Catalogues = (): ReactElement => {
         }
     };
 
+    const handleCancelAddToPlayerCharacter = (): void => {
+        setDisplayCharactersToAddTo(false);
+
+        dispatch<UpdateStore<{ selected: number }>>(
+            {
+                type: 'UPDATE_STORE',
+                reducer: 'catalogues',
+                key: 'playerCharacters',
+                payload: {
+                    selected: 0
+                }
+            }
+        );
+    };
+
     const handleDialogOpen = (): void => {
         setDialogOpen(true);
     };
@@ -408,7 +418,12 @@ export const Catalogues = (): ReactElement => {
                                         variant="outlined"
                                         color="secondary"
                                         size="medium"
-                                        disabled={!selectedPlayerCharacters}
+                                        disabled={
+                                            Array.isArray(selectedPlayerCharacters)
+                                                ? !selectedPlayerCharacters.length
+                                                : !selectedPlayerCharacters
+                                        }
+                                        onClick={handleCancelAddToPlayerCharacter}
                                     >
                                             Cancel
                                     </Button>
@@ -416,7 +431,11 @@ export const Catalogues = (): ReactElement => {
                                         variant="outlined"
                                         color="primary"
                                         size="medium"
-                                        disabled={!selectedPlayerCharacters}
+                                        disabled={
+                                            Array.isArray(selectedPlayerCharacters)
+                                                ? !selectedPlayerCharacters.length
+                                                : !selectedPlayerCharacters
+                                        }
                                         onClick={handleAddToPlayerCharacter}
                                     >
                                             Add
