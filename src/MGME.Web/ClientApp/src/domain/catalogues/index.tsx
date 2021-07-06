@@ -76,6 +76,11 @@ enum SELECTED_MENU {
 export const Catalogues = (): ReactElement => {
     const dispatch = useDispatch();
 
+    /*
+    TODO: regression test and make sure to default values on pagination and sorting
+    (access params from here)
+    */
+
     const [selectedMenu, setSelectedMenu] = useState<number>(SELECTED_MENU.PLAYER_CHARACTERS);
 
     /*
@@ -218,8 +223,8 @@ export const Catalogues = (): ReactElement => {
         // Temp hardcode
         const response = await addToPlayerCharacter(
             {
-                playerCharacter: 86,
-                nonPlayerCharacters: [94]
+                playerCharacter: selectedPlayerCharacters as number,
+                nonPlayerCharacters: selectedNonPlayerCharacters
             }
         );
 
@@ -392,7 +397,7 @@ export const Catalogues = (): ReactElement => {
                                         variant="outlined"
                                         color="secondary"
                                         size="medium"
-                                        disabled={!selectedAdventure}
+                                        disabled={!selectedPlayerCharacters}
                                     >
                                             Cancel
                                     </Button>
@@ -400,7 +405,7 @@ export const Catalogues = (): ReactElement => {
                                         variant="outlined"
                                         color="primary"
                                         size="medium"
-                                        disabled={!selectedAdventure}
+                                        disabled={!selectedPlayerCharacters}
                                         onClick={handleAddToPlayerCharacter}
                                     >
                                             Add

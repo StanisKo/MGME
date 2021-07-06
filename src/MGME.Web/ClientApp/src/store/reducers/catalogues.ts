@@ -12,7 +12,7 @@ export interface CataloguesState {
     playerCharacters: {
         data: PlayerCharacter[],
         pagination: Pagination,
-        selected: number[]
+        selected: number[] | number
     },
 
     nonPlayerCharacters: {

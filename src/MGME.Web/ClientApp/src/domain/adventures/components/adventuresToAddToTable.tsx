@@ -149,7 +149,7 @@ export const AdventuresToAddToTable = (): ReactElement => {
     }, [adventures]);
 
     useEffect(() => {
-        if (selectedPlayerCharacters.length === 0 && selectedNonPlayerCharacters.length === 0) {
+        if ((selectedPlayerCharacters as number[]).length === 0 && selectedNonPlayerCharacters.length === 0) {
             dispatch<UpdateStore<{ selected: number }>>(
                 {
                     type: 'UPDATE_STORE',

@@ -20,7 +20,8 @@ import {
     TableSortLabel,
     TablePagination,
     LinearProgress,
-    Box
+    Box,
+    Radio
 } from '@material-ui/core';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -279,10 +280,17 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
                                 selected={isItemSelected}
                             >
                                 <TableCell padding="checkbox">
-                                    <Checkbox
-                                        checked={isItemSelected}
-                                        inputProps={{ 'aria-labelledby': labelId }}
-                                    />
+                                    {mode === PLAYER_CHARACTER_TABLE_DISPLAY_MODE.TO_SHOW ? (
+                                        <Checkbox
+                                            checked={isItemSelected}
+                                            inputProps={{ 'aria-labelledby': labelId }}
+                                        />
+                                    ) : (
+                                        <Radio
+                                            checked={isItemSelected}
+                                            inputProps={{ 'aria-labelledby': labelId }}
+                                        />
+                                    )}
                                 </TableCell>
 
                                 <TableCell align="left">
