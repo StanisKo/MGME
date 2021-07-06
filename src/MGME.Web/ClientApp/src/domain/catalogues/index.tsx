@@ -160,7 +160,10 @@ export const Catalogues = (): ReactElement => {
             {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 adventure: selectedAdventure!,
-                playerCharacters: selectedPlayerCharacters as number[],
+                // If single character was selected, send nothing, otherwise send list
+                playerCharacters: typeof(selectedPlayerCharacters) === 'number'
+                    ? []
+                    : selectedPlayerCharacters as number[],
                 nonPlayerCharacters: selectedNonPlayerCharacters,
                 keys: [key]
             }
