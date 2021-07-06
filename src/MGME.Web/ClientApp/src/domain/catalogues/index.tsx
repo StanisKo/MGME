@@ -160,7 +160,7 @@ export const Catalogues = (): ReactElement => {
             {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 adventure: selectedAdventure!,
-                playerCharacters: selectedPlayerCharacters as number[],
+                playerCharacters: selectedPlayerCharacters as number[] ?? [],
                 nonPlayerCharacters: selectedNonPlayerCharacters,
                 keys: [key]
             }
