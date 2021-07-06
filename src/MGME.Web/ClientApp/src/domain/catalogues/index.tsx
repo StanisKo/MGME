@@ -264,7 +264,13 @@ export const Catalogues = (): ReactElement => {
 
     useEffect(() => {
         if (nothingSelected) {
-            setDisplayAdventures(false);
+            if (displayAdventures) {
+                setDisplayAdventures(false);
+            }
+
+            if (displayCharactersToAddTo) {
+                setDisplayCharactersToAddTo(false);
+            }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPlayerCharacters, selectedNonPlayerCharacters]);
