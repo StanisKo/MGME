@@ -7,9 +7,11 @@ import { PlayerCharacter } from '../interfaces';
 
 import { createPlayerCharacter } from '../requests';
 
-import { AvailableNonPlayerCharacter, BaseServiceResponse, NewEntityToAdd } from '../../../shared/interfaces';
-import { fetchAvailableNonPlayerCharacters } from '../../../shared/requests';
+import { BaseServiceResponse, NewEntityToAdd } from '../../../shared/interfaces';
 import { INPUT_TYPE, NON_PLAYER_CHARACTER_FILTER } from '../../../shared/const';
+
+import { AvailableNonPlayerCharacter } from '../../nonPlayerCharacter/interfaces';
+import { fetchAvailableNonPlayerCharacters } from '../../nonPlayerCharacter/requests';
 
 import {
     Dialog,

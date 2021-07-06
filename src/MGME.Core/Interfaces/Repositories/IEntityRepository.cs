@@ -14,12 +14,12 @@ namespace MGME.Core.Interfaces.Repositories
         // Get a single entity
         Task <TEntity> GetEntityAsync(int? id = null,
                                       bool tracking = false,
+                                      bool splitQuery = false,
                                       Expression<Func<TEntity, bool>> predicate = null,
                                       IEnumerable<string> include = null);
 
         // For when we need to select only some columns
         Task <TEntityDTO> GetEntityAsync<TEntityDTO>(int? id = null,
-                                                     bool tracking = false,
                                                      Expression<Func<TEntity, bool>> predicate = null,
                                                      IEnumerable<string> include = null,
                                                      Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO;
@@ -33,8 +33,7 @@ namespace MGME.Core.Interfaces.Repositories
                                                int? page = null);
 
         // For when we need to select only some columns
-        Task <List<TEntityDTO>> GetEntititesAsync<TEntityDTO>(bool tracking = false,
-                                                              Expression<Func<TEntity, bool>> predicate = null,
+        Task <List<TEntityDTO>> GetEntititesAsync<TEntityDTO>(Expression<Func<TEntity, bool>> predicate = null,
                                                               IEnumerable<string> include = null,
                                                               Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
                                                               int? page = null,

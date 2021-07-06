@@ -24,7 +24,7 @@ namespace MGME.Web.Controllers
         [HttpGet]
         public async Task <IActionResult> GetAllPlayerCharacters([FromQuery] string sorting, int? page)
         {
-            DataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = await _playerCharacterService.GetAllPlayerCharacters(
+            PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = await _playerCharacterService.GetAllPlayerCharacters(
                 sorting ?? "name", page ?? 1
             );
 
@@ -76,10 +76,25 @@ namespace MGME.Web.Controllers
         }
 
         [HttpDelete("Delete")]
-        public async Task <IActionResult> DeletePlayerCharacter(DeletePlayerCharactersDTO playerCharactersToDelete)
+        public async Task <IActionResult> DeletePlayerCharacter(EntitiesToDelete playerCharactersToDelete)
         {
             BaseServiceResponse response = await _playerCharacterService.DeletePlayerCharacters(
                 playerCharactersToDelete.Ids
+            );
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
+
+        [HttpPost("AddTo")]
+        public async Task <IActionResult> AddToPlayerCharacter(AddToPlayerCharacterDTO ids)
+        {
+            BaseServiceResponse response = await _playerCharacterService.AddToPlayerCharacter(
+                ids
             );
 
             if (response.Success)

@@ -3,10 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MGME.Core.DTOs.PlayerCharacter
 {
-    public class DeletePlayerCharactersDTO
+    public class AddToPlayerCharacterDTO
     {
         [Required]
+        public int PlayerCharacter { get; set; }
+
+        [Required]
         [MinLength(1)]
-        public IEnumerable<int> Ids { get; set; }
+        public IEnumerable<int> NonPlayerCharacters { get; set; }
     }
 }

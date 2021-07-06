@@ -140,13 +140,9 @@ namespace MGME.Core.Services.PlayerCharacterService
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
-            bool thereAreNewNonPlayerCharactersToAdd =
-                newPlayerCharacter.NewNonPlayerCharacters != null
-                    && newPlayerCharacter.NewNonPlayerCharacters.Any();
+            bool thereAreNewNonPlayerCharactersToAdd = newPlayerCharacter.NewNonPlayerCharacters?.Any() == true;
 
-            bool thereAreExisitingNonPlayerCharactersToAdd =
-                newPlayerCharacter.ExistingNonPlayerCharacters != null
-                    && newPlayerCharacter.ExistingNonPlayerCharacters.Any();
+            bool thereAreExisitingNonPlayerCharactersToAdd = newPlayerCharacter.ExistingNonPlayerCharacters?.Any() == true;
 
             if (!thereAreNewNonPlayerCharactersToAdd && !thereAreExisitingNonPlayerCharactersToAdd)
             {
@@ -160,8 +156,10 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             try
             {
+                // Check if player character with such name already exists for this user
                 bool playerCharacterExists = await _playerCharacterRepository.CheckIfEntityExistsAsync(
-                    playerCharacter => playerCharacter.Name.ToLower() == newPlayerCharacter.Name.ToLower()
+                    playerCharacter => playerCharacter.UserId == userId
+                        && playerCharacter.Name.ToLower() == newPlayerCharacter.Name.ToLower()
                 );
 
                 if (playerCharacterExists)
@@ -172,49 +170,42 @@ namespace MGME.Core.Services.PlayerCharacterService
                     return response;
                 }
 
-                // Check if at least one new NonPlayerCharacter already exists
-                Expression<Func<NonPlayerCharacter, bool>> nonPlayerCharacterNamePredicate =
-
-                    existingNonPlayerCharacter => newPlayerCharacter.NewNonPlayerCharacters.Select(
-                        newNonPlayerCharacter => newNonPlayerCharacter.Name
-                    ).Contains(
-                        existingNonPlayerCharacter.Name
-                    );
-
-                bool nonPlayerCharacterAlreadyExists = await _nonPlayerCharacterRepository.CheckIfEntityExistsAsync(
-                    nonPlayerCharacterNamePredicate
-                );
-
-                // If so, it belongs to someone else, or takes part in adventure; otherwise client denies the request
-                if (nonPlayerCharacterAlreadyExists)
-                {
-                    response.Success = false;
-                    response.Message = "One of the new NPCs either already belongs to another character, or takes part in adventure";
-
-                    return response;
-                }
-
-                /*
-                We add initial NPCs and Threads to a PlayerCharacter here,
-                since it is faster than sepearating these transactions into their own services
-                (Though, we would use their own services when PlayerCharacter is already created)
-                */
-
                 List<NonPlayerCharacter> newNonPlayerCharactersToAdd = new List<NonPlayerCharacter>();
 
                 if (thereAreNewNonPlayerCharactersToAdd)
                 {
+                    // Check if at least one new NonPlayerCharacter with such name already exists for this user
+                    IEnumerable<string> newNonPlayerCharacterNames = newPlayerCharacter.NewNonPlayerCharacters.Select(
+                            newNonPlayerCharacter => newNonPlayerCharacter.Name
+                    );
+
+                    Expression<Func<NonPlayerCharacter, bool>> nonPlayerCharacterNamePredicate =
+                        existingNonPlayerCharacter => existingNonPlayerCharacter.UserId == userId
+                            && newNonPlayerCharacterNames.Contains(existingNonPlayerCharacter.Name);
+
+                    bool nonPlayerCharacterAlreadyExists = await _nonPlayerCharacterRepository.CheckIfEntityExistsAsync(
+                        nonPlayerCharacterNamePredicate
+                    );
+
+                    if (nonPlayerCharacterAlreadyExists)
+                    {
+                        response.Success = false;
+                        response.Message = "One of the new NPCs already exists";
+
+                        return response;
+                    }
+
                     // Map NonPlayerCharacter DTOs to data models and link to current user
                     newNonPlayerCharactersToAdd = newPlayerCharacter.NewNonPlayerCharacters.Select(
                         nonPlayerCharacter =>
                         {
-                            NonPlayerCharacter nonPlayerCharacterDM = _mapper.Map<NonPlayerCharacter>(
+                            NonPlayerCharacter nonPlayerCharacterDataModel = _mapper.Map<NonPlayerCharacter>(
                                 nonPlayerCharacter
                             );
 
-                            nonPlayerCharacterDM.UserId = userId;
+                            nonPlayerCharacterDataModel.UserId = userId;
 
-                            return nonPlayerCharacterDM;
+                            return nonPlayerCharacterDataModel;
                         }
                     ).ToList();
                 }
@@ -359,6 +350,99 @@ namespace MGME.Core.Services.PlayerCharacterService
 
                 response.Success = true;
                 response.Message = $"Character{args.suffix} {args.verb} successfully deleted";
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
+        }
+
+        public async Task <BaseServiceResponse> AddToPlayerCharacter(AddToPlayerCharacterDTO ids)
+        {
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                PlayerCharacter playerCharacterToAddTo = await _playerCharacterRepository.GetEntityAsync(
+                    id: ids.PlayerCharacter,
+                    predicate: playerCharacter => playerCharacter.UserId == userId,
+                    tracking: true,
+                    include: new[]
+                    {
+                        "NonPlayerCharacters"
+                    }
+                );
+
+                if (playerCharacterToAddTo == null)
+                {
+                    response.Success = false;
+                    response.Message = "Character doesn't exist";
+
+                    return response;
+                }
+
+                IEnumerable<NonPlayerCharacter> nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
+                    predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                        && ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id)
+                );
+
+                IEnumerable<int> matches = playerCharacterToAddTo.NonPlayerCharacters.Select(
+                    nonPlayerCharacter => nonPlayerCharacter.Id
+                ).Intersect(
+                    ids.NonPlayerCharacters
+                );
+
+                if (matches.Any())
+                {
+                    IEnumerable<string> names = playerCharacterToAddTo.NonPlayerCharacters.Where(
+                        nonPlayerCharacter => matches.Contains(nonPlayerCharacter.Id)
+                    ).Select(
+                        nonPlayerCharacter => nonPlayerCharacter.Name
+                    );
+
+                    response.Success = false;
+                    response.Message = $"{String.Join(", ", names)} already added to \"{playerCharacterToAddTo.Name}\"";
+
+                    return response;
+                }
+
+                bool nonPlayerCharacterAlreadyTaken = nonPlayerCharactersToAdd.Any(
+                    nonPlayerCharacter => nonPlayerCharacter.PlayerCharacterId != null
+                );
+
+                if (nonPlayerCharacterAlreadyTaken)
+                {
+                    response.Success = false;
+                    response.Message = "One of the NPCs already belongs to another Character";
+
+                    return response;
+                }
+
+                for (int i  = 0; i < nonPlayerCharactersToAdd.Count(); i++)
+                {
+                    playerCharacterToAddTo.NonPlayerCharacters.Add(
+                        nonPlayerCharactersToAdd.ElementAt(i)
+                    );
+                }
+
+                await _nonPlayerCharacterRepository.LinkEntitiesAsync(
+                    nonPlayerCharactersToAdd,
+                    playerCharacterToAddTo,
+                    "NonPlayerCharacters"
+                );
+
+                (char suffix, string verb) args = (
+                    nonPlayerCharactersToAdd.Count() > 1 ? ('s', "were") : ('\0', "was")
+                );
+
+                response.Success = true;
+                response.Message = $"NPC{args.suffix} {args.verb} successfully added";
+
             }
             catch (Exception exception)
             {

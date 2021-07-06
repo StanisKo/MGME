@@ -1,9 +1,3 @@
-export interface BaseEntity {
-    id: number;
-}
-
-/*    ****    */
-
 export interface BaseServiceResponse {
     success: boolean;
     message: string;
@@ -21,12 +15,6 @@ export interface Pagination {
     page: number;
     numberOfPages: number;
     numberOfResults: number;
-}
-
-// Either NonPlayerCharacter or Thread
-export interface NewEntityToAdd {
-    name: string;
-    description: string;
 }
 
 /*    ****    */
@@ -94,9 +82,13 @@ export interface HeadCell {
     numeric: boolean;
 }
 
-/*    **** Entity related interfaces ****    */
+/*    ****    */
 
-export interface AvailableNonPlayerCharacter {
+export interface BaseEntity {
     id: number;
+}
+
+export interface NewEntityToAdd {
     name: string;
+    description: string;
 }

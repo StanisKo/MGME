@@ -16,6 +16,7 @@ using MGME.Core.DTOs.NonPlayerCharacter;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
 using MGME.Core.Utils;
+using MGME.Core.Utils.Sorters;
 
 namespace MGME.Core.Services.NonPlayerCharacterService
 {
@@ -23,13 +24,17 @@ namespace MGME.Core.Services.NonPlayerCharacterService
     {
         private readonly IEntityRepository<NonPlayerCharacter> _repository;
 
+        private readonly NonPlayerCharacterSorter _sorter;
+
         public NonPlayerCharacterService(IEntityRepository<NonPlayerCharacter> repository,
+                                         NonPlayerCharacterSorter sorter,
                                          IHttpContextAccessor httpContextAccessor): base(httpContextAccessor)
         {
             _repository = repository;
+            _sorter = sorter;
         }
 
-        public async Task <PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter, int? selectedPage)
+        public async Task <PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>>> GetAllNonPlayerCharacters(int filter, string sortingParameter, int? selectedPage)
         {
             PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>> response = new PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>>();
 
@@ -84,6 +89,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                 IEnumerable<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await QueryNonPlayerCharacters(
                     predicate,
                     new Ref<bool>(weNeedAll),
+                    new Ref<string>(sortingParameter),
                     selectedPage != null ? new Ref<int>((int)selectedPage) : null
                 );
 
@@ -267,12 +273,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             return response;
         }
 
-        public Task <BaseServiceResponse> AddToPlayerCharacterOrAdventure(AddToPlayerCharacterOrAdventureDTO ids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task <BaseServiceResponse> DeleteNonPlayerCharacter(int id)
+        public async Task <BaseServiceResponse> DeleteNonPlayerCharacter(IEnumerable<int> ids)
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
@@ -280,20 +281,14 @@ namespace MGME.Core.Services.NonPlayerCharacterService
 
             try
             {
-                NonPlayerCharacter nonPlayerCharacterToDelete = await _repository.GetEntityAsync(
-                    id: id,
-                    predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId
+                await _repository.DeleteEntitiesAsync(ids);
+
+                (char suffix, string verb) args = (
+                    ids.Count() > 1 ? ('s', "were") : ('\0', "was")
                 );
 
-                if (nonPlayerCharacterToDelete == null)
-                {
-                    response.Success = false;
-                    response.Message = "NPC doesn't exist";
-
-                    return response;
-                }
-
-                await _repository.DeleteEntityAsync(nonPlayerCharacterToDelete);
+                response.Success = true;
+                response.Message = $"NPC{args.suffix} {args.verb} successfully deleted";
 
                 response.Success = true;
                 response.Message = "NPC was successfully deleted";
@@ -307,12 +302,21 @@ namespace MGME.Core.Services.NonPlayerCharacterService
             return response;
         }
 
-        private async Task <IEnumerable<GetNonPlayerCharacterListDTO>> QueryNonPlayerCharacters(Expression<Func<NonPlayerCharacter, bool>> predicate, Ref<bool> weNeedAll, Ref<int> selectedPage)
+        private async Task <IEnumerable<GetNonPlayerCharacterListDTO>> QueryNonPlayerCharacters(
+            Expression<Func<NonPlayerCharacter, bool>> predicate,
+            Ref<bool> weNeedAll,
+            Ref<string> sortingParameter,
+            Ref<int> selectedPage
+        )
         {
             IEnumerable<GetNonPlayerCharacterListDTO> nonPlayerCharacters = await _repository.GetEntititesAsync<GetNonPlayerCharacterListDTO>(
                 predicate: predicate,
                 include: weNeedAll.Value
-                    ? new[] { "PlayerCharacter" }
+                    ? new[]
+                    {
+                        "PlayerCharacter",
+                        "Adventures"
+                    }
                     : null,
                 select: nonPlayerCharacter => new GetNonPlayerCharacterListDTO()
                 {
@@ -327,10 +331,19 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                         }
                         : null,
 
+                    Adventure = weNeedAll.Value && nonPlayerCharacter.Adventures.Count == 1
+                        ? new GetAdventureDTO()
+                        {
+                            Id = nonPlayerCharacter.Adventures.FirstOrDefault().Id,
+                            Title = nonPlayerCharacter.Adventures.FirstOrDefault().Title
+                        }
+                        : null,
+
                     AdventureCount = weNeedAll.Value
                         ? nonPlayerCharacter.Adventures.Count
                         : null
                 },
+                orderBy: _sorter.DetermineSorting(sortingParameter.Value),
                 page: selectedPage?.Value ?? null
             );
 

@@ -1,6 +1,9 @@
 import { Action, Reducer } from 'redux';
 
 import { PlayerCharacter } from '../../domain/playerCharacter/interfaces';
+import { NonPlayerCharacter } from '../../domain/nonPlayerCharacter/interfaces';
+import { Adventure } from '../../domain/adventures/interfaces';
+
 import { PaginatedDataServiceResponse, Pagination } from '../../shared/interfaces';
 
 import { UpdateStore } from '../';
@@ -9,9 +12,20 @@ export interface CataloguesState {
     playerCharacters: {
         data: PlayerCharacter[],
         pagination: Pagination,
-        selected: number[],
-        sorting: string
+        selected: number[] | number
     },
+
+    nonPlayerCharacters: {
+        data: NonPlayerCharacter[],
+        pagination: Pagination,
+        selected: number[]
+    },
+
+    adventures: {
+        data: Adventure[],
+        pagination: Pagination,
+        selected: number
+    }
 }
 
 export const CataloguesReducer: Reducer<CataloguesState> = (

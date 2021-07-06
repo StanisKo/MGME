@@ -1,4 +1,4 @@
-import { ReactElement, useState, ChangeEvent, SyntheticEvent } from 'react';
+import { ReactElement, useState, ChangeEvent, SyntheticEvent, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ApplicationState, UpdateStore } from '../../store';
@@ -6,7 +6,13 @@ import { ApplicationState, UpdateStore } from '../../store';
 import { BaseServiceResponse } from '../../shared/interfaces';
 
 import { PlayerCharactersTable, CreatePlayerCharacterModal } from '../playerCharacter/components';
-import { deletePlayerCharacters } from '../playerCharacter/requests';
+import { deletePlayerCharacters, addToPlayerCharacter } from '../playerCharacter/requests';
+
+import { NonPlayerCharactersTable } from '../nonPlayerCharacter/components';
+import { deleteNonPlayerCharacters } from '../nonPlayerCharacter/requests';
+
+import { AdventuresToAddToTable } from '../adventures/components';
+import { addToAdventure } from '../adventures/requests';
 
 import {
     Paper,
@@ -16,10 +22,12 @@ import {
     MenuItem,
     Button,
     Snackbar,
-    Theme
+    Theme,
+    Divider
 } from '@material-ui/core';
 
 import { Alert } from '../../shared/components';
+import { PLAYER_CHARACTER_TABLE_DISPLAY_MODE } from '../../shared/const';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -68,11 +76,23 @@ enum SELECTED_MENU {
 export const Catalogues = (): ReactElement => {
     const dispatch = useDispatch();
 
-    const selectedEntities = useSelector(
-        (store: ApplicationState) => store.catalogues?.playerCharacters?.selected ?? []
+    const [selectedMenu, setSelectedMenu] = useState<number>(SELECTED_MENU.PLAYER_CHARACTERS);
+
+    /*
+    If we're looking at characters, selected corresponds to list of their ids
+    If we're looking at npcs, selected corresponds to single id of character we want to add npcs to
+    */
+    const selectedPlayerCharacters = useSelector(
+        (store: ApplicationState) => store.catalogues?.playerCharacters?.selected
     );
 
-    const [selectedMenu, setSelectedMenu] = useState<number>(SELECTED_MENU.PLAYER_CHARACTERS);
+    const selectedNonPlayerCharacters = useSelector(
+        (store: ApplicationState) => store.catalogues?.nonPlayerCharacters?.selected ?? []
+    );
+
+    const selectedAdventure = useSelector(
+        (store: ApplicationState) => store.catalogues?.adventures?.selected
+    );
 
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
@@ -80,12 +100,35 @@ export const Catalogues = (): ReactElement => {
 
     const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
 
+    const [displayAdventures, setDisplayAdventures] = useState<boolean>(false);
+
+    const [displayCharactersToAddTo, setDisplayCharactersToAddTo] = useState<boolean>(false);
+
     const handleChange = (event: ChangeEvent<{ value: unknown }>): void => {
         setSelectedMenu(event.target.value as number);
+
+        const itsPlayerCharacters = selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS;
+
+        dispatch<UpdateStore<{ selected: number[] }>>(
+            {
+                type: 'UPDATE_STORE',
+                reducer: 'catalogues',
+                key: itsPlayerCharacters ? 'playerCharacters' : 'nonPlayerCharacters',
+                payload: {
+                    selected: []
+                }
+            }
+        );
+
+        itsPlayerCharacters ? setDisplayAdventures(false) : setDisplayCharactersToAddTo(false);
     };
 
     const handleDelete = async (): Promise<void> => {
-        const response = await deletePlayerCharacters(selectedEntities);
+        const itsPlayerCharacters = selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS;
+
+        const response = itsPlayerCharacters
+            ? await deletePlayerCharacters(selectedPlayerCharacters as number[])
+            : await deleteNonPlayerCharacters(selectedNonPlayerCharacters);
 
         setResponse(response);
 
@@ -96,13 +139,121 @@ export const Catalogues = (): ReactElement => {
                 {
                     type: 'UPDATE_STORE',
                     reducer: 'catalogues',
-                    key: 'playerCharacters',
+                    key: itsPlayerCharacters ? 'playerCharacters' : 'nonPlayerCharacters',
                     payload: {
                         selected: []
                     }
                 }
             );
         }
+    };
+
+    const handleRequestAdventuresToAddTo = async (): Promise<void> => {
+        setDisplayAdventures(true);
+    };
+
+    const handleAddToAdventure = async (): Promise<void> => {
+        const key = selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? 'playerCharacters' : 'nonPlayerCharacters';
+
+        // We know value is there, otherwise handler wouldn't be called in the first place
+        const response = await addToAdventure(
+            {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                adventure: selectedAdventure!,
+                playerCharacters: selectedPlayerCharacters as number[],
+                nonPlayerCharacters: selectedNonPlayerCharacters,
+                keys: [key]
+            }
+        );
+
+        setResponse(response);
+
+        setOpenSnackbar(true);
+
+        if (response.success) {
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: key,
+                    payload: {
+                        selected: []
+                    }
+                }
+            );
+
+            dispatch<UpdateStore<{ selected: number }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'adventures',
+                    payload: {
+                        selected: 0
+                    }
+                }
+            );
+        }
+    };
+
+    const handleCancelAddToAdventure = (): void => {
+        setDisplayAdventures(false);
+
+        dispatch<UpdateStore<{ selected: number }>>(
+            {
+                type: 'UPDATE_STORE',
+                reducer: 'catalogues',
+                key: 'adventures',
+                payload: {
+                    selected: 0
+                }
+            }
+        );
+    };
+
+    const handleRequestCharactersToAddTo = async (): Promise<void> => {
+        setDisplayCharactersToAddTo(true);
+    };
+
+    const handleAddToPlayerCharacter = async (): Promise<void> => {
+        // Temp hardcode
+        const response = await addToPlayerCharacter(
+            {
+                playerCharacter: selectedPlayerCharacters as number,
+                nonPlayerCharacters: selectedNonPlayerCharacters
+            }
+        );
+
+        setResponse(response);
+
+        setOpenSnackbar(true);
+
+        if (response.success) {
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'nonPlayerCharacters',
+                    payload: {
+                        selected: []
+                    }
+                }
+            );
+        }
+    };
+
+    const handleCancelAddToPlayerCharacter = (): void => {
+        setDisplayCharactersToAddTo(false);
+
+        dispatch<UpdateStore<{ selected: number }>>(
+            {
+                type: 'UPDATE_STORE',
+                reducer: 'catalogues',
+                key: 'playerCharacters',
+                payload: {
+                    selected: 0
+                }
+            }
+        );
     };
 
     const handleDialogOpen = (): void => {
@@ -121,7 +272,26 @@ export const Catalogues = (): ReactElement => {
         setOpenSnackbar(false);
     };
 
-    const nothingSelected = selectedEntities.length === 0;
+    useEffect(() => {
+        if (nothingSelected) {
+            if (displayAdventures) {
+                setDisplayAdventures(false);
+            }
+
+            if (displayCharactersToAddTo) {
+                setDisplayCharactersToAddTo(false);
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedPlayerCharacters, selectedNonPlayerCharacters]);
+
+    /*
+    We are forced to check for value here, since we don't give it a default
+    As it can be either list or int
+    */
+    const nothingSelected = selectedPlayerCharacters && selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS
+        ? (selectedPlayerCharacters as number[]).length === 0
+        : selectedNonPlayerCharacters.length === 0;
 
     // Rest are also shared by creation modal
     const { deleteButton, ...classes } = useStyles();
@@ -148,7 +318,8 @@ export const Catalogues = (): ReactElement => {
                                 variant="outlined"
                                 color="primary"
                                 size="medium"
-                                disabled={nothingSelected || selectedMenu === SELECTED_MENU.NON_PLAYER_CHARACTERS}
+                                disabled={nothingSelected || displayAdventures || displayCharactersToAddTo}
+                                onClick={handleRequestAdventuresToAddTo}
                             >
                                 Add to Adventure
                             </Button>
@@ -156,7 +327,13 @@ export const Catalogues = (): ReactElement => {
                                 variant="outlined"
                                 color="primary"
                                 size="medium"
-                                disabled={nothingSelected || selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS}
+                                disabled={
+                                    nothingSelected
+                                        || selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS
+                                            || displayAdventures
+                                                || displayCharactersToAddTo
+                                }
+                                onClick={handleRequestCharactersToAddTo}
                             >
                                 Add to Character
                             </Button>
@@ -165,6 +342,7 @@ export const Catalogues = (): ReactElement => {
                                 color="primary"
                                 size="medium"
                                 onClick={handleDialogOpen}
+                                disabled={!nothingSelected}
                             >
                                 Create
                             </Button>
@@ -172,7 +350,7 @@ export const Catalogues = (): ReactElement => {
                                 variant="outlined"
                                 color="primary"
                                 size="medium"
-                                disabled={nothingSelected}
+                                disabled={nothingSelected || displayAdventures || displayCharactersToAddTo}
                                 className={deleteButton}
                                 onClick={handleDelete}
                             >
@@ -181,8 +359,90 @@ export const Catalogues = (): ReactElement => {
                         </Grid>
 
                         <Grid item xs={12}>
-                            {selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS && <PlayerCharactersTable />}
+                            {selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS && (
+                                <PlayerCharactersTable mode={PLAYER_CHARACTER_TABLE_DISPLAY_MODE.TO_SHOW} />
+                            )}
+
+                            {selectedMenu === SELECTED_MENU.NON_PLAYER_CHARACTERS && <NonPlayerCharactersTable />}
                         </Grid>
+
+                        {displayAdventures && (
+                            <Grid item xs={12}>
+                                <Divider />
+                                <AdventuresToAddToTable />
+                                <Grid
+                                    item
+                                    container
+                                    xs={12}
+                                    alignItems="center"
+                                    justify="flex-end"
+                                    className={classes.buttons}
+                                    style={{ marginTop: '2em' }}
+                                >
+                                    <Button
+                                        variant="outlined"
+                                        color="secondary"
+                                        size="medium"
+                                        disabled={!selectedAdventure}
+                                        onClick={handleCancelAddToAdventure}
+                                    >
+                                            Cancel
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        color="primary"
+                                        size="medium"
+                                        disabled={!selectedAdventure}
+                                        onClick={handleAddToAdventure}
+                                    >
+                                            Add
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        )}
+
+                        {displayCharactersToAddTo && (
+                            <Grid item xs={12}>
+                                <Divider />
+                                <PlayerCharactersTable mode={PLAYER_CHARACTER_TABLE_DISPLAY_MODE.TO_ADD_TO} />
+                                <Grid
+                                    item
+                                    container
+                                    xs={12}
+                                    alignItems="center"
+                                    justify="flex-end"
+                                    className={classes.buttons}
+                                    style={{ marginTop: '2em' }}
+                                >
+                                    <Button
+                                        variant="outlined"
+                                        color="secondary"
+                                        size="medium"
+                                        disabled={
+                                            Array.isArray(selectedPlayerCharacters)
+                                                ? !selectedPlayerCharacters.length
+                                                : !selectedPlayerCharacters
+                                        }
+                                        onClick={handleCancelAddToPlayerCharacter}
+                                    >
+                                            Cancel
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        color="primary"
+                                        size="medium"
+                                        disabled={
+                                            Array.isArray(selectedPlayerCharacters)
+                                                ? !selectedPlayerCharacters.length
+                                                : !selectedPlayerCharacters
+                                        }
+                                        onClick={handleAddToPlayerCharacter}
+                                    >
+                                            Add
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        )}
                     </Grid>
                 </Paper>
             </div>

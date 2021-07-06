@@ -8,6 +8,7 @@ using MGME.Core.Services.AuthService;
 using MGME.Core.Services.UserService;
 using MGME.Core.Services.PlayerCharacterService;
 using MGME.Core.Services.NonPlayerCharacterService;
+using MGME.Core.Services.AdventureService;
 using MGME.Core.Utils.Sorters;
 
 namespace MGME.Core
@@ -37,6 +38,12 @@ namespace MGME.Core
             services.AddScoped<PlayerCharacterSorter>();
 
             services.AddScoped<INonPlayerCharacterService, NonPlayerCharacterService>();
+
+            services.AddScoped<NonPlayerCharacterSorter>();
+
+            services.AddScoped<IAdventureService, AdventureService>();
+
+            services.AddScoped<AdventureSorter>();
         }
     }
 }

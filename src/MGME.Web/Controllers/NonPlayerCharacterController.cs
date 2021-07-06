@@ -33,10 +33,10 @@ namespace MGME.Web.Controllers
                 (int)NonPlayerCharacterFilter.AVAILABLE_FOR_PLAYER_CHARACTERS
             ),
             FromQuery
-            ] int filter, int? page)
+            ] int filter, string sorting, int? page)
         {
             PaginatedDataServiceResponse<IEnumerable<GetNonPlayerCharacterListDTO>> response = await _nonPlayerCharacterService.GetAllNonPlayerCharacters(
-                filter, page
+                filter, sorting ?? "name", page
             );
 
             if (response.Success)
@@ -87,9 +87,11 @@ namespace MGME.Web.Controllers
         }
 
         [HttpDelete("Delete")]
-        public async Task <IActionResult> DeleteNonPlayerCharacter([BindRequired, FromQuery] int id)
+        public async Task <IActionResult> DeleteNonPlayerCharacter(EntitiesToDelete nonPlayerCharactersToDelete)
         {
-            BaseServiceResponse response = await _nonPlayerCharacterService.DeleteNonPlayerCharacter(id);
+            BaseServiceResponse response = await _nonPlayerCharacterService.DeleteNonPlayerCharacter(
+                nonPlayerCharactersToDelete.Ids
+            );
 
             if (response.Success)
             {
