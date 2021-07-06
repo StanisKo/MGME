@@ -9,11 +9,12 @@ using Microsoft.EntityFrameworkCore;
 using MGME.Core.DTOs;
 using MGME.Core.Entities;
 using MGME.Core.Constants;
+using MGME.Core.Utils;
 using MGME.Core.Interfaces.Repositories;
 
 namespace MGME.Infra.Data.Repositories
 {
-    public class EntityRepository<TEntity> : IEntityRepository<TEntity> where TEntity: BaseEntity
+    public class EntityRepository<TEntity> : IEntityRepository<TEntity> where TEntity: BaseEntity, new()
     {
         private readonly ApplicationDbContext _database;
 
@@ -22,25 +23,33 @@ namespace MGME.Infra.Data.Repositories
             _database = database;
         }
 
-        public async Task <TEntity> GetEntityAsync(
-            int? id = null,
-            bool tracking = false,
-            Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>>[] entitiesToInclude = null)
+        public async Task <TEntity> GetEntityAsync(int? id = null,
+                                                   bool tracking = false,
+                                                   bool splitQuery = false,
+                                                   Expression<Func<TEntity, bool>> predicate = null,
+                                                   IEnumerable<string> include = null)
         {
             IQueryable<TEntity> query = _database.Set<TEntity>();
 
+            // Don't track unless explicitly specified
             if (!tracking)
             {
                 query = query.AsNoTracking();
             }
 
-            if (entitiesToInclude != null)
+            // Join requested entities
+            if (include != null)
             {
-                foreach (Expression<Func<TEntity, object>> entityToInclude in entitiesToInclude)
+                for (int i = 0; i < include.Count(); i++)
                 {
-                    query = query.Include(entityToInclude);
+                    query = query.Include(include.ElementAt(i));
                 }
+            }
+
+            // Split query if explicitly requested
+            if (splitQuery)
+            {
+                query = query.AsSplitQuery();
             }
 
             // If we query only on primary key
@@ -52,60 +61,57 @@ namespace MGME.Infra.Data.Repositories
             // If we query on primary key and also want to filter
             if (predicate != null && id != null)
             {
-                query = query.Where(predicate);
-
-                return await query.SingleOrDefaultAsync(entity => entity.Id == id);
+                return await query
+                    .Where(predicate)
+                        .SingleOrDefaultAsync(entity => entity.Id == id);
             }
 
             // If we query only on filter avoiding primary key
             return await query.FirstOrDefaultAsync(predicate);
         }
 
-        public async Task <TEntityDTO> GetEntityAsync<TEntityDTO>(
-            int? id = null,
-            bool tracking = false,
-            Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>>[] entitiesToInclude = null,
-            Expression<Func<TEntity, TEntityDTO>> columnsToSelect = null) where TEntityDTO : BaseEntityDTO
+        public async Task <TEntityDTO> GetEntityAsync<TEntityDTO>(int? id = null,
+                                                                  Expression<Func<TEntity, bool>> predicate = null,
+                                                                  IEnumerable<string> include = null,
+                                                                  Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO : BaseEntityDTO
         {
-            IQueryable<TEntity> query = _database.Set<TEntity>();
+            IQueryable<TEntity> query = _database.Set<TEntity>().AsNoTracking();
 
-            if (!tracking)
+            if (include != null)
             {
-                query = query.AsNoTracking();
-            }
-
-            if (entitiesToInclude != null)
-            {
-                foreach (Expression<Func<TEntity, object>> entityToInclude in entitiesToInclude)
+                for (int i = 0; i < include.Count(); i++)
                 {
-                    query = query.Include(entityToInclude);
+                    query = query.Include(include.ElementAt(i));
                 }
             }
 
-            // If we query only on primary key and want related entities
+            // If we query only on primary key
             if (predicate == null && id != null)
             {
-                return await query.Select(columnsToSelect).SingleOrDefaultAsync(entity => entity.Id == id);
+                return await query
+                    .Select(select)
+                        .SingleOrDefaultAsync(entity => entity.Id == id);
             }
 
-            // If we query on primary key, want related entities, and also want to filter
+            // If we query on primary key and also want to filter
             if (predicate != null && id != null)
             {
-                query = query.Where(predicate);
-
-                return await query.Select(columnsToSelect).SingleOrDefaultAsync(entity => entity.Id == id);
+                return await query
+                    .Where(predicate)
+                        .Select(select)
+                            .SingleOrDefaultAsync(entity => entity.Id == id);
             }
 
-            // If we query only on filter avoiding primary key, but still want related entities
-            return await query.Where(predicate).Select(columnsToSelect).FirstOrDefaultAsync();
+            // If we query only on filter avoiding primary key
+            return await query.Where(predicate).Select(select).FirstOrDefaultAsync();
         }
 
-        public async Task<List<TEntity>> GetEntititesAsync(
-            bool tracking = false,
-            Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>>[] entitiesToInclude = null,
-            Tuple<Expression<Func<TEntity, object>>[], int> fieldsToOrderBy = null)
+
+        public async Task<List<TEntity>> GetEntititesAsync(bool tracking = false,
+                                                           Expression<Func<TEntity, bool>> predicate = null,
+                                                           IEnumerable<string> include = null,
+                                                           Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
+                                                           int? page = null)
         {
             IQueryable<TEntity> query = _database.Set<TEntity>();
 
@@ -114,11 +120,11 @@ namespace MGME.Infra.Data.Repositories
                 query = query.AsNoTracking();
             }
 
-            if (entitiesToInclude != null)
+            if (include != null)
             {
-                foreach (Expression<Func<TEntity, object>> entityToInclude in entitiesToInclude)
+                for (int i = 0; i < include.Count(); i++)
                 {
-                    query = query.Include(entityToInclude);
+                    query = query.Include(include.ElementAt(i));
                 }
             }
 
@@ -127,44 +133,49 @@ namespace MGME.Infra.Data.Repositories
                 query = query.Where(predicate);
             }
 
-            if (fieldsToOrderBy != null)
+            if (orderBy != null)
             {
-                (Expression<Func<TEntity, object>>[] fields, int order) = fieldsToOrderBy;
+                // Parse priority of sorting and order direction
+                (IEnumerable<Expression<Func<TEntity, object>>> fields, SortOrder order) = orderBy;
 
-                query = order == (int)SortOrder.ASCENDING
+                // Order by first field in priority
+                query = order == SortOrder.ASCENDING
                     ? query.OrderBy(fields.First())
-                    : query.OrderByDescending(fields.First());
+                        : query.OrderByDescending(fields.First());
 
-                foreach (Expression<Func<TEntity, object>> field in fields.Skip(1))
+                // Order by other fields in the same direction as the first
+                for (int i = 0; i < fields.Skip(1).Count(); i++)
                 {
                     query = order == (int)SortOrder.ASCENDING
-                        ? (query as IOrderedQueryable<TEntity>).ThenBy(field)
-                        : (query as IOrderedQueryable<TEntity>).ThenByDescending(field);
+                        ? (query as IOrderedQueryable<TEntity>).ThenBy(fields.ElementAt(i))
+                            : (query as IOrderedQueryable<TEntity>).ThenByDescending(fields.ElementAt(i));
                 }
+            }
+
+            // Paginate
+            if (page != null)
+            {
+                query = query
+                    .Skip(((int)page - 1) * DataAccessHelpers.PAGINATE_BY)
+                        .Take(DataAccessHelpers.PAGINATE_BY);
             }
 
             return await query.ToListAsync();
         }
 
-        public async Task <List<TEntityDTO>> GetEntititesAsync<TEntityDTO>(
-            bool tracking = false,
-            Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>>[] entitiesToInclude = null,
-            Tuple<Expression<Func<TEntity, object>>[], int> fieldsToOrderBy = null,
-            Expression<Func<TEntity, TEntityDTO>> columnsToSelect = null) where TEntityDTO: BaseEntityDTO
+        public async Task <List<TEntityDTO>> GetEntititesAsync<TEntityDTO>(Expression<Func<TEntity, bool>> predicate = null,
+                                                                           IEnumerable<string> include = null,
+                                                                           Tuple<IEnumerable<Expression<Func<TEntity, object>>>, SortOrder> orderBy = null,
+                                                                           int? page = null,
+                                                                           Expression<Func<TEntity, TEntityDTO>> select = null) where TEntityDTO: BaseEntityDTO
         {
             IQueryable<TEntity> query = _database.Set<TEntity>();
 
-            if (!tracking)
+            if (include != null)
             {
-                query = query.AsNoTracking();
-            }
-
-            if (entitiesToInclude != null)
-            {
-                foreach (Expression<Func<TEntity, object>> entityToInclude in entitiesToInclude)
+                for (int i = 0; i < include.Count(); i++)
                 {
-                    query = query.Include(entityToInclude);
+                    query = query.Include(include.ElementAt(i));
                 }
             }
 
@@ -173,24 +184,32 @@ namespace MGME.Infra.Data.Repositories
                 query = query.Where(predicate);
             }
 
-            if (fieldsToOrderBy != null)
+            if (orderBy != null)
             {
-                (Expression<Func<TEntity, object>>[] fields, int order) = fieldsToOrderBy;
+                (IEnumerable<Expression<Func<TEntity, object>>> fields, SortOrder order) = orderBy;
 
-                query = order == (int)SortOrder.ASCENDING
+                query = order == SortOrder.ASCENDING
                     ? query.OrderBy(fields.First())
-                    : query.OrderByDescending(fields.First());
+                        : query.OrderByDescending(fields.First());
 
-                foreach (Expression<Func<TEntity, object>> field in fields.Skip(1))
+                for (int i = 0; i < fields.Skip(1).Count(); i++)
                 {
                     query = order == (int)SortOrder.ASCENDING
-                        ? (query as IOrderedQueryable<TEntity>).ThenBy(field)
-                        : (query as IOrderedQueryable<TEntity>).ThenByDescending(field);
+                        ? (query as IOrderedQueryable<TEntity>).ThenBy(fields.ElementAt(i))
+                            : (query as IOrderedQueryable<TEntity>).ThenByDescending(fields.ElementAt(i));
                 }
             }
 
-            return await query.Select(columnsToSelect).ToListAsync();
+            if (page != null)
+            {
+                query = query
+                    .Skip(((int)page - 1) * DataAccessHelpers.PAGINATE_BY)
+                        .Take(DataAccessHelpers.PAGINATE_BY);
+            }
+
+            return await query.Select(select).ToListAsync();
         }
+
 
         public async Task AddEntityAsync(TEntity entity)
         {
@@ -199,43 +218,57 @@ namespace MGME.Infra.Data.Repositories
             await _database.SaveChangesAsync();
         }
 
+
         public async Task UpdateEntityAsync(TEntity entity, IEnumerable<string> updatedProperties)
         {
+            // Don't change anything on the entity
             _database.Entry(entity).State = EntityState.Unchanged;
 
-            foreach (string property in updatedProperties)
+            // But the provided fields
+            for (int i = 0; i < updatedProperties.Count(); i++)
             {
-                _database.Entry(entity).Property(property).IsModified = true;
+                _database
+                    .Entry(entity)
+                        .Property(updatedProperties.ElementAt(i)).IsModified = true;
             }
 
             await _database.SaveChangesAsync();
         }
 
-        public async Task UpdateEntitiesAsync(List<TEntity> entities, IEnumerable<string> updatedProperties)
-        {
-            entities.ForEach(entity =>
-            {
-                _database.Set<TEntity>().Attach(entity);
 
-                foreach (string property in updatedProperties)
-                {
-                    _database.Entry(entity).Property(property).IsModified = true;
-                }
-            });
+        public async Task LinkEntitiesAsync(IEnumerable<TEntity> entities, string linkingProperty)
+        {
+            // No changes to the entities we're linking
+            for (int i = 0; i < entities.Count(); i++)
+            {
+                _database.Set<TEntity>().Attach(entities.ElementAt(i));
+
+                // Only change the linking property
+                _database
+                    .Entry(entities.ElementAt(i))
+                        .Property(linkingProperty).IsModified = true;
+            }
 
             await _database.SaveChangesAsync();
         }
 
-        public async Task LinkEntityAsync(TEntity entity, BaseEntity linkedEntity, string linkedCollection)
+        public async Task LinkEntitiesAsync(IEnumerable<TEntity> entities, BaseEntity linkedEntity, string linkingCollection)
         {
-            _database.Entry(entity).State = EntityState.Unchanged;
+            // No changes to entities we're linking
+            for (int i = 0; i < entities.Count(); i++)
+            {
+                _database.Entry(entities.ElementAt(i)).State = EntityState.Unchanged;
+            }
 
+            // No changes to the linked entity
             _database.Entry(linkedEntity).State = EntityState.Unchanged;
 
-            _database.Entry(entity).Collection(linkedCollection).IsModified = true;
+            // Only change the collection on the linked entity (and thus write to mapping table)
+            _database.Entry(linkedEntity).Collection(linkingCollection).IsModified = true;
 
             await _database.SaveChangesAsync();
         }
+
 
         public async Task DeleteEntityAsync(TEntity entity)
         {
@@ -244,11 +277,29 @@ namespace MGME.Infra.Data.Repositories
             await _database.SaveChangesAsync();
         }
 
-        public async Task DeleteEntitiesAsync(List<TEntity> entities)
+        public async Task DeleteEntitiesAsync(IEnumerable<int> ids)
         {
+            /*
+            Initialize a collection of entities we want to remove
+            in order to avoid querying for objects we want to remove
+            */
+            IEnumerable<TEntity> entities = ids.Select(id => new TEntity { Id = id });
+
             _database.Set<TEntity>().RemoveRange(entities);
 
             await _database.SaveChangesAsync();
+        }
+
+        public async Task <bool> CheckIfEntityExistsAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _database.Set<TEntity>().AnyAsync(
+                predicate
+            );
+        }
+
+        public async Task <int> GetEntitiesCountAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _database.Set<TEntity>().Where(predicate).CountAsync();
         }
     }
 }

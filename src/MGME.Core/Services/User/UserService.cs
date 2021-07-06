@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
@@ -43,7 +42,7 @@ namespace MGME.Core.Services.UserService
             {
                 GetOrUpdateUserDTO user = await _repository.GetEntityAsync(
                     id: userId,
-                    columnsToSelect: user => new GetOrUpdateUserDTO()
+                    select: user => new GetOrUpdateUserDTO()
                     {
                         Id = user.Id,
                         Name = user.Name,
@@ -61,7 +60,6 @@ namespace MGME.Core.Services.UserService
 
                 response.Data = user;
                 response.Success = true;
-
             }
             catch (Exception exception)
             {
@@ -82,7 +80,7 @@ namespace MGME.Core.Services.UserService
             {
                 GetOrUpdateUserDTO userToUpdate = await _repository.GetEntityAsync(
                     id: userId,
-                    columnsToSelect: user => new GetOrUpdateUserDTO()
+                    select: user => new GetOrUpdateUserDTO()
                     {
                         Id = user.Id,
                         Name = user.Name,
@@ -98,47 +96,18 @@ namespace MGME.Core.Services.UserService
                     return response;
                 }
 
-                /*
-                Here we use reflections, to loop through updated properties
-                and assign their values to the object queried from the database
-
-                If the property is missing from request
-                (we know that since possible fields are nullable and after serialization will be null)
-                we simply skip the update, effectively updating only provided fields
-                */
-                Type typeOfUser = userToUpdate.GetType();
-
-                PropertyInfo[] updatedProperties = updatedUser.GetType().GetProperties();
-
-                // Is used later to let context know which properties to update
-                List<string> propertiesToUpdate = new List<string>();
-
-                foreach (PropertyInfo updatedProperty in updatedProperties)
-                {
-                    if (updatedProperty.GetValue(updatedUser) == null || updatedProperty.Name == "Id")
-                    {
-                        continue;
-                    }
-
-                    PropertyInfo propertyToUpdate = typeOfUser.GetProperty(updatedProperty.Name);
-
-                    propertyToUpdate.SetValue(
-                        userToUpdate,
-                        updatedProperty.GetValue(updatedUser)
-                    );
-
-                    propertiesToUpdate.Add(updatedProperty.Name);
-                }
+                (GetOrUpdateUserDTO userWithUpdates, List<string> propertiesToUpdate) = UpdateVariableNumberOfFields<GetOrUpdateUserDTO>(
+                    userToUpdate,
+                    updatedUser
+                );
 
                 await _repository.UpdateEntityAsync(
-                    _mapper.Map<User>(userToUpdate),
+                    _mapper.Map<User>(userWithUpdates),
                     propertiesToUpdate
                 );
 
                 response.Success = true;
                 response.Message = $"User was successfully updated";
-
-                return response;
             }
             catch (Exception exception)
             {
@@ -159,7 +128,7 @@ namespace MGME.Core.Services.UserService
             {
                 UserPasswordDTO userToChangePassword = await _repository.GetEntityAsync(
                     id: userId,
-                    columnsToSelect: user => new UserPasswordDTO()
+                    select: user => new UserPasswordDTO()
                     {
                         Id = user.Id,
                         PasswordHash = user.PasswordHash,
@@ -237,8 +206,6 @@ namespace MGME.Core.Services.UserService
 
                 response.Success = true;
                 response.Message = $"{userToDelete.Name} was successfully deleted";
-
-                return response;
             }
             catch (Exception exception)
             {

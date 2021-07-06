@@ -20,10 +20,18 @@ namespace MGME.Core.Entities
         [Required]
         public byte[] PasswordSalt { get; set; }
 
+        [Required]
         public bool EmailIsConfirmed { get; set; }
 
+        [Required]
         public string Role { get; set; }
 
         public ICollection<RefreshToken> RefreshTokens { get; set; }
+
+        public ICollection<PlayerCharacter> PlayerCharacters { get; set; }
+
+        public ICollection<Adventure> Adventures { get; set; }
+
+        public ICollection<NonPlayerCharacter> NonPlayerCharacters { get; set; }
     }
 }

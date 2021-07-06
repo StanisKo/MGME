@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Claims;
-using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.IdentityModel.Tokens.Jwt;
@@ -203,11 +202,11 @@ namespace MGME.Core.Services.AuthService
             {
                 UserRefreshTokenDTO tokenOwner = await _userRepository.GetEntityAsync(
                     predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
-                    entitiesToInclude: new Expression<Func<User, object>>[]
+                    include: new[]
                     {
-                        user => user.RefreshTokens
+                        "RefreshTokens"
                     },
-                    columnsToSelect: user => new UserRefreshTokenDTO()
+                    select: user => new UserRefreshTokenDTO()
                     {
                         Id = user.Id,
                         RefreshTokens = user.RefreshTokens
@@ -229,9 +228,6 @@ namespace MGME.Core.Services.AuthService
                 await _tokenRepository.DeleteEntityAsync(oldRefreshToken);
 
                 response.Success = true;
-
-                return response;
-
             }
             catch (Exception exception)
             {
@@ -251,10 +247,7 @@ namespace MGME.Core.Services.AuthService
                 // We query for user and not DTO, since we need additional values for JWT claims
                 User tokenOwner = await _userRepository.GetEntityAsync(
                     predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
-                    entitiesToInclude: new Expression<Func<User, object>>[]
-                    {
-                        user => user.RefreshTokens
-                    }
+                    include: new[] { "RefreshTokens" }
                 );
 
                 if (tokenOwner == null)
@@ -362,7 +355,7 @@ namespace MGME.Core.Services.AuthService
                 // Besides id, we only need one field ...
                 ConfirmUserEmailDTO userToConfirmEmail = await _userRepository.GetEntityAsync(
                     id: userId,
-                    columnsToSelect: user => new ConfirmUserEmailDTO()
+                    select: user => new ConfirmUserEmailDTO()
                     {
                         Id = user.Id,
                         EmailIsConfirmed = user.EmailIsConfirmed
@@ -432,8 +425,6 @@ namespace MGME.Core.Services.AuthService
 
                 response.Success = false;
                 response.Message = "Your confirmation link has expired. We've sent you another email";
-
-                return response;
             }
             catch (Exception exception)
             {
