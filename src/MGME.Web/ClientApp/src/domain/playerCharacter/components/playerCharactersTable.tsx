@@ -304,7 +304,8 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
 
                                 <TableCell align="right">
                                     {playerCharacter.adventure?.title
-                                        ?? `${playerCharacter.adventureCount} adventures`}
+                                        ?? `${playerCharacter.adventureCount > 1
+                                            ? `${playerCharacter.adventureCount}` : 'No'} Adventures`}
                                 </TableCell>
 
                                 <TableCell align="right">
