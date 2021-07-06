@@ -58,8 +58,6 @@ const headCells: HeadCell[] = [
 export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): ReactElement => {
     const dispatch = useDispatch();
 
-    console.log(mode);
-
     const isAuthorized: boolean = useSelector(
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
     );
@@ -75,7 +73,9 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
     const [page, setPage] = useState(0);
     const [order, setOrder] = useState<SortOrder>('asc');
     const [orderBy, setOrderBy] = useState<string>('name');
-    const [selected, setSelected] = useState<number[]>([]);
+
+    const [singleSelected, setSingleSelected] = useState<number>(0);
+    const [multipleSelected, setMultipleSelected] = useState<number[]>([]);
 
     /*
     We dispatch values to store in separate handlers and not on hook, to avoid unnecessary
@@ -92,7 +92,7 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
             newSelected = [];
         }
 
-        setSelected(newSelected);
+        setMultipleSelected(newSelected);
 
         dispatch<UpdateStore<{ selected: number[] }>>(
             {
@@ -107,27 +107,44 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
     };
 
     const handleSelect = (selectedId: number) => (event: MouseEvent<unknown>): void => {
-        let newSelected: number[] = [];
+        if (mode === PLAYER_CHARACTER_TABLE_DISPLAY_MODE.TO_SHOW) {
+            let newSelected: number[] = [];
 
-        if (selected.includes(selectedId)) {
-            newSelected = selected.filter((id: number) => id !== selectedId);
-        }
-        else {
-            newSelected = [...selected, selectedId];
-        }
-
-        setSelected(newSelected);
-
-        dispatch<UpdateStore<{ selected: number[] }>>(
-            {
-                type: 'UPDATE_STORE',
-                reducer: 'catalogues',
-                key: 'playerCharacters',
-                payload: {
-                    selected: newSelected
-                }
+            if (multipleSelected.includes(selectedId)) {
+                newSelected = multipleSelected.filter((id: number) => id !== selectedId);
             }
-        );
+            else {
+                newSelected = [...multipleSelected, selectedId];
+            }
+
+            setMultipleSelected(newSelected);
+
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'playerCharacters',
+                    payload: {
+                        selected: newSelected
+                    }
+                }
+            );
+        }
+        else
+        {
+            setSingleSelected(selectedId);
+
+            dispatch<UpdateStore<{ selected: number }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'playerCharacters',
+                    payload: {
+                        selected: selectedId
+                    }
+                }
+            );
+        }
     };
 
     const handleSorting = (newSortingParam: string) => (event: MouseEvent<unknown>): void => {
@@ -166,19 +183,36 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
 
     // Default current state every time new dataset comes in, keep it simple
     useEffect(() => {
-        if (playerCharacters && selected.length > 0) {
-            setSelected([]);
+        if (playerCharacters) {
 
-            dispatch<UpdateStore<{ selected: number[] }>>(
-                {
-                    type: 'UPDATE_STORE',
-                    reducer: 'catalogues',
-                    key: 'playerCharacters',
-                    payload: {
-                        selected: []
+            if (multipleSelected.length > 0) {
+                setMultipleSelected([]);
+
+                dispatch<UpdateStore<{ selected: number[] }>>(
+                    {
+                        type: 'UPDATE_STORE',
+                        reducer: 'catalogues',
+                        key: 'playerCharacters',
+                        payload: {
+                            selected: []
+                        }
                     }
-                }
-            );
+                );
+            }
+            else if (singleSelected > 0) {
+                setSingleSelected(0);
+
+                dispatch<UpdateStore<{ selected: number }>>(
+                    {
+                        type: 'UPDATE_STORE',
+                        reducer: 'catalogues',
+                        key: 'playerCharacters',
+                        payload: {
+                            selected: 0
+                        }
+                    }
+                );
+            }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playerCharacters]);
@@ -191,11 +225,16 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
                 <TableHead>
                     <TableRow>
                         <TableCell padding="checkbox">
-                            <Checkbox
-                                checked={selected.length === playerCharacters.length}
-                                indeterminate={selected.length > 0 && selected.length < playerCharacters.length}
-                                onChange={handleSelectAll}
-                            />
+                            {mode === PLAYER_CHARACTER_TABLE_DISPLAY_MODE.TO_SHOW && (
+                                <Checkbox
+                                    checked={multipleSelected.length === playerCharacters.length}
+                                    indeterminate={
+                                        multipleSelected.length > 0
+                                            && multipleSelected.length < playerCharacters.length
+                                    }
+                                    onChange={handleSelectAll}
+                                />
+                            )}
                         </TableCell>
                         {headCells.map((headCell) => (
                             <TableCell
@@ -222,7 +261,11 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
                 </TableHead>
                 <TableBody>
                     {playerCharacters.map((playerCharacter, index) => {
-                        const isItemSelected = isSelected(playerCharacter.id, selected);
+
+                        const isItemSelected = mode === PLAYER_CHARACTER_TABLE_DISPLAY_MODE.TO_SHOW
+                            ? isSelected(playerCharacter.id, multipleSelected)
+                            : singleSelected === playerCharacter.id;
+
                         const labelId = `playerCharacter-table-checkbox-${index}`;
 
                         return (
