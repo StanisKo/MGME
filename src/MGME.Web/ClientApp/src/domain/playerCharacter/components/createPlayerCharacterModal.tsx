@@ -254,6 +254,7 @@ export const CreatePlayerCharacterModal = ({
             ]
         );
 
+        // Clean up
         setNonPlayerCharacterName('');
 
         if (nonPlayerCharacterDescription) {
@@ -278,16 +279,14 @@ export const CreatePlayerCharacterModal = ({
             setDisplayedAvailableNonPlayerCharacters(
                 [
                     ...displayedAvailableNonPlayerCharacters as AvailableNonPlayerCharacter[],
-                    // We know it's there
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    availableNonPlayerCharacterToAddBack!
+                    availableNonPlayerCharacterToAddBack
                 ]
             );
 
             return;
         }
 
-        // Otherwise it is freshly created NPC -- remove it
+        // Otherwise it is freshly created NPC -- remove it from what we send
         setNewNonPlayerCharactersToAdd(
             newNonPlayerCharactersToAdd.filter(
                 nonPlayerCharacter => nonPlayerCharacter.name !== name
@@ -296,12 +295,12 @@ export const CreatePlayerCharacterModal = ({
     };
 
     const handleAddingExistingNonPlayerCharacter = (id: number, name: string) => (): void => {
-        // Add id that is sent to the server
+        // Set what we send
         setExistingNonPlayerCharactersToAdd(
             [...existingNonPlayerCharactersToAdd, id]
         );
 
-        // Add name that is displayed in ui
+        // Set what we show
         setDisplayedNonPlayerCharactersToAdd(
             [
                 ...displayedNonPlayerCharactersToAdd,
