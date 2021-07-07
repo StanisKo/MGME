@@ -30,11 +30,9 @@ type AddToPlayerCharacterParams = {
 export const fetchPlayerCharacters = async (page?: number, sorting?: string): Promise<void> => {
     const params: ReadFromApi['params'] = {};
 
-    /*
-    Since API supports nullable page param to return non-paginated response
-    We hardcode the page if none is provided
-    */
-    params['page'] = page ?? 1;
+    if (page) {
+        params['page'] = page;
+    }
 
     if (sorting) {
         params['sorting'] = sorting;

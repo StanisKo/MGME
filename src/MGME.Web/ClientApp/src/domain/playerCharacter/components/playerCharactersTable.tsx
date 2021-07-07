@@ -164,7 +164,11 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
     useEffect(() => {
         (async (): Promise<void> => {
             if (isAuthorized && playerCharacters === null) {
-                await fetchPlayerCharacters();
+                /*
+                Since API supports nullable page param to return non-paginated response
+                We explicitly provide page argument
+                */
+                await fetchPlayerCharacters(1);
             }
         })();
     }, [isAuthorized, playerCharacters]);
