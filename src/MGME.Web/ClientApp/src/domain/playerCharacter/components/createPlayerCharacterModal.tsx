@@ -98,6 +98,7 @@ export const CreatePlayerCharacterModal = ({
 
     const [threadDescription, setThreadDescription] = useState<string>('');
 
+    // Collection of threads to add to new character
     const [threadsToAdd, setThreadsToAdd] = useState<NewEntityToAdd[]>([]);
 
     const [nonPlayerCharacterName, setNonPlayerCharacterName] = useState<string>('');
@@ -106,11 +107,14 @@ export const CreatePlayerCharacterModal = ({
 
     const [nonPlayerCharacterDescription, setNonPlayerCharacterDescription] = useState<string>('');
 
+    // A collection of newly created npcs that we actually send to the API
     const [newNonPlayerCharactersToAdd, setNewNonPlayerCharactersToAdd] = useState<NewEntityToAdd[]>([]);
 
+    // A pool of newly created and existing npcs that are displayed to the user
     const [displayedNonPlayerCharactersToAdd, setDisplayedNonPlayerCharactersToAdd] =
         useState<NewEntityToAdd[]>([]);
 
+    // A collection of existing npcs' ids that we actually send to the API
     const [existingNonPlayerCharactersToAdd, setExistingNonPlayerCharactersToAdd] = useState<number[]>([]);
 
     // Variables that take part in validation
