@@ -73,8 +73,16 @@ export const CreatePlayerCharacterModal = ({
         (state: ApplicationState) => state.catalogues?.playerCharacters?.data ?? null
     );
 
+    /*
+    Original collection of npcs that are available for adding. Acts as a source of truth
+    from which characters can be added back to what we display
+    */
     const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
 
+    /*
+    A replica of original npc collection that is modified via ui interaction:
+    via it we show what we add or remove to/from the list avialable npcs
+    */
     const [displayedAvailableNonPlayerCharacters, setDisplayedAvailableNonPlayerCharacters]
         = useState<AvailableNonPlayerCharacter[]>();
 
