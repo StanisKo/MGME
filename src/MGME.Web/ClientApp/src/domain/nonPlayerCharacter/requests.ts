@@ -6,6 +6,12 @@ import { PaginatedDataServiceResponse, BaseServiceResponse, ReadFromApi } from '
 
 import { URLBuilder, DataController } from '../../shared/utils';
 
+type CreateNonPlayerCharacterParams = {
+    name: string;
+    description: string;
+    playerCharacter: number;
+}
+
 export const fetchNonPlayerCharacters = async (page?: number, sorting?: string): Promise<void> => {
     const params: ReadFromApi['params'] = {};
 
@@ -53,6 +59,19 @@ export const deleteNonPlayerCharacters = async (ids: number[]): Promise<BaseServ
             url: URLBuilder.WriteTo('nonplayercharacter', 'delete'),
             method: 'DELETE',
             body: { ids: ids },
+            page: 'catalogues',
+            keys: ['nonPlayerCharacters']
+        }
+    );
+};
+
+export const createNonPlayerCharacter = async (
+    params: CreateNonPlayerCharacterParams): Promise<BaseServiceResponse> => {
+    return await DataController.UpdateAndRefetch(
+        {
+            url: URLBuilder.WriteTo('nonplayercharacter', 'add'),
+            method: 'POST',
+            body: params,
             page: 'catalogues',
             keys: ['nonPlayerCharacters']
         }
