@@ -43,7 +43,7 @@ namespace MGME.Core.Services.PlayerCharacterService
             _sorter = sorter;
         }
 
-        public async Task <PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters(string sortingParameter, int selectedPage)
+        public async Task <PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters(string sortingParameter, int? selectedPage)
         {
             PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = new PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>();
 
@@ -51,21 +51,30 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             try
             {
-                int numberOfResults = await _playerCharacterRepository.GetEntitiesCountAsync(
-                    playerCharacter => playerCharacter.UserId == userId
-                );
+
+                int? numberOfResults = null;
+
+                if (selectedPage != null)
+                {
+                    numberOfResults = await _playerCharacterRepository.GetEntitiesCountAsync(
+                        playerCharacter => playerCharacter.UserId == userId
+                    );
+                }
 
                 IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await QueryPlayerCharacters(
+                    new Ref<int>(userId),
                     new Ref<string>(sortingParameter),
-                    new Ref<int>(selectedPage),
-                    new Ref<int>(userId)
+                    selectedPage != null ? new Ref<int>((int)selectedPage) : null
                 );
 
                 response.Data = playerCharacters;
 
-                response.Pagination.Page = selectedPage;
-                response.Pagination.NumberOfResults = numberOfResults;
-                response.Pagination.NumberOfPages = DataAccessHelpers.GetNumberOfPages(numberOfResults);
+                if (selectedPage != null)
+                {
+                    response.Pagination.Page = selectedPage;
+                    response.Pagination.NumberOfResults = numberOfResults;
+                    response.Pagination.NumberOfPages = DataAccessHelpers.GetNumberOfPages((int)numberOfResults);
+                }
 
                 response.Success = true;
             }
@@ -453,7 +462,7 @@ namespace MGME.Core.Services.PlayerCharacterService
             return response;
         }
 
-        private async Task <IEnumerable<GetPlayerCharacterListDTO>> QueryPlayerCharacters(Ref<string> sortingParameter, Ref<int> selectedPage, Ref<int> userId)
+        private async Task <IEnumerable<GetPlayerCharacterListDTO>> QueryPlayerCharacters(Ref<int> userId, Ref<string> sortingParameter, Ref<int> selectedPage)
         {
             IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
                 predicate: playerCharacter => playerCharacter.UserId == userId.Value,
@@ -502,7 +511,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                     NonPlayerCharacterCount = playerCharacter.NonPlayerCharacters.Count
                 },
                 orderBy: _sorter.DetermineSorting(sortingParameter.Value),
-                page: selectedPage.Value
+                page: selectedPage?.Value ?? null
             );
 
             return playerCharacters;

@@ -8,7 +8,7 @@ namespace MGME.Core.Interfaces.Services
 {
     public interface IPlayerCharacterService
     {
-        Task <PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters(string sorting, int page);
+        Task <PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters(string sortingParameter, int? selectedPage);
 
         Task <DataServiceResponse<GetPlayerCharacterDetailDTO>> GetPlayerCharacter(int id);
 
