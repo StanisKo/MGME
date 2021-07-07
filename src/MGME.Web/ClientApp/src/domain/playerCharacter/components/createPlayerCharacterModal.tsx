@@ -65,6 +65,10 @@ interface Props {
 export const CreatePlayerCharacterModal = ({
     handleDialogClose, classes, setResponse, setOpenSnackBar }: Props): ReactElement => {
 
+    /*
+    Used exclusively to extract names and deny ui interaction
+    if name of a new character already exists
+    */
     const playerCharacters: PlayerCharacter[] | null = useSelector(
         (state: ApplicationState) => state.catalogues?.playerCharacters?.data ?? null
     );
@@ -121,7 +125,7 @@ export const CreatePlayerCharacterModal = ({
                 }
 
                 // This doesn't cover character names outside of what is currently displayed on the page
-                if (playerCharacterNames?.includes(value.trim())) {
+                if (playerCharacterNames?.includes(value.trim().toLowerCase())) {
                     setNameError(true);
                     setNameHelperText('Character with such name already exists');
 
@@ -178,7 +182,7 @@ export const CreatePlayerCharacterModal = ({
                 (If such name is already taked by unavailable npc, api will return 400)
                 */
                 const nonPlayerCharacterAlreadyExists = nonPlayerCharacterNames.includes(
-                    value.trim()
+                    value.trim().toLowerCase()
                 );
 
                 if (nonPlayerCharacterAlreadyExists) {
