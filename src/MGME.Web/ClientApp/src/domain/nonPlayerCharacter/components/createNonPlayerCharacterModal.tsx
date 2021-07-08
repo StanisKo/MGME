@@ -134,7 +134,7 @@ export const CreateNonPlayerCharacterModal = ({
             {
                 name: name,
                 description: description,
-                playerCharacter: playerCharacterToAdd
+                ...(playerCharacterToAdd ? { playerCharacter: playerCharacterToAdd } : null)
             }
         );
 

@@ -9,7 +9,7 @@ import { URLBuilder, DataController } from '../../shared/utils';
 type CreateNonPlayerCharacterParams = {
     name: string;
     description: string;
-    playerCharacter: number;
+    playerCharacter?: number;
 }
 
 export const fetchNonPlayerCharacters = async (page?: number, sorting?: string): Promise<void> => {
