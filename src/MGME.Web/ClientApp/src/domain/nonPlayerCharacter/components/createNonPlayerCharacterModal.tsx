@@ -70,7 +70,7 @@ those are: id and name, we don't need joins here
 export const CreateNonPlayerCharacterModal = ({
     handleDialogClose, classes, setResponse, setOpenSnackBar }: Props): ReactElement => {
 
-    // Used explicitly for input validation
+    // Used exclusively for input validation
     const nonPlayerCharacters: NonPlayerCharacter[] | null = useSelector(
         (state: ApplicationState) => state.catalogues?.nonPlayerCharacters?.data ?? null
     );
@@ -86,6 +86,8 @@ export const CreateNonPlayerCharacterModal = ({
     const [nameHelperText, setNameHelperText] = useState<string>('');
 
     const [description, setDescription] = useState<string>('');
+
+    const [expanded, setExpanded] = useState<boolean>(false);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
@@ -127,6 +129,8 @@ export const CreateNonPlayerCharacterModal = ({
     const handleAddingPlayerCharacter = (id: number) => (): void => {
         // Set what we send
         setPlayerCharacterToAdd(id);
+
+        setExpanded(false);
     };
 
     const handleCreate = async (): Promise<void> => {
@@ -145,6 +149,10 @@ export const CreateNonPlayerCharacterModal = ({
         if (response.success) {
             handleDialogClose();
         }
+    };
+
+    const handleAccordionExpand = (): void => {
+        setExpanded(!expanded);
     };
 
     useEffect(() => {
@@ -210,11 +218,12 @@ export const CreateNonPlayerCharacterModal = ({
                         {/* Display selected Character here */}
                     </Grid>
 
-                    {/* Find a way to set the accordion expanded programmatically */}
                     <Grid item xs={12}>
                         {playerCharacters ? (
                             <Accordion
                                 disabled={playerCharacterToAdd !== 0}
+                                expanded={expanded}
+                                onChange={handleAccordionExpand}
                             >
                                 <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
