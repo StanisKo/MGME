@@ -1,11 +1,14 @@
-import { ReactElement, useState, ChangeEvent, Dispatch, SetStateAction } from 'react';
+import { ReactElement, useState, useEffect, ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useSelector } from 'react-redux';
 
 import { ApplicationState } from '../../../store';
 
 import { NonPlayerCharacter } from '../interfaces';
 
+import { createNonPlayerCharacter } from '../requests';
+
 import { PlayerCharacter } from '../../playerCharacter/interfaces';
+import { fetchAvailablePlayerCharacters } from '../../playerCharacter/requests';
 
 import { BaseServiceResponse } from '../../../shared/interfaces';
 import { INPUT_TYPE } from '../../../shared/const';
@@ -63,14 +66,12 @@ interface Props {
 export const CreateNonPlayerCharacterModal = ({
     handleDialogClose, classes, setResponse, setOpenSnackBar }: Props): ReactElement => {
 
-    const playerCharacters: PlayerCharacter[] | null = useSelector(
-        (state: ApplicationState) => state.catalogues?.playerCharacters?.data ?? null
-    );
-
     // Used explicitly for input validation
     const nonPlayerCharacters: NonPlayerCharacter[] | null = useSelector(
         (state: ApplicationState) => state.catalogues?.nonPlayerCharacters?.data ?? null
     );
+
+    const [playerCharacters, setPlayerCharacters] = useState<PlayerCharacter[]>([]);
 
     const [displayedPlayerCharacters, setDisplayedPlayerCharacters] = useState<PlayerCharacter[]>([]);
 
@@ -120,6 +121,41 @@ export const CreateNonPlayerCharacterModal = ({
                 break;
         }
     };
+
+    const handleCreate = async (): Promise<void> => {
+        const response = await createNonPlayerCharacter(
+            {
+                name: name,
+                description: description,
+                playerCharacter: playerCharacterToAdd
+            }
+        );
+
+        setResponse(response);
+
+        setOpenSnackBar(true);
+
+        if (response.success) {
+            handleDialogClose();
+        }
+    };
+
+    useEffect(() => {
+        (async (): Promise<void> => {
+            if (!playerCharacters) {
+                const availablePlayerCharacters = await fetchAvailablePlayerCharacters();
+
+                setPlayerCharacters(availablePlayerCharacters.data);
+
+                setDisplayedPlayerCharacters(availablePlayerCharacters.data);
+            }
+        })();
+    });
+
+    const allowedToCreate =
+        name
+        && !nameError
+        && playerCharacterToAdd !== 0;
 
     const { root } = useStyles();
 
@@ -202,10 +238,10 @@ export const CreateNonPlayerCharacterModal = ({
                     Cancel
                 </Button>
                 <Button
-                    // onClick={handleCreate}
+                    onClick={handleCreate}
                     variant="contained"
                     color="primary"
-                    // disabled={!allowedToCreate}
+                    disabled={!allowedToCreate}
                 >
                     Create
                 </Button>
