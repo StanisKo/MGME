@@ -77,7 +77,7 @@ export const CreateNonPlayerCharacterModal = ({
 
     const [nonPlayerCharacterNames, setNonPlayerCharacterNames] = useState<string[]>([]);
 
-    const [playerCharacters, setPlayerCharacters] = useState<PlayerCharacter[]>([]);
+    const [playerCharacters, setPlayerCharacters] = useState<PlayerCharacter[]>();
 
     const [playerCharacterToAdd, setPlayerCharacterToAdd] = useState<number>(0);
 
