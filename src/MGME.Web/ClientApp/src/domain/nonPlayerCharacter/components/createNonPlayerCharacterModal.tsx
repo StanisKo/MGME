@@ -215,10 +215,6 @@ export const CreateNonPlayerCharacterModal = ({
                     </Grid>
 
                     <Grid item xs={12}>
-                        {/* Display selected Character here */}
-                    </Grid>
-
-                    <Grid item xs={12}>
                         {playerCharacters ? (
                             <Accordion
                                 disabled={playerCharacterToAdd !== 0}
@@ -230,8 +226,15 @@ export const CreateNonPlayerCharacterModal = ({
                                     aria-controls="playerCharacters-content"
                                     id="playerCharacter-header"
                                 >
+                                    {/*
+                                    So, this: if user selects character, show character's name
+                                    as accordion title; otherwise show strings based on weather
+                                    available characters exist
+                                    */}
                                     <Typography>
-                                        {playerCharacters?.length
+                                        {playerCharacterToAdd > 0 ? playerCharacters?.find(
+                                            character => character.id === playerCharacterToAdd
+                                        )?.name : playerCharacters?.length
                                             ? 'Available Characters'
                                             : 'No available Characters'
                                         }
