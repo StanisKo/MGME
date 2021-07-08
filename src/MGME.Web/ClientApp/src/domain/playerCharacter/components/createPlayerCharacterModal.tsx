@@ -366,7 +366,9 @@ export const CreatePlayerCharacterModal = ({
     useEffect(() => {
         if (playerCharacters) {
             setPlayerCharacterNames(
-                playerCharacters?.map(playerCharacter => playerCharacter.name)
+                playerCharacters?.map(
+                    playerCharacter => playerCharacter.name.toLowerCase()
+                )
             );
         }
     }, [playerCharacters]);
@@ -390,7 +392,9 @@ export const CreatePlayerCharacterModal = ({
             );
 
             setNonPlayerCharacterNames(
-                Array.from(poolOfNamesToCheckAgainst)
+                Array.from(poolOfNamesToCheckAgainst).map(
+                    name => name.toLowerCase()
+                )
             );
         }
 

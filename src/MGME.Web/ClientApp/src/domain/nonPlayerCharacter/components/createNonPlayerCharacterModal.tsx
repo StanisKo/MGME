@@ -162,16 +162,11 @@ export const CreateNonPlayerCharacterModal = ({
         if (nonPlayerCharacters) {
             setNonPlayerCharacterNames(
                 nonPlayerCharacters.map(
-                    nonPlayerCharacter => nonPlayerCharacter.name
+                    nonPlayerCharacter => nonPlayerCharacter.name.toLowerCase()
                 )
             );
         }
     }, [nonPlayerCharacters]);
-
-    const allowedToCreate =
-        name
-        && !nameError
-        && playerCharacterToAdd !== 0;
 
     const { root } = useStyles();
 
@@ -215,6 +210,7 @@ export const CreateNonPlayerCharacterModal = ({
                         {/* Display selected Character here */}
                     </Grid>
 
+                    {/* Find a way to set the accordion expanded programmatically */}
                     <Grid item xs={12}>
                         {playerCharacters ? (
                             <Accordion
@@ -262,7 +258,7 @@ export const CreateNonPlayerCharacterModal = ({
                     onClick={handleCreate}
                     variant="contained"
                     color="primary"
-                    disabled={!allowedToCreate}
+                    disabled={!name || nameError}
                 >
                     Create
                 </Button>
