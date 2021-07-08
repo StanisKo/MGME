@@ -1,4 +1,4 @@
 BE: Refactor to target-typed constructor invocation expression where possible (C#)
 FE: Use react-router's generatePath() instead of custom URLBuilder class
 BE: Refactor complex data-type variables to use 'var' keyword
-BE: Refactor checks against null with 'is'
+BE: Refactor checks against null with 'is' and 'is not'

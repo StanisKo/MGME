@@ -62,11 +62,6 @@ interface Props {
     setOpenSnackBar: Dispatch<SetStateAction<boolean>>;
 }
 
-/*
-!!!TODO:!!! Add filter to API to query only necessary fields when we need available player characters
-those are: id and name, we don't need joins here
-*/
-
 export const CreateNonPlayerCharacterModal = ({
     handleDialogClose, classes, setResponse, setOpenSnackBar }: Props): ReactElement => {
 

@@ -464,20 +464,26 @@ namespace MGME.Core.Services.PlayerCharacterService
 
         private async Task <IEnumerable<GetPlayerCharacterListDTO>> QueryPlayerCharacters(Ref<int> userId, Ref<string> sortingParameter, Ref<int> selectedPage)
         {
+            /*
+            Here, if client does not provide selectedPage == does not request paginated result, it means we only
+            need PlayerCharacters that will be linked with NonPlayerCharacter or Adventure upon creating of two former
+
+            Therefore, we can avoid querying unnecessary data, as we only need names and ids
+            */
             IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
                 predicate: playerCharacter => playerCharacter.UserId == userId.Value,
-                include: new[]
+                include: selectedPage != null ? new[]
                 {
                     "Threads",
                     "Adventures",
                     "NonPlayerCharacters"
-                },
+                } : null,
                 select: playerCharacter => new GetPlayerCharacterListDTO()
                 {
                     Id = playerCharacter.Id,
                     Name = playerCharacter.Name,
 
-                    Thread = playerCharacter.Threads.Select(
+                    Thread = selectedPage != null ? playerCharacter.Threads.Select(
                         thread => new GetThreadDTO()
                         {
                             Id = thread.Id,
@@ -485,10 +491,11 @@ namespace MGME.Core.Services.PlayerCharacterService
                         }
                     ).Where(
                         thread => playerCharacter.Threads.Count == 1
-                    ).FirstOrDefault(),
-                    ThreadCount = playerCharacter.Threads.Count,
+                    ).FirstOrDefault() : null,
 
-                    Adventure = playerCharacter.Adventures.Select(
+                    ThreadCount = selectedPage != null ? playerCharacter.Threads.Count : null,
+
+                    Adventure = selectedPage != null ? playerCharacter.Adventures.Select(
                         adventure => new GetAdventureDTO()
                         {
                             Id = adventure.Id,
@@ -496,10 +503,11 @@ namespace MGME.Core.Services.PlayerCharacterService
                         }
                     ).Where(
                         adventure => playerCharacter.Adventures.Count == 1
-                    ).FirstOrDefault(),
-                    AdventureCount = playerCharacter.Adventures.Count,
+                    ).FirstOrDefault() : null,
 
-                    NonPlayerCharacter = playerCharacter.NonPlayerCharacters.Select(
+                    AdventureCount = selectedPage != null ? playerCharacter.Adventures.Count : null,
+
+                    NonPlayerCharacter = selectedPage != null ? playerCharacter.NonPlayerCharacters.Select(
                         nonPlayerCharacter => new GetNonPlayerCharacterDTO()
                         {
                             Id = nonPlayerCharacter.Id,
@@ -507,9 +515,10 @@ namespace MGME.Core.Services.PlayerCharacterService
                         }
                     ).Where(
                         nonPlayerCharacter => playerCharacter.NonPlayerCharacters.Count == 1
-                    ).FirstOrDefault(),
-                    NonPlayerCharacterCount = playerCharacter.NonPlayerCharacters.Count
-                },
+                    ).FirstOrDefault() : null,
+
+                    NonPlayerCharacterCount = selectedPage != null ? playerCharacter.NonPlayerCharacters.Count : null
+                } ,
                 orderBy: _sorter.DetermineSorting(sortingParameter.Value),
                 page: selectedPage?.Value ?? null
             );
