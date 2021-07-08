@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux';
 
 import { ApplicationState } from '../../../store';
 
+import { NonPlayerCharacter } from '../interfaces';
+
 import { PlayerCharacter } from '../../playerCharacter/interfaces';
 
 import { INPUT_TYPE } from '../../../shared/const';
@@ -14,9 +16,16 @@ export const CreateNonPlayerCharacterModal = (): ReactElement => {
         (state: ApplicationState) => state.catalogues?.playerCharacters?.data ?? null
     );
 
+    // Used explicitly for input validation
+    const nonPlayerCharacters: NonPlayerCharacter[] | null = useSelector(
+        (state: ApplicationState) => state.catalogues?.nonPlayerCharacters?.data ?? null
+    );
+
     const [displayedPlayerCharacters, setDisplayedPlayerCharacters] = useState<PlayerCharacter[]>([]);
 
     const [playerCharacterToAdd, setPlayerCharacterToAdd] = useState<number>(0);
+
+    const [nonPlayerCharacterNames, setNonPlayerCharacterNames] = useState<string[]>([]);
 
     const [name, setName] = useState<string>('');
     const [nameError, setNameError] = useState<boolean>(false);
@@ -33,15 +42,15 @@ export const CreateNonPlayerCharacterModal = (): ReactElement => {
             case INPUT_TYPE.ENTITY_NAME:
                 if (value.length < 1) {
                     setNameError(true);
-                    setNameHelperText('Please provide character name');
+                    setNameHelperText('Please provide NPC name');
 
                     break;
                 }
 
                 // This doesn't cover npc names outside of what is currently displayed on the page
-                if ([]?.includes(value.trim().toLowerCase())) {
+                if (nonPlayerCharacterNames?.includes(value.trim().toLowerCase())) {
                     setNameError(true);
-                    setNameHelperText('Character with such name already exists');
+                    setNameHelperText('NPC with such name already exists');
 
                     break;
                 }
