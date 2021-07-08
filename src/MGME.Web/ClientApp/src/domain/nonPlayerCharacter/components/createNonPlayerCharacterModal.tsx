@@ -147,6 +147,10 @@ export const CreateNonPlayerCharacterModal = ({
     };
 
     const handleAccordionExpand = (): void => {
+        if (playerCharacterToAdd > 0) {
+            setPlayerCharacterToAdd(0);
+        }
+
         setExpanded(!expanded);
     };
 
@@ -212,7 +216,6 @@ export const CreateNonPlayerCharacterModal = ({
                     <Grid item xs={12}>
                         {playerCharacters ? (
                             <Accordion
-                                disabled={playerCharacterToAdd !== 0}
                                 expanded={expanded}
                                 onChange={handleAccordionExpand}
                             >
