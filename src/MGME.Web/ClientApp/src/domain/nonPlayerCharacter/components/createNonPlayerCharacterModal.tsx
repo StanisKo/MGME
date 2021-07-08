@@ -160,173 +160,33 @@ export const CreateNonPlayerCharacterModal = ({
                     </Grid>
 
                     <Grid item xs={12}>
-                        <TextField
-                            value={threadName}
-                            error={threadError}
-                            helperText={threadHelperText}
-                            variant="outlined"
-                            required
-                            fullWidth
-                            label="Thread Name"
-                            onChange={handleInputChange}
-                            inputProps={{ inputtype: INPUT_TYPE.THREAD_NAME }}
-                            className={root}
-                        />
+                        {/* Display selected Character here */}
                     </Grid>
 
                     <Grid item xs={12}>
-                        <TextField
-                            value={threadDescription}
-                            variant="outlined"
-                            fullWidth
-                            label="Thread Description"
-                            onChange={handleInputChange}
-                            inputProps={{ inputtype: INPUT_TYPE.THREAD_DESCRIPTION }}
-                        />
-                    </Grid>
-
-                    <Grid item container xs={12} justify="flex-end">
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            disabled={!threadName || threadError}
-                            onClick={handleAddingThreads}
-                        >
-                            Add
-                        </Button>
-                    </Grid>
-
-                    <Grid item xs={12}>
-                        <Accordion
-                            disabled={threadsToAdd.length === 0}
-                            expanded={threadsToAdd.length > 0}
-                        >
-                            <AccordionSummary
-                                aria-controls="newThreads-content"
-                                id="newThreads-header"
-                            >
-                                <Typography>
-                                    Your Threads
-                                </Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <List style={{ width: '100%' }}>
-                                    {threadsToAdd.map((thread, index) => {
-                                        return (
-                                            <ListItem
-                                                key={`new-thread-${index}`}
-                                                button
-                                                onClick={handleRemovingThreads(
-                                                    thread.name
-                                                )}
-                                            >
-                                                <ListItemText primary={thread.name} />
-                                            </ListItem>
-                                        );
-                                    })}
-                                </List>
-                            </AccordionDetails>
-                        </Accordion>
-                    </Grid>
-
-                    <Grid item xs={12}>
-                        <TextField
-                            value={nonPlayerCharacterName}
-                            error={nonPlayerCharacterError}
-                            helperText={nonPlayerCharacterHelperText}
-                            variant="outlined"
-                            required
-                            fullWidth
-                            label="NPC Name"
-                            onChange={handleInputChange}
-                            inputProps={{ inputtype: INPUT_TYPE.NON_PLAYER_CHARACTER_NAME }}
-                            className={root}
-                        />
-                    </Grid>
-
-                    <Grid item xs={12}>
-                        <TextField
-                            value={nonPlayerCharacterDescription}
-                            variant="outlined"
-                            fullWidth
-                            label="NPC Description"
-                            onChange={handleInputChange}
-                            inputProps={{ inputtype: INPUT_TYPE.NON_PLAYER_CHARACTER_DESCRIPTION }}
-                        />
-                    </Grid>
-
-                    <Grid item container xs={12} justify="flex-end">
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            disabled={!nonPlayerCharacterName || nonPlayerCharacterError}
-                            onClick={handleAddingNewNonPlayerCharacters}
-                        >
-                            Add
-                        </Button>
-                    </Grid>
-
-                    <Grid item xs={12}>
-                        <Accordion
-                            disabled={displayedNonPlayerCharactersToAdd.length === 0}
-                            expanded={displayedNonPlayerCharactersToAdd.length > 0}
-                        >
-                            <AccordionSummary
-                                aria-controls="newNonPlayerCharacters-content"
-                                id="newNonPlayerCharacters-header"
-                            >
-                                <Typography>
-                                    Your NPCs
-                                </Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <List style={{ width: '100%' }}>
-                                    {displayedNonPlayerCharactersToAdd.map((nonPlayerCharacter, index) => {
-                                        return (
-                                            <ListItem
-                                                key={`new-npc-${index}`}
-                                                button
-                                                onClick={handleRemovingNewNonPlayerCharacters(
-                                                    nonPlayerCharacter.name
-                                                )}
-                                            >
-                                                <ListItemText primary={nonPlayerCharacter.name} />
-                                            </ListItem>
-                                        );
-                                    })}
-                                </List>
-                            </AccordionDetails>
-                        </Accordion>
-                    </Grid>
-
-                    <Grid item xs={12}>
-                        {availableNonPlayerCharacters ? (
+                        {playerCharacters ? (
                             <Accordion>
                                 <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="availableNonPlayerCharacters-content"
-                                    id="availableNonPlayerCharacters-header"
+                                    aria-controls="playerCharacters-content"
+                                    id="playerCharacter-header"
                                 >
                                     <Typography>
-                                        {displayedAvailableNonPlayerCharacters?.length
-                                            ? 'Available NPCs'
-                                            : 'No available NPCs'
+                                        {displayedPlayerCharacters?.length
+                                            ? 'Available Characters'
+                                            : 'No available Characters'
                                         }
                                     </Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <List style={{ width: '100%' }}>
-                                        {displayedAvailableNonPlayerCharacters?.map((nonPlayerCharacter, index) => {
+                                        {displayedPlayerCharacters?.map((playerCharacter, index) => {
                                             return (
                                                 <ListItem
-                                                    key={`avaialable-npc-${index}`}
+                                                    key={`avaialable-character-${index}`}
                                                     button
-                                                    onClick={handleAddingExistingNonPlayerCharacter(
-                                                        nonPlayerCharacter.id,
-                                                        nonPlayerCharacter.name
-                                                    )}
                                                 >
-                                                    <ListItemText primary={nonPlayerCharacter.name} />
+                                                    <ListItemText primary={playerCharacter.name} />
                                                 </ListItem>
                                             );
                                         })}
@@ -341,7 +201,12 @@ export const CreateNonPlayerCharacterModal = ({
                 <Button onClick={handleDialogClose} variant="contained" color="secondary">
                     Cancel
                 </Button>
-                <Button onClick={handleCreate} variant="contained" color="primary" disabled={!allowedToCreate}>
+                <Button
+                    // onClick={handleCreate}
+                    variant="contained"
+                    color="primary"
+                    // disabled={!allowedToCreate}
+                >
                     Create
                 </Button>
             </DialogActions>
