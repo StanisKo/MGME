@@ -8,7 +8,7 @@ import { BaseServiceResponse } from '../../shared/interfaces';
 import { PlayerCharactersTable, CreatePlayerCharacterModal } from '../playerCharacter/components';
 import { deletePlayerCharacters, addToPlayerCharacter } from '../playerCharacter/requests';
 
-import { NonPlayerCharactersTable } from '../nonPlayerCharacter/components';
+import { NonPlayerCharactersTable, CreateNonPlayerCharacterModal } from '../nonPlayerCharacter/components';
 import { deleteNonPlayerCharacters } from '../nonPlayerCharacter/requests';
 
 import { AdventuresToAddToTable } from '../adventures/components';
@@ -451,12 +451,21 @@ export const Catalogues = (): ReactElement => {
             </div>
 
             {dialogOpen && (
-                <CreatePlayerCharacterModal
-                    handleDialogClose={handleDialogClose}
-                    classes={classes as unknown as { [key: string]: string }}
-                    setResponse={setResponse}
-                    setOpenSnackBar={setOpenSnackbar}
-                />
+                selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? (
+                    <CreatePlayerCharacterModal
+                        handleDialogClose={handleDialogClose}
+                        classes={classes as unknown as { [key: string]: string }}
+                        setResponse={setResponse}
+                        setOpenSnackBar={setOpenSnackbar}
+                    />
+                ) : (
+                    <CreateNonPlayerCharacterModal
+                        handleDialogClose={handleDialogClose}
+                        classes={classes as unknown as { [key: string]: string }}
+                        setResponse={setResponse}
+                        setOpenSnackBar={setOpenSnackbar}
+                    />
+                )
             )}
 
             <Snackbar open={openSnackbar} onClose={handleSnackbarClose}>

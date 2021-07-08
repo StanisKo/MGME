@@ -62,6 +62,10 @@ interface Props {
     setOpenSnackBar: Dispatch<SetStateAction<boolean>>;
 }
 
+/*
+!!!TODO:!!! Add filter to API to query only necessary fields when we need available player characters
+those are: id and name, we don't need joins here
+*/
 
 export const CreateNonPlayerCharacterModal = ({
     handleDialogClose, classes, setResponse, setOpenSnackBar }: Props): ReactElement => {
@@ -71,13 +75,11 @@ export const CreateNonPlayerCharacterModal = ({
         (state: ApplicationState) => state.catalogues?.nonPlayerCharacters?.data ?? null
     );
 
+    const [nonPlayerCharacterNames, setNonPlayerCharacterNames] = useState<string[]>([]);
+
     const [playerCharacters, setPlayerCharacters] = useState<PlayerCharacter[]>([]);
 
-    const [displayedPlayerCharacters, setDisplayedPlayerCharacters] = useState<PlayerCharacter[]>([]);
-
     const [playerCharacterToAdd, setPlayerCharacterToAdd] = useState<number>(0);
-
-    const [nonPlayerCharacterNames, setNonPlayerCharacterNames] = useState<string[]>([]);
 
     const [name, setName] = useState<string>('');
     const [nameError, setNameError] = useState<boolean>(false);
@@ -122,6 +124,11 @@ export const CreateNonPlayerCharacterModal = ({
         }
     };
 
+    const handleAddingPlayerCharacter = (id: number) => (): void => {
+        // Set what we send
+        setPlayerCharacterToAdd(id);
+    };
+
     const handleCreate = async (): Promise<void> => {
         const response = await createNonPlayerCharacter(
             {
@@ -146,11 +153,19 @@ export const CreateNonPlayerCharacterModal = ({
                 const availablePlayerCharacters = await fetchAvailablePlayerCharacters();
 
                 setPlayerCharacters(availablePlayerCharacters.data);
-
-                setDisplayedPlayerCharacters(availablePlayerCharacters.data);
             }
         })();
     });
+
+    useEffect(() => {
+        if (nonPlayerCharacters) {
+            setNonPlayerCharacterNames(
+                nonPlayerCharacters.map(
+                    nonPlayerCharacter => nonPlayerCharacter.name
+                )
+            );
+        }
+    }, [nonPlayerCharacters]);
 
     const allowedToCreate =
         name
@@ -201,14 +216,16 @@ export const CreateNonPlayerCharacterModal = ({
 
                     <Grid item xs={12}>
                         {playerCharacters ? (
-                            <Accordion>
+                            <Accordion
+                                disabled={playerCharacterToAdd !== 0}
+                            >
                                 <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
                                     aria-controls="playerCharacters-content"
                                     id="playerCharacter-header"
                                 >
                                     <Typography>
-                                        {displayedPlayerCharacters?.length
+                                        {playerCharacters?.length
                                             ? 'Available Characters'
                                             : 'No available Characters'
                                         }
@@ -216,11 +233,14 @@ export const CreateNonPlayerCharacterModal = ({
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <List style={{ width: '100%' }}>
-                                        {displayedPlayerCharacters?.map((playerCharacter, index) => {
+                                        {playerCharacters?.map((playerCharacter, index) => {
                                             return (
                                                 <ListItem
                                                     key={`avaialable-character-${index}`}
                                                     button
+                                                    onClick={handleAddingPlayerCharacter(
+                                                        playerCharacter.id
+                                                    )}
                                                 >
                                                     <ListItemText primary={playerCharacter.name} />
                                                 </ListItem>
