@@ -10,8 +10,15 @@ If scene is seeded with random event, <b>GOTO Random Event Flow</b>
 |
 |
 v
+_
 
-Roll, if both digits of rollResult are equal, <b>GOTO Random Event Flow</b>, else <b>GOTO Fate Question Flow</b>
+
+|
+|
+|
+v
+User asks fate question:
+Roll; if both digits of rollResult are equal, and one of them is equal or less than chaos factor <b>GOTO Random Event Flow</b>, else <b>GOTO Fate Question Flow</b>
 </pre>
 
 
@@ -69,7 +76,7 @@ odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 1-100)
             |
             |
             v
-            We retrieve margins: int[] margins = oddsAndMargins[odds][chaosFactor]
+            We retrieve margins: int[] margins = oddsAndMargins[odds, chaosFactor]
             |
             |
             |
