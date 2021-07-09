@@ -372,7 +372,7 @@ export const Catalogues = (): ReactElement => {
                         {displayAdventures && (
                             <Grid item xs={12}>
                                 <Divider />
-                                <AdventuresTable />
+                                <AdventuresTable mode={TABLE_DISPLAY_MODE.TO_ADD_TO} />
                                 <Grid
                                     item
                                     container

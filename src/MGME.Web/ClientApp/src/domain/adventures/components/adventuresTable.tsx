@@ -1,4 +1,4 @@
-import { ReactElement, useState, useEffect, MouseEvent } from 'react';
+import { ReactElement, useState, useEffect, MouseEvent, ChangeEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { ApplicationState, UpdateStore } from '../../../store';
@@ -8,7 +8,7 @@ import { Adventure } from '../interfaces';
 import { fetchAdventures } from '../requests';
 
 import { HeadCell, Pagination } from '../../../shared/interfaces';
-import { SortOrder } from '../../../shared/const';
+import { SortOrder, TABLE_DISPLAY_MODE } from '../../../shared/const';
 
 import {
     Table,
@@ -44,6 +44,10 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
+interface AdventureTableProps {
+    mode: TABLE_DISPLAY_MODE
+}
+
 const headCells: HeadCell[] = [
     { label: 'Title', sorting: 'title', numeric: false },
     { label: 'Thread', sorting: 'thread', numeric: true },
@@ -51,7 +55,7 @@ const headCells: HeadCell[] = [
     { label: 'NPC', sorting: 'npc', numeric: true }
 ];
 
-export const AdventuresTable = (): ReactElement => {
+export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => {
     const dispatch = useDispatch();
 
     const isAuthorized: boolean = useSelector(
@@ -77,7 +81,33 @@ export const AdventuresTable = (): ReactElement => {
     const [page, setPage] = useState(0);
     const [order, setOrder] = useState<SortOrder>('asc');
     const [orderBy, setOrderBy] = useState<string>('title');
-    const [selected, setSelected] = useState<number>(0);
+
+    const [singleSelected, setSingleSelected] = useState<number>(0);
+    const [multipleSelected, setMultipleSelected] = useState<number[]>([]);
+
+    const handleSelectAll = (event: ChangeEvent<HTMLInputElement>): void => {
+        let newSelected: number[] = [];
+
+        if (event.target.checked) {
+            newSelected = (adventures ?? []).map((adventure: Adventure) => adventure.id);
+        }
+        else {
+            newSelected = [];
+        }
+
+        setMultipleSelected(newSelected);
+
+        dispatch<UpdateStore<{ selected: number[] }>>(
+            {
+                type: 'UPDATE_STORE',
+                reducer: 'adventures',
+                key: 'dataset',
+                payload: {
+                    selected: newSelected
+                }
+            }
+        );
+    };
 
     const handleSelect = (selectedId: number) => (event: MouseEvent<unknown>): void => {
         setSelected(selectedId);

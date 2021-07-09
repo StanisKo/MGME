@@ -1,42 +1,28 @@
 import { Action, Reducer } from 'redux';
 
-import { PlayerCharacter } from '../../domain/playerCharacter/interfaces';
-import { NonPlayerCharacter } from '../../domain/nonPlayerCharacter/interfaces';
 import { Adventure } from '../../domain/adventures/interfaces';
 
 import { PaginatedDataServiceResponse, Pagination } from '../../shared/interfaces';
 
 import { UpdateStore } from '../';
 
-export interface CataloguesState {
-    playerCharacters: {
-        data: PlayerCharacter[],
-        pagination: Pagination,
-        selected: number[] | number
-    },
-
-    nonPlayerCharacters: {
-        data: NonPlayerCharacter[],
-        pagination: Pagination,
-        selected: number[]
-    },
-
-    adventures: {
+export interface AdventuresState {
+    dataset: {
         data: Adventure[],
         pagination: Pagination,
-        selected: number
+        selected: number | number[]
     }
 }
 
-export const CataloguesReducer: Reducer<CataloguesState> = (
-    state: CataloguesState | undefined, incomingAction: Action): CataloguesState => {
+export const CataloguesReducer: Reducer<AdventuresState> = (
+    state: AdventuresState | undefined, incomingAction: Action): AdventuresState => {
 
     if (state === undefined) {
-        return {} as CataloguesState;
+        return {} as AdventuresState;
     }
 
     const { type, reducer, key, payload } =
-        incomingAction as UpdateStore<PaginatedDataServiceResponse<PlayerCharacter[]>>;
+        incomingAction as UpdateStore<PaginatedDataServiceResponse<Adventure[]>>;
 
     if (reducer !== 'catalogues') {
         return state;
@@ -54,7 +40,7 @@ export const CataloguesReducer: Reducer<CataloguesState> = (
                 [key]: {
 
                     // Retain previous state of THIS key
-                    ...state[key as keyof CataloguesState],
+                    ...state[key as keyof AdventuresState],
 
                     // Add/update things in THIS key
                     ...payload
