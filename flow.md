@@ -5,13 +5,13 @@ User creates a scene
 |
 |
 v
-If scene is seeded with random event, **GOTO Random Event Flow**
+If scene is seeded with random event, <pre><b>GOTO Random Event Flow</b</pre>
 |
 |
 |
 v
 
-Roll, if both digits of rollResult are equal, **GOTO Random Event Flow**, else **GOTO Fate Question Flow**
+Roll, if both digits of rollResult are equal, <pre><b>GOTO Random Event Flow</b</pre>, else <pre><b>GOTO Fate Question Flow</b</pre>
 ```
 
 
