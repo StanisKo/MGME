@@ -16,13 +16,13 @@ Roll, if both digits of rollResult are equal, <b>GOTO Random Event Flow</b>, els
 
 
 ### Random Event Flow: ###
-```
+<pre>
 
-```
+</pre>
 
 
 ### Fate Question Flow:
-```
+<pre>
 User asks fate question (string) and provides:
 odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 1-100)
     |
@@ -43,16 +43,16 @@ odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 1-100)
             v
             As in:
                     [
-                        # Odd
+                        <b>Odd</b>
                         [
-                            # Chaos Factor
+                            <b>Chaos Factor</b>
                             [Lowest Margin, Target Value, Highest Margin],
 
-                            # Chaos Factor
+                            <b>Chaos Factor</b>
                             [Lowest Margin, Target Value, Highest Margin],
                         ],
 
-                        # Odd
+                        <b>Odd</b>
                         [
                             # Chaos Factor
                             [Lowest Margin, Target Value, Highest Margin],
@@ -62,9 +62,8 @@ odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 1-100)
                         ]
                     ]
 
-                    # First-, second-, and third-level arrays have predetermined size:
+                    <i>First-, second-, and third-level arrays have predetermined size:</i>
 
-                    # Where
                     int[,,] oddsAndMargins = new int[11, 9, 3] {}
             |
             |
@@ -87,4 +86,4 @@ odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 1-100)
         |
         v
         Update fate question with answer
-```
+</pre>
