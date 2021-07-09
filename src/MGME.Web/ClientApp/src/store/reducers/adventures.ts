@@ -14,7 +14,7 @@ export interface AdventuresState {
     }
 }
 
-export const CataloguesReducer: Reducer<AdventuresState> = (
+export const AdventuresReducer: Reducer<AdventuresState> = (
     state: AdventuresState | undefined, incomingAction: Action): AdventuresState => {
 
     if (state === undefined) {

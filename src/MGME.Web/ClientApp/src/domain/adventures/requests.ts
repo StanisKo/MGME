@@ -32,7 +32,7 @@ We parametrize the page, since we might need to different datasets at the same p
 One on catalogues, from where user can add entities to adventures
 Another on the actual list of adventures
 */
-export const fetchAdventures = async (reducer: string, page?: number, sorting?: string): Promise<void> => {
+export const fetchAdventures = async (reducer: string, key: string, page?: number, sorting?: string): Promise<void> => {
     const params: ReadFromApi['params'] = {};
 
     if (page) {
@@ -48,7 +48,7 @@ export const fetchAdventures = async (reducer: string, page?: number, sorting?: 
             url: URLBuilder.ReadFrom('adventure'),
             ...(Object.keys(params).length > 0 ? { params: { ...params } } : null),
             page: reducer,
-            key: 'adventures'
+            key: key
         }
     );
 };

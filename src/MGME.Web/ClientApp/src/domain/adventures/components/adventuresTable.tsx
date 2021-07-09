@@ -62,8 +62,12 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
     );
 
-    const adventures: Adventure[] | null = useSelector(
+    const adventuresToAddTo: Adventure[] | null = useSelector(
         (state: ApplicationState) => state.catalogues?.adventures?.data ?? null
+    );
+
+    const adventuresToShow: Adventure[] | null = useSelector(
+        (state: ApplicationState) => state.adventures?.dataset ?? null
     );
 
     const pagination: Pagination | null = useSelector(
@@ -89,7 +93,7 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
         let newSelected: number[] = [];
 
         if (event.target.checked) {
-            newSelected = (adventures ?? []).map((adventure: Adventure) => adventure.id);
+            newSelected = (adventuresToShow ?? []).map((adventure: Adventure) => adventure.id);
         }
         else {
             newSelected = [];
@@ -110,18 +114,44 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
     };
 
     const handleSelect = (selectedId: number) => (event: MouseEvent<unknown>): void => {
-        setSelected(selectedId);
+        if (mode === TABLE_DISPLAY_MODE.TO_SHOW) {
+            let newSelected: number[] = [];
 
-        dispatch<UpdateStore<{ selected: number }>>(
-            {
-                type: 'UPDATE_STORE',
-                reducer: 'catalogues',
-                key: 'adventures',
-                payload: {
-                    selected: selectedId
-                }
+            if (multipleSelected.includes(selectedId)) {
+                newSelected = multipleSelected.filter((id: number) => id !== selectedId);
             }
-        );
+            else {
+                newSelected = [...multipleSelected, selectedId];
+            }
+
+            setMultipleSelected(newSelected);
+
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'adventures',
+                    key: 'dataset',
+                    payload: {
+                        selected: newSelected
+                    }
+                }
+            );
+        }
+        else
+        {
+            setSingleSelected(selectedId);
+
+            dispatch<UpdateStore<{ selected: number }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'adventures',
+                    payload: {
+                        selected: selectedId
+                    }
+                }
+            );
+        }
     };
 
     const handleSorting = (newSortingParam: string) => (event: MouseEvent<unknown>): void => {
@@ -139,21 +169,42 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
     // Initial request
     useEffect(() => {
         (async (): Promise<void> => {
-            if (isAuthorized && adventures === null) {
-                await fetchAdventures('catalogues');
+            if (isAuthorized) {
+
+                if (mode === TABLE_DISPLAY_MODE.TO_SHOW && adventuresToShow === null) {
+                    await fetchAdventures('adventures', 'dataset');
+                }
+                else if (mode === TABLE_DISPLAY_MODE.TO_ADD_TO && adventuresToAddTo === null) {
+                    await fetchAdventures('catalogues', 'adventures');
+                }
+
             }
         })();
-    }, [isAuthorized, adventures]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAuthorized, adventuresToShow, adventuresToAddTo]);
 
     // Request with params
     useEffect(() => {
         (async (): Promise<void> => {
-            if (isAuthorized && adventures !== null) {
-                await fetchAdventures(
-                    'catalogues',
-                    page + 1,
-                    `${order === 'asc' ? '' : '-'}${orderBy}`
-                );
+            if (isAuthorized ) {
+
+                if (mode === TABLE_DISPLAY_MODE.TO_SHOW && adventuresToShow === null) {
+                    await fetchAdventures(
+                        'adventures',
+                        'dataset',
+                        page + 1,
+                        `${order === 'asc' ? '' : '-'}${orderBy}`
+                    );
+                }
+                else if (mode === TABLE_DISPLAY_MODE.TO_ADD_TO && adventuresToAddTo === null) {
+                    await fetchAdventures(
+                        'catalogues',
+                        'adventures',
+                        page + 1,
+                        `${order === 'asc' ? '' : '-'}${orderBy}`
+                    );
+                }
+
             }
         })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -161,22 +212,39 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
 
     // Default current state every time new dataset comes in, keep it simple
     useEffect(() => {
-        if (adventures && selected > 0) {
-            setSelected(0);
+        if (adventuresToShow || adventuresToAddTo) {
 
-            dispatch<UpdateStore<{ selected: number }>>(
-                {
-                    type: 'UPDATE_STORE',
-                    reducer: 'catalogues',
-                    key: 'adventures',
-                    payload: {
-                        selected: 0
+            if (multipleSelected.length > 0) {
+                setMultipleSelected([]);
+
+                dispatch<UpdateStore<{ selected: number[] }>>(
+                    {
+                        type: 'UPDATE_STORE',
+                        reducer: 'adventures',
+                        key: 'dataset',
+                        payload: {
+                            selected: []
+                        }
                     }
-                }
-            );
+                );
+            }
+            else if (singleSelected > 0) {
+                setSingleSelected(0);
+
+                dispatch<UpdateStore<{ selected: number }>>(
+                    {
+                        type: 'UPDATE_STORE',
+                        reducer: 'adventures',
+                        key: 'dataset',
+                        payload: {
+                            selected: 0
+                        }
+                    }
+                );
+            }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [adventures]);
+    }, [adventuresToShow, adventuresToAddTo]);
 
     useEffect(() => {
         if ((selectedPlayerCharacters as number[]).length === 0 && selectedNonPlayerCharacters.length === 0) {
