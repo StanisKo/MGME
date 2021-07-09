@@ -9,6 +9,7 @@ import { fetchAdventures } from '../requests';
 
 import { HeadCell, Pagination } from '../../../shared/interfaces';
 import { SortOrder, TABLE_DISPLAY_MODE } from '../../../shared/const';
+import { isSelected } from '../../../shared/helpers';
 
 import {
     Table,
@@ -20,7 +21,8 @@ import {
     TablePagination,
     LinearProgress,
     Box,
-    Radio
+    Radio,
+    Checkbox
 } from '@material-ui/core';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -62,12 +64,12 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
     );
 
-    const adventuresToAddTo: Adventure[] | null = useSelector(
-        (state: ApplicationState) => state.catalogues?.adventures?.data ?? null
+    const adventuresToShow: Adventure[] | null = useSelector(
+        (state: ApplicationState) => state.adventures?.dataset?.data ?? null
     );
 
-    const adventuresToShow: Adventure[] | null = useSelector(
-        (state: ApplicationState) => state.adventures?.dataset ?? null
+    const adventuresToAddTo: Adventure[] | null = useSelector(
+        (state: ApplicationState) => state.catalogues?.adventures?.data ?? null
     );
 
     const paginationOfToShow: Pagination | null = useSelector(
@@ -277,7 +279,18 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                 <Table className={root}>
                     <TableHead>
                         <TableRow>
-                            <TableCell padding="checkbox" />
+                            <TableCell padding="checkbox">
+                                {mode === TABLE_DISPLAY_MODE.TO_SHOW && (
+                                    <Checkbox
+                                        checked={multipleSelected.length === adventuresToShow?.length}
+                                        indeterminate={
+                                            multipleSelected.length > 0
+                                                && multipleSelected.length < (adventuresToShow as Adventure[]).length
+                                        }
+                                        onChange={handleSelectAll}
+                                    />
+                                )}
+                            </TableCell>
                             {headCells.map((headCell) => (
                                 <TableCell
                                     key={headCell.label}
@@ -302,8 +315,15 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {adventures.map((adventure, index) => {
-                            const isItemSelected = selected === adventure.id;
+                        {(mode === TABLE_DISPLAY_MODE.TO_SHOW
+                            ? adventuresToShow
+                            : adventuresToAddTo
+                        )?.map((adventure, index) => {
+
+                            const isItemSelected = mode === TABLE_DISPLAY_MODE.TO_SHOW
+                                ? isSelected(adventure.id, multipleSelected)
+                                : singleSelected === adventure.id;
+
                             const labelId = `adventure-table-checkbox-${index}`;
 
                             return (
@@ -351,7 +371,12 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                         component="div"
                         rowsPerPage={15}
                         rowsPerPageOptions={[]}
-                        count={pagination?.numberOfResults}
+                        count={
+                            (mode === TABLE_DISPLAY_MODE.TO_SHOW
+                                ? paginationOfToShow?.numberOfResults
+                                : paginationOfToAddTo?.numberOfResults
+                            ) as number
+                        }
                         page={page}
                         onChangePage={handlePageChange}
                     />

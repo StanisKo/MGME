@@ -5,6 +5,7 @@ import { AdventuresTable } from './components';
 import { Paper, Grid, Theme, Button } from '@material-ui/core';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
+import { TABLE_DISPLAY_MODE } from '../../shared/const';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -78,7 +79,7 @@ export const Adventures = (): ReactElement => {
                         </Grid>
 
                         <Grid item xs={12}>
-                            <AdventuresTable />
+                            <AdventuresTable mode={TABLE_DISPLAY_MODE.TO_SHOW} />
                         </Grid>
                     </Grid>
                 </Paper>
