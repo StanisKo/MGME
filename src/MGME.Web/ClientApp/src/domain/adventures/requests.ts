@@ -45,7 +45,7 @@ export const addToAdventure = async (
 };
 
 /*
-We parametrize the page, since we might need to different datasets at the same point in time:
+We parametrize the reducer, since we might need to different datasets at the same point in time:
 One on catalogues, from where user can add entities to adventures
 Another on the actual list of adventures
 */

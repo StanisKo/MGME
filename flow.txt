@@ -1,0 +1,70 @@
+# A flow of adventure to not forget :)
+
+User creates adventure
+|
+|
+|
+v
+
+
+###
+
+Fate Question flow:
+
+User asks fate question (string) and provides odds and chaos factor (0-10) (0-9)
+    |
+    |
+    |
+    v
+    Matrix of odds and margins initialized
+        |
+        |
+        |
+        v
+        Where index of each collection is the int of the odd,
+        Index within second-level collection is the chaos factor of adventure
+        And each value is an array of 3 ints: lowest margin, target value, highest margin
+            |
+            |
+            |
+            v
+            As in:
+                    [
+                        # Odd
+                        [
+                            # Chaos Factor
+                            [Lowest Margin, Target Value, Highest Margin]
+                        ],
+
+                        # Odd
+                        [
+                            # Chaos Factor
+                            [Lowest Margin, Target Value, Highest Margin]
+                        ]
+                    ]
+
+                    # First-, second-, and third-level arrays have predetermined size:
+
+                    # Where
+                    int[,,] oddsAndMargins = new int[11, 9, 3] {}
+            |
+            |
+            |
+            v
+            1D100 is randomized
+            |
+            |
+            |
+            v
+            We retrieve margins: int[] margins = oddsAndMargins[odds][chaosFactor]
+            |
+            |
+            |
+            v
+            # If rollResult <= margins[targetValue]: "Yes"
+
+            # If rollResult > margins[targetValue]: "No"
+
+            # If rollResult <= margins[lowestMargin]: "Exceptional Yes"
+
+            # If rollResult >= margins[highestMargin]: "Exceptional No"
