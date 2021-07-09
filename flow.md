@@ -18,7 +18,7 @@ _
 |
 v
 User asks fate question:
-Roll; if both digits of rollResult are equal, and one of them is equal or less than chaos factor <b>GOTO Random Event Flow</b>, else <b>GOTO Fate Question Flow</b>
+Roll; if both digits of rollResult are equal, and one of them <= chaosFactor <b>GOTO Random Event Flow</b>, else <b>GOTO Fate Question Flow</b>
 </pre>
 
 
