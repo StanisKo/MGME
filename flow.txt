@@ -21,8 +21,8 @@ User asks fate question (string) and provides odds and chaos factor (0-10) (0-9)
         |
         |
         v
-        Where index of each collection is the int of the odd,
-        Index within second-level collection is the chaos factor of adventure
+        Where index of first-level array is the int of the odd,
+        Index of second-level array is the chaos factor of adventure
         And each value is an array of 3 ints: lowest margin, target value, highest margin
             |
             |
@@ -33,13 +33,19 @@ User asks fate question (string) and provides odds and chaos factor (0-10) (0-9)
                         # Odd
                         [
                             # Chaos Factor
-                            [Lowest Margin, Target Value, Highest Margin]
+                            [Lowest Margin, Target Value, Highest Margin],
+
+                            # Chaos Factor
+                            [Lowest Margin, Target Value, Highest Margin],
                         ],
 
                         # Odd
                         [
                             # Chaos Factor
-                            [Lowest Margin, Target Value, Highest Margin]
+                            [Lowest Margin, Target Value, Highest Margin],
+
+                            # Chaos Factor
+                            [Lowest Margin, Target Value, Highest Margin],
                         ]
                     ]
 
@@ -68,3 +74,8 @@ User asks fate question (string) and provides odds and chaos factor (0-10) (0-9)
             # If rollResult <= margins[lowestMargin]: "Exceptional Yes"
 
             # If rollResult >= margins[highestMargin]: "Exceptional No"
+        |
+        |
+        |
+        v
+        Update fate question with answer
