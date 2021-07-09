@@ -70,7 +70,11 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
         (state: ApplicationState) => state.adventures?.dataset ?? null
     );
 
-    const pagination: Pagination | null = useSelector(
+    const paginationOfToShow: Pagination | null = useSelector(
+        (state: ApplicationState) => state.adventures?.dataset?.pagination ?? null
+    );
+
+    const paginationOfToAddTo: Pagination | null = useSelector(
         (state: ApplicationState) => state.catalogues?.adventures?.pagination ?? null
     );
 
@@ -264,91 +268,95 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
 
     const { root, visuallyHidden } = useStyles();
 
-    return adventures !== null && pagination !== null ? (
-        <Box mt={2}>
-            <Table className={root}>
-                <TableHead>
-                    <TableRow>
-                        <TableCell padding="checkbox" />
-                        {headCells.map((headCell) => (
-                            <TableCell
-                                key={headCell.label}
-                                align={headCell.numeric ? 'right' : 'left'}
-                                sortDirection={orderBy === headCell.sorting ? order : false}
-                            >
-                                <TableSortLabel
-                                    active={orderBy === headCell.sorting}
-                                    direction={orderBy === headCell.sorting ? order : 'asc'}
-                                    onClick={handleSorting(headCell.sorting)}
-                                    style={{ fontWeight: 'bold' }}
-                                >
-                                    {headCell.label}
-                                    {orderBy === headCell.sorting ? (
-                                        <span className={visuallyHidden}>
-                                            {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                        </span>
-                                    ) : null}
-                                </TableSortLabel>
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {adventures.map((adventure, index) => {
-                        const isItemSelected = selected === adventure.id;
-                        const labelId = `adventure-table-checkbox-${index}`;
-
-                        return (
-                            <TableRow
-                                hover
-                                onClick={handleSelect(adventure.id)}
-                                role="checkbox"
-                                aria-checked={isItemSelected}
-                                tabIndex={-1}
-                                key={adventure.title}
-                                selected={isItemSelected}
-                            >
-                                <TableCell padding="checkbox">
-                                    <Radio
-                                        checked={isItemSelected}
-                                        inputProps={{ 'aria-labelledby': labelId }}
-                                    />
-                                </TableCell>
-
-                                <TableCell align="left">
-                                    {adventure.title}
-                                </TableCell>
-
-                                <TableCell align="right">
-                                    {adventure.thread?.name
-                                        ?? `${adventure.threadCount} threads`}
-                                </TableCell>
-
-                                <TableCell align="right">
-                                    {adventure.playerCharacter?.name
-                                        ?? `${adventure.playerCharacterCount} Characters`}
-                                </TableCell>
-
-                                <TableCell align="right">
-                                    {adventure.nonPlayerCharacter?.name
-                                        ?? `${adventure.nonPlayerCharacterCount} NPCs`}
-                                </TableCell>
-                            </TableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
+    return (
+        mode === TABLE_DISPLAY_MODE.TO_SHOW
+            ? adventuresToShow !== null && paginationOfToShow !== null
+            : adventuresToAddTo === null && paginationOfToAddTo !== null
+    ) ? (
             <Box mt={2}>
-                <TablePagination
-                    component="div"
-                    rowsPerPage={15}
-                    rowsPerPageOptions={[]}
-                    count={pagination?.numberOfResults}
-                    page={page}
-                    onChangePage={handlePageChange}
-                />
-            </Box>
-        </Box>
+                <Table className={root}>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell padding="checkbox" />
+                            {headCells.map((headCell) => (
+                                <TableCell
+                                    key={headCell.label}
+                                    align={headCell.numeric ? 'right' : 'left'}
+                                    sortDirection={orderBy === headCell.sorting ? order : false}
+                                >
+                                    <TableSortLabel
+                                        active={orderBy === headCell.sorting}
+                                        direction={orderBy === headCell.sorting ? order : 'asc'}
+                                        onClick={handleSorting(headCell.sorting)}
+                                        style={{ fontWeight: 'bold' }}
+                                    >
+                                        {headCell.label}
+                                        {orderBy === headCell.sorting ? (
+                                            <span className={visuallyHidden}>
+                                                {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                            </span>
+                                        ) : null}
+                                    </TableSortLabel>
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {adventures.map((adventure, index) => {
+                            const isItemSelected = selected === adventure.id;
+                            const labelId = `adventure-table-checkbox-${index}`;
 
-    ) : <LinearProgress />;
+                            return (
+                                <TableRow
+                                    hover
+                                    onClick={handleSelect(adventure.id)}
+                                    role="checkbox"
+                                    aria-checked={isItemSelected}
+                                    tabIndex={-1}
+                                    key={adventure.title}
+                                    selected={isItemSelected}
+                                >
+                                    <TableCell padding="checkbox">
+                                        <Radio
+                                            checked={isItemSelected}
+                                            inputProps={{ 'aria-labelledby': labelId }}
+                                        />
+                                    </TableCell>
+
+                                    <TableCell align="left">
+                                        {adventure.title}
+                                    </TableCell>
+
+                                    <TableCell align="right">
+                                        {adventure.thread?.name
+                                            ?? `${adventure.threadCount} threads`}
+                                    </TableCell>
+
+                                    <TableCell align="right">
+                                        {adventure.playerCharacter?.name
+                                            ?? `${adventure.playerCharacterCount} Characters`}
+                                    </TableCell>
+
+                                    <TableCell align="right">
+                                        {adventure.nonPlayerCharacter?.name
+                                            ?? `${adventure.nonPlayerCharacterCount} NPCs`}
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+                <Box mt={2}>
+                    <TablePagination
+                        component="div"
+                        rowsPerPage={15}
+                        rowsPerPageOptions={[]}
+                        count={pagination?.numberOfResults}
+                        page={page}
+                        onChangePage={handlePageChange}
+                    />
+                </Box>
+            </Box>
+
+        ) : <LinearProgress />;
 };
