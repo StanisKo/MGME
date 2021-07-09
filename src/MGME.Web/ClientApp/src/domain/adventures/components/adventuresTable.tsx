@@ -253,7 +253,11 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
     }, [adventuresToShow, adventuresToAddTo]);
 
     useEffect(() => {
-        if ((selectedPlayerCharacters as number[]).length === 0 && selectedNonPlayerCharacters.length === 0) {
+        const shouldFlushSelectedAdventure = mode === TABLE_DISPLAY_MODE.TO_ADD_TO
+            && selectedNonPlayerCharacters.length === 0
+                && (selectedPlayerCharacters as number[]).length === 0;
+
+        if (shouldFlushSelectedAdventure) {
             dispatch<UpdateStore<{ selected: number }>>(
                 {
                     type: 'UPDATE_STORE',
