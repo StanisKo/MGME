@@ -1,18 +1,18 @@
 ### A flow of adventure to not forget :) ###
-```
+<pre>
 User creates a scene
 |
 |
 |
 v
-If scene is seeded with random event, **`GOTO Random Event Flow`**
+If scene is seeded with random event, <b>GOTO Random Event Flow</b>
 |
 |
 |
 v
 
-Roll, if both digits of rollResult are equal, **`GOTO Random Event Flow`**, else **`GOTO Fate Question Flow`**
-```
+Roll, if both digits of rollResult are equal, <b>GOTO Random Event Flow</b>, else <b>GOTO Fate Question Flow</b>
+</pre>
 
 
 ### Random Event Flow: ###
