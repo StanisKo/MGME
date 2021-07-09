@@ -194,23 +194,23 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
         (async (): Promise<void> => {
             if (isAuthorized) {
 
-                if (mode === TABLE_DISPLAY_MODE.TO_SHOW && adventuresToShow === null) {
+                if (mode === TABLE_DISPLAY_MODE.TO_SHOW) {
                     await fetchAdventures(
                         'adventures',
                         'dataset',
                         page + 1,
                         `${order === 'asc' ? '' : '-'}${orderBy}`
                     );
-                }
-                else if (mode === TABLE_DISPLAY_MODE.TO_ADD_TO && adventuresToAddTo === null) {
-                    await fetchAdventures(
-                        'catalogues',
-                        'adventures',
-                        page + 1,
-                        `${order === 'asc' ? '' : '-'}${orderBy}`
-                    );
+
+                    return;
                 }
 
+                await fetchAdventures(
+                    'catalogues',
+                    'adventures',
+                    page + 1,
+                    `${order === 'asc' ? '' : '-'}${orderBy}`
+                );
             }
         })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -277,7 +277,7 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
     return (
         mode === TABLE_DISPLAY_MODE.TO_SHOW
             ? adventuresToShow !== null && paginationOfToShow !== null
-            : adventuresToAddTo === null && paginationOfToAddTo !== null
+            : adventuresToAddTo !== null && paginationOfToAddTo !== null
     ) ? (
             <Box mt={2}>
                 <Table className={root}>
@@ -287,6 +287,10 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                                 {mode === TABLE_DISPLAY_MODE.TO_SHOW && (
                                     <Checkbox
                                         checked={multipleSelected.length === adventuresToShow?.length}
+                                        /*
+                                        Forced casting as TS doesn't understand adventuresToShow?.length
+                                        with arithmetical operators
+                                        */
                                         indeterminate={
                                             multipleSelected.length > 0
                                                 && multipleSelected.length < (adventuresToShow as Adventure[]).length
@@ -341,10 +345,17 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                                     selected={isItemSelected}
                                 >
                                     <TableCell padding="checkbox">
-                                        <Radio
-                                            checked={isItemSelected}
-                                            inputProps={{ 'aria-labelledby': labelId }}
-                                        />
+                                        {mode === TABLE_DISPLAY_MODE.TO_SHOW ? (
+                                            <Checkbox
+                                                checked={isItemSelected}
+                                                inputProps={{ 'aria-labelledby': labelId }}
+                                            />
+                                        ) : (
+                                            <Radio
+                                                checked={isItemSelected}
+                                                inputProps={{ 'aria-labelledby': labelId }}
+                                            />
+                                        )}
                                     </TableCell>
 
                                     <TableCell align="left">

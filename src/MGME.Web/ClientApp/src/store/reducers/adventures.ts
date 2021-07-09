@@ -24,7 +24,7 @@ export const AdventuresReducer: Reducer<AdventuresState> = (
     const { type, reducer, key, payload } =
         incomingAction as UpdateStore<PaginatedDataServiceResponse<Adventure[]>>;
 
-    if (reducer !== 'catalogues') {
+    if (reducer !== 'adventures') {
         return state;
     }
 
