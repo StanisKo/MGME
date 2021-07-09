@@ -5,7 +5,7 @@ User creates a scene
 |
 |
 v
-If scene is seeded with random event, <span style="color:blue"><b>GOTO Random Event Flow</b></span>
+If scene is seeded with random event, <b>GOTO Random Event Flow</b>
 |
 |
 |
@@ -54,10 +54,10 @@ odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 1-100)
 
                         <b>Odd</b>
                         [
-                            # Chaos Factor
+                            <b>Chaos Factor</b>
                             [Lowest Margin, Target Value, Highest Margin],
 
-                            # Chaos Factor
+                            <b>Chaos Factor</b>
                             [Lowest Margin, Target Value, Highest Margin],
                         ]
                     ]
@@ -74,13 +74,13 @@ odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 1-100)
             |
             |
             v
-            # If rollResult <= margins[targetValue]: "Yes"
+            If rollResult <= margins[targetValue]: "Yes"
 
-            # If rollResult > margins[targetValue]: "No"
+            If rollResult > margins[targetValue]: "No"
 
-            # If rollResult <= margins[lowestMargin]: "Exceptional Yes"
+            If rollResult <= margins[lowestMargin]: "Exceptional Yes"
 
-            # If rollResult >= margins[highestMargin]: "Exceptional No"
+            If rollResult >= margins[highestMargin]: "Exceptional No"
         |
         |
         |
