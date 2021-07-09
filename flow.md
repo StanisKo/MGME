@@ -1,17 +1,18 @@
-# A flow of adventure to not forget :)
+### A flow of adventure to not forget :)
 
 User creates adventure
 |
 |
 |
 v
+Roll, if both digits of rollResult are equal, GOTO Random Event Flow, else GOTO Fate Question Flow
 
+### Random Event Flow:
 
-###
+### Fate Question Flow:
 
-Fate Question flow:
-
-User asks fate question (string) and provides odds and chaos factor (0-10) (0-9)
+User asks fate question (string) and provides:
+odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 0-100)
     |
     |
     |
@@ -23,7 +24,7 @@ User asks fate question (string) and provides odds and chaos factor (0-10) (0-9)
         v
         Where index of first-level array is the int of the odd,
         Index of second-level array is the chaos factor of adventure
-        And each value is an array of 3 ints: lowest margin, target value, highest margin
+        And each value of second-level array is an array of 3 ints: lowest margin, target value, highest margin
             |
             |
             |
@@ -52,12 +53,7 @@ User asks fate question (string) and provides odds and chaos factor (0-10) (0-9)
                     # First-, second-, and third-level arrays have predetermined size:
 
                     # Where
-                    int[,,] oddsAndMargins = new int[11, 9, 3] {}
-            |
-            |
-            |
-            v
-            1D100 is randomized
+                    int[,,] oddsAndMargins = new int[11, 8, 3] {}
             |
             |
             |
