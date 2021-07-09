@@ -7,7 +7,7 @@ import { PlayerCharacter } from '../interfaces';
 import { fetchPlayerCharacters } from '../requests';
 
 import { HeadCell, Pagination } from '../../../shared/interfaces';
-import { SortOrder, PLAYER_CHARACTER_TABLE_DISPLAY_MODE } from '../../../shared/const';
+import { SortOrder, TABLE_DISPLAY_MODE } from '../../../shared/const';
 import { isSelected } from '../../../shared/helpers';
 
 import {
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface PlayerCharacterTableProps {
-    mode: PLAYER_CHARACTER_TABLE_DISPLAY_MODE
+    mode: TABLE_DISPLAY_MODE
 }
 
 const headCells: HeadCell[] = [
@@ -108,7 +108,7 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
     };
 
     const handleSelect = (selectedId: number) => (event: MouseEvent<unknown>): void => {
-        if (mode === PLAYER_CHARACTER_TABLE_DISPLAY_MODE.TO_SHOW) {
+        if (mode === TABLE_DISPLAY_MODE.TO_SHOW) {
             let newSelected: number[] = [];
 
             if (multipleSelected.includes(selectedId)) {
@@ -226,7 +226,7 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
                 <TableHead>
                     <TableRow>
                         <TableCell padding="checkbox">
-                            {mode === PLAYER_CHARACTER_TABLE_DISPLAY_MODE.TO_SHOW && (
+                            {mode === TABLE_DISPLAY_MODE.TO_SHOW && (
                                 <Checkbox
                                     checked={multipleSelected.length === playerCharacters.length}
                                     indeterminate={
@@ -263,7 +263,7 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
                 <TableBody>
                     {playerCharacters.map((playerCharacter, index) => {
 
-                        const isItemSelected = mode === PLAYER_CHARACTER_TABLE_DISPLAY_MODE.TO_SHOW
+                        const isItemSelected = mode === TABLE_DISPLAY_MODE.TO_SHOW
                             ? isSelected(playerCharacter.id, multipleSelected)
                             : singleSelected === playerCharacter.id;
 
@@ -280,7 +280,7 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
                                 selected={isItemSelected}
                             >
                                 <TableCell padding="checkbox">
-                                    {mode === PLAYER_CHARACTER_TABLE_DISPLAY_MODE.TO_SHOW ? (
+                                    {mode === TABLE_DISPLAY_MODE.TO_SHOW ? (
                                         <Checkbox
                                             checked={isItemSelected}
                                             inputProps={{ 'aria-labelledby': labelId }}
