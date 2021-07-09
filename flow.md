@@ -1,15 +1,25 @@
 ### A flow of adventure to not forget :) ###
-
 ```
-User creates adventure
+User creates a scene
 |
 |
 |
 v
-Roll, if both digits of rollResult are equal, GOTO Random Event Flow, else GOTO Fate Question Flow
+If scene is seeded with random event, **GOTO Random Event Flow**
+|
+|
+|
+v
+
+Roll, if both digits of rollResult are equal, **GOTO Random Event Flow**, else **GOTO Fate Question Flow**
 ```
 
+
 ### Random Event Flow: ###
+```
+
+```
+
 
 ### Fate Question Flow:
 ```
