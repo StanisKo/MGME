@@ -5,7 +5,7 @@ User creates a scene
 |
 |
 v
-If scene is seeded with random event, <b>GOTO Random Event Flow</b>
+If scene is seeded with random event, <span style="color:blue"><b>GOTO Random Event Flow</b></span>
 |
 |
 |
