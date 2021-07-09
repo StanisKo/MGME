@@ -1,16 +1,18 @@
-### A flow of adventure to not forget :)
+### A flow of adventure to not forget :) ###
 
+```
 User creates adventure
 |
 |
 |
 v
 Roll, if both digits of rollResult are equal, GOTO Random Event Flow, else GOTO Fate Question Flow
+```
 
-### Random Event Flow:
+### Random Event Flow: ###
 
 ### Fate Question Flow:
-
+```
 User asks fate question (string) and provides:
 odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 0-100)
     |
@@ -75,3 +77,4 @@ odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 0-100)
         |
         v
         Update fate question with answer
+```
