@@ -11,7 +11,7 @@ import { deletePlayerCharacters, addToPlayerCharacter } from '../playerCharacter
 import { NonPlayerCharactersTable, CreateNonPlayerCharacterModal } from '../nonPlayerCharacter/components';
 import { deleteNonPlayerCharacters } from '../nonPlayerCharacter/requests';
 
-import { AdventuresToAddToTable } from '../adventures/components';
+import { AdventuresTable } from '../adventures/components';
 import { addToAdventure } from '../adventures/requests';
 
 import {
@@ -372,7 +372,7 @@ export const Catalogues = (): ReactElement => {
                         {displayAdventures && (
                             <Grid item xs={12}>
                                 <Divider />
-                                <AdventuresToAddToTable />
+                                <AdventuresTable />
                                 <Grid
                                     item
                                     container

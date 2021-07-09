@@ -51,7 +51,7 @@ const headCells: HeadCell[] = [
     { label: 'NPC', sorting: 'npc', numeric: true }
 ];
 
-export const AdventuresToAddToTable = (): ReactElement => {
+export const AdventuresTable = (): ReactElement => {
     const dispatch = useDispatch();
 
     const isAuthorized: boolean = useSelector(

@@ -1,3 +1,3 @@
-import { AdventuresToAddToTable } from './adventuresToAddToTable';
+import { AdventuresTable } from './adventuresTable';
 
-export { AdventuresToAddToTable };
+export { AdventuresTable };
