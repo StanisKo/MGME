@@ -14,7 +14,7 @@ Roll, if both digits of rollResult are equal, GOTO Random Event Flow, else GOTO 
 ### Fate Question Flow:
 ```
 User asks fate question (string) and provides:
-odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 0-100)
+odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 1-100)
     |
     |
     |
@@ -24,7 +24,7 @@ odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 0-100)
         |
         |
         v
-        Where index of first-level array is the int of the odd,
+        Where index of first-level array is the the odd,
         Index of second-level array is the chaos factor of adventure
         And each value of second-level array is an array of 3 ints: lowest margin, target value, highest margin
             |
@@ -55,7 +55,7 @@ odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 0-100)
                     # First-, second-, and third-level arrays have predetermined size:
 
                     # Where
-                    int[,,] oddsAndMargins = new int[11, 8, 3] {}
+                    int[,,] oddsAndMargins = new int[11, 9, 3] {}
             |
             |
             |
