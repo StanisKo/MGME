@@ -186,7 +186,7 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
     // Request with params
     useEffect(() => {
         (async (): Promise<void> => {
-            if (isAuthorized ) {
+            if (isAuthorized) {
 
                 if (mode === TABLE_DISPLAY_MODE.TO_SHOW && adventuresToShow === null) {
                     await fetchAdventures(
@@ -234,8 +234,8 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                 dispatch<UpdateStore<{ selected: number }>>(
                     {
                         type: 'UPDATE_STORE',
-                        reducer: 'adventures',
-                        key: 'dataset',
+                        reducer: 'catalogues',
+                        key: 'adventures',
                         payload: {
                             selected: 0
                         }
