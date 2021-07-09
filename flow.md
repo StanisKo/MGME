@@ -5,7 +5,7 @@ User creates a scene
 |
 |
 v
-If (first) scene is seeded with random event or if 1D10 rollResult <= chaosFactor and rollResult is even , <b>GOTO Random Event Flow</b>
+If (first) scene is seeded with random event or if 1D10 rollResult <= chaosFactor and rollResult is even, <b>GOTO Random Event Flow</b>
 |
 |
 |
