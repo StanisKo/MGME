@@ -71,17 +71,38 @@ Return with answer
 ### Random Event Flow: ###
 <pre>
 Random even is requested
-|
-|
-|
-v
-Determine <i>Event Focus</i>:
+    |
+    |
+    |
+    v
+    Roll 1D100
+    |
+    |
+    |
+    v
+    Determine <i>Event Focus</i>:
 
-eventFocus switch
-{
-    < 7 => "Remote event",
+    rollResult switch
+    {
+        <= 7 => "Remote event",
 
-}
+        (> 7) and (<= 28) => "NPC action",
+
+        (> 28) and (<= 35) => "Introduce new NPC",
+
+        (> 35) and (<= 45) => "Move toward a thread",
+
+        (> 45) and (<= 52) => "Move away from a thread",
+
+        (> 52) and (<= 55) => "Close a thread",
+
+        (> 55) and (<= 67) => "PC negative",
+
+        (> 67) and (<= 75) => "PC positive",
+
+        
+
+    }
 </pre>
 
 

@@ -6,10 +6,10 @@ namespace MGME.Core.Entities
     public class RandomEvent : BaseEntity
     {
         [Required]
-        public int Focus { get; set; }
+        public string Focus { get; set; }
 
         [Required]
-        public int Meaning { get; set; }
+        public string Meaning { get; set; }
 
         public string Interpetation { get; set; }
 
