@@ -28,16 +28,16 @@ User asks fate question
 |
 v
 Front end does 1D100 roll
-|
-|
-|
-v
-If both digits of rollResult are equal, and one of them <= chaosFactor <b>GOTO Random Event Flow</b>
-|
-|
-|
-v
-Else <b>GOTO Fate Question Flow</b>
+    |
+    |
+    |
+    v
+    If both digits of rollResult are equal, and one of them <= chaosFactor <b>GOTO Random Event Flow</b>
+    |
+    |
+    |
+    v
+    Else <b>GOTO Fate Question Flow</b>
 </pre>
 
 
