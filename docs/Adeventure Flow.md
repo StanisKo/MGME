@@ -44,12 +44,17 @@ User asks fate question
 |
 |
 v
+Roll 1D100
+|
+|
+|
+v
 <b>GOTO Fate Question Flow</b>
 |
 |
 |
 v
-Roll 1D100
+Return with answer
     |
     |
     |
