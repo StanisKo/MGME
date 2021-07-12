@@ -100,8 +100,11 @@ Random even is requested
 
         (> 67) and (<= 75) => "PC positive",
 
-        
+        (> 75) and (<= 83) => "Ambiguous event",
 
+        (> 83) and (<= 92) => "NPC negative",
+
+        (> 92) and (<= 100) => "NPC positive"
     }
 </pre>
 
