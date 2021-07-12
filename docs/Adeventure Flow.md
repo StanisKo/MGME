@@ -70,7 +70,18 @@ Return with answer
 
 ### Random Event Flow: ###
 <pre>
+Random even is requested
+|
+|
+|
+v
+Determine <i>Event Focus</i>:
 
+eventFocus switch
+{
+    < 7 => "Remote event",
+
+}
 </pre>
 
 
@@ -122,15 +133,18 @@ We retrieve margins: int[] margins = oddsAndMargins[odds, chaosFactor]
     |
     |
     v
-    switch (rollResult):
+    Determine answer:
 
-        case rollResult <= margins[targetValue]: "Yes"
+    rollResult switch
+    {
+        <= margins[targetValue] => "Yes"
 
-        case rollResult > margins[targetValue]: "No"
+        > margins[targetValue] => "No"
 
-        case rollResult <= margins[lowestMargin]: "Exceptional Yes"
+        <= margins[lowestMargin] => "Exceptional Yes"
 
-        case rollResult >= margins[highestMargin]: "Exceptional No"
+        >= margins[highestMargin] => "Exceptional No"
+    }
 |
 |
 |
