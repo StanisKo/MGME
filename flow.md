@@ -5,20 +5,39 @@ User creates a scene
 |
 |
 v
+Front end does 1D10 roll
+|
+|
+|
+v
 If (first) scene is seeded with random event or if 1D10 rollResult <= chaosFactor and rollResult is even, <b>GOTO Random Event Flow</b>
 |
 |
 |
 v
-_
 
+_
 
 |
 |
 |
 v
-User asks fate question:
-Roll; if both digits of rollResult are equal, and one of them <= chaosFactor <b>GOTO Random Event Flow</b>, else <b>GOTO Fate Question Flow</b>
+User asks fate question
+|
+|
+|
+v
+Front end does 1D100 roll
+|
+|
+|
+v
+If both digits of rollResult are equal, and one of them <= chaosFactor <b>GOTO Random Event Flow</b>
+|
+|
+|
+v
+Else <b>GOTO Fate Question Flow</b>
 </pre>
 
 
