@@ -71,11 +71,11 @@ Return with answer
 ### Random Event Flow: ###
 <pre>
 Random even is requested
-    |
-    |
-    |
-    v
-    Roll 1D100
+|
+|
+|
+v
+Roll 1D100
     |
     |
     |
