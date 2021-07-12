@@ -118,6 +118,7 @@ We retrieve margins: int[] margins = oddsAndMargins[odds, chaosFactor]
     |
     v
     switch (rollResult):
+
         case rollResult <= margins[targetValue]: "Yes"
 
         case rollResult > margins[targetValue]: "No"
