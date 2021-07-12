@@ -10,12 +10,7 @@ User creates a scene
         |
         |
         v
-        If seeded with random event
-            |
-            |
-            |
-            v
-            <b>GOTO Random Event Flow</b>
+        If seeded with random event <b>GOTO Random Event Flow</b>
         |
         |
         |
