@@ -42,6 +42,8 @@ User creates a scene
         v
         Else scene proceeds as expected
 <hr/>
+Then within scene:
+
 User asks fate question
 |
 |
@@ -58,6 +60,11 @@ Roll 1D100
     |
     v
     If both digits of rollResult are equal, and one of them <= chaosFactor <b>GOTO Random Event Flow</b>
+    |
+    |
+    |
+    v
+    Else scene proceeds as expected
 </pre>
 
 
