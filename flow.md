@@ -5,18 +5,24 @@ User creates a scene
 |
 |
 v
-Front end does 1D10 roll
+First scene and it is seeded with random event ? <b>GOTO Random Event Flow</b> : Front end does 1D10 roll
 |
 |
 |
 v
-If (first) scene is seeded with random event or if 1D10 rollResult <= chaosFactor and rollResult is even, <b>GOTO Random Event Flow</b>
+If 1D10 rollResult <= chaosFactor and rollResult is even, <b>GOTO Random Event Flow</b>
 |
 |
 |
 v
+Else if 1D10 rollResult <= chaosFactor and rollResult is odd, scene is <i>altered</i>
+|
+|
+|
+v
+Else scene proceeds as expected
 
-_
+<hr/>
 
 |
 |
