@@ -10,7 +10,7 @@ User creates a scene
         |
         |
         v
-        If Seeded with random event
+        If seeded with random event
             |
             |
             |
@@ -25,17 +25,22 @@ User creates a scene
     |
     |
     v
-    Else front end rolls 1D10
+    Roll 1D10
         |
         |
         |
         v
-        If 1D10 rollResult <= chaosFactor and rollResult is even, <b>GOTO Random Event Flow</b>
+        If rollResult <= chaosFactor and rollResult is even, <b>GOTO Random Event Flow</b>
         |
         |
         |
         v
-        Else if 1D10 rollResult <= chaosFactor and rollResult is odd, scene is <i>altered</i>
+        Else if rollResult <= chaosFactor and rollResult is odd, scene is <i>altered</i>
+        |
+        |
+        |
+        v
+        Else scene proceeds as expected
 <hr/>
 User asks fate question
 |
@@ -47,7 +52,7 @@ v
 |
 |
 v
-Front end does 1D100 roll
+Roll 1D100
     |
     |
     |
@@ -117,9 +122,9 @@ We retrieve margins: int[] margins = oddsAndMargins[odds, chaosFactor]
     If rollResult <= margins[lowestMargin]: "Exceptional Yes"
 
     If rollResult >= margins[highestMargin]: "Exceptional No"
-    |
-    |
-    |
-    v
-    Update fate question with answer and return to caller
+|
+|
+|
+v
+Update fate question with answer and return to caller
 </pre>
