@@ -96,20 +96,20 @@ odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 1-100)
             |
             v
             We retrieve margins: int[] margins = oddsAndMargins[odds, chaosFactor]
+                |
+                |
+                |
+                v
+                If rollResult <= margins[targetValue]: "Yes"
+
+                If rollResult > margins[targetValue]: "No"
+
+                If rollResult <= margins[lowestMargin]: "Exceptional Yes"
+
+                If rollResult >= margins[highestMargin]: "Exceptional No"
             |
             |
             |
             v
-            If rollResult <= margins[targetValue]: "Yes"
-
-            If rollResult > margins[targetValue]: "No"
-
-            If rollResult <= margins[lowestMargin]: "Exceptional Yes"
-
-            If rollResult >= margins[highestMargin]: "Exceptional No"
-        |
-        |
-        |
-        v
-        Update fate question with answer
+            Update fate question with answer
 </pre>
