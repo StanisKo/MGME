@@ -20,7 +20,7 @@ User creates a scene
     |
     |
     v
-    Roll 1D10
+    Else roll 1D10
         |
         |
         |
@@ -54,7 +54,7 @@ Roll 1D100
     |
     |
     v
-    If both digits of rollResult are equal, and one of them <= chaosFactor <b>GOTO Random Event Flow</b>
+    If both digits of rollResult are equal and one of them <= chaosFactor <b>GOTO Random Event Flow</b>
     |
     |
     |
@@ -117,16 +117,17 @@ We retrieve margins: int[] margins = oddsAndMargins[odds, chaosFactor]
     |
     |
     v
-    If rollResult <= margins[targetValue]: "Yes"
+    switch (rollResult):
+        case rollResult <= margins[targetValue]: "Yes"
 
-    If rollResult > margins[targetValue]: "No"
+        case rollResult > margins[targetValue]: "No"
 
-    If rollResult <= margins[lowestMargin]: "Exceptional Yes"
+        case rollResult <= margins[lowestMargin]: "Exceptional Yes"
 
-    If rollResult >= margins[highestMargin]: "Exceptional No"
+        case rollResult >= margins[highestMargin]: "Exceptional No"
 |
 |
 |
 v
-Update fate question with answer and return to caller
+Update fate question with answer and return to scene
 </pre>
