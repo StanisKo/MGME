@@ -5,7 +5,27 @@ User creates a scene
     |
     |
     v
-    First scene and it is seeded with random event ? <b>GOTO Random Event Flow</b> : Front end does 1D10 roll
+    If first scene
+        |
+        |
+        |
+        v
+        If Seeded with random event
+            |
+            |
+            |
+            v
+            <b>GOTO Random Event Flow</b>
+        |
+        |
+        |
+        v
+        Else scene proceeds as expected
+    |
+    |
+    |
+    v
+    Else front end rolls 1D10
         |
         |
         |
@@ -16,11 +36,6 @@ User creates a scene
         |
         v
         Else if 1D10 rollResult <= chaosFactor and rollResult is odd, scene is <i>altered</i>
-        |
-        |
-        |
-        v
-        Else scene proceeds as expected
 <hr/>
 User asks fate question
 |
