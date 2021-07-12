@@ -1,26 +1,26 @@
 ### A flow of adventure to not forget :) ###
 <pre>
 User creates a scene
-|
-|
-|
-v
-First scene and it is seeded with random event ? <b>GOTO Random Event Flow</b> : Front end does 1D10 roll
-|
-|
-|
-v
-If 1D10 rollResult <= chaosFactor and rollResult is even, <b>GOTO Random Event Flow</b>
-|
-|
-|
-v
-Else if 1D10 rollResult <= chaosFactor and rollResult is odd, scene is <i>altered</i>
-|
-|
-|
-v
-Else scene proceeds as expected
+    |
+    |
+    |
+    v
+    First scene and it is seeded with random event ? <b>GOTO Random Event Flow</b> : Front end does 1D10 roll
+        |
+        |
+        |
+        v
+        If 1D10 rollResult <= chaosFactor and rollResult is even, <b>GOTO Random Event Flow</b>
+        |
+        |
+        |
+        v
+        Else if 1D10 rollResult <= chaosFactor and rollResult is odd, scene is <i>altered</i>
+        |
+        |
+        |
+        v
+        Else scene proceeds as expected
 <hr/>
 User asks fate question
 |
