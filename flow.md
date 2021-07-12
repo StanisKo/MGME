@@ -27,17 +27,17 @@ User asks fate question
 |
 |
 v
+<b>GOTO Fate Question Flow</b>
+|
+|
+|
+v
 Front end does 1D100 roll
     |
     |
     |
     v
     If both digits of rollResult are equal, and one of them <= chaosFactor <b>GOTO Random Event Flow</b>
-    |
-    |
-    |
-    v
-    Else <b>GOTO Fate Question Flow</b>
 </pre>
 
 
@@ -102,9 +102,9 @@ We retrieve margins: int[] margins = oddsAndMargins[odds, chaosFactor]
     If rollResult <= margins[lowestMargin]: "Exceptional Yes"
 
     If rollResult >= margins[highestMargin]: "Exceptional No"
-|
-|
-|
-v
-Update fate question with answer
+    |
+    |
+    |
+    v
+    Update fate question with answer and return to caller
 </pre>
