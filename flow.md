@@ -63,34 +63,35 @@ odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 1-100)
         Where index of first-level array is the the odd,
         Index of second-level array is the chaos factor of adventure
         And each value of second-level array is an array of 3 ints: lowest margin, target value, highest margin
-            |
-            |
-            |
-            v
-            As in:
-                    [
-                        <b>Odd</b>
-                        [
-                            <b>Chaos Factor</b>
-                            [Lowest Margin, Target Value, Highest Margin],
+        |
+        |
+        |
+        v
+        As in:
 
-                            <b>Chaos Factor</b>
-                            [Lowest Margin, Target Value, Highest Margin],
-                        ],
+            [
+                <b>Odd</b>
+                [
+                    <b>Chaos Factor</b>
+                    [Lowest Margin, Target Value, Highest Margin],
 
-                        <b>Odd</b>
-                        [
-                            <b>Chaos Factor</b>
-                            [Lowest Margin, Target Value, Highest Margin],
+                    <b>Chaos Factor</b>
+                    [Lowest Margin, Target Value, Highest Margin],
+                ],
 
-                            <b>Chaos Factor</b>
-                            [Lowest Margin, Target Value, Highest Margin],
-                        ]
-                    ]
+                <b>Odd</b>
+                [
+                    <b>Chaos Factor</b>
+                    [Lowest Margin, Target Value, Highest Margin],
 
-                    <i>First-, second-, and third-level arrays have predetermined size:</i>
+                    <b>Chaos Factor</b>
+                    [Lowest Margin, Target Value, Highest Margin],
+                ]
+            ]
 
-                    int[,,] oddsAndMargins = new int[11, 9, 3] {}
+            <i>First-, second-, and third-level arrays have predetermined size:</i>
+
+            int[,,] oddsAndMargins = new int[11, 9, 3] {}
             |
             |
             |
