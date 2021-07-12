@@ -21,13 +21,7 @@ Else if 1D10 rollResult <= chaosFactor and rollResult is odd, scene is <i>altere
 |
 v
 Else scene proceeds as expected
-
 <hr/>
-
-|
-|
-|
-v
 User asks fate question
 |
 |
