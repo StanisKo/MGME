@@ -1,12 +1,4 @@
-import {
-    ReactElement,
-    useEffect,
-    useState,
-    ChangeEvent,
-    Dispatch,
-    SetStateAction,
-    SyntheticEvent
-} from 'react';
+import { ReactElement, useEffect, useState, ChangeEvent, SyntheticEvent } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -141,40 +133,34 @@ export const UserProfile = (): ReactElement | null => {
 
     const [dialogOpen, setDialogOpen] = useState(false);
 
-    const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
-        [INPUT_TYPE.USERNAME]: setName,
-        [INPUT_TYPE.EMAIL]: setEmail,
-        [INPUT_TYPE.OLD_PASSWORD]: setOldPassword,
-        [INPUT_TYPE.PASSWORD]: setNewPassword,
-        [INPUT_TYPE.CONFRIM_PASSWORD]: setConfirmPassword
-    };
-
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
 
         const value = event.target.value;
 
-        inputTypeToCallback[inputType](value);
-
         handleInputValidation(inputType, value);
     };
 
     const handleInputValidation = (inputType: number, value: string): void => {
+        const normalizedInput = value.trim();
+
         switch (inputType) {
             case INPUT_TYPE.USERNAME:
-                if (value.length < 6) {
+                if (normalizedInput.length < 6) {
                     setNameError(true);
                     setNameHelperText('Username must be at least 6 characters long');
 
                     break;
                 }
 
-                if (value === user?.name) {
+                if (normalizedInput === user?.name) {
                     setNameError(true);
                     setNameHelperText('Username cannot be the same as old username');
 
                     break;
                 }
+
+                setName(normalizedInput);
 
                 setNameError(false);
                 setNameHelperText('');
@@ -182,25 +168,28 @@ export const UserProfile = (): ReactElement | null => {
                 break;
 
             case INPUT_TYPE.EMAIL:
-                if (!validEmailFormat.test(value)) {
+                if (!validEmailFormat.test(normalizedInput)) {
                     setEmailError(true);
                     setEmailHelperText('Email address is not valid');
 
                     break;
                 }
 
-                if (value === user?.email) {
+                if (normalizedInput === user?.email) {
                     setEmailError(true);
                     setEmailHelperText('Email cannot be the same as old email');
 
                     break;
                 }
 
+                setEmail(normalizedInput);
+
                 setEmailError(false);
                 setEmailHelperText('');
 
                 break;
 
+            // For passwords we use pure argument, since user might include whitespaces
             case INPUT_TYPE.OLD_PASSWORD:
                 if (!validPasswordFormat.test(value)) {
                     setOldPasswordError(true);
@@ -213,6 +202,8 @@ export const UserProfile = (): ReactElement | null => {
 
                     break;
                 }
+
+                setOldPassword(value);
 
                 setOldPasswordError(false);
                 setOldPasswordHelperText('');
@@ -232,6 +223,8 @@ export const UserProfile = (): ReactElement | null => {
                     break;
                 }
 
+                setNewPassword(value);
+
                 setNewPasswordError(false);
                 setNewPasswordHelperText('');
 
@@ -244,6 +237,8 @@ export const UserProfile = (): ReactElement | null => {
 
                     break;
                 }
+
+                setConfirmPassword(value);
 
                 setConfirmPasswordError(false);
                 setConfirmPasswordHelperText('');
@@ -283,7 +278,7 @@ export const UserProfile = (): ReactElement | null => {
     };
 
     const handleUpdate = async (): Promise<void> => {
-        if (user || email) {
+        if (name || email) {
             await handleUserUpdate();
         }
 
@@ -584,7 +579,7 @@ export const UserProfile = (): ReactElement | null => {
                 <DialogTitle id="alert-dialog-title">{'Are you sure you want to delete your account?'}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        This action is irreversable, your account will be deleted forever
+                        This action is irreversible, your account will be deleted forever
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
