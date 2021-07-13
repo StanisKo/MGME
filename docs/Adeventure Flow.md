@@ -21,16 +21,21 @@ User creates a scene
     |
     v
     Else roll 1D10
+    |
+    |
+    |
+    v
+    Create scene and return to the caller
         |
         |
         |
         v
-        If rollResult <= chaosFactor and rollResult is even, <b>GOTO Random Event Flow</b>
+        If scene type is <i>interrupted</i>, <b>GOTO Random Event Flow</b> and modify setup based on output
         |
         |
         |
         v
-        Else if rollResult <= chaosFactor and rollResult is odd, scene is <i>altered</i>
+        Else if scene type is <i>altered</i>, modify setup
         |
         |
         |
