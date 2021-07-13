@@ -65,6 +65,26 @@ Return with answer
     |
     v
     Else scene proceeds as expected
+|
+|
+|
+v
+User creates a battle
+|
+|
+|
+v
+User resolves the scene and modifies adventure's chaos factor
+|
+|
+|
+v
+Repeat flow
+|
+|
+|
+v
+User resolves the adventure
 </pre>
 
 
