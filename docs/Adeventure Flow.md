@@ -106,6 +106,21 @@ Roll 1D100
 
         (> 92) and (<= 100) => "NPC positive"
     }
+    |
+    |
+    |
+    v
+    <i>Event Meaning</i> and <i>Event Subject</i> Dictionaries of <int, str> are initialized
+    |
+    |
+    |
+    v
+    Roll 1D100 on Event Meaning and roll 1D100 on Event Subject to get necessary values
+    |
+    |
+    |
+    v
+    Create random event instance and return to the caller
 </pre>
 
 
