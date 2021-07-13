@@ -48,7 +48,14 @@ const useStyles = makeStyles((theme) => ({
             color: theme.palette.secondary.main
         }
     },
-    deleteButton: {
+    outlinedDeleteButton: {
+        borderColor: '#bf7c7c',
+        '&:hover': {
+            borderColor: '#b52828'
+        },
+        color: '#b52828'
+    },
+    containedDeleteButton: {
         backgroundColor: '#d32f2f',
         '&:hover': {
             backgroundColor: '#b52828'
@@ -250,7 +257,8 @@ export const UserProfile = (): ReactElement | null => {
         }
     };
 
-    const handleUserUpdate = async (): Promise<void | BaseServiceResponse> => {
+    const handleUserUpdate = async (): Promise<void> => {
+        // Condition if user wants to update only one field
         const params: { [key: string]: string } = {
             ...(name && !nameError ? { name: name } : null),
             ...(email && !emailError ? { email: email } : null)
@@ -258,27 +266,27 @@ export const UserProfile = (): ReactElement | null => {
 
         const response = await updateUser(params);
 
-        if (response) {
-            setUserUpdateResponse(response);
-        }
-
-        setEditing(false);
+        setUserUpdateResponse(response);
         setUserUpdateOpenSnackbar(true);
+
+        if (response.success) {
+            setEditing(false);
+        }
     };
 
-    const handleChangePassword = async (): Promise<void | BaseServiceResponse> => {
+    const handleChangePassword = async (): Promise<void> => {
         const response = await changePassword({ oldPassword, newPassword, confirmPassword });
 
-        if (response) {
-            setChangePasswordResponse(response);
-        }
-
-        setEditing(false);
+        setChangePasswordResponse(response);
         setChangePasswordOpenSnackbar(true);
+
+        if (response.success) {
+            setEditing(false);
+        }
     };
 
     const handleUpdate = async (): Promise<void> => {
-        if (name || email) {
+        if ((name && !nameError && name !== user?.name) || (email && !emailError && email !== user?.email)) {
             await handleUserUpdate();
         }
 
@@ -422,7 +430,16 @@ export const UserProfile = (): ReactElement | null => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [oldPassword, oldPasswordError, newPassword, newPasswordError, confirmPassword, confirmPasswordError]);
 
-    const { root, centered, deleteButton, oneThirdWidth, toRight, editIcon, input } = useStyles();
+    const {
+        root,
+        centered,
+        outlinedDeleteButton,
+        containedDeleteButton,
+        oneThirdWidth,
+        toRight,
+        editIcon,
+        input
+    } = useStyles();
 
     return user ? (
         <div className={centered}>
@@ -536,7 +553,7 @@ export const UserProfile = (): ReactElement | null => {
                     <Grid item container spacing={4} className={toRight}>
                         <Grid item>
                             <Button
-                                variant="contained"
+                                variant="outlined"
                                 color="primary"
                                 onClick={handleUpdate}
                                 disabled={!canUpdate}
@@ -546,8 +563,8 @@ export const UserProfile = (): ReactElement | null => {
                         </Grid>
                         <Grid item>
                             <Button
-                                variant="contained"
-                                className={deleteButton}
+                                variant="outlined"
+                                className={outlinedDeleteButton}
                                 onClick={handleDialogOpen}
                             >
                                 Delete
@@ -586,7 +603,7 @@ export const UserProfile = (): ReactElement | null => {
                     <Button onClick={handleDialogClose} variant="contained" color="secondary">
                         Back
                     </Button>
-                    <Button onClick={handleDelete} variant="contained" className={deleteButton}>
+                    <Button onClick={handleDelete} variant="contained" className={containedDeleteButton}>
                         Yes
                     </Button>
                 </DialogActions>

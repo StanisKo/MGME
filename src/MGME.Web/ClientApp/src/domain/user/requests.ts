@@ -24,7 +24,7 @@ export const getUser = async (): Promise<void> => {
     );
 };
 
-export const updateUser = async ({ name, email }: UpdateUserProps): Promise<BaseServiceResponse | void> => {
+export const updateUser = async ({ name, email }: UpdateUserProps): Promise<BaseServiceResponse> => {
     return await DataController.UpdateAndRefetch(
         {
             url: URLBuilder.WriteTo('user', 'update'),
@@ -40,7 +40,7 @@ export const updateUser = async ({ name, email }: UpdateUserProps): Promise<Base
 };
 
 export const changePassword = async (
-    { oldPassword, newPassword, confirmPassword }: ChangePasswordParams): Promise<BaseServiceResponse | void> => {
+    { oldPassword, newPassword, confirmPassword }: ChangePasswordParams): Promise<BaseServiceResponse> => {
 
     return await DataController.UpdateAndRefetch(
         {
