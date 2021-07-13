@@ -30,12 +30,12 @@ User creates a scene
         |
         |
         v
-        If scene type is <i>interrupted</i>, <b>GOTO Random Event Flow</b> and modify setup based on output
+        If scene <i>interrupted</i>, <b>GOTO Random Event Flow</b> and modify setup based on output
         |
         |
         |
         v
-        Else if scene type is <i>altered</i>, modify setup
+        Else if scene <i>altered</i>, modify setup
         |
         |
         |
