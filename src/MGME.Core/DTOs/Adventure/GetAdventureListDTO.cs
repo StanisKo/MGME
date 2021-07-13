@@ -1,3 +1,5 @@
+using System;
+
 using MGME.Core.DTOs.Thread;
 using MGME.Core.DTOs.PlayerCharacter;
 using MGME.Core.DTOs.NonPlayerCharacter;
@@ -21,5 +23,7 @@ namespace MGME.Core.DTOs.Adventure
         public int NonPlayerCharacterCount { get; set; }
 
         public int SceneCount { get; set; }
+
+        public DateTime CreatedAt { get; set; }
     }
 }

@@ -32,6 +32,12 @@ namespace MGME.Core.Utils.Sorters
                 }
             },
             {
+                "created", new()
+                {
+                    adventure => adventure.CreatedAt
+                }
+            },
+            {
                 "character", new()
                 {
                     adventure => adventure.PlayerCharacters.Count,
@@ -48,7 +54,6 @@ namespace MGME.Core.Utils.Sorters
                 }
             },
             {
-                // If count is equal, sort alphabetically
                 "scene", new()
                 {
                     adventure => adventure.Scenes.Count,

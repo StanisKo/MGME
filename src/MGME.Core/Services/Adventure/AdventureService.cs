@@ -409,6 +409,10 @@ namespace MGME.Core.Services.AdventureService
                         nonPlayerCharacter => adventure.NonPlayerCharacters.Count == 1
                     ).FirstOrDefault(),
                     NonPlayerCharacterCount = adventure.NonPlayerCharacters.Count,
+
+                    SceneCount = adventure.Scenes.Count,
+
+                    CreatedAt = adventure.CreatedAt
                 },
                 orderBy: _sorter.DetermineSorting(sortingParameter.Value),
                 page: selectedPage.Value

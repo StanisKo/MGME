@@ -27,6 +27,8 @@ import {
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
+import moment from 'moment';
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -53,8 +55,10 @@ interface AdventureTableProps {
 const headCells: HeadCell[] = [
     { label: 'Title', sorting: 'title', numeric: false },
     { label: 'Thread', sorting: 'thread', numeric: true },
+    { label: 'Created', sorting: 'created', numeric: true },
     { label: 'Character', sorting: 'character', numeric: true },
-    { label: 'NPC', sorting: 'npc', numeric: true }
+    { label: 'NPC', sorting: 'npc', numeric: true },
+    { label: 'Scenes', sorting: 'scene', numeric: true }
 ];
 
 export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => {
@@ -368,6 +372,10 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                                     </TableCell>
 
                                     <TableCell align="right">
+                                        {moment(adventure.createdAt).fromNow()}
+                                    </TableCell>
+
+                                    <TableCell align="right">
                                         {adventure.playerCharacter?.name
                                             ?? `${adventure.playerCharacterCount} Characters`}
                                     </TableCell>
@@ -375,6 +383,11 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                                     <TableCell align="right">
                                         {adventure.nonPlayerCharacter?.name
                                             ?? `${adventure.nonPlayerCharacterCount} NPCs`}
+                                    </TableCell>
+
+                                    <TableCell align="right">
+                                        {`${adventure.sceneCount > 1
+                                            ? `${adventure.sceneCount}` : 'No'} Scenes Yet`}
                                     </TableCell>
                                 </TableRow>
                             );

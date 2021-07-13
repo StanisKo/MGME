@@ -83,8 +83,8 @@ export const CreatePlayerCharacterModal = ({
     A replica of original npc collection that is modified via ui interaction:
     via it we show what we add or remove to/from the list avialable npcs
     */
-    const [displayedAvailableNonPlayerCharacters, setDisplayedAvailableNonPlayerCharacters]
-        = useState<AvailableNonPlayerCharacter[]>();
+    const [displayedAvailableNonPlayerCharacters, setDisplayedAvailableNonPlayerCharacters] =
+        useState<AvailableNonPlayerCharacter[]>();
 
     const [name, setName] = useState<string>('');
     const [nameError, setNameError] = useState<boolean>(false);
