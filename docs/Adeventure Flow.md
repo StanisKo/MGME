@@ -49,11 +49,6 @@ User asks fate question
 |
 |
 v
-Roll 1D100
-|
-|
-|
-v
 <b>GOTO Fate Question Flow</b>
 |
 |
@@ -151,8 +146,12 @@ Roll 1D100
 
 ### Fate Question Flow:
 <pre>
-User asks fate question (string) and provides:
-odds (int 0-10), chaos factor (int 0-8), randomized 1D100 roll (int 1-100)
+User asks fate question (string) and provides: odds (int 0-10), chaos factor (int 0-8)
+|
+|
+|
+v
+Roll 1D100
 |
 |
 |
@@ -213,5 +212,5 @@ We retrieve margins: int[] margins = oddsAndMargins[odds, chaosFactor]
 |
 |
 v
-Update fate question with answer and return to scene
+Update fate question with answer and rollResult and return to scene
 </pre>
