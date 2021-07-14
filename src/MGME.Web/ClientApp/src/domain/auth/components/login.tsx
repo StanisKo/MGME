@@ -1,12 +1,4 @@
-import {
-    ReactElement,
-    useState,
-    useEffect,
-    ChangeEvent,
-    SyntheticEvent,
-    Dispatch,
-    SetStateAction
-} from 'react';
+import { ReactElement, useState, useEffect, ChangeEvent, SyntheticEvent } from 'react';
 
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -98,13 +90,6 @@ export const Login = (): ReactElement => {
 
     const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
 
-    const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
-        [INPUT_TYPE.USERNAME]: setName,
-        [INPUT_TYPE.EMAIL]: setEmail,
-        [INPUT_TYPE.PASSWORD]: setPassword,
-        [INPUT_TYPE.CONFRIM_PASSWORD]: setConfirmPassword
-    };
-
     const handleModeChange = (): void => {
         setMode(mode === MODE.SIGN_UP ? MODE.SIGN_IN : MODE.SIGN_UP);
     };
@@ -114,20 +99,22 @@ export const Login = (): ReactElement => {
 
         const value = event.target.value;
 
-        inputTypeToCallback[inputType](value);
-
         handleInputValidation(inputType, value);
     };
 
     const handleInputValidation = (inputType: number, value: string): void => {
+        const normalizedInput = value.trim();
+
         switch (inputType) {
             case INPUT_TYPE.USERNAME:
-                if (value.length < 6) {
+                if (normalizedInput.length < 6) {
                     setNameError(true);
                     setNameHelperText('Username must be at least 6 characters long');
 
                     break;
                 }
+
+                setName(normalizedInput);
 
                 setNameError(false);
                 setNameHelperText('');
@@ -135,19 +122,28 @@ export const Login = (): ReactElement => {
                 break;
 
             case INPUT_TYPE.EMAIL:
-                if (!validEmailFormat.test(value)) {
+                if (!validEmailFormat.test(normalizedInput)) {
                     setEmailError(true);
                     setEmailHelperText('Email address is not valid');
 
                     break;
                 }
 
+                setEmail(normalizedInput);
+
                 setEmailError(false);
                 setEmailHelperText('');
 
                 break;
 
+            // For passwords we use pure argument, since user might include whitespaces
             case INPUT_TYPE.PASSWORD:
+                if (mode === MODE.SIGN_IN) {
+                    setPassword(value);
+
+                    break;
+                }
+
                 if (!validPasswordFormat.test(value)) {
                     setPasswordError(true);
                     setPasswordHelperText(
@@ -159,6 +155,8 @@ export const Login = (): ReactElement => {
 
                     break;
                 }
+
+                setPassword(value);
 
                 setPasswordError(false);
                 setPasswordHelperText('');
@@ -172,6 +170,8 @@ export const Login = (): ReactElement => {
 
                     break;
                 }
+
+                setConfirmPassword(value);
 
                 setConfirmPasswordError(false);
                 setConfirmPasswordHelperText('');
