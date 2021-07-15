@@ -1,93 +1,217 @@
-// import { ReactElement, useState, Dispatch, SetStateAction } from 'react';
-// import { useSelector } from 'react-redux';
+import { ReactElement, useState, Dispatch, SetStateAction, ChangeEvent } from 'react';
+import { useSelector } from 'react-redux';
 
-// import { ApplicationState } from '../../../store';
+import { ApplicationState } from '../../../store';
 
-// import { Adventure } from '../interfaces';
+import { Adventure } from '../interfaces';
 
-// import { BaseServiceResponse } from '../../../shared/interfaces';
+import { BaseServiceResponse, NewEntityToAdd } from '../../../shared/interfaces';
 
-// import { AvailableNonPlayerCharacter } from '../../nonPlayerCharacter/interfaces';
+import { AvailableNonPlayerCharacter } from '../../nonPlayerCharacter/interfaces';
 
-// import {
-//     Dialog,
-//     DialogTitle,
-//     DialogContent,
-//     Grid,
-//     TextField,
-//     Accordion,
-//     AccordionSummary,
-//     AccordionDetails,
-//     List,
-//     ListItem,
-//     ListItemText,
-//     LinearProgress,
-//     DialogActions,
-//     Button,
-//     Typography
-// } from '@material-ui/core';
+import { INPUT_TYPE } from '../../../shared/const';
 
-// import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    Grid,
+    TextField,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    List,
+    ListItem,
+    ListItemText,
+    LinearProgress,
+    DialogActions,
+    Button,
+    Typography
+} from '@material-ui/core';
 
-// import clsx from 'clsx';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
-// const useStyles = makeStyles((theme: Theme) =>
-//     createStyles({
-//         root: {
-//             '& label.Mui-error': {
-//                 color: theme.palette.secondary.main
-//             },
-//             '& .Mui-error': {
-//                 '& fieldset': {
-//                     borderColor: '#077b8a !important'
-//                 }
-//             },
-//             '& .MuiFormHelperText-root': {
-//                 color: theme.palette.secondary.main
-//             }
-//         }
-//     })
-// );
+import clsx from 'clsx';
 
-// interface Props {
-//     handleDialogClose: () => void;
-//     classes: { [key: string]: string };
-//     setResponse: Dispatch<SetStateAction<BaseServiceResponse>>;
-//     setOpenSnackBar: Dispatch<SetStateAction<boolean>>;
-// }
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        root: {
+            '& label.Mui-error': {
+                color: theme.palette.secondary.main
+            },
+            '& .Mui-error': {
+                '& fieldset': {
+                    borderColor: '#077b8a !important'
+                }
+            },
+            '& .MuiFormHelperText-root': {
+                color: theme.palette.secondary.main
+            }
+        }
+    })
+);
 
-// export const CreateAdventureModal = (
-//     { handleDialogClose, classes, setResponse, setOpenSnackBar }: Props): ReactElement => {
+interface Props {
+    handleDialogClose: () => void;
+    classes: { [key: string]: string };
+    setResponse: Dispatch<SetStateAction<BaseServiceResponse>>;
+    setOpenSnackBar: Dispatch<SetStateAction<boolean>>;
+}
 
-//     /*
-//     Used exclusively to extract names and deny ui interaction
-//     if name of a new adventure already exists
-//     */
-//     const adventures: Adventure[] | null = useSelector(
-//         (state: ApplicationState) => state.adventures?.dataset?.data ?? null
-//     );
+export const CreateAdventureModal = (
+    { handleDialogClose, classes, setResponse, setOpenSnackBar }: Props): ReactElement => {
 
-//     /*
-//     Original collection of npcs that are available for adding. Acts as a source of truth
-//     from which characters can be added back to what we display
-//     */
-//     const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
+    /*
+    Used exclusively to extract names and deny ui interaction
+    if name of a new adventure already exists
+    */
+    const adventures: Adventure[] | null = useSelector(
+        (state: ApplicationState) => state.adventures?.dataset?.data ?? null
+    );
 
-//     /*
-//     A replica of original npc collection that is modified via ui interaction:
-//     via it we show what we add or remove to/from the list avialable npcs
-//     */
-//     const [displayedAvailableNonPlayerCharacters, setDisplayedAvailableNonPlayerCharacters] =
-//         useState<AvailableNonPlayerCharacter[]>();
+    /*
+    Original collection of npcs that are available for adding. Acts as a source of truth
+    from which characters can be added back to what we display
+    */
+    const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
 
-//     const [title, setTitle] = useState<string>('');
-//     const [titleError, setNameError] = useState<boolean>(false);
-//     const [nameHelperText, setNameHelperText] = useState<string>('');
+    /*
+    A replica of original npc collection that is modified via ui interaction:
+    via it we show what we add or remove to/from the list avialable npcs
+    */
+    const [displayedAvailableNonPlayerCharacters, setDisplayedAvailableNonPlayerCharacters] =
+        useState<AvailableNonPlayerCharacter[]>();
 
-//     const { root } = useStyles();
+    const [title, setTitle] = useState<string>('');
+    const [titleError, setTitleError] = useState<boolean>(false);
+    const [titleHelperText, setTitleHelperText] = useState<string>('');
 
-//     return <div></div>;
-// };
+    const [context, setContext] = useState<string>('');
 
-export {};
+    const [threadName, setThreadName] = useState<string>('');
+    const [threadError, setThreadError] = useState<boolean>(false);
+    const [threadHelperText, setThreadHelperText] = useState<string>('');
 
+    const [threadDescription, setThreadDescription] = useState<string>('');
+
+    // Collection of threads to add to new adventure
+    const [threadsToAdd, setThreadsToAdd] = useState<NewEntityToAdd[]>([]);
+
+    const [nonPlayerCharacterName, setNonPlayerCharacterName] = useState<string>('');
+    const [nonPlayerCharacterError, setNonPlayerCharacterError] = useState<boolean>(false);
+    const [nonPlayerCharacterHelperText, setNonPlayerCharacterHelperText] = useState<string>('');
+
+    const [nonPlayerCharacterDescription, setNonPlayerCharacterDescription] = useState<string>('');
+
+    // A collection of newly created npcs that we actually send to the API
+    const [newNonPlayerCharactersToAdd, setNewNonPlayerCharactersToAdd] = useState<NewEntityToAdd[]>([]);
+
+    // A pool of newly created and existing npcs that are displayed to the user
+    const [displayedNonPlayerCharactersToAdd, setDisplayedNonPlayerCharactersToAdd] =
+        useState<NewEntityToAdd[]>([]);
+
+    // A collection of existing npcs' ids that we actually send to the API
+    const [existingNonPlayerCharactersToAdd, setExistingNonPlayerCharactersToAdd] = useState<number[]>([]);
+
+    // Takes part in validing names of freshly created npcs
+    const [nonPlayerCharacterNames, setNonPlayerCharacterNames] = useState<string[]>([]);
+
+    const { root } = useStyles();
+
+    const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
+
+        const value = event.target.value.trim().toLowerCase();
+
+        switch (inputType) {
+            case INPUT_TYPE.ENTITY_NAME:
+                if (normalizedInput.length < 1) {
+                    setTitleError(true);
+                    setNameHelperText('Please provide character name');
+
+                    break;
+                }
+
+                // This doesn't cover character names outside of what is currently displayed on the page
+                if (playerCharacterNames?.includes(value.trim().toLowerCase())) {
+                    setNameError(true);
+                    setNameHelperText('Character with such name already exists');
+
+                    break;
+                }
+
+                setName(value);
+
+                setNameError(false);
+                setNameHelperText('');
+
+                break;
+
+            // We don't need to validate description, it's up to the user to provide it or not
+            case INPUT_TYPE.ENTITY_DESCRIPTION:
+                setDescription(value);
+
+                break;
+
+            case INPUT_TYPE.THREAD_NAME:
+                setThreadName(value);
+
+                const threadAlreadyExists = threadsToAdd.map(thread => thread.name).includes(
+                    value.trim()
+                );
+
+                if (threadAlreadyExists) {
+                    setThreadError(true);
+                    setThreadHelperText('Such thread already exists');
+
+                    break;
+                }
+
+                setThreadError(false);
+                setThreadHelperText('');
+
+                break;
+
+            case INPUT_TYPE.THREAD_DESCRIPTION:
+                setThreadDescription(value);
+
+                break;
+
+            case INPUT_TYPE.NON_PLAYER_CHARACTER_NAME:
+                setNonPlayerCharacterName(value);
+
+                /*
+                Check if provided name is already taken by some of the available npcs,
+                or by those that were added manually before
+
+                This doesn't cover for such name belonging to an npc in adventure, or that is
+                linked to another character, yet it still adds to better UX
+
+                (If such name is already taked by unavailable npc, api will return 400)
+                */
+                const nonPlayerCharacterAlreadyExists = nonPlayerCharacterNames.includes(
+                    value.trim().toLowerCase()
+                );
+
+                if (nonPlayerCharacterAlreadyExists) {
+                    setNonPlayerCharacterError(true);
+                    setNonPlayerCharacterHelperText('Such NPC already exists');
+
+                    break;
+                }
+
+                setNonPlayerCharacterError(false);
+                setNonPlayerCharacterHelperText('');
+
+                break;
+
+            case INPUT_TYPE.NON_PLAYER_CHARACTER_DESCRIPTION:
+                setNonPlayerCharacterDescription(value);
+
+                break;
+
+        }
+    };
+
+    return <div></div>;
+};

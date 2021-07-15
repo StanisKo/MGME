@@ -127,9 +127,11 @@ export const CreatePlayerCharacterModal = ({
 
         const value = event.target.value;
 
+        const normalizedInput = value.trim().toLowerCase();
+
         switch (inputType) {
             case INPUT_TYPE.ENTITY_NAME:
-                if (value.length < 1) {
+                if (normalizedInput.length < 1) {
                     setNameError(true);
                     setNameHelperText('Please provide character name');
 
@@ -137,7 +139,7 @@ export const CreatePlayerCharacterModal = ({
                 }
 
                 // This doesn't cover character names outside of what is currently displayed on the page
-                if (playerCharacterNames?.includes(value.trim().toLowerCase())) {
+                if (playerCharacterNames?.includes(normalizedInput)) {
                     setNameError(true);
                     setNameHelperText('Character with such name already exists');
 
@@ -158,10 +160,8 @@ export const CreatePlayerCharacterModal = ({
                 break;
 
             case INPUT_TYPE.THREAD_NAME:
-                setThreadName(value);
-
-                const threadAlreadyExists = threadsToAdd.map(thread => thread.name).includes(
-                    value.trim()
+                const threadAlreadyExists = threadsToAdd.map(thread => thread.name.toLowerCase()).includes(
+                    normalizedInput
                 );
 
                 if (threadAlreadyExists) {
@@ -170,7 +170,8 @@ export const CreatePlayerCharacterModal = ({
 
                     break;
                 }
-
+                
+                setThreadName(value);
                 setThreadError(false);
                 setThreadHelperText('');
 
@@ -182,8 +183,6 @@ export const CreatePlayerCharacterModal = ({
                 break;
 
             case INPUT_TYPE.NON_PLAYER_CHARACTER_NAME:
-                setNonPlayerCharacterName(value);
-
                 /*
                 Check if provided name is already taken by some of the available npcs,
                 or by those that were added manually before
@@ -193,8 +192,10 @@ export const CreatePlayerCharacterModal = ({
 
                 (If such name is already taked by unavailable npc, api will return 400)
                 */
-                const nonPlayerCharacterAlreadyExists = nonPlayerCharacterNames.includes(
-                    value.trim().toLowerCase()
+                const nonPlayerCharacterAlreadyExists = nonPlayerCharacterNames.map(
+                    name => name.toLowerCase()
+                ).includes(
+                    normalizedInput
                 );
 
                 if (nonPlayerCharacterAlreadyExists) {
@@ -204,6 +205,7 @@ export const CreatePlayerCharacterModal = ({
                     break;
                 }
 
+                setNonPlayerCharacterName(value);
                 setNonPlayerCharacterError(false);
                 setNonPlayerCharacterHelperText('');
 
