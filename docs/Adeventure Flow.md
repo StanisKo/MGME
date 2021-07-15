@@ -1,4 +1,4 @@
-### A flow of adventure to not forget :) ###
+### Adventure Flow ###
 <pre>
 User creates a scene
     |
