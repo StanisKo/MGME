@@ -75,6 +75,6 @@ Refresh tokens written into the database remain
 Moreover, there can be multiple of them per one user at one point in time,
 Since this mechanism allows users to login from different machines
 
-Therefore, on boot, a hosted service is initialized and every 8 hours
+Therefore, on boot, a hosted service is initialized and every 8 hours (TODO: interval has to be reduced)
 Checks for expired refresh tokens of all users and removes them
 </pre>
