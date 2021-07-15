@@ -48,24 +48,25 @@ New JWT is created and returned in response body
     |
     |
     v
-    If token cannot be refreshed (either refresh token or session flag has expired and missing from cookies)
+    If token cannot be refreshed (either refresh token or session flag has expired and/or missing from cookies)
     Service returns 401
     |
     |
     |
     v
     Client treats it as end of session, logs user out and denies access to private routes
+    |
+    |
+    |
+    v
+    Else if user logs out manually, current refresh token is removed from database and cookies
+    Along with session flag
+    Client denies access to private routes
 |
 |
 |
 v
 User needs to log in
-    |
-    |
-    |
-    v
-    If user logs out, current refresh token is removed from database and cookies
-    Along with session flag
 
 <hr/>
 Even though refresh token has expiration and is removed from cookies at the same time with session flag
