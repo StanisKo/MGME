@@ -1,217 +1,221 @@
-import { ReactElement, useState, Dispatch, SetStateAction, ChangeEvent } from 'react';
-import { useSelector } from 'react-redux';
+// import { ReactElement, useState, Dispatch, SetStateAction, ChangeEvent } from 'react';
+// import { useSelector } from 'react-redux';
 
-import { ApplicationState } from '../../../store';
+// import { ApplicationState } from '../../../store';
 
-import { Adventure } from '../interfaces';
+// import { Adventure } from '../interfaces';
 
-import { BaseServiceResponse, NewEntityToAdd } from '../../../shared/interfaces';
+// import { BaseServiceResponse, NewEntityToAdd } from '../../../shared/interfaces';
 
-import { AvailableNonPlayerCharacter } from '../../nonPlayerCharacter/interfaces';
+// import { AvailableNonPlayerCharacter } from '../../nonPlayerCharacter/interfaces';
 
-import { INPUT_TYPE } from '../../../shared/const';
+// import { INPUT_TYPE } from '../../../shared/const';
 
-import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    Grid,
-    TextField,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    List,
-    ListItem,
-    ListItemText,
-    LinearProgress,
-    DialogActions,
-    Button,
-    Typography
-} from '@material-ui/core';
+// import {
+//     Dialog,
+//     DialogTitle,
+//     DialogContent,
+//     Grid,
+//     TextField,
+//     Accordion,
+//     AccordionSummary,
+//     AccordionDetails,
+//     List,
+//     ListItem,
+//     ListItemText,
+//     LinearProgress,
+//     DialogActions,
+//     Button,
+//     Typography
+// } from '@material-ui/core';
 
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+// import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
-import clsx from 'clsx';
+// import clsx from 'clsx';
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            '& label.Mui-error': {
-                color: theme.palette.secondary.main
-            },
-            '& .Mui-error': {
-                '& fieldset': {
-                    borderColor: '#077b8a !important'
-                }
-            },
-            '& .MuiFormHelperText-root': {
-                color: theme.palette.secondary.main
-            }
-        }
-    })
-);
+// const useStyles = makeStyles((theme: Theme) =>
+//     createStyles({
+//         root: {
+//             '& label.Mui-error': {
+//                 color: theme.palette.secondary.main
+//             },
+//             '& .Mui-error': {
+//                 '& fieldset': {
+//                     borderColor: '#077b8a !important'
+//                 }
+//             },
+//             '& .MuiFormHelperText-root': {
+//                 color: theme.palette.secondary.main
+//             }
+//         }
+//     })
+// );
 
-interface Props {
-    handleDialogClose: () => void;
-    classes: { [key: string]: string };
-    setResponse: Dispatch<SetStateAction<BaseServiceResponse>>;
-    setOpenSnackBar: Dispatch<SetStateAction<boolean>>;
-}
+// interface Props {
+//     handleDialogClose: () => void;
+//     classes: { [key: string]: string };
+//     setResponse: Dispatch<SetStateAction<BaseServiceResponse>>;
+//     setOpenSnackBar: Dispatch<SetStateAction<boolean>>;
+// }
 
-export const CreateAdventureModal = (
-    { handleDialogClose, classes, setResponse, setOpenSnackBar }: Props): ReactElement => {
+// export const CreateAdventureModal = (
+//     { handleDialogClose, classes, setResponse, setOpenSnackBar }: Props): ReactElement => {
 
-    /*
-    Used exclusively to extract names and deny ui interaction
-    if name of a new adventure already exists
-    */
-    const adventures: Adventure[] | null = useSelector(
-        (state: ApplicationState) => state.adventures?.dataset?.data ?? null
-    );
+//     /*
+//     Used exclusively to extract names and deny ui interaction
+//     if name of a new adventure already exists
+//     */
+//     const adventures: Adventure[] | null = useSelector(
+//         (state: ApplicationState) => state.adventures?.dataset?.data ?? null
+//     );
 
-    /*
-    Original collection of npcs that are available for adding. Acts as a source of truth
-    from which characters can be added back to what we display
-    */
-    const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
+//     /*
+//     Original collection of npcs that are available for adding. Acts as a source of truth
+//     from which characters can be added back to what we display
+//     */
+//     const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
 
-    /*
-    A replica of original npc collection that is modified via ui interaction:
-    via it we show what we add or remove to/from the list avialable npcs
-    */
-    const [displayedAvailableNonPlayerCharacters, setDisplayedAvailableNonPlayerCharacters] =
-        useState<AvailableNonPlayerCharacter[]>();
+//     /*
+//     A replica of original npc collection that is modified via ui interaction:
+//     via it we show what we add or remove to/from the list avialable npcs
+//     */
+//     const [displayedAvailableNonPlayerCharacters, setDisplayedAvailableNonPlayerCharacters] =
+//         useState<AvailableNonPlayerCharacter[]>();
 
-    const [title, setTitle] = useState<string>('');
-    const [titleError, setTitleError] = useState<boolean>(false);
-    const [titleHelperText, setTitleHelperText] = useState<string>('');
+//     const [title, setTitle] = useState<string>('');
+//     const [titleError, setTitleError] = useState<boolean>(false);
+//     const [titleHelperText, setTitleHelperText] = useState<string>('');
 
-    const [context, setContext] = useState<string>('');
+//     const [context, setContext] = useState<string>('');
 
-    const [threadName, setThreadName] = useState<string>('');
-    const [threadError, setThreadError] = useState<boolean>(false);
-    const [threadHelperText, setThreadHelperText] = useState<string>('');
+//     const [threadName, setThreadName] = useState<string>('');
+//     const [threadError, setThreadError] = useState<boolean>(false);
+//     const [threadHelperText, setThreadHelperText] = useState<string>('');
 
-    const [threadDescription, setThreadDescription] = useState<string>('');
+//     const [threadDescription, setThreadDescription] = useState<string>('');
 
-    // Collection of threads to add to new adventure
-    const [threadsToAdd, setThreadsToAdd] = useState<NewEntityToAdd[]>([]);
+//     // Collection of threads to add to new adventure
+//     const [threadsToAdd, setThreadsToAdd] = useState<NewEntityToAdd[]>([]);
 
-    const [nonPlayerCharacterName, setNonPlayerCharacterName] = useState<string>('');
-    const [nonPlayerCharacterError, setNonPlayerCharacterError] = useState<boolean>(false);
-    const [nonPlayerCharacterHelperText, setNonPlayerCharacterHelperText] = useState<string>('');
+//     const [nonPlayerCharacterName, setNonPlayerCharacterName] = useState<string>('');
+//     const [nonPlayerCharacterError, setNonPlayerCharacterError] = useState<boolean>(false);
+//     const [nonPlayerCharacterHelperText, setNonPlayerCharacterHelperText] = useState<string>('');
 
-    const [nonPlayerCharacterDescription, setNonPlayerCharacterDescription] = useState<string>('');
+//     const [nonPlayerCharacterDescription, setNonPlayerCharacterDescription] = useState<string>('');
 
-    // A collection of newly created npcs that we actually send to the API
-    const [newNonPlayerCharactersToAdd, setNewNonPlayerCharactersToAdd] = useState<NewEntityToAdd[]>([]);
+//     // A collection of newly created npcs that we actually send to the API
+//     const [newNonPlayerCharactersToAdd, setNewNonPlayerCharactersToAdd] = useState<NewEntityToAdd[]>([]);
 
-    // A pool of newly created and existing npcs that are displayed to the user
-    const [displayedNonPlayerCharactersToAdd, setDisplayedNonPlayerCharactersToAdd] =
-        useState<NewEntityToAdd[]>([]);
+//     // A pool of newly created and existing npcs that are displayed to the user
+//     const [displayedNonPlayerCharactersToAdd, setDisplayedNonPlayerCharactersToAdd] =
+//         useState<NewEntityToAdd[]>([]);
 
-    // A collection of existing npcs' ids that we actually send to the API
-    const [existingNonPlayerCharactersToAdd, setExistingNonPlayerCharactersToAdd] = useState<number[]>([]);
+//     // A collection of existing npcs' ids that we actually send to the API
+//     const [existingNonPlayerCharactersToAdd, setExistingNonPlayerCharactersToAdd] = useState<number[]>([]);
 
-    // Takes part in validing names of freshly created npcs
-    const [nonPlayerCharacterNames, setNonPlayerCharacterNames] = useState<string[]>([]);
+//     // Takes part in validing names of freshly created npcs
+//     const [nonPlayerCharacterNames, setNonPlayerCharacterNames] = useState<string[]>([]);
 
-    const { root } = useStyles();
+//     const { root } = useStyles();
 
-    const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
-        const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
+//     const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
+//         const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
 
-        const value = event.target.value.trim().toLowerCase();
+//         const value = event.target.value;
 
-        switch (inputType) {
-            case INPUT_TYPE.ENTITY_NAME:
-                if (normalizedInput.length < 1) {
-                    setTitleError(true);
-                    setNameHelperText('Please provide character name');
+//         const normalizedInput = value.trim().toLowerCase();
 
-                    break;
-                }
+//         switch (inputType) {
+//             case INPUT_TYPE.ENTITY_NAME:
+//                 if (normalizedInput.length < 1) {
+//                     setTitleError(true);
+//                     setNameHelperText('Please provide character name');
 
-                // This doesn't cover character names outside of what is currently displayed on the page
-                if (playerCharacterNames?.includes(value.trim().toLowerCase())) {
-                    setNameError(true);
-                    setNameHelperText('Character with such name already exists');
+//                     break;
+//                 }
 
-                    break;
-                }
+//                 // This doesn't cover character names outside of what is currently displayed on the page
+//                 if (playerCharacterNames?.includes(value.trim().toLowerCase())) {
+//                     setNameError(true);
+//                     setNameHelperText('Character with such name already exists');
 
-                setName(value);
+//                     break;
+//                 }
 
-                setNameError(false);
-                setNameHelperText('');
+//                 setName(value);
 
-                break;
+//                 setNameError(false);
+//                 setNameHelperText('');
 
-            // We don't need to validate description, it's up to the user to provide it or not
-            case INPUT_TYPE.ENTITY_DESCRIPTION:
-                setDescription(value);
+//                 break;
 
-                break;
+//             // We don't need to validate description, it's up to the user to provide it or not
+//             case INPUT_TYPE.ENTITY_DESCRIPTION:
+//                 setDescription(value);
 
-            case INPUT_TYPE.THREAD_NAME:
-                setThreadName(value);
+//                 break;
 
-                const threadAlreadyExists = threadsToAdd.map(thread => thread.name).includes(
-                    value.trim()
-                );
+//             case INPUT_TYPE.THREAD_NAME:
+//                 setThreadName(value);
 
-                if (threadAlreadyExists) {
-                    setThreadError(true);
-                    setThreadHelperText('Such thread already exists');
+//                 const threadAlreadyExists = threadsToAdd.map(thread => thread.name).includes(
+//                     value.trim()
+//                 );
 
-                    break;
-                }
+//                 if (threadAlreadyExists) {
+//                     setThreadError(true);
+//                     setThreadHelperText('Such thread already exists');
 
-                setThreadError(false);
-                setThreadHelperText('');
+//                     break;
+//                 }
 
-                break;
+//                 setThreadError(false);
+//                 setThreadHelperText('');
 
-            case INPUT_TYPE.THREAD_DESCRIPTION:
-                setThreadDescription(value);
+//                 break;
 
-                break;
+//             case INPUT_TYPE.THREAD_DESCRIPTION:
+//                 setThreadDescription(value);
 
-            case INPUT_TYPE.NON_PLAYER_CHARACTER_NAME:
-                setNonPlayerCharacterName(value);
+//                 break;
 
-                /*
-                Check if provided name is already taken by some of the available npcs,
-                or by those that were added manually before
+//             case INPUT_TYPE.NON_PLAYER_CHARACTER_NAME:
+//                 setNonPlayerCharacterName(value);
 
-                This doesn't cover for such name belonging to an npc in adventure, or that is
-                linked to another character, yet it still adds to better UX
+//                 /*
+//                 Check if provided name is already taken by some of the available npcs,
+//                 or by those that were added manually before
 
-                (If such name is already taked by unavailable npc, api will return 400)
-                */
-                const nonPlayerCharacterAlreadyExists = nonPlayerCharacterNames.includes(
-                    value.trim().toLowerCase()
-                );
+//                 This doesn't cover for such name belonging to an npc in adventure, or that is
+//                 linked to another character, yet it still adds to better UX
 
-                if (nonPlayerCharacterAlreadyExists) {
-                    setNonPlayerCharacterError(true);
-                    setNonPlayerCharacterHelperText('Such NPC already exists');
+//                 (If such name is already taked by unavailable npc, api will return 400)
+//                 */
+//                 const nonPlayerCharacterAlreadyExists = nonPlayerCharacterNames.includes(
+//                     value.trim().toLowerCase()
+//                 );
 
-                    break;
-                }
+//                 if (nonPlayerCharacterAlreadyExists) {
+//                     setNonPlayerCharacterError(true);
+//                     setNonPlayerCharacterHelperText('Such NPC already exists');
 
-                setNonPlayerCharacterError(false);
-                setNonPlayerCharacterHelperText('');
+//                     break;
+//                 }
 
-                break;
+//                 setNonPlayerCharacterError(false);
+//                 setNonPlayerCharacterHelperText('');
 
-            case INPUT_TYPE.NON_PLAYER_CHARACTER_DESCRIPTION:
-                setNonPlayerCharacterDescription(value);
+//                 break;
 
-                break;
+//             case INPUT_TYPE.NON_PLAYER_CHARACTER_DESCRIPTION:
+//                 setNonPlayerCharacterDescription(value);
 
-        }
-    };
+//                 break;
 
-    return <div></div>;
-};
+//         }
+//     };
+
+//     return <div></div>;
+// };
+
+export {};

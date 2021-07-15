@@ -160,6 +160,8 @@ export const CreatePlayerCharacterModal = ({
                 break;
 
             case INPUT_TYPE.THREAD_NAME:
+                setThreadName(value);
+
                 const threadAlreadyExists = threadsToAdd.map(thread => thread.name.toLowerCase()).includes(
                     normalizedInput
                 );
@@ -170,8 +172,7 @@ export const CreatePlayerCharacterModal = ({
 
                     break;
                 }
-                
-                setThreadName(value);
+
                 setThreadError(false);
                 setThreadHelperText('');
 
@@ -183,6 +184,8 @@ export const CreatePlayerCharacterModal = ({
                 break;
 
             case INPUT_TYPE.NON_PLAYER_CHARACTER_NAME:
+                setNonPlayerCharacterName(value);
+
                 /*
                 Check if provided name is already taken by some of the available npcs,
                 or by those that were added manually before
@@ -205,7 +208,6 @@ export const CreatePlayerCharacterModal = ({
                     break;
                 }
 
-                setNonPlayerCharacterName(value);
                 setNonPlayerCharacterError(false);
                 setNonPlayerCharacterHelperText('');
 
