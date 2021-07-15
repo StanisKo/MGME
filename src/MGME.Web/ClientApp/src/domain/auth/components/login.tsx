@@ -199,10 +199,6 @@ export const Login = (): ReactElement => {
 
         if (authResponse.success) {
 
-            if (mode === MODE.SIGN_IN) {
-                localStorage.setItem('userLoggedIn', JSON.stringify(true));
-            }
-
             if (!userRegisteredBefore) {
                 /*
                 If no value in storage, be it sign in or sign up, we set it there
@@ -212,6 +208,8 @@ export const Login = (): ReactElement => {
             }
 
             if (mode === MODE.SIGN_IN) {
+                localStorage.setItem('userLoggedIn', JSON.stringify(true));
+
                 const token = (authResponse as DataServiceResponse<UserTokenResponse>).data.accessToken;
 
                 const decoded = jwt_decode(token) as DecodedToken;
