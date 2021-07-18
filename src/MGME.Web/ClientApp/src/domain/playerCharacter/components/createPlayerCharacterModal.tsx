@@ -73,12 +73,6 @@ export const CreatePlayerCharacterModal = ({
         (state: ApplicationState) => state.catalogues?.playerCharacters?.data ?? null
     );
 
-    /*
-    Original collection of npcs that are available for adding. Acts as a source of truth
-    from which characters can be added back to what we display
-    */
-    const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
-
     const [name, setName] = useState<string>('');
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHelperText, setNameHelperText] = useState<string>('');
@@ -100,15 +94,18 @@ export const CreatePlayerCharacterModal = ({
 
     const [nonPlayerCharacterDescription, setNonPlayerCharacterDescription] = useState<string>('');
 
-    // A collection of newly created npcs that we actually send to the API
+    // A collection of npcs that are available for adding
+    const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
+
+    // A collection of existing npcs' ids that we send to the API
+    const [existingNonPlayerCharactersToAdd, setExistingNonPlayerCharactersToAdd] = useState<number[]>([]);
+
+    // A collection of newly created npcs that we send to the API
     const [newNonPlayerCharactersToAdd, setNewNonPlayerCharactersToAdd] = useState<NewEntityToAdd[]>([]);
 
     // A pool of newly created and existing npcs that are displayed to the user
     const [displayedNonPlayerCharactersToAdd, setDisplayedNonPlayerCharactersToAdd] =
         useState<NewEntityToAdd[]>([]);
-
-    // A collection of existing npcs' ids that we actually send to the API
-    const [existingNonPlayerCharactersToAdd, setExistingNonPlayerCharactersToAdd] = useState<number[]>([]);
 
     // Variables that take part in validation
     const [playerCharacterNames, setPlayerCharacterNames] = useState<string[]>([]);
