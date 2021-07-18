@@ -80,6 +80,8 @@ export const CreateAdventureModal = (
 
     const [context, setContext] = useState<string>('');
 
+    console.log(context);
+
     const [threadName, setThreadName] = useState<string>('');
     const [threadError, setThreadError] = useState<boolean>(false);
     const [threadHelperText, setThreadHelperText] = useState<string>('');
@@ -462,6 +464,48 @@ export const CreateAdventureModal = (
                                 </List>
                             </AccordionDetails>
                         </Accordion>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        {availablePlayerCharacters ? (
+                            <Accordion>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="availablePlayerCharacters-content"
+                                    id="availablePlayerCharacters-header"
+                                >
+                                    <Typography>
+                                        {availablePlayerCharacters?.filter(
+                                            playerCharacter => !playerCharactersToAdd.includes(
+                                                playerCharacter.id
+                                            )
+                                        )?.length ? 'Available Characters' : 'No Available Characters'
+                                        }
+                                    </Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <List style={{ width: '100%' }}>
+                                        {availablePlayerCharacters?.filter(
+                                            playerCharacter => !playerCharactersToAdd.includes(
+                                                playerCharacter.id
+                                            )
+                                        )?.map((playerCharacter, index) => {
+                                            return (
+                                                <ListItem
+                                                    key={`avaialable-character-${index}`}
+                                                    button
+                                                    onClick={handleAddingPlayerCharacters(
+                                                        playerCharacter.id
+                                                    )}
+                                                >
+                                                    <ListItemText primary={playerCharacter.name} />
+                                                </ListItem>
+                                            );
+                                        })}
+                                    </List>
+                                </AccordionDetails>
+                            </Accordion>
+                        ) : <LinearProgress />}
                     </Grid>
 
                     <Grid item xs={12}>

@@ -571,7 +571,7 @@ export const CreatePlayerCharacterModal = ({
                                             nonPlayerCharacter => !existingNonPlayerCharactersToAdd.includes(
                                                 nonPlayerCharacter.id
                                             )
-                                        ).length ? 'Available NPCs' : 'No available NPCs'
+                                        ).length ? 'Available NPCs' : 'No Available NPCs'
                                         }
                                     </Typography>
                                 </AccordionSummary>
