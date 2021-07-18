@@ -165,6 +165,7 @@ namespace MGME.Core.Services.AdventureService
                 {
                     Title = newAdventure.Title,
                     Context = newAdventure.Context,
+                    ChaosFactor = newAdventure.ChaosFactor,
                     NonPlayerCharacters = newNonPlayerCharactersToAdd,
                     Threads = threadsToAdd,
                     UserId = userId

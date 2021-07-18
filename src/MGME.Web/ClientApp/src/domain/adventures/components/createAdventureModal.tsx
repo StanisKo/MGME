@@ -4,6 +4,8 @@ import { useSelector } from 'react-redux';
 import { ApplicationState } from '../../../store';
 
 import { Adventure } from '../interfaces';
+import { createAdventure } from '../requests';
+import { chaosFactorOptions } from '../helpers';
 
 import { BaseServiceResponse, NewEntityToAdd } from '../../../shared/interfaces';
 import { INPUT_TYPE, NON_PLAYER_CHARACTER_FILTER } from '../../../shared/const';
@@ -29,7 +31,8 @@ import {
     LinearProgress,
     DialogActions,
     Button,
-    Typography
+    Typography,
+    Slider
 } from '@material-ui/core';
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -121,6 +124,8 @@ export const CreateAdventureModal = (
 
     // Takes part in validing names of freshly created/added from existing npcs
     const [nonPlayerCharacterNames, setNonPlayerCharacterNames] = useState<string[]>([]);
+
+    const [chaosFactor, setChaosFactor] = useState<number>(5);
 
     const { root } = useStyles();
 
@@ -332,8 +337,50 @@ export const CreateAdventureModal = (
         );
     };
 
+    const handleChangeChaosFactor = (event: ChangeEvent<unknown>, value: number | number[]): void => {
+        setChaosFactor(value as number);
+    };
+
+    console.log(chaosFactor);
+
     const handleCreate = async (): Promise<void> => {
-        console.log();
+        const response = await createAdventure(
+            {
+                title: title.trim(),
+
+                context: context.trim(),
+
+                chaosFactor: chaosFactor,
+
+                threads: threadsToAdd.map(
+                    thread => {
+                        return {
+                            name: thread.name.trim(), description: thread.description.trim()
+                        };
+                    }
+                ),
+
+                newNonPlayerCharacters: newNonPlayerCharactersToAdd.map(
+                    nonPlayerCharacter => {
+                        return {
+                            name: nonPlayerCharacter.name.trim(), description: nonPlayerCharacter.description.trim()
+                        };
+                    }
+                ),
+
+                existingNonPlayerCharacters: existingNonPlayerCharactersToAdd,
+
+                playerCharacters: playerCharactersToAdd
+            }
+        );
+
+        setResponse(response);
+
+        setOpenSnackBar(true);
+
+        if (response.success) {
+            handleDialogClose();
+        }
     };
 
     const allowedToCreate =
@@ -704,6 +751,18 @@ export const CreateAdventureModal = (
                                 </AccordionDetails>
                             </Accordion>
                         ) : <LinearProgress />}
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Typography id="discrete-slider-restrict" gutterBottom>
+                            Restricted values
+                        </Typography>
+                        <Slider
+                            defaultValue={chaosFactor}
+                            step={null}
+                            marks={chaosFactorOptions}
+                            onChange={handleChangeChaosFactor}
+                        />
                     </Grid>
                 </Grid>
             </DialogContent>

@@ -19,11 +19,11 @@ interface AddToAdventureParams {
 type CreateAdventureParams = {
     title: string;
     context: string;
-    chaosFactor?: number;
+    chaosFactor: number;
     playerCharacters: number[];
     threads: NewEntityToAdd[];
     newNonPlayerCharacters: NewEntityToAdd[];
-    existingPlayerCharacters: number[];
+    existingNonPlayerCharacters: number[];
 }
 
 export const addToAdventure = async (

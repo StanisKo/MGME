@@ -14,7 +14,7 @@ namespace MGME.Core.DTOs.Adventure
         [Required]
         public string Context { get; set; }
 
-        public int? ChaosFactor { get; set; }
+        public int ChaosFactor { get; set; }
 
         // There always has to be at least one PlayerCharacter
         [Required]

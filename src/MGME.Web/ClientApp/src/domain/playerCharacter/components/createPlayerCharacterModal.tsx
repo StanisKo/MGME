@@ -312,11 +312,19 @@ export const CreatePlayerCharacterModal = ({
                 description: description.trim(),
 
                 threads: threadsToAdd.map(
-                    thread => { return { ...thread, name: name.trim() }; }
+                    thread => {
+                        return {
+                            name: thread.name.trim(), description: thread.description.trim()
+                        };
+                    }
                 ),
 
                 newNonPlayerCharacters: newNonPlayerCharactersToAdd.map(
-                    nonPlayerCharacter => { return { ...nonPlayerCharacter, name: name.trim() }; }
+                    nonPlayerCharacter => {
+                        return {
+                            name: nonPlayerCharacter.name.trim(), description: nonPlayerCharacter.description.trim()
+                        };
+                    }
                 ),
 
                 existingNonPlayerCharacters: existingNonPlayerCharactersToAdd
