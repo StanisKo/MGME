@@ -73,7 +73,7 @@ export const fetchAdventures = async (reducer: string, key: string, page?: numbe
 export const createAdventure = async (params: CreateAdventureParams): Promise<BaseServiceResponse> => {
     return await DataController.UpdateAndRefetch(
         {
-            url: URLBuilder.WriteTo('adventures', 'add'),
+            url: URLBuilder.WriteTo('adventure', 'add'),
             method: 'POST',
             body: params,
             page: 'adventures',

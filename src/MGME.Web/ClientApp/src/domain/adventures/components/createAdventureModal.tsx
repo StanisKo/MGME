@@ -339,9 +339,13 @@ export const CreateAdventureModal = (
 
     const handleChangeChaosFactor = (event: ChangeEvent<unknown>, value: number | number[]): void => {
         setChaosFactor(value as number);
-    };
 
-    console.log(chaosFactor);
+        /*
+        What's up Material UI?
+        C:617 Uncaught TypeError: Cannot read property 'getBoundingClientRect' of null
+        */
+        console.clear();
+    };
 
     const handleCreate = async (): Promise<void> => {
         const response = await createAdventure(
@@ -754,12 +758,15 @@ export const CreateAdventureModal = (
                     </Grid>
 
                     <Grid item xs={12}>
-                        <Typography id="discrete-slider-restrict" gutterBottom>
-                            Restricted values
+                        <Typography id="chaos-factor-slider" gutterBottom>
+                            Chaos Factor
                         </Typography>
                         <Slider
+                            key={`slider-${chaosFactor}`}
                             defaultValue={chaosFactor}
-                            step={null}
+                            step={1}
+                            min={1}
+                            max={9}
                             marks={chaosFactorOptions}
                             onChange={handleChangeChaosFactor}
                         />
