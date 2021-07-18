@@ -112,8 +112,8 @@ export const CreateAdventureModal = (
     const [displayedNonPlayerCharactersToAdd, setDisplayedNonPlayerCharactersToAdd] =
         useState<NewEntityToAdd[]>([]);
 
-    // Takes part in validing names of freshly created npcs
-    const [adventureNames, setAdventureNames] = useState<string[]>([]);
+    // Takes part in validing titles of new adventures
+    const [adventureTitles, setAdventureTitles] = useState<string[]>([]);
 
     // Takes part in validing names of freshly created/added from existing npcs
     const [nonPlayerCharacterNames, setNonPlayerCharacterNames] = useState<string[]>([]);
@@ -131,15 +131,15 @@ export const CreateAdventureModal = (
             case INPUT_TYPE.ENTITY_NAME:
                 if (normalizedInput.length < 1) {
                     setTitleError(true);
-                    setTitleHelperText('Please provide character name');
+                    setTitleHelperText('Please provide adventure title');
 
                     break;
                 }
 
                 // This doesn't cover adventur  names outside of what is currently displayed on the page
-                if (adventureNames?.includes(normalizedInput)) {
+                if (adventureTitles?.includes(normalizedInput)) {
                     setTitleError(true);
-                    setTitleHelperText('Character with such name already exists');
+                    setTitleHelperText('Adventure with such title already exists');
 
                     break;
                 }
@@ -335,13 +335,40 @@ export const CreateAdventureModal = (
 
     useEffect(() => {
         if (adventures) {
-            setAdventureNames(
+            setAdventureTitles(
                 adventures?.map(
                     adventure => adventure.title.toLowerCase()
                 )
             );
         }
     }, [adventures]);
+
+    useEffect(() => {
+        if (availableNonPlayerCharacters && displayedNonPlayerCharactersToAdd) {
+
+            const namesOfAvailableNonPlayerCharacters = availableNonPlayerCharacters?.map(
+                nonPlayerCharacter => nonPlayerCharacter.name
+            );
+
+            const namesOfDisplayedNonPlayerCharactersToAdd = displayedNonPlayerCharactersToAdd.map(
+                nonPlayerCharacter => nonPlayerCharacter.name
+            );
+
+            const poolOfNamesToCheckAgainst = new Set(
+                [
+                    ...namesOfAvailableNonPlayerCharacters,
+                    ...namesOfDisplayedNonPlayerCharactersToAdd
+                ]
+            );
+
+            setNonPlayerCharacterNames(
+                Array.from(poolOfNamesToCheckAgainst).map(
+                    name => name.toLowerCase()
+                )
+            );
+        }
+
+    }, [availableNonPlayerCharacters, displayedNonPlayerCharactersToAdd]);
 
     return <div></div>;
 };
