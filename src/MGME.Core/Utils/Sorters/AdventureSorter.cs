@@ -20,7 +20,7 @@ namespace MGME.Core.Utils.Sorters
             {
                 "title", new()
                 {
-                    adventure => adventure.Title
+                    adventure => adventure.Title,
                 }
             },
             {
@@ -29,6 +29,14 @@ namespace MGME.Core.Utils.Sorters
                     adventure => adventure.Threads.Count,
                     adventure => adventure.Threads.FirstOrDefault().Name,
                     adventure => adventure.Threads.FirstOrDefault().Id
+                }
+            },
+            {
+                "chaos", new()
+                {
+                    adventure => adventure.ChaosFactor,
+                    adventure => adventure.Title,
+                    adventure => adventure.Id
                 }
             },
             {
@@ -57,7 +65,8 @@ namespace MGME.Core.Utils.Sorters
                 "scene", new()
                 {
                     adventure => adventure.Scenes.Count,
-                    adventure => adventure.Title
+                    adventure => adventure.Title,
+                    adventure => adventure.Id
                 }
             }
         };

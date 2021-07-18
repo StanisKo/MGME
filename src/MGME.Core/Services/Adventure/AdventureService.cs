@@ -389,6 +389,8 @@ namespace MGME.Core.Services.AdventureService
                     ).FirstOrDefault(),
                     ThreadCount = adventure.Threads.Count,
 
+                    ChaosFactor = adventure.ChaosFactor,
+
                     PlayerCharacter = adventure.PlayerCharacters.Select(
                         playerCharacter => new GetPlayerCharacterDTO()
                         {

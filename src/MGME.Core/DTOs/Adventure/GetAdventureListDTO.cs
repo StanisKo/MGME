@@ -14,6 +14,8 @@ namespace MGME.Core.DTOs.Adventure
 
         public int ThreadCount { get; set; }
 
+        public int ChaosFactor { get; set; }
+
         public GetPlayerCharacterDTO PlayerCharacter { get; set; }
 
         public int PlayerCharacterCount { get; set; }

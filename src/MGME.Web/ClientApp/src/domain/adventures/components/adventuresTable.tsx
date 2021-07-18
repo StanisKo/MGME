@@ -55,6 +55,7 @@ interface AdventureTableProps {
 const headCells: HeadCell[] = [
     { label: 'Title', sorting: 'title', numeric: false },
     { label: 'Thread', sorting: 'thread', numeric: true },
+    { label: 'Chaos Factor', sorting: 'chaos', numeric: true },
     { label: 'Created', sorting: 'created', numeric: true },
     { label: 'Character', sorting: 'character', numeric: true },
     { label: 'NPC', sorting: 'npc', numeric: true },
@@ -369,6 +370,10 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                                     <TableCell align="right">
                                         {adventure.thread?.name
                                             ?? `${adventure.threadCount} threads`}
+                                    </TableCell>
+
+                                    <TableCell align="right">
+                                        {adventure.chaosFactor}
                                     </TableCell>
 
                                     <TableCell align="right">
