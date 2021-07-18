@@ -79,13 +79,6 @@ export const CreatePlayerCharacterModal = ({
     */
     const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
 
-    /*
-    A replica of original npc collection that is modified via ui interaction:
-    via it we show what we add or remove to/from the list avialable npcs
-    */
-    const [displayedAvailableNonPlayerCharacters, setDisplayedAvailableNonPlayerCharacters] =
-        useState<AvailableNonPlayerCharacter[]>();
-
     const [name, setName] = useState<string>('');
     const [nameError, setNameError] = useState<boolean>(false);
     const [nameHelperText, setNameHelperText] = useState<string>('');
@@ -217,7 +210,6 @@ export const CreatePlayerCharacterModal = ({
                 setNonPlayerCharacterDescription(value);
 
                 break;
-
         }
     };
 
@@ -274,17 +266,19 @@ export const CreatePlayerCharacterModal = ({
             )
         );
 
-        // If it is one of the available NPCs, add it back
+        /*
+        If it is one of the available NPCs, add it back
+        by removing from the list of ids we send to api
+        */
         const availableNonPlayerCharacterToAddBack = availableNonPlayerCharacters?.find(
             nonPlayerCharacter => nonPlayerCharacter.name === name
         );
 
         if (availableNonPlayerCharacterToAddBack) {
-            setDisplayedAvailableNonPlayerCharacters(
-                [
-                    ...displayedAvailableNonPlayerCharacters as AvailableNonPlayerCharacter[],
-                    availableNonPlayerCharacterToAddBack
-                ]
+            setExistingNonPlayerCharactersToAdd(
+                existingNonPlayerCharactersToAdd.filter(
+                    id => id !== availableNonPlayerCharacterToAddBack.id
+                )
             );
 
             return;
@@ -310,19 +304,6 @@ export const CreatePlayerCharacterModal = ({
                 ...displayedNonPlayerCharactersToAdd,
                 { name: name } as NewEntityToAdd
             ]
-        );
-
-        /*
-        Remove npc from list of displayed available npcs:
-
-        First, we filter out the collection of available npcs by id
-        But then also check, that new collection does not contain names that were already added before
-        */
-        setDisplayedAvailableNonPlayerCharacters(
-            availableNonPlayerCharacters?.filter(
-                nonPlayerCharacter => nonPlayerCharacter.id !== id &&
-                    !displayedNonPlayerCharactersToAdd.map(entity => entity.name).includes(nonPlayerCharacter.name)
-            )
         );
     };
 
@@ -360,8 +341,6 @@ export const CreatePlayerCharacterModal = ({
                 );
 
                 setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
-
-                setDisplayedAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
             }
         })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -591,15 +570,21 @@ export const CreatePlayerCharacterModal = ({
                                     id="availableNonPlayerCharacters-header"
                                 >
                                     <Typography>
-                                        {displayedAvailableNonPlayerCharacters?.length
-                                            ? 'Available NPCs'
-                                            : 'No available NPCs'
+                                        {availableNonPlayerCharacters?.filter(
+                                            nonPlayerCharacter => !existingNonPlayerCharactersToAdd.includes(
+                                                nonPlayerCharacter.id
+                                            )
+                                        ).length ? 'Available NPCs' : 'No available NPCs'
                                         }
                                     </Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <List style={{ width: '100%' }}>
-                                        {displayedAvailableNonPlayerCharacters?.map((nonPlayerCharacter, index) => {
+                                        {availableNonPlayerCharacters?.filter(
+                                            nonPlayerCharacter => !existingNonPlayerCharactersToAdd.includes(
+                                                nonPlayerCharacter.id
+                                            )
+                                        )?.map((nonPlayerCharacter, index) => {
                                             return (
                                                 <ListItem
                                                     key={`avaialable-npc-${index}`}

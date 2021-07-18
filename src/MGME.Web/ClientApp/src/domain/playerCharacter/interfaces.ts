@@ -19,3 +19,7 @@ export interface PlayerCharacter extends BaseEntity {
     nonPlayerCharacter: RelatedNonPlayerCharacter;
     nonPlayerCharacterCount: number;
 }
+
+export interface AvailablePlayerCharacter extends BaseEntity {
+    name: string;
+}
