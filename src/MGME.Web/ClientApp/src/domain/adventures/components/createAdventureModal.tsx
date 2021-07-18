@@ -1,4 +1,4 @@
-import { ReactElement, useState, Dispatch, SetStateAction, ChangeEvent } from 'react';
+import { ReactElement, useState, useEffect, Dispatch, SetStateAction, ChangeEvent } from 'react';
 import { useSelector } from 'react-redux';
 
 import { ApplicationState } from '../../../store';
@@ -6,12 +6,13 @@ import { ApplicationState } from '../../../store';
 import { Adventure } from '../interfaces';
 
 import { BaseServiceResponse, NewEntityToAdd } from '../../../shared/interfaces';
+import { INPUT_TYPE, NON_PLAYER_CHARACTER_FILTER } from '../../../shared/const';
 
 import { AvailablePlayerCharacter } from '../../playerCharacter/interfaces';
+import { fetchAvailablePlayerCharacters } from '../../playerCharacter/requests';
 
 import { AvailableNonPlayerCharacter } from '../../nonPlayerCharacter/interfaces';
-
-import { INPUT_TYPE } from '../../../shared/const';
+import { fetchAvailableNonPlayerCharacters } from '../../nonPlayerCharacter/requests';
 
 import {
     Dialog,
@@ -261,17 +262,19 @@ export const CreateAdventureModal = (
             )
         );
 
-        // If it is one of the available NPCs, add it back
+        /*
+        If it is one of the available NPCs, add it back
+        by removing from the list of ids we send to api
+        */
         const availableNonPlayerCharacterToAddBack = availableNonPlayerCharacters?.find(
             nonPlayerCharacter => nonPlayerCharacter.name === name
         );
 
         if (availableNonPlayerCharacterToAddBack) {
-            setDisplayedAvailableNonPlayerCharacters(
-                [
-                    ...displayedAvailableNonPlayerCharacters as AvailableNonPlayerCharacter[],
-                    availableNonPlayerCharacterToAddBack
-                ]
+            setExistingNonPlayerCharactersToAdd(
+                existingNonPlayerCharactersToAdd.filter(
+                    id => id !== availableNonPlayerCharacterToAddBack.id
+                )
             );
 
             return;
@@ -298,19 +301,6 @@ export const CreateAdventureModal = (
                 { name: name } as NewEntityToAdd
             ]
         );
-
-        /*
-        Remove npc from list of displayed available npcs:
-
-        First, we filter out the collection of available npcs by id
-        But then also check, that new collection does not contain names that were already added before
-        */
-        setDisplayedAvailableNonPlayerCharacters(
-            availableNonPlayerCharacters?.filter(
-                nonPlayerCharacter => nonPlayerCharacter.id !== id &&
-                    !displayedNonPlayerCharactersToAdd.map(entity => entity.name).includes(nonPlayerCharacter.name)
-            )
-        );
     };
 
     const handleCreate = async (): Promise<void> => {
@@ -321,8 +311,37 @@ export const CreateAdventureModal = (
         title
         && !titleError
         && threadsToAdd.length
+        && playerCharactersToAdd.length
         && (existingNonPlayerCharactersToAdd.length || newNonPlayerCharactersToAdd.length);
 
+    useEffect(() => {
+        (async (): Promise<void> => {
+            if (!availablePlayerCharacters) {
+                const availablePlayerCharacters = await fetchAvailablePlayerCharacters();
+
+                setAvailablePlayerCharacters(availablePlayerCharacters.data);
+            }
+
+            if (!availableNonPlayerCharacters) {
+                const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters(
+                    NON_PLAYER_CHARACTER_FILTER.AVAILABLE_FOR_PLAYER_CHARACTERS
+                );
+
+                setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
+            }
+        })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (adventures) {
+            setAdventureNames(
+                adventures?.map(
+                    adventure => adventure.title.toLowerCase()
+                )
+            );
+        }
+    }, [adventures]);
 
     return <div></div>;
 };
