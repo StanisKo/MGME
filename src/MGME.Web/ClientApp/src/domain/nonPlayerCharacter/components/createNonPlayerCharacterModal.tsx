@@ -89,9 +89,11 @@ export const CreateNonPlayerCharacterModal = ({
 
         const value = event.target.value;
 
+        const normalizedInput = value.trim().toLowerCase();
+
         switch (inputType) {
             case INPUT_TYPE.ENTITY_NAME:
-                if (value.length < 1) {
+                if (normalizedInput.length < 1) {
                     setNameError(true);
                     setNameHelperText('Please provide NPC name');
 
@@ -99,7 +101,7 @@ export const CreateNonPlayerCharacterModal = ({
                 }
 
                 // This doesn't cover npc names outside of what is currently displayed on the page
-                if (nonPlayerCharacterNames?.includes(value.trim().toLowerCase())) {
+                if (nonPlayerCharacterNames?.includes(normalizedInput)) {
                     setNameError(true);
                     setNameHelperText('NPC with such name already exists');
 
@@ -131,8 +133,8 @@ export const CreateNonPlayerCharacterModal = ({
     const handleCreate = async (): Promise<void> => {
         const response = await createNonPlayerCharacter(
             {
-                name: name,
-                description: description,
+                name: name.trim(),
+                description: description.trim(),
                 ...(playerCharacterToAdd ? { playerCharacter: playerCharacterToAdd } : null)
             }
         );

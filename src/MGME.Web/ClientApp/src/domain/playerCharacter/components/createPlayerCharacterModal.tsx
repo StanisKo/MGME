@@ -307,10 +307,18 @@ export const CreatePlayerCharacterModal = ({
     const handleCreate = async (): Promise<void> => {
         const response = await createPlayerCharacter(
             {
-                name: name,
-                description: description,
-                threads: threadsToAdd,
-                newNonPlayerCharacters: newNonPlayerCharactersToAdd,
+                name: name.trim(),
+
+                description: description.trim(),
+
+                threads: threadsToAdd.map(
+                    thread => { return { ...thread, name: name.trim() }; }
+                ),
+
+                newNonPlayerCharacters: newNonPlayerCharactersToAdd.map(
+                    nonPlayerCharacter => { return { ...nonPlayerCharacter, name: name.trim() }; }
+                ),
+
                 existingNonPlayerCharacters: existingNonPlayerCharactersToAdd
             }
         );

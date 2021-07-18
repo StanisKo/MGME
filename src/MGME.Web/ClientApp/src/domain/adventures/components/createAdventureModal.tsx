@@ -79,8 +79,8 @@ export const CreateAdventureModal = (
     const [titleHelperText, setTitleHelperText] = useState<string>('');
 
     const [context, setContext] = useState<string>('');
-
-    console.log(context);
+    const [contextError, setContextError] = useState<boolean>(false);
+    const [contextHelperText, setContextHelperText] = useState<string>('');
 
     const [threadName, setThreadName] = useState<string>('');
     const [threadError, setThreadError] = useState<boolean>(false);
@@ -140,7 +140,7 @@ export const CreateAdventureModal = (
                     break;
                 }
 
-                // This doesn't cover adventur  names outside of what is currently displayed on the page
+                // This doesn't cover adventure names outside of what is currently displayed on the page
                 if (adventureTitles?.includes(normalizedInput)) {
                     setTitleError(true);
                     setTitleHelperText('Adventure with such title already exists');
@@ -155,9 +155,18 @@ export const CreateAdventureModal = (
 
                 break;
 
-            // We don't need to validate context, it's up to the user to provide it or not
             case INPUT_TYPE.ENTITY_DESCRIPTION:
+                if (normalizedInput.length < 1) {
+                    setContextError(true);
+                    setContextHelperText('Please provide adventure context');
+
+                    break;
+                }
+
                 setContext(value);
+
+                setContextError(false);
+                setContextHelperText('');
 
                 break;
 
@@ -330,6 +339,8 @@ export const CreateAdventureModal = (
     const allowedToCreate =
         title
         && !titleError
+        && context
+        && !contextError
         && threadsToAdd.length
         && playerCharactersToAdd.length
         && (existingNonPlayerCharactersToAdd.length || newNonPlayerCharactersToAdd.length);
@@ -398,7 +409,7 @@ export const CreateAdventureModal = (
             aria-describedby="alert-dialog-description"
         >
             <DialogTitle id="alert-dialog-title" className={classes.centered}>
-                Create Character
+                Create Adventure
             </DialogTitle>
             <DialogContent>
                 <Grid container spacing={4}>
@@ -418,23 +429,27 @@ export const CreateAdventureModal = (
 
                     <Grid item xs={12}>
                         <TextField
+                            error={contextError}
+                            helperText={contextHelperText}
                             variant="outlined"
+                            required
                             fullWidth
-                            label="Title"
+                            label="Context"
                             onChange={handleInputChange}
                             inputProps={{ inputtype: INPUT_TYPE.ENTITY_DESCRIPTION }}
+                            className={root}
                         />
                     </Grid>
 
                     <Grid item xs={12}>
                         <Accordion
-                            disabled={availablePlayerCharacters?.filter(
-                                playerCharacter => !playerCharactersToAdd.includes(playerCharacter.id)
-                            )?.length === 0}
+                            disabled={(availablePlayerCharacters?.filter(
+                                playerCharacter => playerCharactersToAdd.includes(playerCharacter.id)
+                            ) ?? []).length === 0}
 
                             expanded={(availablePlayerCharacters?.filter(
-                                playerCharacter => !playerCharactersToAdd.includes(playerCharacter.id)
-                            ) as AvailablePlayerCharacter[])?.length > 0}
+                                playerCharacter => playerCharactersToAdd.includes(playerCharacter.id)
+                            ) ?? []).length > 0}
                         >
                             <AccordionSummary
                                 aria-controls="playerCharacters-content"
