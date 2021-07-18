@@ -305,6 +305,22 @@ export const CreateAdventureModal = (
         );
     };
 
+    const handleAddingPlayerCharacters = (id: number) => (): void => {
+        // Set what we send
+        setPlayerCharactersToAdd(
+            [...playerCharactersToAdd, id]
+        );
+    };
+
+    const handleRemovingPlayerCharacters = (id: number) => (): void => {
+        // Remove from what we send
+        setPlayerCharactersToAdd(
+            playerCharactersToAdd.filter(
+                playerCharacterId => playerCharacterId !== id
+            )
+        );
+    };
+
     const handleCreate = async (): Promise<void> => {
         console.log();
     };
@@ -406,6 +422,46 @@ export const CreateAdventureModal = (
                             onChange={handleInputChange}
                             inputProps={{ inputtype: INPUT_TYPE.ENTITY_DESCRIPTION }}
                         />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Accordion
+                            disabled={availablePlayerCharacters?.filter(
+                                playerCharacter => !playerCharactersToAdd.includes(playerCharacter.id)
+                            ).length === 0}
+
+                            expanded={(availablePlayerCharacters?.filter(
+                                playerCharacter => !playerCharactersToAdd.includes(playerCharacter.id)
+                            ) as AvailablePlayerCharacter[]).length > 0}
+                        >
+                            <AccordionSummary
+                                aria-controls="playerCharacters-content"
+                                id="playerCharacters-header"
+                            >
+                                <Typography>
+                                    Your Characters
+                                </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <List style={{ width: '100%' }}>
+                                    {availablePlayerCharacters?.filter(
+                                        playerCharacter => playerCharactersToAdd.includes(playerCharacter.id)
+                                    ).map((playerCharacter, index) => {
+                                        return (
+                                            <ListItem
+                                                key={`playerCharacterToAdd-${index}`}
+                                                button
+                                                onClick={handleRemovingPlayerCharacters(
+                                                    playerCharacter.id
+                                                )}
+                                            >
+                                                <ListItemText primary={playerCharacter.name} />
+                                            </ListItem>
+                                        );
+                                    })}
+                                </List>
+                            </AccordionDetails>
+                        </Accordion>
                     </Grid>
 
                     <Grid item xs={12}>
