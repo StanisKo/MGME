@@ -10,7 +10,7 @@ export interface AdventuresState {
     dataset: {
         data: Adventure[],
         pagination: Pagination,
-        selected: number | number[]
+        selected: number[]
     }
 }
 

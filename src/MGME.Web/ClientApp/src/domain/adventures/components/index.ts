@@ -1,3 +1,4 @@
 import { AdventuresTable } from './adventuresTable';
+import { CreateAdventureModal } from './createAdventureModal';
 
-export { AdventuresTable };
+export { AdventuresTable, CreateAdventureModal };

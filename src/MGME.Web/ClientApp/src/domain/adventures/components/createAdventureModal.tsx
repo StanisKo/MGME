@@ -430,11 +430,11 @@ export const CreateAdventureModal = (
                         <Accordion
                             disabled={availablePlayerCharacters?.filter(
                                 playerCharacter => !playerCharactersToAdd.includes(playerCharacter.id)
-                            ).length === 0}
+                            )?.length === 0}
 
                             expanded={(availablePlayerCharacters?.filter(
                                 playerCharacter => !playerCharactersToAdd.includes(playerCharacter.id)
-                            ) as AvailablePlayerCharacter[]).length > 0}
+                            ) as AvailablePlayerCharacter[])?.length > 0}
                         >
                             <AccordionSummary
                                 aria-controls="playerCharacters-content"

@@ -1,10 +1,17 @@
-import { ReactElement } from 'react';
+import { ReactElement, useState, SyntheticEvent } from 'react';
+import { useSelector } from 'react-redux';
 
-import { AdventuresTable } from './components';
+import { ApplicationState } from '../../store';
 
-import { Paper, Grid, Theme, Button } from '@material-ui/core';
+import { AdventuresTable, CreateAdventureModal } from './components';
+
+import { BaseServiceResponse } from '../../shared/interfaces';
+
+import { Paper, Grid, Theme, Button, Snackbar } from '@material-ui/core';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
+
+import { Alert } from '../../shared/components';
 import { TABLE_DISPLAY_MODE } from '../../shared/const';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -45,6 +52,33 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const Adventures = (): ReactElement => {
+    const selectedAdventures = useSelector(
+        (store: ApplicationState) => store.adventures?.dataset?.selected ?? []
+    );
+
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+
+    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+
+    const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
+
+    const handleDialogOpen = (): void => {
+        setDialogOpen(true);
+    };
+
+    const handleDialogClose = (): void => {
+        setDialogOpen(false);
+    };
+
+    const handleSnackbarClose = (event?: SyntheticEvent, reason?: string): void => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenSnackbar(false);
+    };
+
+    const nothingSelected = selectedAdventures?.length === 0;
 
     // Rest are also shared by creation modal
     const { deleteButton, ...classes } = useStyles();
@@ -61,8 +95,8 @@ export const Adventures = (): ReactElement => {
                                 variant="outlined"
                                 color="primary"
                                 size="medium"
-                                // onClick={handleDialogOpen}
-                                // disabled={!nothingSelected}
+                                onClick={handleDialogOpen}
+                                disabled={!nothingSelected}
                             >
                                 Create
                             </Button>
@@ -70,9 +104,8 @@ export const Adventures = (): ReactElement => {
                                 variant="outlined"
                                 color="primary"
                                 size="medium"
-                                // disabled={nothingSelected || displayAdventures || displayCharactersToAddTo}
+                                disabled={nothingSelected}
                                 className={deleteButton}
-                                // onClick={handleDelete}
                             >
                                 Remove
                             </Button>
@@ -84,6 +117,24 @@ export const Adventures = (): ReactElement => {
                     </Grid>
                 </Paper>
             </div>
+
+            {dialogOpen && (
+                <CreateAdventureModal
+                    handleDialogClose={handleDialogClose}
+                    classes={classes as unknown as { [key: string]: string }}
+                    setResponse={setResponse}
+                    setOpenSnackBar={setOpenSnackbar}
+                />
+            )}
+
+            <Snackbar open={openSnackbar} onClose={handleSnackbarClose}>
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity={response.success ? 'success' : 'warning'}
+                >
+                    {response.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 };
