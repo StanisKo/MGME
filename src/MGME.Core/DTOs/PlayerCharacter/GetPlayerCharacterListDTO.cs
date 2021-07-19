@@ -10,14 +10,14 @@ namespace MGME.Core.DTOs.PlayerCharacter
 
         public GetThreadDTO Thread { get; set; }
 
-        public int ThreadCount { get; set; }
+        public int? ThreadCount { get; set; }
 
         public GetAdventureDTO Adventure { get; set; }
 
-        public int AdventureCount { get; set; }
+        public int? AdventureCount { get; set; }
 
         public GetNonPlayerCharacterDTO NonPlayerCharacter { get; set; }
 
-        public int NonPlayerCharacterCount { get; set; }
+        public int? NonPlayerCharacterCount { get; set; }
     }
 }

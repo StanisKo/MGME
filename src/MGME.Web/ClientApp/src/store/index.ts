@@ -3,6 +3,7 @@ import { combineReducers, compose, createStore, Store } from 'redux';
 import { AuthState, AuthReducer } from './reducers/auth';
 import { UserState, UserReducer } from './reducers/user';
 import { CataloguesState, CataloguesReducer } from './reducers/catalogues';
+import { AdventuresState, AdventuresReducer } from './reducers/adventures';
 
 import { UpdateStore, LoginUser, UpdateToken, LogoutUser } from './actionTypes';
 
@@ -11,6 +12,7 @@ interface ApplicationState {
     auth: AuthState | undefined;
     user: UserState | undefined;
     catalogues: CataloguesState | undefined;
+    adventures: AdventuresState | undefined;
 }
 
 // Config
@@ -18,7 +20,8 @@ const configureStore = (initialState?: ApplicationState): Store => {
     const rootReducer = combineReducers({
         auth: AuthReducer,
         user: UserReducer,
-        catalogues: CataloguesReducer
+        catalogues: CataloguesReducer,
+        adventures: AdventuresReducer
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

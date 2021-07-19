@@ -3,15 +3,17 @@ using System;
 using MGME.Infra.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace MGME.Infra.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210712160423_ChangeFocusAndMeaningTypeOnRandomEventAsDiscoveredWhenBuildingFlow")]
+    partial class ChangeFocusAndMeaningTypeOnRandomEventAsDiscoveredWhenBuildingFlow
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -132,9 +134,6 @@ namespace MGME.Infra.Migrations
                     b.Property<string>("Question")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("RollResult")
-                        .HasColumnType("integer");
 
                     b.Property<int>("SceneItemId")
                         .HasColumnType("integer");

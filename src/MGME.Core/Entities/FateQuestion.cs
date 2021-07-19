@@ -11,6 +11,10 @@ namespace MGME.Core.Entities
         [Required]
         public bool Answer { get; set; }
 
+        public bool Exceptional { get; set; }
+
+        public int RollResult { get; set; }
+
         public string Interpretation { get; set; }
 
         [ForeignKey("SceneItem")]

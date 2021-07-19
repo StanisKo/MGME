@@ -1,3 +1,4 @@
-import { AdventuresToAddToTable } from './adventuresToAddToTable';
+import { AdventuresTable } from './adventuresTable';
+import { CreateAdventureModal } from './createAdventureModal';
 
-export { AdventuresToAddToTable };
+export { AdventuresTable, CreateAdventureModal };

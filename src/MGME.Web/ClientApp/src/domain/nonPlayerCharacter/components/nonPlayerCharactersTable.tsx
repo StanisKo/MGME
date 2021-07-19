@@ -238,7 +238,8 @@ export const NonPlayerCharactersTable = (): ReactElement => {
 
                                 <TableCell align="right">
                                     {nonPlayerCharacter.adventure?.title
-                                        ?? `${nonPlayerCharacter.adventureCount} adventures`}
+                                        ?? `${nonPlayerCharacter.adventureCount > 1
+                                            ? `${nonPlayerCharacter.adventureCount}` : 'No'} Adventures`}
                                 </TableCell>
 
                                 <TableCell align="right">

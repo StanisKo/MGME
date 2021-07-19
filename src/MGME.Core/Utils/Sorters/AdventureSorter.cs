@@ -20,7 +20,7 @@ namespace MGME.Core.Utils.Sorters
             {
                 "title", new()
                 {
-                    adventure => adventure.Title
+                    adventure => adventure.Title,
                 }
             },
             {
@@ -29,6 +29,20 @@ namespace MGME.Core.Utils.Sorters
                     adventure => adventure.Threads.Count,
                     adventure => adventure.Threads.FirstOrDefault().Name,
                     adventure => adventure.Threads.FirstOrDefault().Id
+                }
+            },
+            {
+                "chaos", new()
+                {
+                    adventure => adventure.ChaosFactor,
+                    adventure => adventure.Title,
+                    adventure => adventure.Id
+                }
+            },
+            {
+                "created", new()
+                {
+                    adventure => adventure.CreatedAt
                 }
             },
             {
@@ -48,11 +62,11 @@ namespace MGME.Core.Utils.Sorters
                 }
             },
             {
-                // If count is equal, sort alphabetically
                 "scene", new()
                 {
                     adventure => adventure.Scenes.Count,
-                    adventure => adventure.Title
+                    adventure => adventure.Title,
+                    adventure => adventure.Id
                 }
             }
         };
