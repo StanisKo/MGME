@@ -1,14 +1,30 @@
 version: "3.9"
+
 services:
     web:
-        build: .
+        build:
+          context: ""
+          dockerfile: Dockerfile
         ports:
-            - "8000:80"
+          - "5001:5001"
+        entrypoint: /entrypoint/entrypoint.sh
+        volumes:
         depends_on:
-            - db
-    # Replace with postgres image
-    db:
-        image: "mcr.microsoft.com/mssql/server"
+          - mgme-database'
+        networks:
+          - mgme-network
+
+    mgme-database:
+        image: "postgres:12"
+        ports:
+          - "5432:5432"
         environment:
-            SA_PASSWORD: "Your_password123"
-            ACCEPT_EULA: "Y"
+          - POSTGRES_USER=admin
+          - POSTGRES_PASSWORD=password
+          - POSTGRES_DB=mgme
+        volumes:
+          - './docker/psql/data:/var/lib/postgresql/data:rw'
+          - './docker/web/postgres_initdb.d:/docker-entrypoint-initdb.d'
+        command: "-p 5432"
+        networks:
+        - mgme-network
