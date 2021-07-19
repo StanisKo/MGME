@@ -324,7 +324,7 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
                     rowsPerPageOptions={[]}
                     count={pagination?.numberOfResults}
                     page={page}
-                    onChangePage={handlePageChange}
+                    onPageChange={handlePageChange}
                 />
             </Box>
         </>

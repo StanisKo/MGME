@@ -411,7 +411,7 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                             ) as number
                         }
                         page={page}
-                        onChangePage={handlePageChange}
+                        onPageChange={handlePageChange}
                     />
                 </Box>
             </Box>
