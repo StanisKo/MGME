@@ -4,6 +4,9 @@
 # Visual Studio 2019 Mac cache/options directory
 .vs/*
 
+# TODOs
+docs/*.todo
+
 # globs
 Makefile.in
 *.userprefs
