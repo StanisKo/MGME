@@ -1,22 +1,30 @@
 # syntax=docker/dockerfile:1
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
-WORKDIR /MGME
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 
-# Make sure node is installed
+WORKDIR /mgme
+
+# Make sure node js and yarn are installed
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
-RUN apt-get install -y nodejs
 
-# Restore from csproj in MGME.Web as it references both Core and Infra
-COPY ./MGME.MGME.Web/*.csproj .
-RUN dotnet restore
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 
-# Copy everything else and build
-COPY . .
-WORKDIR /MGME
-RUN dotnet publish -c release -o published --no-cache
+RUN apt remove cmdtest
+RUN apt remove yarn
 
-# Build runtime image
+RUN apt-get update && apt-get install -y nodejs yarn
+
+COPY ./src .
+
+# Build from MGME.Web.csproj
+RUN dotnet publish "MGME.Web/MGME.Web.csproj" -c release -o /app/publish --no-cache
+
+# Build image with asp net core runtime
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
-WORKDIR /app
-COPY --from=MGME /MGME/published ./
+
+EXPOSE 5001
+
+# Copy the published app to this new runtime-only container
+COPY --from=build /app/publish .
+
 ENTRYPOINT ["dotnet", "MGME.Web.dll"]
