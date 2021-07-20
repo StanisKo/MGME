@@ -1,6 +1,9 @@
 # syntax=docker/dockerfile:1
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 
+# Allow container to ping the entrypoint that runs migrations and boots the project
+RUN chmod +x ./docker/application/entrypoint.sh
+
 WORKDIR /mgme
 
 # Make sure node js and yarn are installed
@@ -22,9 +25,5 @@ RUN dotnet publish "MGME.Web/MGME.Web.csproj" -c release -o /app/publish --no-ca
 # Build image with asp net core runtime
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 
-EXPOSE 5001
-
 # Copy the published app to this new runtime-only container
 COPY --from=build /app/publish .
-
-ENTRYPOINT ["dotnet", "MGME.Web.dll"]

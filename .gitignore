@@ -7,6 +7,9 @@
 # TODOs
 docs/*.todo
 
+# Database
+docker/psql
+
 # globs
 Makefile.in
 *.userprefs
