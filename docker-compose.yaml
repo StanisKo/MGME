@@ -7,12 +7,10 @@ services:
           dockerfile: Dockerfile
         env_file:
           - .env
-        entrypoint: ./entrypoint.sh
         ports:
           - "${APP_PORT}:${APP_PORT}"
         volumes:
-          - ./docker/application:/entrypoint
-          - ./src:/src
+          - ./src:/mgme
           - ./docker/data:/data
         depends_on:
           - database

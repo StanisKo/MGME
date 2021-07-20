@@ -1,13 +1,7 @@
 # syntax=docker/dockerfile:1
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 
-WORKDIR /mgme
-
-# Make sure dotnet-ef is installed
-RUN dotnet tool install --global dotnet-ef
-
-# Make sure dotnet CLI is available
-ENV PATH="${PATH}:/root/.dotnet/tools"
+WORKDIR /build
 
 # Make sure node js and yarn are installed
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
@@ -18,24 +12,22 @@ RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources
 RUN apt remove cmdtest
 RUN apt remove yarn
 
-RUN apt-get update && apt-get install -y nodejs yarn wget
-
-# setup and install dockerize
-ENV DOCKERIZE_VERSION v0.6.1
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+RUN apt-get update && apt-get install -y nodejs yarn
 
 # Build from MGME.Web.csproj
 COPY ./src .
 
 RUN dotnet publish "MGME.Web/MGME.Web.csproj" -c release -o /publish --no-cache
 
-# Build image with asp net core runtime
-FROM mcr.microsoft.com/dotnet/aspnet:5.0
+# We use sdk image for multi-staged builds to make dotnet CLI available
+FROM mcr.microsoft.com/dotnet/sdk:5.0
 
 # Copy the published app to this new runtime-only container
-COPY --from=build /publish .
+COPY --from=build-env /publish .
 
-# Allow container to ping the entrypoint that runs migrations and boots the project
-COPY ./docker/application/entrypoint.sh .
-RUN chmod +x entrypoint.sh
+ENTRYPOINT ["dotnet", "MGME.Web.dll"]
+
+
+# Some fucking revelations about .NET
+# https://docs.docker.com/samples/aspnet-mssql-compose/
+# https://stackoverflow.com/questions/66988943/could-not-execute-because-the-application-was-not-found-or-a-compatible-net-sdk
