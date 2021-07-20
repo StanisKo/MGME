@@ -9,6 +9,7 @@ docs/*.todo
 
 # Database
 docker/psql
+docker/data
 
 # globs
 Makefile.in
