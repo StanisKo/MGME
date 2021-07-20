@@ -8,7 +8,7 @@ run_cmd="dotnet run --no-build --urls http://0.0.0.0:${APP_PORT} -v d"
 export PATH="$PATH:/root/.dotnet/tools"
 
 printf "\n${CYAN}Waiting for Database...${TRANS}\n"
-dockerize -wait tcp://${SQL_HOST:-database}:{$SQL_PORT-5432} -timeout 30s
+tcp://${SQL_HOST:-database}:{$SQL_PORT-5432} -timeout 30s
 
 printf "\n${CYAN}Applying database migrations...${TRANS}\n"
 dotnet ef database update

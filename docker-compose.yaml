@@ -1,8 +1,5 @@
 version: "3.8"
 
-networks:
-  mgme:
-
 services:
     application:
         build:
@@ -10,17 +7,15 @@ services:
           dockerfile: Dockerfile
         env_file:
           - .env
-        entrypoint: /entrypoint/entrypoint.sh
+        entrypoint: /entrypoint.sh
         ports:
           - "${APP_PORT}:${APP_PORT}"
         volumes:
-          - ./src
           - ./docker/application:/entrypoint
+          - ./src:/src
           - ./docker/data:/data
         depends_on:
           - database
-        networks:
-          - mgme
 
     database:
         image: "postgres:12"
@@ -34,5 +29,3 @@ services:
           - './docker/psql/data:/var/lib/postgresql/data:rw'
           - './docker/application/postgres_initdb.d:/docker-entrypoint-initdb.d'
         command: "-p ${SQL_PORT}"
-        networks:
-        - mgme
