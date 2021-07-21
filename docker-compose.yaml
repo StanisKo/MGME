@@ -5,15 +5,12 @@ services:
         build:
           context: ""
           dockerfile: Dockerfile
-        entrypoint: /entrypoint.sh
         env_file:
           - .env
         ports:
           - "${APP_PORT}:${APP_PORT}"
         volumes:
-          - ./docker/application:/entrypoint
           - ./src:/mgme
-          - ./docker/data:/data
         depends_on:
           - database
 
@@ -27,5 +24,4 @@ services:
           - POSTGRES_DATABASE=${SQL_DATABASE}
         volumes:
           - './docker/psql/data:/var/lib/postgresql/data:rw'
-          - './docker/application/postgres_initdb.d:/docker-entrypoint-initdb.d'
         command: "-p ${SQL_PORT}"

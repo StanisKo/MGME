@@ -26,7 +26,4 @@ COPY --from=build-env /publish .
 # For rebuilds on changes
 ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 
-COPY ./docker/application/entrypoint.sh .
-
-# Entrypoint waits for postgres, runs the migrations and then dotnet-watch-runs the dll
-RUN chmod +x entrypoint.sh
+ENTRYPOINT ["dotnet", "MGME.Web.dll"]
