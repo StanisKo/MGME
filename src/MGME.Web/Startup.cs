@@ -40,11 +40,11 @@ namespace MGME.Web
         {
             NpgsqlConnectionStringBuilder connectionStringBuilder = new NpgsqlConnectionStringBuilder()
             {
-                Host = Configuration["Host"],
-                Port = Convert.ToInt32(Configuration["Port"]),
-                Database = Configuration["Database"],
-                Username = Configuration["Username"],
-                Password = Configuration["Password"]
+                Host = Environment.GetEnvironmentVariable("SQL_HOST"),
+                Port = Convert.ToInt32(Environment.GetEnvironmentVariable("SQL_PORT")),
+                Database = Environment.GetEnvironmentVariable("SQL_DATABASE"),
+                Username = Environment.GetEnvironmentVariable("SQL_USER"),
+                Password = Environment.GetEnvironmentVariable("SQL_PASSWORD")
             };
 
             // Database context: ../MGME.Infra/InfraStartup.cs
@@ -70,7 +70,7 @@ namespace MGME.Web
                         ValidateIssuerSigningKey = true,
 
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.ASCII.GetBytes(Configuration["JWTKey"])
+                            Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWTKEY"))
                         ),
 
                         ValidateIssuer = true,
