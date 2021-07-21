@@ -16,6 +16,13 @@ RUN apt-get update && apt-get install -y nodejs yarn
 
 COPY ./src .
 
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+RUN dotnet tool install --global dotnet-ef
+
+# ?
+RUN cd MGME.Infra && dotnet ef database update -s ../MGME.Web
+
 RUN dotnet publish "MGME.Web/MGME.Web.csproj" -c release -o /publish --no-cache
 
 # We use sdk image for multi-staged builds to make dotnet CLI available
@@ -26,4 +33,8 @@ COPY --from=build-env /publish .
 # For rebuilds on changes
 ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 
-ENTRYPOINT ["dotnet", "MGME.Web.dll"]
+COPY ./docker/application/entrypoint.sh .
+
+# # Entrypoint waits for postgres, runs the migrations and then dotnet-watch-runs the dll
+RUN chmod +x entrypoint.sh
+CMD bin/bash entrypoint.sh

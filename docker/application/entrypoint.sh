@@ -2,7 +2,15 @@
 
 set -e
 
-run_cmd="dotnet watch run --urls=https://*:$APP_PORT --project MGME.Web.csproj"
+# ?
+# export PATH="$PATH:/root/.dotnet/tools"
+
+# dotnet tool install --global dotnet-ef
+
+# dotnet ef database update
+
+# Run dll
+run_cmd="dotnet watch run --project MGME.Web.dll"
 
 printf "%s" "Waiting for database ..."
 
