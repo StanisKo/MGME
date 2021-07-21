@@ -5,11 +5,13 @@ services:
         build:
           context: ""
           dockerfile: Dockerfile
+        entrypoint: /entrypoint.sh
         env_file:
           - .env
         ports:
           - "${APP_PORT}:${APP_PORT}"
         volumes:
+          - ./docker/application:/entrypoint
           - ./src:/mgme
           - ./docker/data:/data
         depends_on:

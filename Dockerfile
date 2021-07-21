@@ -14,7 +14,6 @@ RUN apt remove yarn
 
 RUN apt-get update && apt-get install -y nodejs yarn
 
-# Build from MGME.Web.csproj
 COPY ./src .
 
 RUN dotnet publish "MGME.Web/MGME.Web.csproj" -c release -o /publish --no-cache
@@ -22,12 +21,12 @@ RUN dotnet publish "MGME.Web/MGME.Web.csproj" -c release -o /publish --no-cache
 # We use sdk image for multi-staged builds to make dotnet CLI available
 FROM mcr.microsoft.com/dotnet/sdk:5.0
 
-# Copy the published app to this new runtime-only container
 COPY --from=build-env /publish .
 
-ENTRYPOINT ["dotnet", "MGME.Web.dll"]
+# For rebuilds on changes
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 
+COPY ./docker/application/entrypoint.sh .
 
-# Some fucking revelations about .NET
-# https://docs.docker.com/samples/aspnet-mssql-compose/
-# https://stackoverflow.com/questions/66988943/could-not-execute-because-the-application-was-not-found-or-a-compatible-net-sdk
+# Entrypoint waits for postgres, runs the migrations and then dotnet-watch-runs the dll
+RUN chmod +x entrypoint.sh
