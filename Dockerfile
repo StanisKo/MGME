@@ -3,7 +3,18 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 
 WORKDIR /build
 
-# Make sure node js and yarn are installed
+# Make sure dotnet tools are avaialable
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+# Install EF Core CLI
+RUN dotnet tool install --global dotnet-ef
+
+COPY ./src .
+
+# Run migrations
+RUN dotnet ef database update --project MGME.Infra --startup-project MGME.Web
+
+# Make sure node js and yarn are installed so we can build front end assets
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
@@ -14,18 +25,11 @@ RUN apt remove yarn
 
 RUN apt-get update && apt-get install -y nodejs yarn
 
-COPY ./src .
-
-ENV PATH="${PATH}:/root/.dotnet/tools"
-
-RUN dotnet tool install --global dotnet-ef
-
-# ?
-RUN cd MGME.Infra && dotnet ef database update -s ../MGME.Web
-
+# Build binaries and front end assets
 RUN dotnet publish "MGME.Web/MGME.Web.csproj" -c release -o /publish --no-cache
 
-# We use sdk image for multi-staged builds to make dotnet CLI available
+# We use sdk image for multi-staged builds to make dotnet CLI available: If migrations from top are OK, use
+# aspnetcore runtime to build runtime image
 FROM mcr.microsoft.com/dotnet/sdk:5.0
 
 COPY --from=build-env /publish .
