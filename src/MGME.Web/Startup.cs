@@ -137,6 +137,8 @@ namespace MGME.Web
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+
+            // Testing applying migrations runtime
         }
     }
 }
