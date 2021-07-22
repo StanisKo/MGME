@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 
-WORKDIR /build
+WORKDIR /mgme
 
 # Make sure dotnet tools are avaialable
 ENV PATH="${PATH}:/root/.dotnet/tools"
@@ -10,9 +10,6 @@ ENV PATH="${PATH}:/root/.dotnet/tools"
 RUN dotnet tool install --global dotnet-ef
 
 COPY ./src .
-
-# Run migrations
-# RUN cd MGME.Infra && dotnet ef database update --startup-project ../MGME.Web
 
 # Make sure node js and yarn are installed so we can build front end assets
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
@@ -42,3 +39,20 @@ COPY ./docker/application/entrypoint.sh .
 # # Entrypoint waits for postgres, runs the migrations and then dotnet-watch-runs the dll
 RUN chmod +x entrypoint.sh
 CMD /bin/bash entrypoint.sh
+
+# Resources on running migrations against dll:
+# https://github.com/dotnet/efcore/issues/16882
+# https://stackoverflow.com/questions/37562122/is-there-a-way-to-run-ef-core-rc2-tools-from-published-dll/59269689#59269689
+# https://github.com/marketplace/actions/deploy-entity-framework-core-ef-core-migrations-from-a-dll
+# https://www.benday.com/2017/12/19/ef-core-2-0-migrations-without-hard-coded-connection-strings/ look into dbContextDesignFactory (most probably it is required)
+
+# THIS !!!!
+
+# https://dotnetthoughts.net/docker-compose-asp-net-core-application/
+
+
+# Create a separate light-weight container that will run migrations
+
+# Then improve this file to use lighter only core runtime and not the whole sdk
+
+# Then add watcher
