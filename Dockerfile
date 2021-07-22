@@ -21,24 +21,28 @@ RUN apt remove yarn
 RUN apt-get update && apt-get install -y nodejs yarn
 
 # Build binaries and front end assets (Duct tape, rewrite Dockerfile properly)
-RUN cd MGME.Web && dotnet build && dotnet restore && cd ClientApp && yarn install && yarn upgrade && yarn build
+# RUN cd MGME.Web && dotnet build && dotnet restore && cd ClientApp && yarn install && yarn upgrade && yarn build
 
-# RUN dotnet publish "MGME.Web/MGME.Web.csproj" -c release -o /publish --no-cache
+RUN dotnet publish "MGME.Web/MGME.Web.csproj" -c release -o /publish --no-cache
 
 # We use sdk image for multi-staged builds to make dotnet CLI available: If migrations from top are OK, use
 # aspnetcore runtime to build runtime image
-# FROM mcr.microsoft.com/dotnet/sdk:5.0
+FROM mcr.microsoft.com/dotnet/sdk:5.0
 
-# COPY --from=build-env /publish .
+COPY --from=build-env /publish .
 
 # For rebuilds on changes
 ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 
-COPY ./docker/application/entrypoint.sh .
+ENV ASPNETCORE_URLS=http://+:5001
 
-# # Entrypoint waits for postgres, runs the migrations and then dotnet-watch-runs the dll
-RUN chmod +x entrypoint.sh
-CMD /bin/bash entrypoint.sh
+# COPY ./docker/application/entrypoint.sh .
+
+# # # Entrypoint waits for postgres, runs the migrations and then dotnet-watch-runs the dll
+# RUN chmod +x entrypoint.sh
+# CMD /bin/bash entrypoint.sh
+
+ENTRYPOINT ["dotnet", "MGME.Web.dll"]
 
 # Resources on running migrations against dll:
 # https://github.com/dotnet/efcore/issues/16882
@@ -56,3 +60,18 @@ CMD /bin/bash entrypoint.sh
 # Then improve this file to use lighter only core runtime and not the whole sdk
 
 # Then add watcher
+
+# Or we can do it easier:
+# https://stackoverflow.com/questions/55970148/apply-entity-framework-migrations-when-using-asp-net-core-in-a-docker-image
+
+# This explains how to apply migrations on startup, which is equivalent of applying them via .sh file
+
+# Also some docs on it from ms:
+
+# https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#apply-migrations-at-runtime
+
+# About that: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3] Failed to determine the https port for redirect.
+
+# See this: https://www.thecodebuzz.com/failed-to-determine-the-https-port-for-the-redirect/
+
+# And fix
