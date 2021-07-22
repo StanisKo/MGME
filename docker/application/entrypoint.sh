@@ -2,30 +2,17 @@
 
 set -e
 
-# ?
-# export PATH="$PATH:/root/.dotnet/tools"
+run_cmd="dotnet run --no-build --urls http://0.0.0.0:5001 -v d"
 
-# dotnet tool install --global dotnet-ef
+export PATH="$PATH:/root/.dotnet/tools"
 
-# dotnet ef database update
+cd ./MGME.Infra
 
-# Run dll
-run_cmd="dotnet watch run --project MGME.Web.dll"
-
-printf "%s" "Waiting for database ..."
-
-while ! timeout 0.2 ping -c 1 -n 127.0.0.1:$SQL_PORT &> /dev/null
-do
-    printf "%c" "."
+until dotnet ef database update -s ../MGME.Web/MGME.Web.csproj; do
+    >&2 echo "Migrations executing"
+    sleep 1
 done
 
-printf "\n%s\n" "Database is up, running migrations ..."
-
-until dotnet ef database update; do
->&2 echo "."
-sleep 1
-done
-
-printf "\n%s\n" "All migrations are applied, starting the server ..."
-
+>&2 echo "DB Migrations complete, starting app."
+>&2 echo "Running': $run_cmd"
 exec $run_cmd
