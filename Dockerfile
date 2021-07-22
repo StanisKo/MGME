@@ -23,8 +23,9 @@ RUN apt remove cmdtest
 RUN apt remove yarn
 RUN apt-get update && apt-get install -y nodejs yarn
 
-# Build binaries and front end assets
-RUN cd MGME.Web && dotnet build && dotnet restore
+# Build binaries and front end assets (Duct tape, rewrite Dockerfile properly)
+RUN cd MGME.Web && dotnet build && dotnet restore && cd ClientApp && yarn install && yarn upgrade && yarn build
+
 # RUN dotnet publish "MGME.Web/MGME.Web.csproj" -c release -o /publish --no-cache
 
 # We use sdk image for multi-staged builds to make dotnet CLI available: If migrations from top are OK, use
@@ -34,7 +35,7 @@ RUN cd MGME.Web && dotnet build && dotnet restore
 # COPY --from=build-env /publish .
 
 # For rebuilds on changes
-# ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 
 COPY ./docker/application/entrypoint.sh .
 
