@@ -75,3 +75,12 @@ ENTRYPOINT ["dotnet", "MGME.Web.dll"]
 # See this: https://www.thecodebuzz.com/failed-to-determine-the-https-port-for-the-redirect/
 
 # And fix
+
+# On you own smpt server with sendgrid (add to notes): https://www.reddit.com/r/docker/comments/fuigae/how_do_i_setup_a_simple_smtp_docker_server_to/
+
+# Use asp net core runtime for lighter image
+# Map local ./src volume to ./mgme dir in container
+# Add watcher
+# Configure ports
+# Improve logging
+# Front end shebang
