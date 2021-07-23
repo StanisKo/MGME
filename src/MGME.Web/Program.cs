@@ -10,12 +10,13 @@ namespace MGME.Web
     {
         public static void Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
+            IHost host = CreateHostBuilder(args).Build();
 
-            using (var scope = host.Services.CreateScope())
+            using (IServiceScope scope = host.Services.CreateScope())
             {
-                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                db.Database.Migrate();
+                ApplicationDbContext databaseContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                databaseContext.Database.Migrate();
             }
 
             host.Run();
@@ -27,5 +28,7 @@ namespace MGME.Web
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+
+        pr
     }
 }
