@@ -28,7 +28,5 @@ namespace MGME.Web
                 {
                     webBuilder.UseStartup<Startup>();
                 });
-
-        pr
     }
 }
