@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y nodejs yarn
 
 RUN dotnet publish "MGME.Web/MGME.Web.csproj" -c release -o /publish --no-cache
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0
+FROM mcr.microsoft.com/dotnet/aspnet:5.0
 
 ENV ASPNETCORE_URLS=http://+:5001
 
@@ -24,8 +24,8 @@ WORKDIR /mgme
 
 COPY --from=build-env /publish .
 
-COPY ./docker/application/entrypoint.sh .
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait /wait
 
-RUN chmod +x ./entrypoint.sh
+RUN chmod +x /wait
 
-RUN ./entrypoint.sh
+CMD /wait && dotnet mgme/MGME.Web.dll
