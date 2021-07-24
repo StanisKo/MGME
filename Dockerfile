@@ -26,6 +26,6 @@ COPY --from=build-env /publish .
 
 COPY ./docker/application/entrypoint.sh .
 
-RUN chmod +x entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
-CMD /bin/bash entrypoint.sh
+RUN ./entrypoint.sh
