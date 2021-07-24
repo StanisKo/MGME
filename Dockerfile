@@ -20,7 +20,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:5.0
 
 ENV ASPNETCORE_URLS=http://+:5001
 
-WORKDIR /mgme
+WORKDIR /app
 
 COPY --from=build-env /publish .
 
