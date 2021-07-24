@@ -2,15 +2,7 @@
 
 set -e
 
-export PATH="$PATH:/root/.dotnet/tools"
+# Wait for postgres to be up
+while ! nc -z $SQL_HOST $SQL_PORT; do sleep 1; done;
 
-cd ./MGME.Infra
-
-until dotnet ef database update -s ../MGME.Web/MGME.Web.csproj; do
-    >&2 echo "Migrations executing"
-    sleep 1
-done
-
->&2 echo "DB Migrations complete, starting app."
-
-cd ../MGME.Web && dotnet run --no-build --urls http://0.0.0.0:5001 -v d
+dotnet run --no-build --urls http://0.0.0.0:5001 -v d
