@@ -16,7 +16,9 @@ RUN apt-get update && apt-get install -y nodejs yarn
 
 RUN dotnet publish "MGME.Web/MGME.Web.csproj" -c release -o /publish --no-cache
 
-FROM mcr.microsoft.com/dotnet/aspnet:5.0
+FROM mcr.microsoft.com/dotnet/sdk:5.0
+
+ENV ASPNETCORE_URLS=http://+:5001
 
 WORKDIR /mgme
 
