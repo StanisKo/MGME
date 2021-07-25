@@ -111,7 +111,8 @@ namespace MGME.Web
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MGME.Web v1"));
             }
 
-            app.UseHttpsRedirection();
+            // It's not production project: https://stackoverflow.com/a/59663629
+            // app.UseHttpsRedirection();
 
             app.UseRouting();
 
