@@ -111,8 +111,7 @@ namespace MGME.Web
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MGME.Web v1"));
             }
 
-            // It's not production project: https://stackoverflow.com/a/59663629
-            // app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 
@@ -128,6 +127,8 @@ namespace MGME.Web
             {
                 endpoints.MapControllers();
             });
+
+            // https://github.com/dotnet/aspnetcore/issues/5223#issuecomment-801335456
 
             app.UseSpa(spa =>
             {
