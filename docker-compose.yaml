@@ -3,7 +3,6 @@ version: "3.4"
 services:
     application:
         build:
-          # container_name: mgme
           context: .
           dockerfile: Dockerfile
         env_file:
@@ -16,12 +15,11 @@ services:
         ports:
           - "${APP_PORT}:${APP_PORT}"
         volumes:
-          - ./src:/mgme
+          - ./src:/app # look into watcher
         depends_on:
           - database
 
     database:
-        # container_name: database
         image: "postgres:12"
         ports:
           - "${SQL_PORT}:${SQL_PORT}"
