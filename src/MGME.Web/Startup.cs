@@ -126,8 +126,6 @@ namespace MGME.Web
                 endpoints.MapControllers();
             });
 
-            // https://github.com/dotnet/aspnetcore/issues/5223#issuecomment-801335456
-
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";
