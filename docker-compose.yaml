@@ -14,8 +14,6 @@ services:
           - "ASPNETCORE_URLS=http://*:${APP_PORT}"
         ports:
           - "${APP_PORT}:${APP_PORT}"
-        volumes:
-          - ./src:/app
         depends_on:
           - database
 
