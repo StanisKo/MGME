@@ -18,12 +18,10 @@ RUN dotnet publish "MGME.Web/MGME.Web.csproj" -c release -o /publish --no-cache
 
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 
-WORKDIR /app
-
-COPY --from=build-env /publish .
+COPY --from=build-env /publish ./mgme
 
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait /wait
 
 RUN chmod +x /wait
 
-CMD /wait && dotnet MGME.Web.dll
+CMD /wait && cd mgme && dotnet MGME.Web.dll
