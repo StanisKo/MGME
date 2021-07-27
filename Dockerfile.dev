@@ -26,3 +26,5 @@ RUN chmod +x /wait
 
 # Use env vars for port
 CMD /wait && cd MGME.Web && dotnet watch run --urls http://*:5001
+
+# Please remove node_modules from dev image, lol
