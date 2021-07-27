@@ -24,7 +24,4 @@ ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait
 
 RUN chmod +x /wait
 
-# Use env vars for port
-CMD /wait && cd MGME.Web && dotnet watch run --urls http://*:5001
-
-# Please remove node_modules from dev image, lol
+CMD /wait && cd MGME.Web && dotnet watch run --urls http://0.0.0.0:5001
