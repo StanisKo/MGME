@@ -9,7 +9,9 @@ docs/*.todo
 
 # Database
 docker/psql
-docker/data
+
+# docker-compose override for local dev
+docker-compose.override.yaml
 
 # globs
 Makefile.in

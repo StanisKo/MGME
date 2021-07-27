@@ -15,7 +15,7 @@ services:
         ports:
           - "${APP_PORT}:${APP_PORT}"
         volumes:
-          - ./src:/app # look into watcher
+          - ./src:/app
         depends_on:
           - database
 
