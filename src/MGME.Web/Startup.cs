@@ -21,6 +21,8 @@ using Npgsql;
 using MGME.Core;
 using MGME.Infra;
 
+// develop locally, read .env file like this: https://dusted.codes/dotenv-in-dotnet
+
 namespace MGME.Web
 {
     public class Startup
@@ -38,6 +40,12 @@ namespace MGME.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            if (_environment.IsDevelopment())
+            {
+                // Local dev ? use localhost : otherwise service name is used when running in container
+                Environment.SetEnvironmentVariable("SQL_HOST", "localhost");
+            }
+
             NpgsqlConnectionStringBuilder connectionStringBuilder = new NpgsqlConnectionStringBuilder()
             {
                 Host = Environment.GetEnvironmentVariable("SQL_HOST"),
