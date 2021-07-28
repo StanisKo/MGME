@@ -1,12 +1,4 @@
-import {
-    ReactElement,
-    useEffect,
-    useState,
-    ChangeEvent,
-    Dispatch,
-    SetStateAction,
-    SyntheticEvent
-} from 'react';
+import { ReactElement, useEffect, useState, ChangeEvent, SyntheticEvent } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -56,7 +48,14 @@ const useStyles = makeStyles((theme) => ({
             color: theme.palette.secondary.main
         }
     },
-    deleteButton: {
+    outlinedDeleteButton: {
+        borderColor: '#bf7c7c',
+        '&:hover': {
+            borderColor: '#b52828'
+        },
+        color: '#b52828'
+    },
+    containedDeleteButton: {
         backgroundColor: '#d32f2f',
         '&:hover': {
             backgroundColor: '#b52828'
@@ -141,40 +140,34 @@ export const UserProfile = (): ReactElement | null => {
 
     const [dialogOpen, setDialogOpen] = useState(false);
 
-    const inputTypeToCallback: { [key: number]: Dispatch<SetStateAction<string>> } = {
-        [INPUT_TYPE.USERNAME]: setName,
-        [INPUT_TYPE.EMAIL]: setEmail,
-        [INPUT_TYPE.OLD_PASSWORD]: setOldPassword,
-        [INPUT_TYPE.PASSWORD]: setNewPassword,
-        [INPUT_TYPE.CONFRIM_PASSWORD]: setConfirmPassword
-    };
-
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
 
         const value = event.target.value;
 
-        inputTypeToCallback[inputType](value);
-
         handleInputValidation(inputType, value);
     };
 
     const handleInputValidation = (inputType: number, value: string): void => {
+        const normalizedInput = value.trim();
+
         switch (inputType) {
             case INPUT_TYPE.USERNAME:
-                if (value.length < 6) {
+                if (normalizedInput.length < 6) {
                     setNameError(true);
                     setNameHelperText('Username must be at least 6 characters long');
 
                     break;
                 }
 
-                if (value === user?.name) {
+                if (normalizedInput === user?.name) {
                     setNameError(true);
                     setNameHelperText('Username cannot be the same as old username');
 
                     break;
                 }
+
+                setName(normalizedInput);
 
                 setNameError(false);
                 setNameHelperText('');
@@ -182,25 +175,28 @@ export const UserProfile = (): ReactElement | null => {
                 break;
 
             case INPUT_TYPE.EMAIL:
-                if (!validEmailFormat.test(value)) {
+                if (!validEmailFormat.test(normalizedInput)) {
                     setEmailError(true);
                     setEmailHelperText('Email address is not valid');
 
                     break;
                 }
 
-                if (value === user?.email) {
+                if (normalizedInput === user?.email) {
                     setEmailError(true);
                     setEmailHelperText('Email cannot be the same as old email');
 
                     break;
                 }
 
+                setEmail(normalizedInput);
+
                 setEmailError(false);
                 setEmailHelperText('');
 
                 break;
 
+            // For passwords we use pure argument, since user might include whitespaces
             case INPUT_TYPE.OLD_PASSWORD:
                 if (!validPasswordFormat.test(value)) {
                     setOldPasswordError(true);
@@ -213,6 +209,8 @@ export const UserProfile = (): ReactElement | null => {
 
                     break;
                 }
+
+                setOldPassword(value);
 
                 setOldPasswordError(false);
                 setOldPasswordHelperText('');
@@ -232,6 +230,8 @@ export const UserProfile = (): ReactElement | null => {
                     break;
                 }
 
+                setNewPassword(value);
+
                 setNewPasswordError(false);
                 setNewPasswordHelperText('');
 
@@ -245,6 +245,8 @@ export const UserProfile = (): ReactElement | null => {
                     break;
                 }
 
+                setConfirmPassword(value);
+
                 setConfirmPasswordError(false);
                 setConfirmPasswordHelperText('');
 
@@ -255,7 +257,8 @@ export const UserProfile = (): ReactElement | null => {
         }
     };
 
-    const handleUserUpdate = async (): Promise<void | BaseServiceResponse> => {
+    const handleUserUpdate = async (): Promise<void> => {
+        // Condition if user wants to update only one field
         const params: { [key: string]: string } = {
             ...(name && !nameError ? { name: name } : null),
             ...(email && !emailError ? { email: email } : null)
@@ -263,27 +266,27 @@ export const UserProfile = (): ReactElement | null => {
 
         const response = await updateUser(params);
 
-        if (response) {
-            setUserUpdateResponse(response);
-        }
-
-        setEditing(false);
+        setUserUpdateResponse(response);
         setUserUpdateOpenSnackbar(true);
+
+        if (response.success) {
+            setEditing(false);
+        }
     };
 
-    const handleChangePassword = async (): Promise<void | BaseServiceResponse> => {
+    const handleChangePassword = async (): Promise<void> => {
         const response = await changePassword({ oldPassword, newPassword, confirmPassword });
 
-        if (response) {
-            setChangePasswordResponse(response);
-        }
-
-        setEditing(false);
+        setChangePasswordResponse(response);
         setChangePasswordOpenSnackbar(true);
+
+        if (response.success) {
+            setEditing(false);
+        }
     };
 
     const handleUpdate = async (): Promise<void> => {
-        if (user || email) {
+        if ((name && !nameError && name !== user?.name) || (email && !emailError && email !== user?.email)) {
             await handleUserUpdate();
         }
 
@@ -427,7 +430,16 @@ export const UserProfile = (): ReactElement | null => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [oldPassword, oldPasswordError, newPassword, newPasswordError, confirmPassword, confirmPasswordError]);
 
-    const { root, centered, deleteButton, oneThirdWidth, toRight, editIcon, input } = useStyles();
+    const {
+        root,
+        centered,
+        outlinedDeleteButton,
+        containedDeleteButton,
+        oneThirdWidth,
+        toRight,
+        editIcon,
+        input
+    } = useStyles();
 
     return user ? (
         <div className={centered}>
@@ -541,7 +553,7 @@ export const UserProfile = (): ReactElement | null => {
                     <Grid item container spacing={4} className={toRight}>
                         <Grid item>
                             <Button
-                                variant="contained"
+                                variant="outlined"
                                 color="primary"
                                 onClick={handleUpdate}
                                 disabled={!canUpdate}
@@ -551,8 +563,8 @@ export const UserProfile = (): ReactElement | null => {
                         </Grid>
                         <Grid item>
                             <Button
-                                variant="contained"
-                                className={deleteButton}
+                                variant="outlined"
+                                className={outlinedDeleteButton}
                                 onClick={handleDialogOpen}
                             >
                                 Delete
@@ -584,14 +596,14 @@ export const UserProfile = (): ReactElement | null => {
                 <DialogTitle id="alert-dialog-title">{'Are you sure you want to delete your account?'}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        This action is irreversable, your account will be deleted forever
+                        This action is irreversible, your account will be deleted forever
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleDialogClose} variant="contained" color="secondary">
                         Back
                     </Button>
-                    <Button onClick={handleDelete} variant="contained" className={deleteButton}>
+                    <Button onClick={handleDelete} variant="contained" className={containedDeleteButton}>
                         Yes
                     </Button>
                 </DialogActions>

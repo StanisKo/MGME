@@ -25,7 +25,7 @@ namespace MGME.Web.Controllers
         public async Task <IActionResult> GetAllPlayerCharacters([FromQuery] string sorting, int? page)
         {
             PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = await _playerCharacterService.GetAllPlayerCharacters(
-                sorting ?? "name", page ?? 1
+                sorting ?? "name", page
             );
 
             if (response.Success)

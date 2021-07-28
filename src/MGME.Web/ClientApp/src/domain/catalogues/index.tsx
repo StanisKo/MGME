@@ -8,10 +8,10 @@ import { BaseServiceResponse } from '../../shared/interfaces';
 import { PlayerCharactersTable, CreatePlayerCharacterModal } from '../playerCharacter/components';
 import { deletePlayerCharacters, addToPlayerCharacter } from '../playerCharacter/requests';
 
-import { NonPlayerCharactersTable } from '../nonPlayerCharacter/components';
+import { NonPlayerCharactersTable, CreateNonPlayerCharacterModal } from '../nonPlayerCharacter/components';
 import { deleteNonPlayerCharacters } from '../nonPlayerCharacter/requests';
 
-import { AdventuresToAddToTable } from '../adventures/components';
+import { AdventuresTable } from '../adventures/components';
 import { addToAdventure } from '../adventures/requests';
 
 import {
@@ -27,7 +27,7 @@ import {
 } from '@material-ui/core';
 
 import { Alert } from '../../shared/components';
-import { PLAYER_CHARACTER_TABLE_DISPLAY_MODE } from '../../shared/const';
+import { TABLE_DISPLAY_MODE } from '../../shared/const';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -363,7 +363,7 @@ export const Catalogues = (): ReactElement => {
 
                         <Grid item xs={12}>
                             {selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS && (
-                                <PlayerCharactersTable mode={PLAYER_CHARACTER_TABLE_DISPLAY_MODE.TO_SHOW} />
+                                <PlayerCharactersTable mode={TABLE_DISPLAY_MODE.TO_SHOW} />
                             )}
 
                             {selectedMenu === SELECTED_MENU.NON_PLAYER_CHARACTERS && <NonPlayerCharactersTable />}
@@ -372,7 +372,7 @@ export const Catalogues = (): ReactElement => {
                         {displayAdventures && (
                             <Grid item xs={12}>
                                 <Divider />
-                                <AdventuresToAddToTable />
+                                <AdventuresTable mode={TABLE_DISPLAY_MODE.TO_ADD_TO} />
                                 <Grid
                                     item
                                     container
@@ -407,7 +407,7 @@ export const Catalogues = (): ReactElement => {
                         {displayCharactersToAddTo && (
                             <Grid item xs={12}>
                                 <Divider />
-                                <PlayerCharactersTable mode={PLAYER_CHARACTER_TABLE_DISPLAY_MODE.TO_ADD_TO} />
+                                <PlayerCharactersTable mode={TABLE_DISPLAY_MODE.TO_ADD_TO} />
                                 <Grid
                                     item
                                     container
@@ -451,12 +451,21 @@ export const Catalogues = (): ReactElement => {
             </div>
 
             {dialogOpen && (
-                <CreatePlayerCharacterModal
-                    handleDialogClose={handleDialogClose}
-                    classes={classes as unknown as { [key: string]: string }}
-                    setResponse={setResponse}
-                    setOpenSnackBar={setOpenSnackbar}
-                />
+                selectedMenu === SELECTED_MENU.PLAYER_CHARACTERS ? (
+                    <CreatePlayerCharacterModal
+                        handleDialogClose={handleDialogClose}
+                        classes={classes as unknown as { [key: string]: string }}
+                        setResponse={setResponse}
+                        setOpenSnackBar={setOpenSnackbar}
+                    />
+                ) : (
+                    <CreateNonPlayerCharacterModal
+                        handleDialogClose={handleDialogClose}
+                        classes={classes as unknown as { [key: string]: string }}
+                        setResponse={setResponse}
+                        setOpenSnackBar={setOpenSnackbar}
+                    />
+                )
             )}
 
             <Snackbar open={openSnackbar} onClose={handleSnackbarClose}>

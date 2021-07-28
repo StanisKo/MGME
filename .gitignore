@@ -4,6 +4,12 @@
 # Visual Studio 2019 Mac cache/options directory
 .vs/*
 
+# TODOs
+docs/*.todo
+
+# Database
+docker/psql
+
 # globs
 Makefile.in
 *.userprefs

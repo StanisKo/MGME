@@ -57,7 +57,7 @@ export const CataloguesReducer: Reducer<CataloguesState> = (
                     ...state[key as keyof CataloguesState],
 
                     // Add/update things in THIS key
-                    ...(payload as unknown as CataloguesState)
+                    ...payload
                 }
             };
 

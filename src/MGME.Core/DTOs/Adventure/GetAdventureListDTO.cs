@@ -1,3 +1,5 @@
+using System;
+
 using MGME.Core.DTOs.Thread;
 using MGME.Core.DTOs.PlayerCharacter;
 using MGME.Core.DTOs.NonPlayerCharacter;
@@ -12,6 +14,8 @@ namespace MGME.Core.DTOs.Adventure
 
         public int ThreadCount { get; set; }
 
+        public int ChaosFactor { get; set; }
+
         public GetPlayerCharacterDTO PlayerCharacter { get; set; }
 
         public int PlayerCharacterCount { get; set; }
@@ -21,5 +25,7 @@ namespace MGME.Core.DTOs.Adventure
         public int NonPlayerCharacterCount { get; set; }
 
         public int SceneCount { get; set; }
+
+        public DateTime CreatedAt { get; set; }
     }
 }

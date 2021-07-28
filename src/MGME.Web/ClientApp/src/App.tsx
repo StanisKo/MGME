@@ -108,6 +108,30 @@ export const Application = (): ReactElement => {
                         }
                     );
                 }
+                else {
+                    /*
+                    If unable to refresh token and the app is running,
+                    Repeat logout just as we do when user refreshes the page and the app is rebooted
+                    */
+                    const userLoggedIn = localStorage.getItem('userLoggedIn');
+
+                    // Remove flag and redirect if user logged in
+                    if (userLoggedIn) {
+                        localStorage.removeItem('userLoggedIn');
+
+                        // We also clear out store since menu render depends on it
+                        store.dispatch<LogoutUser>(
+                            {
+                                type: 'LOGOUT_USER'
+                            }
+                        );
+
+                        history.push(ROUTES.LOGIN);
+                    }
+
+                    console.clear();
+                }
+
             }, accessTokenExpiresIn);
         }
     }, [accessTokenExpiresIn]);

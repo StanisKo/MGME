@@ -21,6 +21,8 @@ using Npgsql;
 using MGME.Core;
 using MGME.Infra;
 
+// develop locally, read .env file like this: https://dusted.codes/dotenv-in-dotnet
+
 namespace MGME.Web
 {
     public class Startup
@@ -38,13 +40,19 @@ namespace MGME.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            if (_environment.IsDevelopment())
+            {
+                // Local dev ? use localhost : otherwise service name is used when running in container
+                Environment.SetEnvironmentVariable("SQL_HOST", "localhost");
+            }
+
             NpgsqlConnectionStringBuilder connectionStringBuilder = new NpgsqlConnectionStringBuilder()
             {
-                Host = Configuration["Host"],
-                Port = Convert.ToInt32(Configuration["Port"]),
-                Database = Configuration["Database"],
-                Username = Configuration["Username"],
-                Password = Configuration["Password"]
+                Host = Environment.GetEnvironmentVariable("SQL_HOST"),
+                Port = Convert.ToInt32(Environment.GetEnvironmentVariable("SQL_PORT")),
+                Database = Environment.GetEnvironmentVariable("SQL_DATABASE"),
+                Username = Environment.GetEnvironmentVariable("SQL_USER"),
+                Password = Environment.GetEnvironmentVariable("SQL_PASSWORD")
             };
 
             // Database context: ../MGME.Infra/InfraStartup.cs
@@ -70,7 +78,7 @@ namespace MGME.Web
                         ValidateIssuerSigningKey = true,
 
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.ASCII.GetBytes(Configuration["JWTKey"])
+                            Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWTKEY"))
                         ),
 
                         ValidateIssuer = true,
@@ -110,8 +118,6 @@ namespace MGME.Web
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MGME.Web v1"));
             }
-
-            app.UseHttpsRedirection();
 
             app.UseRouting();
 

@@ -165,6 +165,7 @@ namespace MGME.Core.Services.AdventureService
                 {
                     Title = newAdventure.Title,
                     Context = newAdventure.Context,
+                    ChaosFactor = newAdventure.ChaosFactor,
                     NonPlayerCharacters = newNonPlayerCharactersToAdd,
                     Threads = threadsToAdd,
                     UserId = userId
@@ -388,6 +389,8 @@ namespace MGME.Core.Services.AdventureService
                     ).FirstOrDefault(),
                     ThreadCount = adventure.Threads.Count,
 
+                    ChaosFactor = adventure.ChaosFactor,
+
                     PlayerCharacter = adventure.PlayerCharacters.Select(
                         playerCharacter => new GetPlayerCharacterDTO()
                         {
@@ -409,6 +412,10 @@ namespace MGME.Core.Services.AdventureService
                         nonPlayerCharacter => adventure.NonPlayerCharacters.Count == 1
                     ).FirstOrDefault(),
                     NonPlayerCharacterCount = adventure.NonPlayerCharacters.Count,
+
+                    SceneCount = adventure.Scenes.Count,
+
+                    CreatedAt = adventure.CreatedAt
                 },
                 orderBy: _sorter.DetermineSorting(sortingParameter.Value),
                 page: selectedPage.Value

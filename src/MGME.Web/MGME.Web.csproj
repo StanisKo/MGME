@@ -7,7 +7,6 @@
     <IsPackable>false</IsPackable>
     <SpaRoot>ClientApp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
-    <UserSecretsId>92e6b021-59b6-49ee-8afe-2ea5603bf987</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -45,8 +44,9 @@
   </Target>
 
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
-    <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
+    <!-- As part of publishing, ensure the JS resources are of latest versions and freshly built -->
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn install" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn upgrade" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn build" />
 
     <!-- Include the newly-built files in the publish output -->

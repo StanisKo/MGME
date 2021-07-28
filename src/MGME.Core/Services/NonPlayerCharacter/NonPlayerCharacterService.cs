@@ -289,9 +289,6 @@ namespace MGME.Core.Services.NonPlayerCharacterService
 
                 response.Success = true;
                 response.Message = $"NPC{args.suffix} {args.verb} successfully deleted";
-
-                response.Success = true;
-                response.Message = "NPC was successfully deleted";
             }
             catch (Exception exception)
             {

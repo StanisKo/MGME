@@ -68,7 +68,10 @@ namespace MGME.Core.Services.AuthService
 
             _tokenHandler = new JwtSecurityTokenHandler();
 
-            _securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTKey"]));
+            _securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                Environment.GetEnvironmentVariable("JWTKEY")
+                )
+            );
         }
 
         public async Task <BaseServiceResponse> RegisterUser(string name, string email, string password)
@@ -558,7 +561,9 @@ namespace MGME.Core.Services.AuthService
 
                 smtpClient.Authenticate(
                     _configuration["EmailConfiguration:From"],
-                    _configuration["EmailSenderPassword"]
+                    Environment.GetEnvironmentVariable(
+                        "EMAILSENDERPASSWORD"
+                    )
                 );
 
                 await smtpClient.SendAsync(confirmationMessage);

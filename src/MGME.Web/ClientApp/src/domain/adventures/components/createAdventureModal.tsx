@@ -1,14 +1,17 @@
-import { ReactElement, useState, useEffect, ChangeEvent, Dispatch, SetStateAction } from 'react';
+import { ReactElement, useState, useEffect, Dispatch, SetStateAction, ChangeEvent } from 'react';
 import { useSelector } from 'react-redux';
 
 import { ApplicationState } from '../../../store';
 
-import { PlayerCharacter } from '../interfaces';
-
-import { createPlayerCharacter } from '../requests';
+import { Adventure } from '../interfaces';
+import { createAdventure } from '../requests';
+import { chaosFactorOptions } from '../helpers';
 
 import { BaseServiceResponse, NewEntityToAdd } from '../../../shared/interfaces';
 import { INPUT_TYPE, NON_PLAYER_CHARACTER_FILTER } from '../../../shared/const';
+
+import { AvailablePlayerCharacter } from '../../playerCharacter/interfaces';
+import { fetchAvailablePlayerCharacters } from '../../playerCharacter/requests';
 
 import { AvailableNonPlayerCharacter } from '../../nonPlayerCharacter/interfaces';
 import { fetchAvailableNonPlayerCharacters } from '../../nonPlayerCharacter/requests';
@@ -28,7 +31,8 @@ import {
     LinearProgress,
     DialogActions,
     Button,
-    Typography
+    Typography,
+    Slider
 } from '@material-ui/core';
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -62,22 +66,24 @@ interface Props {
     setOpenSnackBar: Dispatch<SetStateAction<boolean>>;
 }
 
-export const CreatePlayerCharacterModal = ({
-    handleDialogClose, classes, setResponse, setOpenSnackBar }: Props): ReactElement => {
+export const CreateAdventureModal = (
+    { handleDialogClose, classes, setResponse, setOpenSnackBar }: Props): ReactElement => {
 
     /*
     Used exclusively to extract names and deny ui interaction
-    if name of a new character already exists
+    if name of a new adventure already exists
     */
-    const playerCharacters: PlayerCharacter[] | null = useSelector(
-        (state: ApplicationState) => state.catalogues?.playerCharacters?.data ?? null
+    const adventures: Adventure[] | null = useSelector(
+        (state: ApplicationState) => state.adventures?.dataset?.data ?? null
     );
 
-    const [name, setName] = useState<string>('');
-    const [nameError, setNameError] = useState<boolean>(false);
-    const [nameHelperText, setNameHelperText] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
+    const [titleError, setTitleError] = useState<boolean>(false);
+    const [titleHelperText, setTitleHelperText] = useState<string>('');
 
-    const [description, setDescription] = useState<string>('');
+    const [context, setContext] = useState<string>('');
+    const [contextError, setContextError] = useState<boolean>(false);
+    const [contextHelperText, setContextHelperText] = useState<string>('');
 
     const [threadName, setThreadName] = useState<string>('');
     const [threadError, setThreadError] = useState<boolean>(false);
@@ -85,7 +91,7 @@ export const CreatePlayerCharacterModal = ({
 
     const [threadDescription, setThreadDescription] = useState<string>('');
 
-    // Collection of threads to add to new character
+    // Collection of threads to add to new adventure
     const [threadsToAdd, setThreadsToAdd] = useState<NewEntityToAdd[]>([]);
 
     const [nonPlayerCharacterName, setNonPlayerCharacterName] = useState<string>('');
@@ -93,6 +99,12 @@ export const CreatePlayerCharacterModal = ({
     const [nonPlayerCharacterHelperText, setNonPlayerCharacterHelperText] = useState<string>('');
 
     const [nonPlayerCharacterDescription, setNonPlayerCharacterDescription] = useState<string>('');
+
+    // A collection of player characters that are available for adding
+    const [availablePlayerCharacters, setAvailablePlayerCharacters] = useState<AvailablePlayerCharacter[]>();
+
+    // A collection of player characters' ids that we send to API
+    const [playerCharactersToAdd, setPlayerCharactersToAdd] = useState<number[]>([]);
 
     // A collection of npcs that are available for adding
     const [availableNonPlayerCharacters, setAvailableNonPlayerCharacters] = useState<AvailableNonPlayerCharacter[]>();
@@ -107,10 +119,15 @@ export const CreatePlayerCharacterModal = ({
     const [displayedNonPlayerCharactersToAdd, setDisplayedNonPlayerCharactersToAdd] =
         useState<NewEntityToAdd[]>([]);
 
-    // Variables that take part in validation
-    const [playerCharacterNames, setPlayerCharacterNames] = useState<string[]>([]);
+    // Takes part in validing titles of new adventures
+    const [adventureTitles, setAdventureTitles] = useState<string[]>([]);
 
+    // Takes part in validing names of freshly created/added from existing npcs
     const [nonPlayerCharacterNames, setNonPlayerCharacterNames] = useState<string[]>([]);
+
+    const [chaosFactor, setChaosFactor] = useState<number>(5);
+
+    const { root } = useStyles();
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
@@ -122,30 +139,39 @@ export const CreatePlayerCharacterModal = ({
         switch (inputType) {
             case INPUT_TYPE.ENTITY_NAME:
                 if (normalizedInput.length < 1) {
-                    setNameError(true);
-                    setNameHelperText('Please provide character name');
+                    setTitleError(true);
+                    setTitleHelperText('Please provide adventure title');
 
                     break;
                 }
 
-                // This doesn't cover character names outside of what is currently displayed on the page
-                if (playerCharacterNames?.includes(normalizedInput)) {
-                    setNameError(true);
-                    setNameHelperText('Character with such name already exists');
+                // This doesn't cover adventure names outside of what is currently displayed on the page
+                if (adventureTitles?.includes(normalizedInput)) {
+                    setTitleError(true);
+                    setTitleHelperText('Adventure with such title already exists');
 
                     break;
                 }
 
-                setName(value);
+                setTitle(value);
 
-                setNameError(false);
-                setNameHelperText('');
+                setTitleError(false);
+                setTitleHelperText('');
 
                 break;
 
-            // We don't need to validate description, it's up to the user to provide it or not
             case INPUT_TYPE.ENTITY_DESCRIPTION:
-                setDescription(value);
+                if (normalizedInput.length < 1) {
+                    setContextError(true);
+                    setContextHelperText('Please provide adventure context');
+
+                    break;
+                }
+
+                setContext(value);
+
+                setContextError(false);
+                setContextHelperText('');
 
                 break;
 
@@ -176,15 +202,6 @@ export const CreatePlayerCharacterModal = ({
             case INPUT_TYPE.NON_PLAYER_CHARACTER_NAME:
                 setNonPlayerCharacterName(value);
 
-                /*
-                Check if provided name is already taken by some of the available npcs,
-                or by those that were added manually before
-
-                This doesn't cover for such name belonging to an npc in adventure, or that is
-                linked to another character, yet it still adds to better UX
-
-                (If such name is already taked by unavailable npc, api will return 400)
-                */
                 const nonPlayerCharacterAlreadyExists = nonPlayerCharacterNames.map(
                     name => name.toLowerCase()
                 ).includes(
@@ -304,12 +321,40 @@ export const CreatePlayerCharacterModal = ({
         );
     };
 
-    const handleCreate = async (): Promise<void> => {
-        const response = await createPlayerCharacter(
-            {
-                name: name.trim(),
+    const handleAddingPlayerCharacters = (id: number) => (): void => {
+        // Set what we send
+        setPlayerCharactersToAdd(
+            [...playerCharactersToAdd, id]
+        );
+    };
 
-                description: description.trim(),
+    const handleRemovingPlayerCharacters = (id: number) => (): void => {
+        // Remove from what we send
+        setPlayerCharactersToAdd(
+            playerCharactersToAdd.filter(
+                playerCharacterId => playerCharacterId !== id
+            )
+        );
+    };
+
+    const handleChangeChaosFactor = (event: ChangeEvent<unknown>, value: number | number[]): void => {
+        setChaosFactor(value as number);
+
+        /*
+        What's up Material UI?
+        C:617 Uncaught TypeError: Cannot read property 'getBoundingClientRect' of null
+        */
+        console.clear();
+    };
+
+    const handleCreate = async (): Promise<void> => {
+        const response = await createAdventure(
+            {
+                title: title.trim(),
+
+                context: context.trim(),
+
+                chaosFactor: chaosFactor,
 
                 threads: threadsToAdd.map(
                     thread => {
@@ -327,7 +372,9 @@ export const CreatePlayerCharacterModal = ({
                     }
                 ),
 
-                existingNonPlayerCharacters: existingNonPlayerCharactersToAdd
+                existingNonPlayerCharacters: existingNonPlayerCharactersToAdd,
+
+                playerCharacters: playerCharactersToAdd
             }
         );
 
@@ -341,13 +388,22 @@ export const CreatePlayerCharacterModal = ({
     };
 
     const allowedToCreate =
-        name
-        && !nameError
+        title
+        && !titleError
+        && context
+        && !contextError
         && threadsToAdd.length
+        && playerCharactersToAdd.length
         && (existingNonPlayerCharactersToAdd.length || newNonPlayerCharactersToAdd.length);
 
     useEffect(() => {
         (async (): Promise<void> => {
+            if (!availablePlayerCharacters) {
+                const availablePlayerCharacters = await fetchAvailablePlayerCharacters();
+
+                setAvailablePlayerCharacters(availablePlayerCharacters.data);
+            }
+
             if (!availableNonPlayerCharacters) {
                 const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters(
                     NON_PLAYER_CHARACTER_FILTER.AVAILABLE_FOR_PLAYER_CHARACTERS
@@ -360,14 +416,14 @@ export const CreatePlayerCharacterModal = ({
     }, []);
 
     useEffect(() => {
-        if (playerCharacters) {
-            setPlayerCharacterNames(
-                playerCharacters?.map(
-                    playerCharacter => playerCharacter.name.toLowerCase()
+        if (adventures) {
+            setAdventureTitles(
+                adventures?.map(
+                    adventure => adventure.title.toLowerCase()
                 )
             );
         }
-    }, [playerCharacters]);
+    }, [adventures]);
 
     useEffect(() => {
         if (availableNonPlayerCharacters && displayedNonPlayerCharactersToAdd) {
@@ -396,8 +452,6 @@ export const CreatePlayerCharacterModal = ({
 
     }, [availableNonPlayerCharacters, displayedNonPlayerCharactersToAdd]);
 
-    const { root } = useStyles();
-
     return (
         <Dialog
             open={true}
@@ -406,18 +460,18 @@ export const CreatePlayerCharacterModal = ({
             aria-describedby="alert-dialog-description"
         >
             <DialogTitle id="alert-dialog-title" className={classes.centered}>
-                Create Character
+                Create Adventure
             </DialogTitle>
             <DialogContent>
                 <Grid container spacing={4}>
                     <Grid item xs={12}>
                         <TextField
-                            error={nameError}
-                            helperText={nameHelperText}
+                            error={titleError}
+                            helperText={titleHelperText}
                             variant="outlined"
                             required
                             fullWidth
-                            label="Name"
+                            label="Title"
                             onChange={handleInputChange}
                             inputProps={{ inputtype: INPUT_TYPE.ENTITY_NAME }}
                             className={root}
@@ -426,12 +480,98 @@ export const CreatePlayerCharacterModal = ({
 
                     <Grid item xs={12}>
                         <TextField
+                            error={contextError}
+                            helperText={contextHelperText}
                             variant="outlined"
+                            required
                             fullWidth
-                            label="Description"
+                            label="Context"
                             onChange={handleInputChange}
                             inputProps={{ inputtype: INPUT_TYPE.ENTITY_DESCRIPTION }}
+                            className={root}
                         />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Accordion
+                            disabled={(availablePlayerCharacters?.filter(
+                                playerCharacter => playerCharactersToAdd.includes(playerCharacter.id)
+                            ) ?? []).length === 0}
+
+                            expanded={(availablePlayerCharacters?.filter(
+                                playerCharacter => playerCharactersToAdd.includes(playerCharacter.id)
+                            ) ?? []).length > 0}
+                        >
+                            <AccordionSummary
+                                aria-controls="playerCharacters-content"
+                                id="playerCharacters-header"
+                            >
+                                <Typography>
+                                    Your Characters
+                                </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <List style={{ width: '100%' }}>
+                                    {availablePlayerCharacters?.filter(
+                                        playerCharacter => playerCharactersToAdd.includes(playerCharacter.id)
+                                    ).map((playerCharacter, index) => {
+                                        return (
+                                            <ListItem
+                                                key={`playerCharacterToAdd-${index}`}
+                                                button
+                                                onClick={handleRemovingPlayerCharacters(
+                                                    playerCharacter.id
+                                                )}
+                                            >
+                                                <ListItemText primary={playerCharacter.name} />
+                                            </ListItem>
+                                        );
+                                    })}
+                                </List>
+                            </AccordionDetails>
+                        </Accordion>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        {availablePlayerCharacters ? (
+                            <Accordion>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="availablePlayerCharacters-content"
+                                    id="availablePlayerCharacters-header"
+                                >
+                                    <Typography>
+                                        {availablePlayerCharacters?.filter(
+                                            playerCharacter => !playerCharactersToAdd.includes(
+                                                playerCharacter.id
+                                            )
+                                        )?.length ? 'Available Characters' : 'No Available Characters'
+                                        }
+                                    </Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <List style={{ width: '100%' }}>
+                                        {availablePlayerCharacters?.filter(
+                                            playerCharacter => !playerCharactersToAdd.includes(
+                                                playerCharacter.id
+                                            )
+                                        )?.map((playerCharacter, index) => {
+                                            return (
+                                                <ListItem
+                                                    key={`avaialable-character-${index}`}
+                                                    button
+                                                    onClick={handleAddingPlayerCharacters(
+                                                        playerCharacter.id
+                                                    )}
+                                                >
+                                                    <ListItemText primary={playerCharacter.name} />
+                                                </ListItem>
+                                            );
+                                        })}
+                                    </List>
+                                </AccordionDetails>
+                            </Accordion>
+                        ) : <LinearProgress />}
                     </Grid>
 
                     <Grid item xs={12}>
@@ -587,7 +727,7 @@ export const CreatePlayerCharacterModal = ({
                                             nonPlayerCharacter => !existingNonPlayerCharactersToAdd.includes(
                                                 nonPlayerCharacter.id
                                             )
-                                        ).length ? 'Available NPCs' : 'No Available NPCs'
+                                        ).length ? 'Available NPCs' : 'No available NPCs'
                                         }
                                     </Typography>
                                 </AccordionSummary>
@@ -615,6 +755,21 @@ export const CreatePlayerCharacterModal = ({
                                 </AccordionDetails>
                             </Accordion>
                         ) : <LinearProgress />}
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Typography id="chaos-factor-slider" gutterBottom>
+                            Chaos Factor
+                        </Typography>
+                        <Slider
+                            key={`slider-${chaosFactor}`}
+                            defaultValue={chaosFactor}
+                            step={1}
+                            min={1}
+                            max={9}
+                            marks={chaosFactorOptions}
+                            onChange={handleChangeChaosFactor}
+                        />
                     </Grid>
                 </Grid>
             </DialogContent>

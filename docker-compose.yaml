@@ -1,0 +1,29 @@
+version: "3.4"
+
+services:
+    application:
+        build:
+          context: .
+          dockerfile: Dockerfile
+        env_file:
+          - .env
+        environment:
+          - "WAIT_HOSTS=database:${SQL_PORT}"
+          - "WAIT_HOSTS_TIMEOUT=300"
+          - "WAIT_SLEEP_INTERVAL=5"
+          - "ASPNETCORE_URLS=http://*:${APP_PORT}"
+        ports:
+          - "${APP_PORT}:${APP_PORT}"
+        depends_on:
+          - database
+
+    database:
+        image: "postgres:12"
+        ports:
+          - "${SQL_PORT}:${SQL_PORT}"
+        environment:
+          - POSTGRES_USER=${SQL_USER}
+          - POSTGRES_PASSWORD=${SQL_PASSWORD}
+          - POSTGRES_DATABASE=${SQL_DATABASE}
+        volumes:
+          - './docker/psql/data:/var/lib/postgresql/data:rw'

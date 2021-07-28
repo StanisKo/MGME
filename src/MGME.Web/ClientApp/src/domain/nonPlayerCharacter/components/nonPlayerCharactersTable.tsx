@@ -238,7 +238,8 @@ export const NonPlayerCharactersTable = (): ReactElement => {
 
                                 <TableCell align="right">
                                     {nonPlayerCharacter.adventure?.title
-                                        ?? `${nonPlayerCharacter.adventureCount} adventures`}
+                                        ?? `${nonPlayerCharacter.adventureCount > 1
+                                            ? `${nonPlayerCharacter.adventureCount}` : 'No'} Adventures`}
                                 </TableCell>
 
                                 <TableCell align="right">
@@ -256,7 +257,7 @@ export const NonPlayerCharactersTable = (): ReactElement => {
                     rowsPerPageOptions={[]}
                     count={pagination?.numberOfResults}
                     page={page}
-                    onChangePage={handlePageChange}
+                    onPageChange={handlePageChange}
                 />
             </Box>
         </>
