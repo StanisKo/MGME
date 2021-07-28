@@ -257,7 +257,7 @@ export const NonPlayerCharactersTable = (): ReactElement => {
                     rowsPerPageOptions={[]}
                     count={pagination?.numberOfResults}
                     page={page}
-                    onChangePage={handlePageChange}
+                    onPageChange={handlePageChange}
                 />
             </Box>
         </>
