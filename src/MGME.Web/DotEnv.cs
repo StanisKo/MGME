@@ -2,6 +2,7 @@ using System;
 using System.IO;
 
 // Thank you: https://dusted.codes/dotenv-in-dotnet
+
 namespace MGME.Web
 {
     public static class DotEnv
