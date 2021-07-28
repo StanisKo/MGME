@@ -14,13 +14,22 @@ RUN apt remove cmdtest
 RUN apt remove yarn
 RUN apt-get update && apt-get install -y nodejs yarn
 
+# Make sure dotnet-watch has necessary dependencies
+# https://github.com/dotnet/dotnet-docker/issues/2396
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        procps \
+    && rm -rf /var/lib/apt/lists/*
+
 # Restore also takes care of front end packages
 RUN cd MGME.Web && dotnet restore && dotnet build
 
 ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 
+ENV ASPNETCORE_URLS=http://*:5001
+
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait /wait
 
 RUN chmod +x /wait
 
-CMD /wait && cd MGME.Web && dotnet watch run --urls http://0.0.0.0:5001
+CMD /wait && cd MGME.Web && dotnet watch run --no-launch-profile
