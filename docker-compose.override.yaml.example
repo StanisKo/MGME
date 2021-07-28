@@ -5,4 +5,6 @@ services:
         build:
           dockerfile: Dockerfile.dev
         volumes:
+          - ./src/MGME.Core:/mgme/MGME.Core
+          - ./src/MGME.Infra:/mgme/MGME.Infra
           - ./src/MGME.Web:/mgme/MGME.Web
