@@ -145,7 +145,12 @@ export const Application = (): ReactElement => {
                     <Switch>
                         <Redirect exact from={ROUTES.ROOT} to={ROUTES.LOGIN} />
 
-                        <PublicRoute restricted={true} component={Login} path={ROUTES.LOGIN} />
+                        <PublicRoute
+                            restricted={true}
+                            component={Login}
+                            path={ROUTES.LOGIN}
+                            setAccessTokenExpiresIn={setAccessTokenExpiresIn}
+                        />
                         <PublicRoute restricted={true} component={ConfirmEmail} path={ROUTES.CONFIRM_EMAIL} />
 
                         <PrivateRoute component={UserProfile} path={ROUTES.USER_PROFILE} />

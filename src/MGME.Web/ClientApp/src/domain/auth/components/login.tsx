@@ -1,4 +1,4 @@
-import { ReactElement, useState, useEffect, ChangeEvent, SyntheticEvent } from 'react';
+import { ReactElement, useState, useEffect, ChangeEvent, SyntheticEvent, Dispatch, SetStateAction } from 'react';
 
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -54,7 +54,11 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export const Login = (): ReactElement => {
+interface Props {
+    setAccessTokenExpiresIn: Dispatch<SetStateAction<number>>;
+}
+
+export const Login = ({ setAccessTokenExpiresIn }: Props): ReactElement => {
     // We don't need to parse it: it's either there or not
     const userRegisteredBefore = localStorage.getItem('userRegisteredBefore');
 
@@ -222,6 +226,14 @@ export const Login = (): ReactElement => {
                             userRole: decoded.role
                         }
                     }
+                );
+
+                /*
+                We set access token expiration, so the parent component
+                Can start the deferred refresh function
+                */
+                setAccessTokenExpiresIn(
+                    (decoded.exp - decoded.iat) * 1000 * 0.8
                 );
 
                 history.push(ROUTES.CATALOGUES);

@@ -13,8 +13,10 @@ export const PublicRoute = ({component: FunctionComponent, restricted, ...props}
     const userLoggedIn = localStorage.getItem('userLoggedIn');
 
     /*
-    restricted = false meaning public route
-    restricted = true meaning restricted route
+    Restricted == false meaning public route that can be accessed at any time, logged in or not
+
+    Restricted == true meaning public route that can be accessed only on specific condtions
+    E.g., user is not logged in
 
     if user is logged in, restricted routes will return starting page
     */
