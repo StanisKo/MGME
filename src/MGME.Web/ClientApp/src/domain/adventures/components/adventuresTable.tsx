@@ -291,14 +291,21 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                             <TableCell padding="checkbox">
                                 {mode === TABLE_DISPLAY_MODE.TO_SHOW && (
                                     <Checkbox
-                                        checked={multipleSelected.length === adventuresToShow?.length}
+                                        checked={
+                                            multipleSelected.length
+                                                ? multipleSelected.length === adventuresToShow?.length
+                                                : false
+                                        }
                                         /*
                                         Forced casting as TS doesn't understand adventuresToShow?.length
                                         with arithmetical operators
                                         */
                                         indeterminate={
-                                            multipleSelected.length > 0
-                                                && multipleSelected.length < (adventuresToShow as Adventure[]).length
+                                            multipleSelected.length
+                                                ? multipleSelected.length > 0
+                                                    && multipleSelected.length
+                                                        < (adventuresToShow as Adventure[]).length
+                                                : false
                                         }
                                         onChange={handleSelectAll}
                                     />
@@ -400,19 +407,21 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                     </TableBody>
                 </Table>
                 <Box mt={2}>
-                    <TablePagination
-                        component="div"
-                        rowsPerPage={15}
-                        rowsPerPageOptions={[]}
-                        count={
-                            (mode === TABLE_DISPLAY_MODE.TO_SHOW
-                                ? paginationOfToShow?.numberOfResults
-                                : paginationOfToAddTo?.numberOfResults
-                            ) as number
-                        }
-                        page={page}
-                        onPageChange={handlePageChange}
-                    />
+                    {(adventuresToAddTo?.length || adventuresToShow?.length) ? (
+                        <TablePagination
+                            component="div"
+                            rowsPerPage={15}
+                            rowsPerPageOptions={[]}
+                            count={
+                                (mode === TABLE_DISPLAY_MODE.TO_SHOW
+                                    ? paginationOfToShow?.numberOfResults
+                                    : paginationOfToAddTo?.numberOfResults
+                                ) as number
+                            }
+                            page={page}
+                            onPageChange={handlePageChange}
+                        />
+                    ) : null}
                 </Box>
             </Box>
 

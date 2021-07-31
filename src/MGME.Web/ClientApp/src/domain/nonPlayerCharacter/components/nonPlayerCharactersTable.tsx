@@ -182,8 +182,16 @@ export const NonPlayerCharactersTable = (): ReactElement => {
                     <TableRow>
                         <TableCell padding="checkbox">
                             <Checkbox
-                                checked={selected.length === nonPlayerCharacters.length}
-                                indeterminate={selected.length > 0 && selected.length < nonPlayerCharacters.length}
+                                checked={
+                                    selected.length
+                                        ? selected.length === nonPlayerCharacters.length
+                                        : false
+                                }
+                                indeterminate={
+                                    selected.length
+                                        ? selected.length > 0 && selected.length < nonPlayerCharacters.length
+                                        : false
+                                }
                                 onChange={handleSelectAll}
                             />
                         </TableCell>
@@ -251,14 +259,16 @@ export const NonPlayerCharactersTable = (): ReactElement => {
                 </TableBody>
             </Table>
             <Box mt={2}>
-                <TablePagination
-                    component="div"
-                    rowsPerPage={15}
-                    rowsPerPageOptions={[]}
-                    count={pagination?.numberOfResults}
-                    page={page}
-                    onPageChange={handlePageChange}
-                />
+                {nonPlayerCharacters.length ? (
+                    <TablePagination
+                        component="div"
+                        rowsPerPage={15}
+                        rowsPerPageOptions={[]}
+                        count={pagination?.numberOfResults}
+                        page={page}
+                        onPageChange={handlePageChange}
+                    />
+                ) : null}
             </Box>
         </>
 

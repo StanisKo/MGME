@@ -228,10 +228,16 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
                         <TableCell padding="checkbox">
                             {mode === TABLE_DISPLAY_MODE.TO_SHOW && (
                                 <Checkbox
-                                    checked={multipleSelected.length === playerCharacters.length}
+                                    checked={
+                                        multipleSelected.length
+                                            ? multipleSelected.length === playerCharacters.length
+                                            : false
+                                    }
                                     indeterminate={
-                                        multipleSelected.length > 0
-                                            && multipleSelected.length < playerCharacters.length
+                                        multipleSelected.length
+                                            ? multipleSelected.length > 0
+                                                && multipleSelected.length < playerCharacters.length
+                                            : false
                                     }
                                     onChange={handleSelectAll}
                                 />
@@ -318,14 +324,16 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
                 </TableBody>
             </Table>
             <Box mt={2}>
-                <TablePagination
-                    component="div"
-                    rowsPerPage={15}
-                    rowsPerPageOptions={[]}
-                    count={pagination?.numberOfResults}
-                    page={page}
-                    onPageChange={handlePageChange}
-                />
+                {playerCharacters.length ? (
+                    <TablePagination
+                        component="div"
+                        rowsPerPage={15}
+                        rowsPerPageOptions={[]}
+                        count={pagination?.numberOfResults}
+                        page={page}
+                        onPageChange={handlePageChange}
+                    />
+                ) : null}
             </Box>
         </>
 
