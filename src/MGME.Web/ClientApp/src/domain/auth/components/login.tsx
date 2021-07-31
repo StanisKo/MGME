@@ -1,4 +1,4 @@
-import { ReactElement, useState, useEffect, ChangeEvent, SyntheticEvent } from 'react';
+import { ReactElement, useState, useEffect, ChangeEvent, SyntheticEvent, Dispatch, SetStateAction } from 'react';
 
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -54,7 +54,17 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export const Login = (): ReactElement => {
+interface Props {
+    /*
+    We declare indexer to allow passing props from
+    several components up the hierarcy without typing them along the way
+    */
+    [key: string]: unknown;
+
+    setAccessTokenExpiresIn?: Dispatch<SetStateAction<number>>;
+}
+
+export const Login = ({ setAccessTokenExpiresIn }: Props): ReactElement | null => {
     // We don't need to parse it: it's either there or not
     const userRegisteredBefore = localStorage.getItem('userRegisteredBefore');
 
@@ -224,6 +234,16 @@ export const Login = (): ReactElement => {
                     }
                 );
 
+                /*
+                We set access token expiration, so the parent component (Application)
+                Can start the deferred refresh function
+                */
+                if (setAccessTokenExpiresIn) {
+                    setAccessTokenExpiresIn(
+                        (decoded.exp - decoded.iat) * 1000 * 0.8
+                    );
+                }
+
                 history.push(ROUTES.CATALOGUES);
 
                 return;
@@ -285,7 +305,8 @@ export const Login = (): ReactElement => {
 
     const { root, paper, submit, pointer } = useStyles();
 
-    return (
+    // We wait for the handler to be in scope
+    return setAccessTokenExpiresIn ? (
         <Container component="main" maxWidth="xs">
             <div className={paper}>
                 <Box mb={4}>
@@ -392,5 +413,5 @@ export const Login = (): ReactElement => {
                 </Snackbar>
             </div>
         </Container>
-    );
+    ) : null;
 };
