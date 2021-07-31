@@ -151,10 +151,13 @@ export const Application = (): ReactElement => {
                             path={ROUTES.LOGIN}
                             setAccessTokenExpiresIn={setAccessTokenExpiresIn}
                         />
+
                         <PublicRoute restricted={true} component={ConfirmEmail} path={ROUTES.CONFIRM_EMAIL} />
 
                         <PrivateRoute component={UserProfile} path={ROUTES.USER_PROFILE} />
+
                         <PrivateRoute component={Catalogues} path={ROUTES.CATALOGUES} />
+
                         <PrivateRoute component={Adventures} path={ROUTES.ADVENTURES} />
                     </Switch>
                 </Router>

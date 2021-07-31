@@ -55,10 +55,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface Props {
-    setAccessTokenExpiresIn: Dispatch<SetStateAction<number>>;
+    /*
+    We declare indexer to allow passing props from
+    several components up the hierarcy without typing them along the way
+    */
+    [key: string]: unknown;
+
+    setAccessTokenExpiresIn?: Dispatch<SetStateAction<number>>;
 }
 
-export const Login = ({ setAccessTokenExpiresIn }: Props): ReactElement => {
+export const Login = ({ setAccessTokenExpiresIn }: Props): ReactElement | null => {
     // We don't need to parse it: it's either there or not
     const userRegisteredBefore = localStorage.getItem('userRegisteredBefore');
 
@@ -229,12 +235,14 @@ export const Login = ({ setAccessTokenExpiresIn }: Props): ReactElement => {
                 );
 
                 /*
-                We set access token expiration, so the parent component
+                We set access token expiration, so the parent component (Application)
                 Can start the deferred refresh function
                 */
-                setAccessTokenExpiresIn(
-                    (decoded.exp - decoded.iat) * 1000 * 0.8
-                );
+                if (setAccessTokenExpiresIn) {
+                    setAccessTokenExpiresIn(
+                        (decoded.exp - decoded.iat) * 1000 * 0.8
+                    );
+                }
 
                 history.push(ROUTES.CATALOGUES);
 
@@ -297,7 +305,8 @@ export const Login = ({ setAccessTokenExpiresIn }: Props): ReactElement => {
 
     const { root, paper, submit, pointer } = useStyles();
 
-    return (
+    // We wait for the handler to be in scope
+    return setAccessTokenExpiresIn ? (
         <Container component="main" maxWidth="xs">
             <div className={paper}>
                 <Box mb={4}>
@@ -404,5 +413,5 @@ export const Login = ({ setAccessTokenExpiresIn }: Props): ReactElement => {
                 </Snackbar>
             </div>
         </Container>
-    );
+    ) : null;
 };

@@ -4,6 +4,12 @@ import { Route, Redirect } from 'react-router-dom';
 import { ROUTES } from '../const';
 
 interface Props {
+    /*
+    We declare indexer to allow passing variable props through this wrapper
+    Without typing them along the way
+    */
+    [key: string]: unknown;
+
     component: FunctionComponent<{ [key: string]: unknown }>;
     path: string;
     restricted: boolean;
@@ -21,7 +27,7 @@ export const PublicRoute = ({component: FunctionComponent, restricted, ...props}
     if user is logged in, restricted routes will return starting page
     */
     return (
-        <Route {...props} render={(props): ReactElement => (userLoggedIn && restricted
+        <Route {...props} render={(): ReactElement => (userLoggedIn && restricted
             ? <Redirect to={ROUTES.CATALOGUES} />
             : <FunctionComponent {...props} />
         )} />
