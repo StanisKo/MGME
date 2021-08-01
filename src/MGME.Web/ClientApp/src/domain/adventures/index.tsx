@@ -1,9 +1,11 @@
 import { ReactElement, useState, SyntheticEvent } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
-import { ApplicationState } from '../../store';
+import { ApplicationState, UpdateStore } from '../../store';
 
 import { AdventuresTable, CreateAdventureModal } from './components';
+
+import { deleteAdventures } from './requests';
 
 import { BaseServiceResponse } from '../../shared/interfaces';
 
@@ -52,6 +54,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const Adventures = (): ReactElement => {
+    const dispatch = useDispatch();
+
     const selectedAdventures = useSelector(
         (store: ApplicationState) => store.adventures?.dataset?.selected ?? []
     );
@@ -76,6 +80,27 @@ export const Adventures = (): ReactElement => {
         }
 
         setOpenSnackbar(false);
+    };
+
+    const handleDelete = async (): Promise<void> => {
+        const response = await deleteAdventures(selectedAdventures);
+
+        setResponse(response);
+
+        setOpenSnackbar(true);
+
+        if (response.success) {
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'adventures',
+                    key: 'dataset',
+                    payload: {
+                        selected: []
+                    }
+                }
+            );
+        }
     };
 
     const nothingSelected = selectedAdventures?.length === 0;
@@ -112,6 +137,7 @@ export const Adventures = (): ReactElement => {
                                 size="medium"
                                 disabled={nothingSelected}
                                 className={deleteButton}
+                                onClick={handleDelete}
                             >
                                 Remove
                             </Button>
