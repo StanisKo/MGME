@@ -178,6 +178,24 @@ export const NonPlayerCharactersTable = (): ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [nonPlayerCharacters]);
 
+    useEffect(() => {
+        return (): void => {
+            setSelected([]);
+
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'nonPlayerCharacters',
+                    payload: {
+                        selected: []
+                    }
+                }
+            );
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const { root, visuallyHidden, noEntities } = useStyles();
 
     return nonPlayerCharacters !== null && pagination !== null ? (

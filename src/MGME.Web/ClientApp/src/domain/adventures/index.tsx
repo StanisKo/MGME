@@ -90,7 +90,13 @@ export const Adventures = (): ReactElement => {
                     <Grid container spacing={4}>
                         <Grid item xs={6} />
 
-                        <Grid item xs={6} container alignItems="center" justify="flex-end" className={classes.buttons}>
+                        <Grid
+                            item xs={6}
+                            container
+                            alignItems="center"
+                            justifyContent="flex-end"
+                            className={classes.buttons}
+                        >
                             <Button
                                 variant="outlined"
                                 color="primary"

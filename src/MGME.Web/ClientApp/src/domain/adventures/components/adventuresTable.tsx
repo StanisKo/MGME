@@ -263,6 +263,37 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
     }, [adventuresToShow, adventuresToAddTo]);
 
     useEffect(() => {
+        return (): void => {
+            setMultipleSelected([]);
+
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'adventures',
+                    key: 'dataset',
+                    payload: {
+                        selected: []
+                    }
+                }
+            );
+
+            setSingleSelected(0);
+
+            dispatch<UpdateStore<{ selected: number }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'adventures',
+                    payload: {
+                        selected: 0
+                    }
+                }
+            );
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
         const shouldFlushSelectedAdventure = mode === TABLE_DISPLAY_MODE.TO_ADD_TO
             && selectedNonPlayerCharacters.length === 0
                 && (selectedPlayerCharacters as number[]).length === 0;
