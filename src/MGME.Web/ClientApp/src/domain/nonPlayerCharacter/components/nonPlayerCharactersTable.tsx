@@ -20,7 +20,8 @@ import {
     TableSortLabel,
     TablePagination,
     LinearProgress,
-    Box
+    Box,
+    Typography
 } from '@material-ui/core';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -40,6 +41,10 @@ const useStyles = makeStyles((theme: Theme) =>
             position: 'absolute',
             top: 20,
             width: 1
+        },
+        noEntities: {
+            fontSize: '18px',
+            color: '#808080'
         }
     })
 );
@@ -173,7 +178,7 @@ export const NonPlayerCharactersTable = (): ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [nonPlayerCharacters]);
 
-    const { root, visuallyHidden } = useStyles();
+    const { root, visuallyHidden, noEntities } = useStyles();
 
     return nonPlayerCharacters !== null && pagination !== null ? (
         <>
@@ -258,8 +263,15 @@ export const NonPlayerCharactersTable = (): ReactElement => {
                     })}
                 </TableBody>
             </Table>
-            <Box mt={2}>
-                {nonPlayerCharacters.length ? (
+            {nonPlayerCharacters.length === 0 && (
+                <Box mt={4} mb={2}>
+                    <Typography align="center" className={noEntities}>
+                        There are no NPCs yet, go ahead and add some!
+                    </Typography>
+                </Box>
+            )}
+            {nonPlayerCharacters.length ? (
+                <Box mt={2}>
                     <TablePagination
                         component="div"
                         rowsPerPage={15}
@@ -268,9 +280,8 @@ export const NonPlayerCharactersTable = (): ReactElement => {
                         page={page}
                         onPageChange={handlePageChange}
                     />
-                ) : null}
-            </Box>
+                </Box>
+            ) : null}
         </>
-
     ) : <LinearProgress />;
 };
