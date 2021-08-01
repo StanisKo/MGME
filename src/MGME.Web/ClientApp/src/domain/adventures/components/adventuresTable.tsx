@@ -22,7 +22,8 @@ import {
     LinearProgress,
     Box,
     Radio,
-    Checkbox
+    Checkbox,
+    Typography
 } from '@material-ui/core';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -44,6 +45,10 @@ const useStyles = makeStyles((theme: Theme) =>
             position: 'absolute',
             top: 20,
             width: 1
+        },
+        noEntities: {
+            fontSize: '18px',
+            color: '#808080'
         }
     })
 );
@@ -277,7 +282,7 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPlayerCharacters, selectedNonPlayerCharacters]);
 
-    const { root, visuallyHidden } = useStyles();
+    const { root, visuallyHidden, noEntities } = useStyles();
 
     return (
         mode === TABLE_DISPLAY_MODE.TO_SHOW
@@ -406,8 +411,15 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                         })}
                     </TableBody>
                 </Table>
-                <Box mt={2}>
-                    {(adventuresToAddTo?.length || adventuresToShow?.length) ? (
+                {(adventuresToShow?.length === 0 || adventuresToAddTo?.length === 0) && (
+                    <Box mt={4} mb={2}>
+                        <Typography align="center" className={noEntities}>
+                            There are no adventures yet, go ahead and add some!
+                        </Typography>
+                    </Box>
+                )}
+                {(adventuresToAddTo?.length || adventuresToShow?.length) ? (
+                    <Box mt={2}>
                         <TablePagination
                             component="div"
                             rowsPerPage={15}
@@ -421,9 +433,8 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                             page={page}
                             onPageChange={handlePageChange}
                         />
-                    ) : null}
-                </Box>
+                    </Box>
+                ) : null}
             </Box>
-
         ) : <LinearProgress />;
 };
