@@ -223,6 +223,38 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playerCharacters]);
 
+    // Default state on unmount
+    useEffect(() => {
+        return (): void => {
+            setMultipleSelected([]);
+
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'playerCharacters',
+                    payload: {
+                        selected: []
+                    }
+                }
+            );
+
+            setSingleSelected(0);
+
+            dispatch<UpdateStore<{ selected: number }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'playerCharacters',
+                    payload: {
+                        selected: 0
+                    }
+                }
+            );
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const { root, visuallyHidden, noEntities } = useStyles();
 
     return playerCharacters !== null && pagination !== null ? (
