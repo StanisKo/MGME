@@ -90,7 +90,7 @@ User resolves the adventure
 
 ### Random Event Flow: ###
 <pre>
-Random even is requested
+Random event is requested
 |
 |
 |

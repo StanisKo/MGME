@@ -1,15 +1,15 @@
+using System;
+
+using MGME.Core.Interfaces.Services;
+
 namespace MGME.Core.Services.RollingService
 {
-    public static class RollingService
+    public class RollingService : IRollingService
     {
-        public static int RollD10()
-        {
-            throw new System.NotImplementedException();
-        }
+        private static Random _random = new Random();
 
-        public static int Roll1D100()
-        {
-            throw new System.NotImplementedException();
-        }
+        public int RollD10() => _random.Next(1, 11);
+
+        public int Roll1D100() => _random.Next(1, 101);
     }
 }
