@@ -81,3 +81,15 @@ export const createAdventure = async (params: CreateAdventureParams): Promise<Ba
         }
     );
 };
+
+export const deleteAdventures = async (ids: number[]): Promise<BaseServiceResponse> => {
+    return await DataController.UpdateAndRefetch(
+        {
+            url: URLBuilder.WriteTo('adventure', 'delete'),
+            method: 'DELETE',
+            body: { ids: ids },
+            page: 'adventures',
+            keys: ['dataset']
+        }
+    );
+};
