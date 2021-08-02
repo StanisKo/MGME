@@ -363,6 +363,32 @@ namespace MGME.Core.Services.AdventureService
             return response;
         }
 
+        public async Task <BaseServiceResponse> DeleteAdventure(IEnumerable<int> ids)
+        {
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                await _adventureRepository.DeleteEntitiesAsync(ids);
+
+                (char suffix, string verb) args = (
+                    ids.Count() > 1 ? ('s', "were") : ('\0', "was")
+                );
+
+                response.Success = true;
+                response.Message = $"Adventure{args.suffix} {args.verb} successfully deleted";
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
+        }
+
         private async Task <IEnumerable<GetAdventureListDTO>> QueryAdventures(Ref<string> sortingParameter, Ref<int> selectedPage, Ref<int> userId)
         {
             IEnumerable<GetAdventureListDTO> adventures = await _adventureRepository.GetEntititesAsync<GetAdventureListDTO>(

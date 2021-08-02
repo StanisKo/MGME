@@ -21,7 +21,8 @@ import {
     TablePagination,
     LinearProgress,
     Box,
-    Radio
+    Radio,
+    Typography
 } from '@material-ui/core';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -41,6 +42,10 @@ const useStyles = makeStyles((theme: Theme) =>
             position: 'absolute',
             top: 20,
             width: 1
+        },
+        noEntities: {
+            fontSize: '18px',
+            color: '#808080'
         }
     })
 );
@@ -218,7 +223,39 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playerCharacters]);
 
-    const { root, visuallyHidden } = useStyles();
+    // Default state on unmount
+    useEffect(() => {
+        return (): void => {
+            setMultipleSelected([]);
+
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'playerCharacters',
+                    payload: {
+                        selected: []
+                    }
+                }
+            );
+
+            setSingleSelected(0);
+
+            dispatch<UpdateStore<{ selected: number }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'playerCharacters',
+                    payload: {
+                        selected: 0
+                    }
+                }
+            );
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const { root, visuallyHidden, noEntities } = useStyles();
 
     return playerCharacters !== null && pagination !== null ? (
         <>
@@ -228,10 +265,16 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
                         <TableCell padding="checkbox">
                             {mode === TABLE_DISPLAY_MODE.TO_SHOW && (
                                 <Checkbox
-                                    checked={multipleSelected.length === playerCharacters.length}
+                                    checked={
+                                        multipleSelected.length
+                                            ? multipleSelected.length === playerCharacters.length
+                                            : false
+                                    }
                                     indeterminate={
-                                        multipleSelected.length > 0
-                                            && multipleSelected.length < playerCharacters.length
+                                        multipleSelected.length
+                                            ? multipleSelected.length > 0
+                                                && multipleSelected.length < playerCharacters.length
+                                            : false
                                     }
                                     onChange={handleSelectAll}
                                 />
@@ -317,18 +360,26 @@ export const PlayerCharactersTable = ({ mode }: PlayerCharacterTableProps): Reac
                     })}
                 </TableBody>
             </Table>
-            <Box mt={2}>
-                <TablePagination
-                    component="div"
-                    rowsPerPage={15}
-                    rowsPerPageOptions={[]}
-                    count={pagination?.numberOfResults}
-                    page={page}
-                    onPageChange={handlePageChange}
-                />
-            </Box>
+            {playerCharacters.length === 0 && (
+                <Box mt={4} mb={2}>
+                    <Typography align="center" className={noEntities}>
+                        There are no characters yet, go ahead and add some!
+                    </Typography>
+                </Box>
+            )}
+            {playerCharacters.length ? (
+                <Box mt={2}>
+                    <TablePagination
+                        component="div"
+                        rowsPerPage={15}
+                        rowsPerPageOptions={[]}
+                        count={pagination?.numberOfResults}
+                        page={page}
+                        onPageChange={handlePageChange}
+                    />
+                </Box>
+            ) : null}
         </>
-
     ) : <LinearProgress />;
 };
 

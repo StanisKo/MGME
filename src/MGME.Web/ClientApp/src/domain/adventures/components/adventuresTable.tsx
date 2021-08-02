@@ -22,7 +22,8 @@ import {
     LinearProgress,
     Box,
     Radio,
-    Checkbox
+    Checkbox,
+    Typography
 } from '@material-ui/core';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -44,6 +45,10 @@ const useStyles = makeStyles((theme: Theme) =>
             position: 'absolute',
             top: 20,
             width: 1
+        },
+        noEntities: {
+            fontSize: '18px',
+            color: '#808080'
         }
     })
 );
@@ -258,6 +263,37 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
     }, [adventuresToShow, adventuresToAddTo]);
 
     useEffect(() => {
+        return (): void => {
+            setMultipleSelected([]);
+
+            dispatch<UpdateStore<{ selected: number[] }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'adventures',
+                    key: 'dataset',
+                    payload: {
+                        selected: []
+                    }
+                }
+            );
+
+            setSingleSelected(0);
+
+            dispatch<UpdateStore<{ selected: number }>>(
+                {
+                    type: 'UPDATE_STORE',
+                    reducer: 'catalogues',
+                    key: 'adventures',
+                    payload: {
+                        selected: 0
+                    }
+                }
+            );
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
         const shouldFlushSelectedAdventure = mode === TABLE_DISPLAY_MODE.TO_ADD_TO
             && selectedNonPlayerCharacters.length === 0
                 && (selectedPlayerCharacters as number[]).length === 0;
@@ -277,7 +313,7 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPlayerCharacters, selectedNonPlayerCharacters]);
 
-    const { root, visuallyHidden } = useStyles();
+    const { root, visuallyHidden, noEntities } = useStyles();
 
     return (
         mode === TABLE_DISPLAY_MODE.TO_SHOW
@@ -291,14 +327,21 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                             <TableCell padding="checkbox">
                                 {mode === TABLE_DISPLAY_MODE.TO_SHOW && (
                                     <Checkbox
-                                        checked={multipleSelected.length === adventuresToShow?.length}
+                                        checked={
+                                            multipleSelected.length
+                                                ? multipleSelected.length === adventuresToShow?.length
+                                                : false
+                                        }
                                         /*
                                         Forced casting as TS doesn't understand adventuresToShow?.length
                                         with arithmetical operators
                                         */
                                         indeterminate={
-                                            multipleSelected.length > 0
-                                                && multipleSelected.length < (adventuresToShow as Adventure[]).length
+                                            multipleSelected.length
+                                                ? multipleSelected.length > 0
+                                                    && multipleSelected.length
+                                                        < (adventuresToShow as Adventure[]).length
+                                                : false
                                         }
                                         onChange={handleSelectAll}
                                     />
@@ -399,22 +442,30 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                         })}
                     </TableBody>
                 </Table>
-                <Box mt={2}>
-                    <TablePagination
-                        component="div"
-                        rowsPerPage={15}
-                        rowsPerPageOptions={[]}
-                        count={
-                            (mode === TABLE_DISPLAY_MODE.TO_SHOW
-                                ? paginationOfToShow?.numberOfResults
-                                : paginationOfToAddTo?.numberOfResults
-                            ) as number
-                        }
-                        page={page}
-                        onPageChange={handlePageChange}
-                    />
-                </Box>
+                {(adventuresToShow?.length === 0 || adventuresToAddTo?.length === 0) && (
+                    <Box mt={4} mb={2}>
+                        <Typography align="center" className={noEntities}>
+                            There are no adventures yet, go ahead and add some!
+                        </Typography>
+                    </Box>
+                )}
+                {(adventuresToAddTo?.length || adventuresToShow?.length) ? (
+                    <Box mt={2}>
+                        <TablePagination
+                            component="div"
+                            rowsPerPage={15}
+                            rowsPerPageOptions={[]}
+                            count={
+                                (mode === TABLE_DISPLAY_MODE.TO_SHOW
+                                    ? paginationOfToShow?.numberOfResults
+                                    : paginationOfToAddTo?.numberOfResults
+                                ) as number
+                            }
+                            page={page}
+                            onPageChange={handlePageChange}
+                        />
+                    </Box>
+                ) : null}
             </Box>
-
         ) : <LinearProgress />;
 };

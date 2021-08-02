@@ -61,5 +61,20 @@ namespace MGME.Web.Controllers
 
             return BadRequest(response);
         }
+
+        [HttpDelete("Delete")]
+        public async Task <IActionResult> DeleteAdventure(EntitiesToDelete adventuresToDelete)
+        {
+            BaseServiceResponse response = await _adventureService.DeleteAdventure(
+                adventuresToDelete.Ids
+            );
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
     }
 }

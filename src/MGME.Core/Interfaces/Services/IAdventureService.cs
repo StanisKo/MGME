@@ -13,5 +13,7 @@ namespace MGME.Core.Interfaces.Services
         Task <PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>>> GetAllAdventures(string sortingParameter, int selectedPage);
 
         Task <BaseServiceResponse> AddToAdventure(AddToAdventureDTO ids);
+
+        Task <BaseServiceResponse> DeleteAdventure(IEnumerable<int> ids);
     }
 }

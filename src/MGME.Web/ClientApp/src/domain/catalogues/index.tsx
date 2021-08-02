@@ -304,7 +304,7 @@ export const Catalogues = (): ReactElement => {
             <div className={classes.centered}>
                 <Paper elevation={0}>
                     <Grid container spacing={4}>
-                        <Grid item xs={6} container justify="flex-start">
+                        <Grid item xs={6} container justifyContent="flex-start">
                             <FormControl variant="outlined" className={classes.formControl}>
                                 <Select
                                     value={selectedMenu}
@@ -316,7 +316,13 @@ export const Catalogues = (): ReactElement => {
                             </FormControl>
                         </Grid>
 
-                        <Grid item xs={6} container alignItems="center" justify="flex-end" className={classes.buttons}>
+                        <Grid
+                            item xs={6}
+                            container
+                            alignItems="center"
+                            justifyContent="flex-end"
+                            className={classes.buttons}
+                        >
                             <Button
                                 variant="outlined"
                                 color="primary"
@@ -378,7 +384,7 @@ export const Catalogues = (): ReactElement => {
                                     container
                                     xs={12}
                                     alignItems="center"
-                                    justify="flex-end"
+                                    justifyContent="flex-end"
                                     className={classes.buttons}
                                     style={{ marginTop: '2em' }}
                                 >
@@ -413,7 +419,7 @@ export const Catalogues = (): ReactElement => {
                                     container
                                     xs={12}
                                     alignItems="center"
-                                    justify="flex-end"
+                                    justifyContent="flex-end"
                                     className={classes.buttons}
                                     style={{ marginTop: '2em' }}
                                 >
