@@ -4,6 +4,6 @@ namespace MGME.Core.Interfaces.Services
     {
         string DetermineEventFocus();
 
-        string DetermineEventMeaningAndSubject();
+        string DetermineEventMeaning();
     }
 }

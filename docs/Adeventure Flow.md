@@ -130,7 +130,7 @@ Roll 1D100
     |
     |
     v
-    <i>Event Meaning</i> and <i>Event Subject</i> dictionaries of int: string are initialized
+    <i>Event Meaning</i> and <i>Event Subject</i> arrays of strings are initialized
     |
     |
     |
