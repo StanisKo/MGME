@@ -67,7 +67,7 @@ namespace MGME.Core.Services.RandomEventService
             _rollingService = rollingService;
         }
 
-        public string DetermineEventFocus()
+        private string DetermineEventFocus()
         {
             int rollResult = _rollingService.Roll1D100();
 
@@ -101,7 +101,7 @@ namespace MGME.Core.Services.RandomEventService
             return eventFocus;
         }
 
-        public string DetermineEventMeaning()
+        private string DetermineEventMeaning()
         {
             string eventAction = _eventAction[_rollingService.Roll1D100() - 1];
 
@@ -109,5 +109,7 @@ namespace MGME.Core.Services.RandomEventService
 
             return $"{eventAction} {eventSubject}";
         }
+
+        public string GenerateRandomEvent() => $"{DetermineEventFocus()}: {DetermineEventMeaning()}";
     }
 }

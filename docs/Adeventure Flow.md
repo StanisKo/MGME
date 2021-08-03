@@ -10,7 +10,7 @@ User creates a scene
         |
         |
         v
-        If seeded with random event <b>GOTO Random Event Flow</b>
+        If seeded with random event <b>GOTO Random Event Flow</b> and use it as an input for setup
         |
         |
         |
@@ -25,17 +25,22 @@ User creates a scene
     |
     |
     v
-    Create scene and return to the caller
+    If rollResult <= chaosFactor then scene must be modified
         |
         |
         |
         v
-        If scene <i>interrupted</i>, <b>GOTO Random Event Flow</b> and modify setup based on output
+        If rollResult is odd, alter the scene setup
         |
         |
         |
         v
-        Else if scene <i>altered</i>, modify setup
+        Else if rollResult is even, scene is <i>interrupted</i>
+        |
+        |
+        |
+        v
+        <b>GOTO Random Event Flow</b> and modify setup based on output
         |
         |
         |
@@ -140,7 +145,7 @@ Roll 1D100
     |
     |
     v
-    Create random event instance and return to the caller
+    Create random event and return to the caller
 </pre>
 
 

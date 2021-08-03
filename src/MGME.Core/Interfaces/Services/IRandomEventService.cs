@@ -2,8 +2,6 @@ namespace MGME.Core.Interfaces.Services
 {
     public interface IRandomEventService
     {
-        string DetermineEventFocus();
-
-        string DetermineEventMeaning();
+        string GenerateRandomEvent();
     }
 }
