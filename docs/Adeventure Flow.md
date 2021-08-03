@@ -36,11 +36,11 @@ User creates a scene
         |
         v
         Else if rollResult is even, scene is <i>interrupted</i>
-        |
-        |
-        |
-        v
-        <b>GOTO Random Event Flow</b> and modify setup based on output
+            |
+            |
+            |
+            v
+            <b>GOTO Random Event Flow</b> and modify setup based on output
         |
         |
         |
