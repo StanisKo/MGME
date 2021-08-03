@@ -145,7 +145,19 @@ Roll 1D100
     |
     |
     v
-    Create random event and return to the caller
+    Generate random event
+        |
+        |
+        |
+        v
+        If random event is request on scene creatation, return event to the caller
+        And write it to the scene field
+        |
+        |
+        |
+        v
+        Else if random event is requested after asking fate question, create an instance
+        and bind it to scene item
 </pre>
 
 
