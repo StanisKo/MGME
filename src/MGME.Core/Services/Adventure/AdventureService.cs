@@ -367,8 +367,6 @@ namespace MGME.Core.Services.AdventureService
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
-            int userId = GetUserIdFromHttpContext();
-
             try
             {
                 await _adventureRepository.DeleteEntitiesAsync(ids);

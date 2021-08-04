@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-
-using MGME.Core.Constants;
 
 namespace MGME.Core.DTOs.Scene
 {
@@ -11,11 +8,16 @@ namespace MGME.Core.DTOs.Scene
         [StringLength(254)]
         public string Title { get; set; }
 
-        public SceneType? Type { get; set; }
-
         [Required]
         public string Setup { get; set; }
 
-        
+        [Required]
+        public int AdventureId { get; set; }
+
+        /*
+        Client must provide RandomEvent string in case if that's a first scene
+        That was seeded with random event
+        */
+        public string RandomEvent { get; set; }
     }
 }

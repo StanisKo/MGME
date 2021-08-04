@@ -347,8 +347,6 @@ namespace MGME.Core.Services.PlayerCharacterService
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
-            int userId = GetUserIdFromHttpContext();
-
             try
             {
                 await _playerCharacterRepository.DeleteEntitiesAsync(ids);
