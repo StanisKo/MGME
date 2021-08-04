@@ -15,15 +15,25 @@ namespace MGME.Core.Services.SceneService
 {
     public class SceneService : BaseEntityService, ISceneService
     {
-        private IEntityRepository<Scene> _repository;
+        private readonly IEntityRepository<Scene> _repository;
+
+        private readonly IRollingService _rollingService;
+
+        private readonly IRandomEventService _randomEventService;
 
         private readonly IMapper _mapper;
 
         public SceneService(IEntityRepository<Scene> repository,
+                            IRollingService rollingService,
+                            IRandomEventService randomEventService,
                             IMapper mapper,
                             IHttpContextAccessor httpContextAccessor): base(httpContextAccessor)
         {
             _repository = repository;
+            _rollingService = rollingService;
+            _randomEventService = randomEventService;
+
+            _mapper = mapper;
         }
 
         public Task<BaseServiceResponse> AddScene(AddSceneDTO newScene)
@@ -32,7 +42,7 @@ namespace MGME.Core.Services.SceneService
 
             try
             {
-                
+
             }
             catch (Exception exception)
             {
