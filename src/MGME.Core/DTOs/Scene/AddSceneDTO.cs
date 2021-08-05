@@ -14,8 +14,10 @@ namespace MGME.Core.DTOs.Scene
         [Required]
         public int AdventureId { get; set; }
 
+        public int? AdventureChaosFactor { get; set; }
+
         /*
-        Client must provide RandomEvent string in case if that's a first scene
+        Client may provide RandomEvent string in case if that's a first scene
         That was seeded with random event
         */
         public string RandomEvent { get; set; }
