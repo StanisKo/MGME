@@ -71,15 +71,15 @@ namespace MGME.Core.Services.SceneService
                     return response;
                 }
 
-                bool sceneAlreadyExists = await _repository.CheckIfEntityExistsAsync(
+                bool sceneAlreadyExistsOrThereAreUnresolvedScenes = await _repository.CheckIfEntityExistsAsync(
                     scene => scene.AdventureId == newScene.AdventureId
-                        && scene.Title.ToLower() == newScene.Title.ToLower()
+                        && (scene.Title.ToLower() == newScene.Title.ToLower() || !scene.Resolved)
                 );
 
-                if (sceneAlreadyExists)
+                if (sceneAlreadyExistsOrThereAreUnresolvedScenes)
                 {
                     response.Success = false;
-                    response.Message = "Scene with such title already exists";
+                    response.Message = "Scene with such title already exists or there are unresolved scenes that need to be resolved first";
 
                     return response;
                 }
@@ -116,6 +116,11 @@ namespace MGME.Core.Services.SceneService
             }
 
             return response;
+        }
+
+        public async Task <BaseServiceResponse> ResolveScene(ResolveSceneDTO sceneToResolve)
+        {
+            throw new NotImplementedException();
         }
     }
 }

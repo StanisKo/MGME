@@ -8,5 +8,7 @@ namespace MGME.Core.Interfaces.Services
     public interface ISceneService
     {
         Task <BaseServiceResponse> AddScene(AddSceneDTO newScene);
+
+        Task <BaseServiceResponse> ResolveScene(ResolveSceneDTO sceneToResolve);
     }
 }
