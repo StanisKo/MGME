@@ -4,13 +4,17 @@ using AutoMapper;
 
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Services;
+
 using MGME.Core.Services.AuthService;
 using MGME.Core.Services.UserService;
 using MGME.Core.Services.PlayerCharacterService;
 using MGME.Core.Services.NonPlayerCharacterService;
 using MGME.Core.Services.AdventureService;
+using MGME.Core.Services.SceneService;
+
 using MGME.Core.Services.RollingService;
 using MGME.Core.Services.RandomEventService;
+
 using MGME.Core.Utils.Sorters;
 
 namespace MGME.Core
@@ -46,6 +50,8 @@ namespace MGME.Core
             services.AddScoped<IAdventureService, AdventureService>();
 
             services.AddScoped<AdventureSorter>();
+
+            services.AddScoped<ISceneService, SceneService>();
 
             services.AddSingleton<IRollingService, RollingService>();
 

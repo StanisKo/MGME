@@ -52,6 +52,8 @@ namespace MGME.Core.Services.SceneService
                 {
                     Scene firstSceneToCreate = _mapper.Map<Scene>(newScene);
 
+                    firstSceneToCreate.Type = SceneType.NORMAL;
+
                     await _repository.AddEntityAsync(firstSceneToCreate);
 
                     response.Success = true;
@@ -65,6 +67,19 @@ namespace MGME.Core.Services.SceneService
                 {
                     response.Success = false;
                     response.Message = "Chaos factor is required to create a scene";
+
+                    return response;
+                }
+
+                bool sceneAlreadyExists = await _repository.CheckIfEntityExistsAsync(
+                    scene => scene.AdventureId == newScene.AdventureId
+                        && scene.Title.ToLower() == newScene.Title.ToLower()
+                );
+
+                if (sceneAlreadyExists)
+                {
+                    response.Success = false;
+                    response.Message = "Scene with such title already exists";
 
                     return response;
                 }
