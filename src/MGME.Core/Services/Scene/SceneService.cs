@@ -16,7 +16,9 @@ namespace MGME.Core.Services.SceneService
 {
     public class SceneService : BaseEntityService, ISceneService
     {
-        private readonly IEntityRepository<Scene> _repository;
+        private readonly IEntityRepository<Scene> _sceneRepository;
+
+        private readonly IEntityRepository<Adventure> _adventureRepository;
 
         private readonly IRollingService _rollingService;
 
@@ -25,12 +27,15 @@ namespace MGME.Core.Services.SceneService
         private readonly IMapper _mapper;
 
         public SceneService(IEntityRepository<Scene> repository,
+                            IEntityRepository<Adventure> adventureRepository,
                             IRollingService rollingService,
                             IRandomEventService randomEventService,
                             IMapper mapper,
                             IHttpContextAccessor httpContextAccessor): base(httpContextAccessor)
         {
-            _repository = repository;
+            _sceneRepository = repository;
+            _adventureRepository = adventureRepository;
+
             _rollingService = rollingService;
             _randomEventService = randomEventService;
 
@@ -43,7 +48,19 @@ namespace MGME.Core.Services.SceneService
 
             try
             {
-                int scenesCount = await _repository.GetEntitiesCountAsync(
+                bool providedAdventureIdIsValid = await _adventureRepository.CheckIfEntityExistsAsync(
+                    adventure => adventure.Id == newScene.AdventureId
+                );
+
+                if (!providedAdventureIdIsValid)
+                {
+                    response.Success = false;
+                    response.Message = "Adventure with such id does not exist";
+
+                    return response;
+                }
+
+                int scenesCount = await _sceneRepository.GetEntitiesCountAsync(
                     scene => scene.AdventureId == newScene.AdventureId
                 );
 
@@ -54,7 +71,7 @@ namespace MGME.Core.Services.SceneService
 
                     firstSceneToCreate.Type = SceneType.NORMAL;
 
-                    await _repository.AddEntityAsync(firstSceneToCreate);
+                    await _sceneRepository.AddEntityAsync(firstSceneToCreate);
 
                     response.Success = true;
                     response.Message = "Scene was successfully created";
@@ -71,7 +88,7 @@ namespace MGME.Core.Services.SceneService
                     return response;
                 }
 
-                bool sceneAlreadyExistsOrThereAreUnresolvedScenes = await _repository.CheckIfEntityExistsAsync(
+                bool sceneAlreadyExistsOrThereAreUnresolvedScenes = await _sceneRepository.CheckIfEntityExistsAsync(
                     scene => scene.AdventureId == newScene.AdventureId
                         && (scene.Title.ToLower() == newScene.Title.ToLower() || !scene.Resolved)
                 );
@@ -97,6 +114,10 @@ namespace MGME.Core.Services.SceneService
                     sceneToCreate.Type = SceneType.NORMAL;
                 }
 
+                /*
+                If scene is interrupted, we need to generate random event
+                That will serve as input for modifying scene setup
+                */
                 if (sceneToCreate.Type == SceneType.INTERRUPTED)
                 {
                     string randomEvent = _randomEventService.GenerateRandomEvent();
@@ -104,7 +125,7 @@ namespace MGME.Core.Services.SceneService
                     sceneToCreate.RandomEvent = randomEvent;
                 }
 
-                await _repository.AddEntityAsync(sceneToCreate);
+                await _sceneRepository.AddEntityAsync(sceneToCreate);
 
                 response.Success = true;
                 response.Message = "Scene was successfully created";
@@ -120,7 +141,42 @@ namespace MGME.Core.Services.SceneService
 
         public async Task <BaseServiceResponse> ResolveScene(ResolveSceneDTO sceneToResolve)
         {
-            throw new NotImplementedException();
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            try
+            {
+                bool providedAdventureIdIsValid = await _adventureRepository.CheckIfEntityExistsAsync(
+                    adventure => adventure.Id == sceneToResolve.AdventureId
+                );
+
+                if (!providedAdventureIdIsValid)
+                {
+                    response.Success = false;
+                    response.Message = "Adventure with such id does not exist";
+
+                    return response;
+                }
+
+                // TODO: Check if adventure id is valid, check if scene exists, check if there are no unresolved scenes
+                bool thereAreUnresolvedScenes = await _sceneRepository.CheckIfEntityExistsAsync(
+                    scene => scene.AdventureId == sceneToResolve.AdventureId && !scene.Resolved
+                );
+
+                if (thereAreUnresolvedScenes)
+                {
+                    response.Success = false;
+                    response.Message = "There are unresolved scenes that need to be resolved first";
+
+                    return response;
+                }
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
     }
 }

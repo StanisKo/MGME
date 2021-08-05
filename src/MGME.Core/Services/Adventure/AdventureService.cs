@@ -194,10 +194,10 @@ namespace MGME.Core.Services.AdventureService
                 addedAdventure.PlayerCharacters = playerCharacters.ToList();
 
                 await _playerCharacterRepository.LinkEntitiesAsync(
-                        playerCharacters,
-                        addedAdventure,
-                        "PlayerCharacters"
-                    );
+                    playerCharacters,
+                    addedAdventure,
+                    "PlayerCharacters"
+                );
 
                 /*
                 Add existing NonPlayerCharacters if any
