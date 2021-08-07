@@ -186,7 +186,7 @@ namespace MGME.Core.Services.SceneService
 
                 await _sceneRepository.UpdateEntityAsync(resolvedScene, new string[] { "Resolved" });
 
-                response.Success = false;
+                response.Success = true;
                 response.Message = "Scene was successfully resolved";
             }
             catch (Exception exception)

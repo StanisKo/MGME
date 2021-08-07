@@ -31,5 +31,18 @@ namespace MGME.Web.Controllers
 
             return BadRequest(response);
         }
+
+        [HttpPut("Resolve")]
+        public async Task <IActionResult> ResolveScene(ResolveSceneDTO sceneToResolve)
+        {
+            BaseServiceResponse response = await _sceneService.ResolveScene(sceneToResolve);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
     }
 }
