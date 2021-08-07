@@ -14,6 +14,7 @@ using MGME.Core.Services.SceneService;
 
 using MGME.Core.Services.RollingService;
 using MGME.Core.Services.RandomEventService;
+using MGME.Core.Services.FateQuestionService;
 
 using MGME.Core.Utils.Sorters;
 
@@ -56,6 +57,8 @@ namespace MGME.Core
             services.AddSingleton<IRollingService, RollingService>();
 
             services.AddSingleton<IRandomEventService, RandomEventService>();
+
+            services.AddSingleton<IFateQuestionService, FateQuestionService>();
         }
     }
 }

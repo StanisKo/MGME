@@ -10,7 +10,7 @@ namespace MGME.Core.Services.RollingService
     */
     public class RollingService : IRollingService
     {
-        private Random _random = new Random();
+        private readonly Random _random = new Random();
 
         public int Roll1D10() => _random.Next(1, 11);
 

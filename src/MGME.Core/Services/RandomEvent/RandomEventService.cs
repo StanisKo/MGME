@@ -10,9 +10,9 @@ namespace MGME.Core.Services.RandomEventService
     */
     public class RandomEventService : IRandomEventService
     {
-        private IRollingService _rollingService;
+        private readonly IRollingService _rollingService;
 
-        private string[] _eventAction = new string[100]
+        private readonly string[] _eventAction = new string[100]
         {
             "Attainment", "Starting", "Neglect", "Fight", "Recruit", "Triumph", "Violate", "Oppose", "Malice",
 
@@ -37,7 +37,7 @@ namespace MGME.Core.Services.RandomEventService
             "Punish", "Guide", "Transform", "Overthrow", "Oppress", "Change"
         };
 
-        private string[] _eventSubject = new string[100]
+        private readonly string[] _eventSubject = new string[100]
         {
             "Goals", "Dreams", "Environment", "Outside", "Inside", "Reality", "Allies", "Enemies", "Evil", "Good",
 
