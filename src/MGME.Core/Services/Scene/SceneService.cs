@@ -46,10 +46,12 @@ namespace MGME.Core.Services.SceneService
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
+            int userId = GetUserIdFromHttpContext();
+
             try
             {
                 bool providedAdventureIdIsValid = await _adventureRepository.CheckIfEntityExistsAsync(
-                    adventure => adventure.Id == newScene.AdventureId
+                    adventure => adventure.Id == newScene.AdventureId && adventure.UserId == userId
                 );
 
                 if (!providedAdventureIdIsValid)
@@ -143,10 +145,12 @@ namespace MGME.Core.Services.SceneService
         {
             BaseServiceResponse response = new BaseServiceResponse();
 
+            int userId = GetUserIdFromHttpContext();
+
             try
             {
                 bool providedAdventureIdIsValid = await _adventureRepository.CheckIfEntityExistsAsync(
-                    adventure => adventure.Id == sceneToResolve.AdventureId
+                    adventure => adventure.Id == sceneToResolve.AdventureId && adventure.UserId == userId
                 );
 
                 if (!providedAdventureIdIsValid)
@@ -157,18 +161,33 @@ namespace MGME.Core.Services.SceneService
                     return response;
                 }
 
-                // TODO: Check if adventure id is valid, check if scene exists, check if there are no unresolved scenes
-                bool thereAreUnresolvedScenes = await _sceneRepository.CheckIfEntityExistsAsync(
-                    scene => scene.AdventureId == sceneToResolve.AdventureId && !scene.Resolved
+                Scene resolvedScene = await _sceneRepository.GetEntityAsync(
+                    id: sceneToResolve.SceneId,
+                    predicate: scene => scene.AdventureId == sceneToResolve.AdventureId
                 );
 
-                if (thereAreUnresolvedScenes)
+                if (resolvedScene == null)
                 {
                     response.Success = false;
-                    response.Message = "There are unresolved scenes that need to be resolved first";
+                    response.Message = "Scene with such id does not exist";
 
                     return response;
                 }
+
+                if (resolvedScene.Resolved)
+                {
+                    response.Success = false;
+                    response.Message = "Scene is already resolved";
+
+                    return response;
+                }
+
+                resolvedScene.Resolved = true;
+
+                await _sceneRepository.UpdateEntityAsync(resolvedScene, new string[] { "Resolved" });
+
+                response.Success = false;
+                response.Message = "Scene was successfully resolved";
             }
             catch (Exception exception)
             {
