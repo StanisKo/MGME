@@ -1,5 +1,4 @@
 using MGME.Core.Interfaces.Services;
-using MGME.Core.DTOs.FateQuestion;
 
 namespace MGME.Core.Services.FateQuestionService
 {
@@ -8,7 +7,7 @@ namespace MGME.Core.Services.FateQuestionService
         /*
         Declared as matrix and not jagged array to avoid typing out initialization syntax
 
-        of new new int[][] { new int[] { ... } } for every row that corresponds to the odd
+        of new int[][] { new int[] { ... } } for every row that corresponds to the odd
         */
         private readonly int[,,] _oddsAndMargins = new int[11, 9, 3]
         {
@@ -101,46 +100,26 @@ namespace MGME.Core.Services.FateQuestionService
             }
         };
 
-        public (bool exceptional, string answer) AnswerFateQuestion(int odds, int chaosFactor, int rollResult)
+        public (string answer, bool exceptional) AnswerFateQuestion(int odds, int chaosFactor, int rollResult)
         {
-            int lowerMargin = _oddsAndMargins[odds, chaosFactor, 0];
+            int lowerMargin  = _oddsAndMargins[odds, chaosFactor, 0];
 
-            int targetValue = _oddsAndMargins[odds, chaosFactor, 1];
+            int normalMargin = _oddsAndMargins[odds, chaosFactor, 1];
 
             int higherMargin = _oddsAndMargins[odds, chaosFactor, 2];
 
-            /*
-            Microsoft, can we please use non-constant values in pattern matching? ^~^
+            (string answer, bool exceptional) answer = ("No", false);
 
-            (bool exceptional, string asnwer) answer = rollResult switch
+            // If roll is within the normal margin, the answer is yes
+            if (rollResult <= normalMargin)
             {
-                <= targetValue => (false, "Yes"),
-
-                > targetValue => (false, "No"),
-
-                < lowerMargin => (true, "Yes"),
-
-                >= higherMargin => (true, "No")
-            };
-            */
-
-            (bool exceptional, string asnwer) answer = (false, "");
-
-            if (rollResult <= targetValue)
-            {
-                answer = (false, "Yes");
+                answer.answer = "Yes";
             }
-            else if (rollResult > targetValue)
+
+            // If roll falls outside of normal margin, then the answer is exceptional
+            if (rollResult <= lowerMargin || rollResult >= higherMargin)
             {
-                answer = (false, "No");
-            }
-            else if (rollResult < lowerMargin)
-            {
-                answer = (true, "Yes");
-            }
-            else if (rollResult >= higherMargin)
-            {
-                answer = (true, "No");
+                answer.exceptional = true;
             }
 
             return answer;
