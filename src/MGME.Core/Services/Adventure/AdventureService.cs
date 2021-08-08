@@ -405,6 +405,18 @@ namespace MGME.Core.Services.AdventureService
                         predicate: predicate
                     );
 
+                    bool nonPlayerCharacterAlreadyTakenByPlayerCharacter = nonPlayerCharactersToAdd.Any(
+                        nonPlayerCharacter => nonPlayerCharacter.PlayerCharacterId != null
+                    );
+
+                    if (nonPlayerCharacterAlreadyTakenByPlayerCharacter)
+                    {
+                        response.Success = false;
+                        response.Message = "One of the NPCs is already taken by a Character and cannot be added to Adventure";
+
+                        return response;
+                    }
+
                     for (int i = 0; i < nonPlayerCharactersToAdd.Count(); i++)
                     {
                         adventureToAddTo.NonPlayerCharacters.Add(

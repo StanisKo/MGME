@@ -395,7 +395,11 @@ namespace MGME.Core.Services.PlayerCharacterService
 
                 IEnumerable<NonPlayerCharacter> nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
                     predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId
-                        && ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id)
+                        && ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id),
+                    include: new []
+                    {
+                        "Adventures"
+                    }
                 );
 
                 IEnumerable<int> matches = playerCharacterToAddTo.NonPlayerCharacters.Select(
@@ -426,6 +430,18 @@ namespace MGME.Core.Services.PlayerCharacterService
                 {
                     response.Success = false;
                     response.Message = "One of the NPCs already belongs to another Character";
+
+                    return response;
+                }
+
+                bool nonPlayerCharacterAlreadyTakesPartInAdventure = nonPlayerCharactersToAdd.Any(
+                    nonPlayerCharacter => nonPlayerCharacter.Adventures.Count > 0
+                );
+
+                if (nonPlayerCharacterAlreadyTakesPartInAdventure)
+                {
+                    response.Success = false;
+                    response.Message = "One of the NPCs already takes part in Adventure and cannot be added to a Character";
 
                     return response;
                 }
