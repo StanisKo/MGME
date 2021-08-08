@@ -83,6 +83,76 @@ namespace MGME.Core.Services.AdventureService
             return response;
         }
 
+        public async Task <DataServiceResponse<GetAdventureDetailDTO>> GetAdventure(int id)
+        {
+            DataServiceResponse<GetAdventureDetailDTO> response = new DataServiceResponse<GetAdventureDetailDTO>();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                GetAdventureDetailDTO adventure = await _adventureRepository.GetEntityAsync<GetAdventureDetailDTO>(
+                    id: id,
+                    predicate: adventure => adventure.UserId == userId,
+                    include: new[]
+                    {
+                        "PlayerCharacters",
+                        "NonPlayerCharacters",
+                        "Threads"
+                    },
+                    select: adventure => new GetAdventureDetailDTO()
+                    {
+                        Id = adventure.Id,
+                        Title = adventure.Title,
+                        Context = adventure.Context,
+                        ChaosFactor = adventure.ChaosFactor,
+
+                        PlayerCharacters = adventure.PlayerCharacters.Select(
+                            playerCharacter => new GetPlayerCharacterDTO()
+                            {
+                                Id = playerCharacter.Id,
+                                Name = playerCharacter.Name
+                            }
+                        ),
+
+                        NonPlayerCharacters = adventure.NonPlayerCharacters.Select(
+                            nonPlayerCharacter => new GetNonPlayerCharacterDTO()
+                            {
+                                Id = nonPlayerCharacter.Id,
+                                Name = nonPlayerCharacter.Name
+                            }
+                        ),
+
+                        Threads = adventure.Threads.Select(
+                            thread => new GetThreadDTO()
+                            {
+                                Id = thread.Id,
+                                Name = thread.Name
+                            }
+                        )
+                    }
+                );
+
+                if (adventure == null)
+                {
+                    response.Success = false;
+                    response.Message = "Adventure doesn't exist";
+
+                    return response;
+                }
+
+                response.Data = adventure;
+                response.Success = true;
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
+        }
+
         public async Task <BaseServiceResponse> AddAdventure(AddAdventureDTO newAdventure)
         {
             BaseServiceResponse response = new BaseServiceResponse();

@@ -1,3 +1,9 @@
+using System.Collections.Generic;
+
+using MGME.Core.DTOs.PlayerCharacter;
+using MGME.Core.DTOs.NonPlayerCharacter;
+using MGME.Core.DTOs.Thread;
+
 namespace MGME.Core.DTOs.Adventure
 {
     public class GetAdventureDetailDTO : BaseEntityDTO
@@ -8,10 +14,10 @@ namespace MGME.Core.DTOs.Adventure
 
         public int ChaosFactor { get; set; }
 
-        // Characters
+        public IEnumerable<GetPlayerCharacterDTO> PlayerCharacters { get; set; }
 
-        // NPCs
+        public IEnumerable<GetNonPlayerCharacterDTO> NonPlayerCharacters { get; set; }
 
-        // Threads
+        public IEnumerable<GetThreadDTO> Threads { get; set; }
     }
 }
