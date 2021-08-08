@@ -123,7 +123,7 @@ namespace MGME.Core.Services.FateQuestionService
 
             (bool exceptional, string asnwer) answer = rollResult switch
             {
-               <= targetValue => (false, "Yes"),
+                <= targetValue => (false, "Yes"),
 
                 > targetValue => (false, "No"),
 
