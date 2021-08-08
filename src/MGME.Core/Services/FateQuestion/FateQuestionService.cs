@@ -5,8 +5,6 @@ namespace MGME.Core.Services.FateQuestionService
 {
     public class FateQuestionService : IFateQuestionService
     {
-        private readonly IRollingService _rollingService;
-
         /*
         Declared as matrix and not jagged array to avoid typing out initialization syntax
 
@@ -103,20 +101,13 @@ namespace MGME.Core.Services.FateQuestionService
             }
         };
 
-        public FateQuestionService(IRollingService rollingService)
+        public (bool exceptional, string answer) AnswerFateQuestion(int odds, int chaosFactor, int rollResult)
         {
-            _rollingService = rollingService;
-        }
+            int lowerMargin = _oddsAndMargins[odds, chaosFactor, 0];
 
-        public (bool exceptional, string answer) AnswerFateQuestion(AskFateQuestionDTO question)
-        {
-            int rollResult = _rollingService.Roll1D100();
+            int targetValue = _oddsAndMargins[odds, chaosFactor, 1];
 
-            int lowerMargin = _oddsAndMargins[question.Odds, question.AdventureChaosFactor, 0];
-
-            int targetValue = _oddsAndMargins[question.Odds, question.AdventureChaosFactor, 1];
-
-            int higherMargin = _oddsAndMargins[question.Odds, question.AdventureChaosFactor, 2];
+            int higherMargin = _oddsAndMargins[odds, chaosFactor, 2];
 
             /*
             Microsoft, can we please use non-constant values in pattern matching? ^~^
