@@ -4,6 +4,6 @@ namespace MGME.Core.Interfaces.Services
 {
     public interface IFateQuestionService
     {
-        string AnswerFateQuestion(AskFateQuestionDTO question);
+        (bool exceptional, string answer) AnswerFateQuestion(AskFateQuestionDTO question);
     }
 }

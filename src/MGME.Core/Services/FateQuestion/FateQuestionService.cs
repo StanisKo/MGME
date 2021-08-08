@@ -7,8 +7,12 @@ namespace MGME.Core.Services.FateQuestionService
     {
         private readonly IRollingService _rollingService;
 
-        // TODO: double check
-        private readonly int[,,] oddsAndMargins = new int[11, 9, 3]
+        /*
+        Declared as matrix and not jagged array to avoid typing out initialization syntax
+
+        of new new int[][] { new int[] { ... } } for every row that corresponds to the odd
+        */
+        private readonly int[,,] _oddsAndMargins = new int[11, 9, 3]
         {
             {
                 { 0, -20, 77 }, { 0, 0, 81 }, { 0, 0, 81 },
@@ -104,9 +108,51 @@ namespace MGME.Core.Services.FateQuestionService
             _rollingService = rollingService;
         }
 
-        public string AnswerFateQuestion(AskFateQuestionDTO question)
+        public (bool exceptional, string answer) AnswerFateQuestion(AskFateQuestionDTO question)
         {
-            throw new System.NotImplementedException();
+            int rollResult = _rollingService.Roll1D100();
+
+            int lowerMargin = _oddsAndMargins[question.Odds, question.AdventureChaosFactor, 0];
+
+            int targetValue = _oddsAndMargins[question.Odds, question.AdventureChaosFactor, 1];
+
+            int higherMargin = _oddsAndMargins[question.Odds, question.AdventureChaosFactor, 2];
+
+            /*
+            Microsoft, can we please use non-constant values in pattern matching? ^~^
+
+            (bool exceptional, string asnwer) answer = rollResult switch
+            {
+               <= targetValue => (false, "Yes"),
+
+                > targetValue => (false, "No"),
+
+                < lowerMargin => (true, "Yes"),
+
+                >= higherMargin => (true, "No")
+            };
+            */
+
+            (bool exceptional, string asnwer) answer = (false, "");
+
+            if (rollResult <= targetValue)
+            {
+                answer = (false, "Yes");
+            }
+            else if (rollResult > targetValue)
+            {
+                answer = (false, "No");
+            }
+            else if (rollResult < lowerMargin)
+            {
+                answer = (true, "Yes");
+            }
+            else if (rollResult >= higherMargin)
+            {
+                answer = (true, "No");
+            }
+
+            return answer;
         }
     }
 }
