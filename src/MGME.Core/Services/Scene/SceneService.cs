@@ -71,7 +71,9 @@ namespace MGME.Core.Services.SceneService
                 {
                     Scene firstSceneToCreate = _mapper.Map<Scene>(newScene);
 
-                    firstSceneToCreate.Type = SceneType.NORMAL;
+                    // If client requested random event to seed the first scene, reflect it in it's type
+                    firstSceneToCreate.Type =
+                        firstSceneToCreate.RandomEvent != null ? SceneType.INTERRUPTED : SceneType.NORMAL;
 
                     await _sceneRepository.AddEntityAsync(firstSceneToCreate);
 
@@ -107,8 +109,10 @@ namespace MGME.Core.Services.SceneService
 
                 int rollResult = _rollingService.Roll1D10();
 
+                // If roll is within chaos factor, scene must be modified
                 if (rollResult <= newScene.AdventureChaosFactor)
                 {
+                    // Roll is odd ? scene must be altered : scene is interrupted by random event
                     sceneToCreate.Type = rollResult % 2 != 0 ? SceneType.ALTERED : SceneType.INTERRUPTED;
                 }
                 else
