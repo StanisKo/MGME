@@ -12,7 +12,14 @@ namespace MGME.Core.DTOs.SceneItem
         [Required]
         public SceneItemType Type { get; set; }
 
-        // Provided if scene item is a fate question, otherwise nullable
+        /*
+        FateQuestion, Odds, and ChaosFactor are necessary only if
+        type of scene item is fate question, otherwise nullable
+        */
         public string FateQuestion { get; set; }
+
+        public int? Odds { get; set; }
+
+        public int? ChaosFactor { get; set; }
     }
 }

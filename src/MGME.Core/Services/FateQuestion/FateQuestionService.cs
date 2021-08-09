@@ -8,7 +8,7 @@ namespace MGME.Core.Services.FateQuestionService
         Method receives roll result as param and not used roll service from DI,
         Since there are no use cases where this service will be called via a dedicated endpoint
         */
-        public (string answer, bool exceptional) AnswerFateQuestion(int odds, int chaosFactor, int rollResult)
+        public (bool answer, bool exceptional) AnswerFateQuestion(int odds, int chaosFactor, int rollResult)
         {
             int lowerMargin  = _oddsAndMargins[odds, chaosFactor, 0];
 
@@ -16,12 +16,12 @@ namespace MGME.Core.Services.FateQuestionService
 
             int higherMargin = _oddsAndMargins[odds, chaosFactor, 2];
 
-            (string answer, bool exceptional) answer = ("No", false);
+            (bool answer, bool exceptional) answer = (false, false);
 
             // If roll is within the normal margin, the answer is yes
             if (rollResult <= normalMargin)
             {
-                answer.answer = "Yes";
+                answer.answer = true;
             }
 
             // If roll falls outside of normal margin, then the answer is exceptional

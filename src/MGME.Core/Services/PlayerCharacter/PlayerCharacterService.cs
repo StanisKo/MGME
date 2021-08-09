@@ -395,8 +395,8 @@ namespace MGME.Core.Services.PlayerCharacterService
 
                 /*
                 We query only those, that don't have adventure and use their count and count of provided ids
-                To deduce a possible error -- weather some of the NonPlayerCharacters by provided ids already
-                Take part in an Adventure; and in such, save a join on Adventure
+                to deduce a possible error -- weather some of the NonPlayerCharacters by provided ids already
+                take part in an Adventure; and in such, save a join on Adventure
                 */
                 IEnumerable<NonPlayerCharacter> nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
                     predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId
