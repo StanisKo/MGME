@@ -436,6 +436,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                     return response;
                 }
 
+                // If potential error, there will always be less queried NonPlayerCharacters
                 bool nonPlayerCharacterAlreadyTakesPartInAdventure =
                     nonPlayerCharactersToAdd.Count() != ids.NonPlayerCharacters.Count();
 

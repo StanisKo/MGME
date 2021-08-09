@@ -11,5 +11,8 @@ namespace MGME.Core.DTOs.SceneItem
 
         [Required]
         public SceneItemType Type { get; set; }
+
+        // Provided if scene item is a fate question, otherwise nullable
+        public string FateQuestion { get; set; }
     }
 }
