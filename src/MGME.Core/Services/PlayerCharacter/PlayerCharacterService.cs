@@ -396,7 +396,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 IEnumerable<NonPlayerCharacter> nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
                     predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId
                         && ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id),
-                    include: new []
+                    include: new[]
                     {
                         "Adventures"
                     }
