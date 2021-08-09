@@ -43,6 +43,15 @@ namespace MGME.Core.Services.SceneItemService
                     predicate: scene => scene.Adventure.UserId == userId
                 );
 
+                if (sceneToAddItemTo == null)
+                {
+                    response.Success = false;
+                    response.Message = "Scene with such id does not exist";
+
+                    return response;
+                }
+
+                
             }
             catch (Exception exception)
             {

@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 
+using MGME.Web.Utils;
 using MGME.Infra.Data;
 
 namespace MGME.Web

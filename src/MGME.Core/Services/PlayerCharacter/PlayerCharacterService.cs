@@ -393,13 +393,15 @@ namespace MGME.Core.Services.PlayerCharacterService
                     return response;
                 }
 
+                /*
+                We query only those, that don't have adventure and use their count and count of provided ids
+                To deduce a possible error -- weather some of the NonPlayerCharacters by provided ids already
+                Take part in an Adventure; and in such, save a join on Adventure
+                */
                 IEnumerable<NonPlayerCharacter> nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
                     predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId
-                        && ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id),
-                    include: new[]
-                    {
-                        "Adventures"
-                    }
+                        && ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id)
+                            && nonPlayerCharacter.Adventures.Count == 0
                 );
 
                 IEnumerable<int> matches = playerCharacterToAddTo.NonPlayerCharacters.Select(
@@ -434,9 +436,8 @@ namespace MGME.Core.Services.PlayerCharacterService
                     return response;
                 }
 
-                bool nonPlayerCharacterAlreadyTakesPartInAdventure = nonPlayerCharactersToAdd.Any(
-                    nonPlayerCharacter => nonPlayerCharacter.Adventures.Count > 0
-                );
+                bool nonPlayerCharacterAlreadyTakesPartInAdventure =
+                    nonPlayerCharactersToAdd.Count() != ids.NonPlayerCharacters.Count();
 
                 if (nonPlayerCharacterAlreadyTakesPartInAdventure)
                 {

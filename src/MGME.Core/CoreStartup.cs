@@ -11,6 +11,7 @@ using MGME.Core.Services.PlayerCharacterService;
 using MGME.Core.Services.NonPlayerCharacterService;
 using MGME.Core.Services.AdventureService;
 using MGME.Core.Services.SceneService;
+using MGME.Core.Services.SceneItemService;
 
 using MGME.Core.Services.RollingService;
 using MGME.Core.Services.RandomEventService;
@@ -53,6 +54,8 @@ namespace MGME.Core
             services.AddScoped<AdventureSorter>();
 
             services.AddScoped<ISceneService, SceneService>();
+
+            services.AddScoped<ISceneItemService, SceneItemService>();
 
             services.AddSingleton<IRollingService, RollingService>();
 
