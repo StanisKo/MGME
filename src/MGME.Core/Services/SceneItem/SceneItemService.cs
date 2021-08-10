@@ -140,6 +140,8 @@ namespace MGME.Core.Services.SceneItemService
                         {
                             response.Success = false;
                             response.Message = "Outcome is required to create a battle";
+
+                            return response;
                         }
 
                         Battle battleToAdd = new Battle()
