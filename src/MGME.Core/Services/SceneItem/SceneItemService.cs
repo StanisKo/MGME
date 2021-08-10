@@ -88,10 +88,10 @@ namespace MGME.Core.Services.SceneItemService
                     case SceneItemType.FATE_QUESTION:
 
                         // At this point, client must have provided a question, odds, and chaos factor
-                        if (newSceneItem.FateQuestion == null || newSceneItem.Odds == null || newSceneItem.ChaosFactor == null)
+                        if (newSceneItem.Question == null || newSceneItem.Odds == null || newSceneItem.ChaosFactor == null)
                         {
                             response.Success = false;
-                            response.Message = "Fate question, odds, and chaos factor are all required to ask a fate question";
+                            response.Message = "Question, odds, and chaos factor are all required to ask a fate question";
 
                             return response;
                         }
@@ -105,7 +105,7 @@ namespace MGME.Core.Services.SceneItemService
                         FateQuestion fateQuestionToAdd = new FateQuestion()
                         {
                             SceneItemId = sceneItemToAdd.Id,
-                            Question = newSceneItem.FateQuestion,
+                            Question = newSceneItem.Question,
                             Answer = answer.answer,
                             Exceptional = answer.exceptional,
                             RollResult = rollResult
@@ -135,17 +135,17 @@ namespace MGME.Core.Services.SceneItemService
 
                     case SceneItemType.BATTLE:
 
-                        // At this point, client must have provided battle outcome
-                        if (newSceneItem.BattleOutcome == null)
+                        // At this point, client must have provided outcome
+                        if (newSceneItem.Outcome == null)
                         {
                             response.Success = false;
-                            response.Message = "Battle outcome is required to create a battle";
+                            response.Message = "Outcome is required to create a battle";
                         }
 
                         Battle battleToAdd = new Battle()
                         {
                             SceneItemId = sceneItemToAdd.Id,
-                            Outcome = newSceneItem.BattleOutcome
+                            Outcome = newSceneItem.Outcome
                         };
 
                         await _battleRepository.AddEntityAsync(battleToAdd);
