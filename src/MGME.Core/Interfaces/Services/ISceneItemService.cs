@@ -9,6 +9,6 @@ namespace MGME.Core.Interfaces.Services
     {
         Task <BaseServiceResponse> AddSceneItem(AddSceneItemDTO newSceneItem);
 
-        Task <BaseServiceResponse> UpdateSceneItem(UpdateSceneItemDTO updatedScene);
+        Task <BaseServiceResponse> UpdateSceneItem(UpdateSceneItemDTO updatedSceneItem);
     }
 }

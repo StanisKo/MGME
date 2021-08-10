@@ -168,9 +168,73 @@ namespace MGME.Core.Services.SceneItemService
             return response;
         }
 
-        public async Task <BaseServiceResponse> UpdateSceneItem(UpdateSceneItemDTO updatedScene)
+        public async Task <BaseServiceResponse> UpdateSceneItem(UpdateSceneItemDTO updatedSceneItem)
         {
-            throw new NotImplementedException();
+            BaseServiceResponse response = new BaseServiceResponse();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                /*
+                We also query for the parent scene to make sure that api
+                allows updating only those items, that ultimately belong to user
+                via scene --> adventure --> user
+                */
+                Scene sceneToUpdateItemIn = await _sceneRepository.GetEntityAsync(
+                    id: updatedSceneItem.SceneId,
+                    predicate: scene => scene.Adventure.UserId == userId
+                );
+
+                if (sceneToUpdateItemIn == null)
+                {
+                    response.Success = false;
+                    response.Message = "Scene with such id does not exist";
+
+                    return response;
+                }
+
+                if (updatedSceneItem.Type == (int)SceneItemType.FATE_QUESTION)
+                {
+                    FateQuestion fateQuestionToUpdate = await _fateQuestionRepository.GetEntityAsync(
+                        predicate: fateQuestion => fateQuestion.SceneItemId == updatedSceneItem.Id
+                    );
+
+                    fateQuestionToUpdate.Interpretation = updatedSceneItem.Interpretation;
+
+                    await _fateQuestionRepository.UpdateEntityAsync(
+                        fateQuestionToUpdate,
+                        new[] { "Interpretation" }
+                    );
+
+                    response.Success = true;
+                    response.Message = "Fate Question was successfully updated";
+                }
+                // Otherwise it's random event
+                else
+                {
+                    RandomEvent randomEventToUpdate = await _randomEventRepository.GetEntityAsync(
+                        predicate: randomEvent => randomEvent.SceneItemId == updatedSceneItem.Id
+                    );
+
+                    randomEventToUpdate.Interpretation = updatedSceneItem.Interpretation;
+
+                    await _randomEventRepository.UpdateEntityAsync(
+                        randomEventToUpdate,
+                        new[] { "Interpretation" }
+                    );
+
+                    response.Success = true;
+                    response.Message = "Random Event was successfully updated";
+                }
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace MGME.Core.Entities
         [Required]
         public string Description { get; set; }
 
-        public string Interpetation { get; set; }
+        public string Interpretation { get; set; }
 
         [ForeignKey("SceneItem")]
         public int SceneItemId { get; set; }
