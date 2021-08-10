@@ -18,6 +18,8 @@ namespace MGME.Core.Services.SceneItemService
     {
         private readonly IRollingService _rollingService;
 
+        private readonly IRandomEventService _randomEventService;
+
         private readonly IFateQuestionService _fateQuestionService;
 
         private readonly IEntityRepository<Scene> _sceneRepository;
@@ -26,22 +28,32 @@ namespace MGME.Core.Services.SceneItemService
 
         private readonly IEntityRepository<FateQuestion> _fateQuestionRepository;
 
+        private readonly IEntityRepository<RandomEvent> _randomEventRepository;
+
+        private readonly IEntityRepository<Battle> _battleRepository;
+
         private readonly IMapper _mapper;
 
         public SceneItemService(IRollingService rollingService,
+                                IRandomEventService randomEventService,
                                 IFateQuestionService fateQuestionService,
                                 IEntityRepository<Scene> sceneRepository,
                                 IEntityRepository<SceneItem> sceneItemRepository,
                                 IEntityRepository<FateQuestion> fateQuestionRepository,
+                                IEntityRepository<RandomEvent> randomEventRepository,
+                                IEntityRepository<Battle> battleRepository,
                                 IMapper mapper,
                                 IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _rollingService = rollingService;
             _fateQuestionService = fateQuestionService;
+            _randomEventService = randomEventService;
 
             _sceneRepository = sceneRepository;
             _sceneItemRepository = sceneItemRepository;
             _fateQuestionRepository = fateQuestionRepository;
+            _randomEventRepository = randomEventRepository;
+            _battleRepository = battleRepository;
 
             _mapper = mapper;
         }
@@ -75,7 +87,7 @@ namespace MGME.Core.Services.SceneItemService
                 {
                     case SceneItemType.FATE_QUESTION:
 
-                        // At this point, client must've provided a question, odds, and chaos factor
+                        // At this point, client must have provided a question, odds, and chaos factor
                         if (newSceneItem.FateQuestion == null || newSceneItem.Odds == null || newSceneItem.ChaosFactor == null)
                         {
                             response.Success = false;
@@ -99,9 +111,6 @@ namespace MGME.Core.Services.SceneItemService
                             RollResult = rollResult
                         };
 
-                        // What happens on roll result? If conditions met, do we create new random event item here
-                        // or let fe handle it?
-
                         await _fateQuestionRepository.AddEntityAsync(fateQuestionToAdd);
 
                         response.Message = "Fate Question was successfully added";
@@ -109,12 +118,40 @@ namespace MGME.Core.Services.SceneItemService
                         break;
 
                     case SceneItemType.RANDOM_EVENT:
+
+                        string randomEventDescription = _randomEventService.GenerateRandomEvent();
+
+                        RandomEvent randomEventToAdd = new RandomEvent()
+                        {
+                            SceneItemId = sceneItemToAdd.Id,
+                            Description = randomEventDescription
+                        };
+
+                        await _randomEventRepository.AddEntityAsync(randomEventToAdd);
+
+                        response.Message = "Random Event was successfully added";
+
                         break;
 
                     case SceneItemType.BATTLE:
-                        break;
 
-                    default:
+                        // At this point, client must have provided battle outcome
+                        if (newSceneItem.BattleOutcome == null)
+                        {
+                            response.Success = false;
+                            response.Message = "Battle outcome is required to create a battle";
+                        }
+
+                        Battle battleToAdd = new Battle()
+                        {
+                            SceneItemId = sceneItemToAdd.Id,
+                            Outcome = newSceneItem.BattleOutcome
+                        };
+
+                        await _battleRepository.AddEntityAsync(battleToAdd);
+
+                        response.Message = "Battle was successfully added";
+
                         break;
                 }
 

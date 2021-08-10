@@ -5,7 +5,7 @@ namespace MGME.Core.Services.FateQuestionService
     public class FateQuestionService : IFateQuestionService
     {
         /*
-        Method receives roll result as param and not used roll service from DI,
+        Method receives roll result as param and not uses roll service from DI,
         Since there are no use cases where this service will be called via a dedicated endpoint
         */
         public (bool answer, bool exceptional) AnswerFateQuestion(int odds, int chaosFactor, int rollResult)

@@ -21,5 +21,11 @@ namespace MGME.Core.DTOs.SceneItem
         public int? Odds { get; set; }
 
         public int? ChaosFactor { get; set; }
+
+        /*
+        Battle outcome is necessary only if type of scene
+        is battle, otherwise nullable
+        */
+        public string BattleOutcome { get; set; }
     }
 }
