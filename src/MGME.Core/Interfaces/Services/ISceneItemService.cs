@@ -9,6 +9,6 @@ namespace MGME.Core.Interfaces.Services
     {
         Task <BaseServiceResponse> AddSceneItem(AddSceneItemDTO newSceneItem);
 
-        // Get all scene items by scene id
+        Task <BaseServiceResponse> UpdateSceneItem(UpdateSceneItemDTO updatedScene);
     }
 }

@@ -167,5 +167,10 @@ namespace MGME.Core.Services.SceneItemService
 
             return response;
         }
+
+        public async Task <BaseServiceResponse> UpdateSceneItem(UpdateSceneItemDTO updatedScene)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
