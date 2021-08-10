@@ -176,29 +176,28 @@ namespace MGME.Core.Services.SceneItemService
 
             try
             {
-                /*
-                We also query for the parent scene to make sure that api
-                allows updating only those items, that ultimately belong to user
-                via scene --> adventure --> user
-                */
-                Scene sceneToUpdateItemIn = await _sceneRepository.GetEntityAsync(
-                    id: updatedSceneItem.SceneId,
-                    predicate: scene => scene.Adventure.UserId == userId
-                );
-
-                if (sceneToUpdateItemIn == null)
-                {
-                    response.Success = false;
-                    response.Message = "Scene with such id does not exist";
-
-                    return response;
-                }
-
                 if (updatedSceneItem.Type == (int)SceneItemType.FATE_QUESTION)
                 {
                     FateQuestion fateQuestionToUpdate = await _fateQuestionRepository.GetEntityAsync(
                         predicate: fateQuestion => fateQuestion.SceneItemId == updatedSceneItem.Id
+                            && fateQuestion.SceneItem.Scene.Adventure.UserId == userId
                     );
+
+                    if (fateQuestionToUpdate == null)
+                    {
+                        response.Success = false;
+                        response.Message = "Fate Question with such id does not exist";
+
+                        return response;
+                    }
+
+                    // if (fateQuestionToUpdate.Interpretation != null)
+                    // {
+                    //     response.Success = false;
+                    //     response.Message = "This Fate Question was already interpreted before";
+
+                    //     return response;
+                    // }
 
                     fateQuestionToUpdate.Interpretation = updatedSceneItem.Interpretation;
 
@@ -215,7 +214,24 @@ namespace MGME.Core.Services.SceneItemService
                 {
                     RandomEvent randomEventToUpdate = await _randomEventRepository.GetEntityAsync(
                         predicate: randomEvent => randomEvent.SceneItemId == updatedSceneItem.Id
+                            && randomEvent.SceneItem.Scene.Adventure.UserId == userId
                     );
+
+                    if (randomEventToUpdate == null)
+                    {
+                        response.Success = false;
+                        response.Message = "Random Event with such id does not exist";
+
+                        return response;
+                    }
+
+                    // if (randomEventToUpdate.Interpretation != null)
+                    // {
+                    //     response.Success = false;
+                    //     response.Message = "This Random Event was already interpreted before";
+
+                    //     return response;
+                    // }
 
                     randomEventToUpdate.Interpretation = updatedSceneItem.Interpretation;
 

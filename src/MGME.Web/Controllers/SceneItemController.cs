@@ -31,5 +31,18 @@ namespace MGME.Web.Controllers
 
             return BadRequest(response);
         }
+
+        [HttpPut("Update")]
+        public async Task <IActionResult> UpdateSceneItem(UpdateSceneItemDTO updatedSceneItem)
+        {
+            BaseServiceResponse response = await _sceneItemService.UpdateSceneItem(updatedSceneItem);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
     }
 }
