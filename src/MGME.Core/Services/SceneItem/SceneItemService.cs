@@ -66,12 +66,11 @@ namespace MGME.Core.Services.SceneItemService
 
             try
             {
-                Scene sceneToAddItemTo = await _sceneRepository.GetEntityAsync(
-                    id: newSceneItem.SceneId,
-                    predicate: scene => scene.Adventure.UserId == userId
+                bool sceneIdIsValid = await _sceneRepository.CheckIfEntityExistsAsync(
+                    scene => scene.Id == newSceneItem.SceneId && scene.Adventure.UserId == userId
                 );
 
-                if (sceneToAddItemTo == null)
+                if (!sceneIdIsValid)
                 {
                     response.Success = false;
                     response.Message = "Scene with such id does not exist";
