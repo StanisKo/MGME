@@ -1,7 +1,9 @@
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 using MGME.Core.DTOs;
 using MGME.Core.DTOs.SceneItem;
@@ -17,6 +19,21 @@ namespace MGME.Web.Controllers
         public SceneItemController(ISceneItemService sceneItemService)
         {
             _sceneItemService = sceneItemService;
+        }
+
+        [HttpGet]
+        public async Task <IActionResult> GetSceneItems([FromQuery, BindRequired] int sceneId)
+        {
+            DataServiceResponse<IEnumerable<GetSceneItemListDTO>> response = await _sceneItemService.GetSceneItems(
+                sceneId
+            );
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return BadRequest(response);
         }
 
         [HttpPost("Add")]

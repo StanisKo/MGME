@@ -14,7 +14,7 @@ namespace MGME.Core.DTOs.SceneItem
         public DateTime CreatedAt { get; set; }
 
         /*
-        At any point in time, scene item can be either
+        At one point in time, scene item can be either
         Fate Question, Random Event, or Battle
         */
         public GetFateQuestionDTO FateQuestion { get; set; }

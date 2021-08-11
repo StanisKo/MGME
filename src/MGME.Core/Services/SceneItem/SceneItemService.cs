@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using AutoMapper;
 
@@ -8,6 +9,9 @@ using Microsoft.AspNetCore.Http;
 using MGME.Core.Entities;
 using MGME.Core.Constants;
 using MGME.Core.DTOs;
+using MGME.Core.DTOs.Battle;
+using MGME.Core.DTOs.FateQuestion;
+using MGME.Core.DTOs.RandomEvent;
 using MGME.Core.DTOs.SceneItem;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
@@ -56,6 +60,62 @@ namespace MGME.Core.Services.SceneItemService
             _battleRepository = battleRepository;
 
             _mapper = mapper;
+        }
+
+        public async Task <DataServiceResponse<IEnumerable<GetSceneItemListDTO>>> GetSceneItems(int sceneId)
+        {
+            DataServiceResponse<IEnumerable<GetSceneItemListDTO>> response = new DataServiceResponse<IEnumerable<GetSceneItemListDTO>>();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                IEnumerable<GetSceneItemListDTO> sceneItems = await _sceneItemRepository.GetEntititesAsync<GetSceneItemListDTO>(
+                    predicate: sceneItem => sceneItem.SceneId == sceneId && sceneItem.Scene.Adventure.UserId == userId,
+                    include: new[]
+                    {
+                        "FateQuestion",
+                        "RandomEvent",
+                        "Battle"
+                    },
+                    select: sceneItem => new GetSceneItemListDTO()
+                    {
+                        Id = sceneItem.Id,
+                        Type = sceneItem.Type,
+                        CreatedAt = sceneItem.CreatedAt,
+
+                        FateQuestion = sceneItem.FateQuestion != null ? new GetFateQuestionDTO()
+                        {
+                            Question = sceneItem.FateQuestion.Question,
+                            Answer = sceneItem.FateQuestion.Answer,
+                            Exceptional = sceneItem.FateQuestion.Exceptional,
+                            RollResult = sceneItem.FateQuestion.RollResult,
+                            Interpretation = sceneItem.FateQuestion.Interpretation
+                        } : null,
+
+                        RandomEvent = sceneItem.RandomEvent != null ? new GetRandomEventDTO()
+                        {
+                            Description =  sceneItem.RandomEvent.Description,
+                            Interpretation = sceneItem.RandomEvent.Interpretation
+                        } : null,
+                        
+                        Battle = sceneItem.Battle != null ? new GetBattleDTO()
+                        {
+                            Outcome = sceneItem.Battle.Outcome
+                        } : null
+                    }
+                );
+
+                response.Data = sceneItems;
+                response.Success = true;
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
 
         public async Task <BaseServiceResponse> AddSceneItem(AddSceneItemDTO newSceneItem)
@@ -153,6 +213,10 @@ namespace MGME.Core.Services.SceneItemService
 
                         response.Message = "Battle was successfully added";
 
+                        break;
+                    
+                    default:
+                        
                         break;
                 }
 
