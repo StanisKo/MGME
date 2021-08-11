@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -40,6 +41,25 @@ namespace MGME.Core.Services.SceneService
             _randomEventService = randomEventService;
 
             _mapper = mapper;
+        }
+
+        public async Task <PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>>> GetScenes(int adventureId, int selectedPage)
+        {
+            PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>> response = new PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>>();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
         }
 
         public async Task <BaseServiceResponse> AddScene(AddSceneDTO newScene)
@@ -188,7 +208,7 @@ namespace MGME.Core.Services.SceneService
 
                 resolvedScene.Resolved = true;
 
-                await _sceneRepository.UpdateEntityAsync(resolvedScene, new string[] { "Resolved" });
+                await _sceneRepository.UpdateEntityAsync(resolvedScene, new[] { "Resolved" });
 
                 response.Success = true;
                 response.Message = "Scene was successfully resolved";

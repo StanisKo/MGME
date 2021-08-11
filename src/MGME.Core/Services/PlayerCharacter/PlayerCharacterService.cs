@@ -151,9 +151,9 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             bool thereAreNewNonPlayerCharactersToAdd = newPlayerCharacter.NewNonPlayerCharacters?.Any() == true;
 
-            bool thereAreExisitingNonPlayerCharactersToAdd = newPlayerCharacter.ExistingNonPlayerCharacters?.Any() == true;
+            bool thereAreExistingNonPlayerCharactersToAdd = newPlayerCharacter.ExistingNonPlayerCharacters?.Any() == true;
 
-            if (!thereAreNewNonPlayerCharactersToAdd && !thereAreExisitingNonPlayerCharactersToAdd)
+            if (!thereAreNewNonPlayerCharactersToAdd && !thereAreExistingNonPlayerCharactersToAdd)
             {
                 response.Success = false;
                 response.Message = "At least one new or existing NPC must be provided";
@@ -246,7 +246,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 meet conditions above, since we don't supply it to the client app,
                 but it never hurts to double check
                 */
-                if (thereAreExisitingNonPlayerCharactersToAdd)
+                if (thereAreExistingNonPlayerCharactersToAdd)
                 {
                     Expression<Func<NonPlayerCharacter, bool>> predicate =
                         nonPlayerCharacter => nonPlayerCharacter.UserId == userId
