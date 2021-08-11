@@ -66,11 +66,11 @@ namespace MGME.Core.Services.SceneItemService
 
             try
             {
-                bool sceneIdIsValid = await _sceneRepository.CheckIfEntityExistsAsync(
+                bool providedSceneIdIsValid = await _sceneRepository.CheckIfEntityExistsAsync(
                     scene => scene.Id == newSceneItem.SceneId && scene.Adventure.UserId == userId
                 );
 
-                if (!sceneIdIsValid)
+                if (!providedSceneIdIsValid)
                 {
                     response.Success = false;
                     response.Message = "Scene with such id does not exist";
@@ -112,7 +112,7 @@ namespace MGME.Core.Services.SceneItemService
 
                         await _fateQuestionRepository.AddEntityAsync(fateQuestionToAdd);
 
-                        response.Message = "Fate Question was successfully added";
+                        response.Message = "Fate question was successfully added";
 
                         break;
 
@@ -128,7 +128,7 @@ namespace MGME.Core.Services.SceneItemService
 
                         await _randomEventRepository.AddEntityAsync(randomEventToAdd);
 
-                        response.Message = "Random Event was successfully added";
+                        response.Message = "Random event was successfully added";
 
                         break;
 
@@ -185,24 +185,36 @@ namespace MGME.Core.Services.SceneItemService
                     if (fateQuestionToUpdate == null)
                     {
                         response.Success = false;
-                        response.Message = "Fate Question with such id does not exist";
+                        response.Message = "Fate question with such id does not exist";
 
                         return response;
                     }
 
-                    // if (fateQuestionToUpdate.Interpretation != null)
-                    // {
-                    //     response.Success = false;
-                    //     response.Message = "This Fate Question was already interpreted before";
+                    /*
+                    To avoid unnecessary complexity, the skipping of interpretation
+                    is not marked by any specific field, but by a string written into
+                    Interpretation field by a client
 
-                    //     return response;
-                    // }
+                    E.g., whenever user wants to skip interpretation, client must
+                    provide immutable string -- "Interpretation Skipped", effectively
+                    cancelling future updates and using said string for display purposes
+                    */
+                    if (fateQuestionToUpdate.Interpretation != null)
+                    {
+                        response.Success = false;
+                        response.Message = "Interpretation of this fate question was either already provided or skipped";
+
+                        return response;
+                    }
 
                     fateQuestionToUpdate.Interpretation = updatedSceneItem.Interpretation;
 
                     await _fateQuestionRepository.UpdateEntityAsync(
                         fateQuestionToUpdate,
-                        new[] { "Interpretation" }
+                        new[]
+                        {
+                            "Interpretation"
+                        }
                     );
 
                     response.Success = true;
@@ -224,19 +236,31 @@ namespace MGME.Core.Services.SceneItemService
                         return response;
                     }
 
-                    // if (randomEventToUpdate.Interpretation != null)
-                    // {
-                    //     response.Success = false;
-                    //     response.Message = "This Random Event was already interpreted before";
+                    /*
+                    To avoid unnecessary complexity, the skipping of interpretation
+                    is not marked by any specific field, but by a string written into
+                    Interpretation field by a client
 
-                    //     return response;
-                    // }
+                    E.g., whenever user wants to skip interpretation, client must
+                    provide immutable string -- "Interpretation Skipped", effectively
+                    cancelling future updates and using said string for display purposes
+                    */
+                    if (randomEventToUpdate.Interpretation != null)
+                    {
+                        response.Success = false;
+                        response.Message = "Interpretation of this random event was either already provided or skipped";
+
+                        return response;
+                    }
 
                     randomEventToUpdate.Interpretation = updatedSceneItem.Interpretation;
 
                     await _randomEventRepository.UpdateEntityAsync(
                         randomEventToUpdate,
-                        new[] { "Interpretation" }
+                        new[]
+                        {
+                            "Interpretation"
+                        }
                     );
 
                     response.Success = true;
