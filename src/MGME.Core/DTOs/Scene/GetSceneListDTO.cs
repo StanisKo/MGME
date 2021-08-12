@@ -8,13 +8,13 @@ namespace MGME.Core.DTOs.Scene
     {
         public string Title { get; set; }
 
-        public SceneType Type { get; set; }
+        public SceneType? Type { get; set; }
 
         public string Setup { get; set; }
 
-        public string RandomEvent { get; set; }
-
         public string ModifiedSetup { get; set; }
+
+        public string RandomEvent { get; set; }
 
         public bool Resolved { get; set; }
 

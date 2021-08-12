@@ -12,6 +12,7 @@ using MGME.Core.DTOs;
 using MGME.Core.DTOs.Scene;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
+using MGME.Core.Utils;
 
 namespace MGME.Core.Services.SceneService
 {
@@ -43,7 +44,7 @@ namespace MGME.Core.Services.SceneService
             _mapper = mapper;
         }
 
-        public async Task <PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>>> GetScenes(int adventureId, int selectedPage)
+        public async Task <PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>>> GetAllScenes(int adventureId, int selectedPage)
         {
             PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>> response = new PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>>();
 
@@ -51,7 +52,46 @@ namespace MGME.Core.Services.SceneService
 
             try
             {
+                bool providedAdventureIdIsValid = await _adventureRepository.CheckIfEntityExistsAsync(
+                    adventure => adventure.Id == adventureId && adventure.UserId == userId
+                );
 
+                if (!providedAdventureIdIsValid)
+                {
+                    response.Success = false;
+                    response.Message = "Adventure with such id does not exist";
+
+                    return response;
+                }
+
+                // We don't need to check against user here, since we already check against adventure before
+                int numberOfResults = await _sceneRepository.GetEntitiesCountAsync(
+                    scene => scene.AdventureId == adventureId
+                );
+
+                IEnumerable<GetSceneListDTO> scenes = await _sceneRepository.GetEntititesAsync<GetSceneListDTO>(
+                    predicate: scene => scene.AdventureId == adventureId,
+                    select: scene => new GetSceneListDTO()
+                    {
+                        Id = scene.Id,
+                        Title = scene.Title,
+                        Type = scene.Type,
+                        Setup = scene.Setup,
+                        ModifiedSetup = scene.ModifiedSetup,
+                        RandomEvent = scene.RandomEvent,
+                        Resolved = scene.Resolved,
+                        CreatedAt = scene.CreatedAt
+                    },
+                    page: selectedPage
+                );
+
+                response.Data = scenes;
+
+                response.Pagination.Page = selectedPage;
+                response.Pagination.NumberOfResults = numberOfResults;
+                response.Pagination.NumberOfPages = DataAccessHelpers.GetNumberOfPages(numberOfResults);
+
+                response.Success = true;
             }
             catch (Exception exception)
             {

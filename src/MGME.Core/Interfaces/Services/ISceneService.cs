@@ -8,7 +8,7 @@ namespace MGME.Core.Interfaces.Services
 {
     public interface ISceneService
     {
-        Task<PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>>> GetScenes(int adventureId, int selectedPage);
+        Task<PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>>> GetAllScenes(int adventureId, int selectedPage);
 
         Task <BaseServiceResponse> AddScene(AddSceneDTO newScene);
 
