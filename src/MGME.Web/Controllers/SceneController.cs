@@ -1,7 +1,9 @@
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 using MGME.Core.DTOs;
 using MGME.Core.DTOs.Scene;
@@ -17,6 +19,22 @@ namespace MGME.Web.Controllers
         public SceneController(ISceneService sceneService)
         {
             _sceneService = sceneService;
+        }
+
+        [HttpGet]
+        public async Task <IActionResult> GetAllScenes([FromQuery, BindRequired] int adventureId, int? selectedPage)
+        {
+            PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>> response = await _sceneService.GetAllScenes(
+                adventureId,
+                selectedPage
+            );
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return BadRequest(response);
         }
 
         [HttpPost("Add")]

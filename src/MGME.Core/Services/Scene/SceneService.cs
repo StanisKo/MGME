@@ -44,7 +44,7 @@ namespace MGME.Core.Services.SceneService
             _mapper = mapper;
         }
 
-        public async Task <PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>>> GetAllScenes(int adventureId, int selectedPage)
+        public async Task <PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>>> GetAllScenes(int adventureId, int? selectedPage)
         {
             PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>> response = new PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>>();
 
@@ -82,7 +82,11 @@ namespace MGME.Core.Services.SceneService
                         Resolved = scene.Resolved,
                         CreatedAt = scene.CreatedAt
                     },
-                    page: selectedPage
+                    /*
+                    If page is not provided, we query the last page
+                    to return most recent scenes
+                    */
+                    page: selectedPage ?? (int)Math.Ceiling(numberOfResults / (double)DataAccessHelpers.PAGINATE_BY)
                 );
 
                 response.Data = scenes;
