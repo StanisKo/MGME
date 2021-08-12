@@ -69,6 +69,12 @@ namespace MGME.Core.Services.SceneService
                     scene => scene.AdventureId == adventureId
                 );
 
+                /*
+                If page is not provided, we query the last page
+                to return most recent scenes
+                */
+                selectedPage ??= (int)Math.Ceiling(numberOfResults / (double) DataAccessHelpers.PAGINATE_BY);
+
                 IEnumerable<GetSceneListDTO> scenes = await _sceneRepository.GetEntititesAsync<GetSceneListDTO>(
                     predicate: scene => scene.AdventureId == adventureId,
                     select: scene => new GetSceneListDTO()
@@ -82,11 +88,7 @@ namespace MGME.Core.Services.SceneService
                         Resolved = scene.Resolved,
                         CreatedAt = scene.CreatedAt
                     },
-                    /*
-                    If page is not provided, we query the last page
-                    to return most recent scenes
-                    */
-                    page: selectedPage ?? (int)Math.Ceiling(numberOfResults / (double)DataAccessHelpers.PAGINATE_BY)
+                    page: selectedPage
                 );
 
                 response.Data = scenes;
