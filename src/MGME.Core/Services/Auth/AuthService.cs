@@ -28,8 +28,6 @@ namespace MGME.Core.Services.AuthService
 {
     public class AuthService : BaseEntityService, IAuthService
     {
-        private readonly IAuthRepository _authRepository;
-
         private readonly IEntityRepository<User> _userRepository;
 
         private readonly IEntityRepository<RefreshToken> _tokenRepository;
@@ -46,8 +44,7 @@ namespace MGME.Core.Services.AuthService
 
         private readonly SymmetricSecurityKey _securityKey;
 
-        public AuthService(IAuthRepository authRepository,
-                           IEntityRepository<User> userRepository,
+        public AuthService(IEntityRepository<User> userRepository,
                            IEntityRepository<RefreshToken> tokenRepository,
                            IHashingService hashingService,
                            IMapper mapper,
@@ -55,7 +52,6 @@ namespace MGME.Core.Services.AuthService
                            IWebHostEnvironment environment,
                            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
-            _authRepository = authRepository;
             _userRepository = userRepository;
             _tokenRepository = tokenRepository;
 
@@ -78,10 +74,11 @@ namespace MGME.Core.Services.AuthService
         {
             BaseServiceResponse response = new();
 
-            // TODO: do away with auth repository and use entity repository
             try
             {
-                bool userNameIsTaken = await _authRepository.CheckIfUserExistsAsync(name, nameof(User.Name));
+                bool userNameIsTaken = await _userRepository.CheckIfEntityExistsAsync(
+                    user => String.Equals(user.Name.ToLower(), name.ToLower())
+                );
 
                 if (userNameIsTaken)
                 {
@@ -91,7 +88,9 @@ namespace MGME.Core.Services.AuthService
                     return response;
                 }
 
-                bool emailIsTaken = await _authRepository.CheckIfUserExistsAsync(email, nameof(User.Email));
+                bool emailIsTaken = await _userRepository.CheckIfEntityExistsAsync(
+                    user => String.Equals(user.Email.ToLower(), email.ToLower())
+                );
 
                 if (emailIsTaken)
                 {
