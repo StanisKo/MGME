@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
@@ -40,7 +39,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
 
             int userId = GetUserIdFromHttpContext();
 
-            bool weNeedAll = filter == (int)NonPlayerCharacterFilter.ALL;
+            bool weNeedAll = filter is (int)NonPlayerCharacterFilter.ALL;
 
             Expression<Func<NonPlayerCharacter, bool>> predicate = filter switch
             {
@@ -56,9 +55,8 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                 belong to other PlayerCharacters, neither take part in the Adventure
                 */
                 (int)NonPlayerCharacterFilter.AVAILABLE_FOR_PLAYER_CHARACTERS => nonPlayerCharacter
-                    => nonPlayerCharacter.UserId == userId
-                       && nonPlayerCharacter.PlayerCharacterId == null
-                       && nonPlayerCharacter.Adventures.Count == 0,
+                    => nonPlayerCharacter.UserId == userId && nonPlayerCharacter.PlayerCharacterId == null
+                        && nonPlayerCharacter.Adventures.Count == 0,
 
                 // Otherwise just filter on user
                 _ => nonPlayerCharacter => nonPlayerCharacter.UserId == userId
@@ -209,7 +207,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                     predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId
                 );
 
-                if (nonPlayerCharacterToUpdate == null)
+                if (nonPlayerCharacterToUpdate is null)
                 {
                     response.Success = false;
                     response.Message = "NPC doesn't exist";
@@ -217,38 +215,13 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                     return response;
                 }
 
-                /*
-                We avoid explicitly updating fields, since model can grow in the future and
-                at some point we might want to get rid of Name/Description check above and
-                let front end update variable number of fields
-
-                TODO: use generic method from base class
-                */
-                Type typeOfNonPlayerCharacter = nonPlayerCharacterToUpdate.GetType();
-
-                PropertyInfo[] updatedProperties = updatedNonPlayerCharacter.GetType().GetProperties();
-
-                List<string> propertiesToUpdate = new();
-
-                foreach (PropertyInfo updatedProperty in updatedProperties)
-                {
-                    if (updatedProperty.GetValue(updatedNonPlayerCharacter) == null || updatedProperty.Name == "Id")
-                    {
-                        continue;
-                    }
-
-                    PropertyInfo propertyToUpdate = typeOfNonPlayerCharacter.GetProperty(updatedProperty.Name);
-
-                    propertyToUpdate.SetValue(
-                        nonPlayerCharacterToUpdate,
-                        updatedProperty.GetValue(updatedNonPlayerCharacter)
-                    );
-
-                    propertiesToUpdate.Add(updatedProperty.Name);
-                }
+                (NonPlayerCharacter nonPlayerCharacterWithUpdates, List<string> propertiesToUpdate) = UpdateVariableNumberOfFields(
+                    nonPlayerCharacterToUpdate,
+                    updatedNonPlayerCharacter
+                );
 
                 await _repository.UpdateEntityAsync(
-                    nonPlayerCharacterToUpdate,
+                    nonPlayerCharacterWithUpdates,
                     propertiesToUpdate
                 );
 
