@@ -50,7 +50,7 @@ namespace MGME.Web.Controllers
         }
 
         [HttpPost("Add")]
-        public async Task <IActionResult> AddAventure(AddAdventureDTO newAdventure)
+        public async Task <IActionResult> AddAdventure(AddAdventureDTO newAdventure)
         {
             BaseServiceResponse response = await _adventureService.AddAdventure(newAdventure);
 

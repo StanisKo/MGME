@@ -7,7 +7,7 @@ namespace MGME.Core.Utils
     */
     public class Ref<TValue>
     {
-        public TValue Value { get; set; }
+        public TValue Value { get; }
 
         public Ref(TValue value)
         {

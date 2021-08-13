@@ -7,7 +7,6 @@ using MGME.Core.DTOs.User;
 using MGME.Core.Interfaces.Services;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Configuration;
 
 namespace MGME.Web.Controllers
 {
@@ -17,12 +16,9 @@ namespace MGME.Web.Controllers
 
         private readonly IUserService _userService;
 
-        private IConfiguration _configuration;
-
-        public UserController(IUserService userService, IConfiguration configuration)
+        public UserController(IUserService userService)
         {
             _userService = userService;
-            _configuration = configuration;
         }
 
         [HttpGet]
@@ -54,7 +50,7 @@ namespace MGME.Web.Controllers
         [HttpPut("Change-Password")]
         public async Task <IActionResult> ChangeUserPassword(ChangeUserPasswordDTO passwords)
         {
-            BaseServiceResponse response = await _userService.ChageUserPassword(passwords);
+            BaseServiceResponse response = await _userService.ChangeUserPassword(passwords);
 
             if (response.Success)
             {

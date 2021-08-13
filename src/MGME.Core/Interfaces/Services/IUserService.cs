@@ -11,7 +11,7 @@ namespace MGME.Core.Interfaces.Services
 
         Task <BaseServiceResponse> UpdateUser(GetOrUpdateUserDTO updatedUser);
 
-        Task <BaseServiceResponse> ChageUserPassword(ChangeUserPasswordDTO passwords);
+        Task <BaseServiceResponse> ChangeUserPassword(ChangeUserPasswordDTO passwords);
 
         Task <BaseServiceResponse> DeleteUser();
     }

@@ -14,9 +14,9 @@ namespace MGME.Web.Controllers
 {
     public class AuthController : BaseAPIController
     {
-        private IAuthService _authService;
+        private readonly IAuthService _authService;
 
-        private IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
         public AuthController(IAuthService authService, IConfiguration configuration)
         {
@@ -202,7 +202,7 @@ namespace MGME.Web.Controllers
             });
         }
 
-        // Instead of refresh token, we use simple flag to imitate sesssions
+        // Instead of refresh token, we use simple flag to imitate sessions
         private void AddSessionCookie()
         {
             // Secure = true is not needed, as this is not production project
