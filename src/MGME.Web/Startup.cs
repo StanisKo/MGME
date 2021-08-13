@@ -56,7 +56,7 @@ namespace MGME.Web
             // Database context: ../MGME.Infra/InfraStartup.cs
             services.AddDbContext(connectionStringBuilder.ConnectionString);
 
-            // Repositories used accross the application: ../MGME.Infra/InfraStartup.cs
+            // Repositories used across the application: ../MGME.Infra/InfraStartup.cs
             services.AddRepositories();
 
             // Business services used across the application: ../MGME.Core/CoreStartup.cs
