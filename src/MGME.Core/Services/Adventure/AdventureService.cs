@@ -133,7 +133,7 @@ namespace MGME.Core.Services.AdventureService
                     }
                 );
 
-                if (adventure == null)
+                if (adventure is null)
                 {
                     response.Success = false;
                     response.Message = "Adventure doesn't exist";
@@ -453,12 +453,12 @@ namespace MGME.Core.Services.AdventureService
             {
                 await _adventureRepository.DeleteEntitiesAsync(ids);
 
-                (char suffix, string verb) args = (
+                (char suffix, string verb) = (
                     ids.Count() > 1 ? ('s', "were") : ('\0', "was")
                 );
 
                 response.Success = true;
-                response.Message = $"Adventure{args.suffix} {args.verb} successfully deleted";
+                response.Message = $"Adventure{suffix} {verb} successfully deleted";
             }
             catch (Exception exception)
             {
