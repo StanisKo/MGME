@@ -5,7 +5,7 @@ using MGME.Core.Interfaces.Services;
 namespace MGME.Core.Services.RandomEventService
 {
     /*
-    We don't make it static to make it avialable via DI and make use of interfaces
+    We don't make it static to make it available via DI and make use of interfaces
     But register it as Singleton, so only one instance is created
     */
     public class RandomEventService : IRandomEventService
@@ -47,7 +47,7 @@ namespace MGME.Core.Services.RandomEventService
 
                 (> 92) and (<= 100) => "NPC positive",
 
-                >= 101 => throw new Exception("Unsuporrted roll value was provided")
+                >= 101 => throw new Exception("Unsupported roll value was provided")
             };
 
             return eventFocus;
@@ -70,7 +70,7 @@ namespace MGME.Core.Services.RandomEventService
 
             "Move", "Waste", "Truce", "Release", "Befriend", "Judge", "Desert", "Dominate", "Procrastinate",
 
-            "Praise", "Separate", "Take", "Break", "Heal", "Delay", "Stop", "Lie", "Return", "Immitate", "Struggle",
+            "Praise", "Separate", "Take", "Break", "Heal", "Delay", "Stop", "Lie", "Return", "Imitate", "Struggle",
 
             "Inform", "Bestow", "Postpone", "Expose", "Haggle", "Imprison", "Release", "Celebrate", "Develop",
 

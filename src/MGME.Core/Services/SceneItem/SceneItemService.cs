@@ -64,13 +64,13 @@ namespace MGME.Core.Services.SceneItemService
 
         public async Task <DataServiceResponse<IEnumerable<GetSceneItemListDTO>>> GetSceneItems(int sceneId)
         {
-            DataServiceResponse<IEnumerable<GetSceneItemListDTO>> response = new DataServiceResponse<IEnumerable<GetSceneItemListDTO>>();
+            DataServiceResponse<IEnumerable<GetSceneItemListDTO>> response = new();
 
             int userId = GetUserIdFromHttpContext();
 
             try
             {
-                IEnumerable<GetSceneItemListDTO> sceneItems = await _sceneItemRepository.GetEntititesAsync<GetSceneItemListDTO>(
+                IEnumerable<GetSceneItemListDTO> sceneItems = await _sceneItemRepository.GetEntititesAsync(
                     predicate: sceneItem => sceneItem.SceneId == sceneId && sceneItem.Scene.Adventure.UserId == userId,
                     include: new[]
                     {
@@ -120,7 +120,7 @@ namespace MGME.Core.Services.SceneItemService
 
         public async Task <BaseServiceResponse> AddSceneItem(AddSceneItemDTO newSceneItem)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -147,7 +147,7 @@ namespace MGME.Core.Services.SceneItemService
                     case SceneItemType.FATE_QUESTION:
 
                         // At this point, client must have provided a question, odds, and chaos factor
-                        if (newSceneItem.Question == null || newSceneItem.Odds == null || newSceneItem.ChaosFactor == null)
+                        if (newSceneItem.Question is null || newSceneItem.Odds is null || newSceneItem.ChaosFactor is null)
                         {
                             response.Success = false;
                             response.Message = "Question, odds, and chaos factor are all required to ask a fate question";
@@ -157,16 +157,16 @@ namespace MGME.Core.Services.SceneItemService
 
                         int rollResult = _rollingService.Roll1D100();
 
-                        (bool answer, bool exceptional) answer = _fateQuestionService.AnswerFateQuestion(
+                        (bool answer, bool exceptional) = _fateQuestionService.AnswerFateQuestion(
                             (int)newSceneItem.Odds, (int)newSceneItem.ChaosFactor, rollResult
                         );
 
-                        FateQuestion fateQuestionToAdd = new FateQuestion()
+                        FateQuestion fateQuestionToAdd = new()
                         {
                             SceneItemId = sceneItemToAdd.Id,
                             Question = newSceneItem.Question,
-                            Answer = answer.answer,
-                            Exceptional = answer.exceptional,
+                            Answer = answer,
+                            Exceptional = exceptional,
                             RollResult = rollResult
                         };
 
@@ -180,7 +180,7 @@ namespace MGME.Core.Services.SceneItemService
 
                         string randomEventDescription = _randomEventService.GenerateRandomEvent();
 
-                        RandomEvent randomEventToAdd = new RandomEvent()
+                        RandomEvent randomEventToAdd = new()
                         {
                             SceneItemId = sceneItemToAdd.Id,
                             Description = randomEventDescription
@@ -195,7 +195,7 @@ namespace MGME.Core.Services.SceneItemService
                     case SceneItemType.BATTLE:
 
                         // At this point, client must have provided outcome
-                        if (newSceneItem.Outcome == null)
+                        if (newSceneItem.Outcome is null)
                         {
                             response.Success = false;
                             response.Message = "Outcome is required to create a battle";
@@ -203,7 +203,7 @@ namespace MGME.Core.Services.SceneItemService
                             return response;
                         }
 
-                        Battle battleToAdd = new Battle()
+                        Battle battleToAdd = new()
                         {
                             SceneItemId = sceneItemToAdd.Id,
                             Outcome = newSceneItem.Outcome
@@ -214,9 +214,9 @@ namespace MGME.Core.Services.SceneItemService
                         response.Message = "Battle was successfully added";
 
                         break;
-                    
+
                     default:
-                        
+
                         break;
                 }
 
@@ -233,20 +233,20 @@ namespace MGME.Core.Services.SceneItemService
 
         public async Task <BaseServiceResponse> UpdateSceneItem(UpdateSceneItemDTO updatedSceneItem)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             int userId = GetUserIdFromHttpContext();
 
             try
             {
-                if (updatedSceneItem.Type == (int)SceneItemType.FATE_QUESTION)
+                if (updatedSceneItem.Type is (int)SceneItemType.FATE_QUESTION)
                 {
                     FateQuestion fateQuestionToUpdate = await _fateQuestionRepository.GetEntityAsync(
                         predicate: fateQuestion => fateQuestion.SceneItemId == updatedSceneItem.Id
                             && fateQuestion.SceneItem.Scene.Adventure.UserId == userId
                     );
 
-                    if (fateQuestionToUpdate == null)
+                    if (fateQuestionToUpdate is null)
                     {
                         response.Success = false;
                         response.Message = "Fate question with such id does not exist";
@@ -263,7 +263,7 @@ namespace MGME.Core.Services.SceneItemService
                     provide immutable string -- "Interpretation Skipped", effectively
                     cancelling future updates and using said string for display purposes
                     */
-                    if (fateQuestionToUpdate.Interpretation != null)
+                    if (fateQuestionToUpdate.Interpretation is not null)
                     {
                         response.Success = false;
                         response.Message = "Interpretation of this fate question was either already provided or skipped";
@@ -292,7 +292,7 @@ namespace MGME.Core.Services.SceneItemService
                             && randomEvent.SceneItem.Scene.Adventure.UserId == userId
                     );
 
-                    if (randomEventToUpdate == null)
+                    if (randomEventToUpdate is null)
                     {
                         response.Success = false;
                         response.Message = "Random Event with such id does not exist";
@@ -309,7 +309,7 @@ namespace MGME.Core.Services.SceneItemService
                     provide immutable string -- "Interpretation Skipped", effectively
                     cancelling future updates and using said string for display purposes
                     */
-                    if (randomEventToUpdate.Interpretation != null)
+                    if (randomEventToUpdate.Interpretation is not null)
                     {
                         response.Success = false;
                         response.Message = "Interpretation of this random event was either already provided or skipped";

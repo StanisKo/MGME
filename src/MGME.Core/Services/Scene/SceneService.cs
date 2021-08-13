@@ -46,7 +46,7 @@ namespace MGME.Core.Services.SceneService
 
         public async Task <PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>>> GetAllScenes(int adventureId, int? selectedPage)
         {
-            PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>> response = new PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>>();
+            PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>> response = new();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -75,7 +75,7 @@ namespace MGME.Core.Services.SceneService
                 */
                 selectedPage ??= (int)Math.Ceiling(numberOfResults / (double) DataAccessHelpers.PAGINATE_BY);
 
-                IEnumerable<GetSceneListDTO> scenes = await _sceneRepository.GetEntititesAsync<GetSceneListDTO>(
+                IEnumerable<GetSceneListDTO> scenes = await _sceneRepository.GetEntititesAsync(
                     predicate: scene => scene.AdventureId == adventureId,
                     select: scene => new GetSceneListDTO()
                     {
@@ -110,7 +110,7 @@ namespace MGME.Core.Services.SceneService
 
         public async Task <BaseServiceResponse> AddScene(AddSceneDTO newScene)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -133,13 +133,13 @@ namespace MGME.Core.Services.SceneService
                 );
 
                 // It's the first scene in adventure
-                if (scenesCount == 0)
+                if (scenesCount is 0)
                 {
                     Scene firstSceneToCreate = _mapper.Map<Scene>(newScene);
 
                     // If client requested random event to seed the first scene, reflect it in it's type
                     firstSceneToCreate.Type =
-                        firstSceneToCreate.RandomEvent != null ? SceneType.INTERRUPTED : SceneType.NORMAL;
+                        firstSceneToCreate.RandomEvent is not null ? SceneType.INTERRUPTED : SceneType.NORMAL;
 
                     await _sceneRepository.AddEntityAsync(firstSceneToCreate);
 
@@ -150,7 +150,7 @@ namespace MGME.Core.Services.SceneService
                 }
 
                 // If it's not the first scene, client must provide chaos factor
-                if (newScene.AdventureChaosFactor == null)
+                if (newScene.AdventureChaosFactor is null)
                 {
                     response.Success = false;
                     response.Message = "Chaos factor is required to create a scene";
@@ -160,7 +160,7 @@ namespace MGME.Core.Services.SceneService
 
                 bool sceneAlreadyExistsOrThereAreUnresolvedScenes = await _sceneRepository.CheckIfEntityExistsAsync(
                     scene => scene.AdventureId == newScene.AdventureId
-                        && (scene.Title.ToLower() == newScene.Title.ToLower() || !scene.Resolved)
+                        && (String.Equals(scene.Title.ToLower(), newScene.Title.ToLower()) || !scene.Resolved)
                 );
 
                 if (sceneAlreadyExistsOrThereAreUnresolvedScenes)
@@ -190,7 +190,7 @@ namespace MGME.Core.Services.SceneService
                 If scene is interrupted, we need to generate random event
                 That will serve as input for modifying scene setup
                 */
-                if (sceneToCreate.Type == SceneType.INTERRUPTED)
+                if (sceneToCreate.Type is SceneType.INTERRUPTED)
                 {
                     string randomEvent = _randomEventService.GenerateRandomEvent();
 
@@ -213,7 +213,7 @@ namespace MGME.Core.Services.SceneService
 
         public async Task <BaseServiceResponse> ResolveScene(ResolveSceneDTO sceneToResolve)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -236,7 +236,7 @@ namespace MGME.Core.Services.SceneService
                     predicate: scene => scene.AdventureId == sceneToResolve.AdventureId
                 );
 
-                if (resolvedScene == null)
+                if (resolvedScene is null)
                 {
                     response.Success = false;
                     response.Message = "Scene with such id does not exist";

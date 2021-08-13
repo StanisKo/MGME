@@ -78,6 +78,7 @@ namespace MGME.Core.Services.AuthService
         {
             BaseServiceResponse response = new();
 
+            // TODO: do away with auth repository and use entity repository
             try
             {
                 bool userNameIsTaken = await _authRepository.CheckIfUserExistsAsync(name, nameof(User.Name));
@@ -355,7 +356,7 @@ namespace MGME.Core.Services.AuthService
                         ValidateLifetime = true,
                         ClockSkew = TimeSpan.Zero
                     },
-                    out SecurityToken validatedToken
+                    out SecurityToken _
                 );
 
                 // Besides id, we only need one field ...
