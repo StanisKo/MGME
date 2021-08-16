@@ -93,8 +93,8 @@ namespace MGME.Core.Services.SceneService
                         Resolved = scene.Resolved,
                         CreatedAt = scene.CreatedAt
                     },
-                    // We always sort on timeptamp descending
-                    orderBy: _sorter.DetermineSorting("-created"),
+                    // We always sort on timestamp ascending
+                    orderBy: _sorter.DetermineSorting("created"),
                     page: selectedPage
                 );
 
