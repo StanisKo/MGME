@@ -211,15 +211,11 @@ namespace MGME.Infra.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("Focus")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Interpetation")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Meaning")
-                        .IsRequired()
+                    b.Property<string>("Interpretation")
                         .HasColumnType("text");
 
                     b.Property<int>("SceneItemId")
@@ -272,10 +268,10 @@ namespace MGME.Infra.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasDefaultValueSql("NOW()");
 
-                    b.Property<string>("InterruptEvent")
+                    b.Property<string>("ModifiedSetup")
                         .HasColumnType("text");
 
-                    b.Property<string>("ModifiedSetup")
+                    b.Property<string>("RandomEvent")
                         .HasColumnType("text");
 
                     b.Property<bool>("Resolved")

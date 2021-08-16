@@ -434,8 +434,11 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                                     </TableCell>
 
                                     <TableCell align="right">
-                                        {`${adventure.sceneCount > 1
-                                            ? `${adventure.sceneCount}` : 'No'} Scenes Yet`}
+                                        {
+                                            adventure.sceneCount === 0
+                                                ? 'No Scenes Yet'
+                                                : `${adventure.sceneCount} Scene${adventure.sceneCount > 1 ? 's' : ''}`
+                                        }
                                     </TableCell>
                                 </TableRow>
                             );

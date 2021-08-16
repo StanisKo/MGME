@@ -20,7 +20,7 @@ namespace MGME.Core.Utils.Sorters
             return base.DetermineSorting(sortingParameter, _playerCharacterSortingOptions);
         }
 
-        private Dictionary<string, List<Expression<Func<PlayerCharacter, object>>>> _playerCharacterSortingOptions = new()
+        private readonly Dictionary<string, List<Expression<Func<PlayerCharacter, object>>>> _playerCharacterSortingOptions = new()
         {
             {
                 "name", new()

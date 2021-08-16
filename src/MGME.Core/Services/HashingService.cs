@@ -9,30 +9,28 @@ namespace MGME.Core.Services
     {
         public void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            using (HMACSHA512 hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-            }
+            using HMACSHA512 hmac = new();
+
+            passwordSalt = hmac.Key;
+            passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
 
         public bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
-            using (HMACSHA512 hmac = new HMACSHA512(passwordSalt))
+            using HMACSHA512 hmac = new(passwordSalt);
+
+            byte[] computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+
+            // Compare hash with the hash from db byte-by-byte
+            for (int i = 0; i < computedHash.Length; i++)
             {
-                byte[] computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-                // Compare hash with the hash from db byte-by-byte
-                for (int i = 0; i < computedHash.Length; i++)
+                if (computedHash[i] != passwordHash[i])
                 {
-                    if (computedHash[i] != passwordHash[i])
-                    {
-                        return false;
-                    }
+                    return false;
                 }
-
-                return true;
             }
+
+            return true;
         }
     }
 }

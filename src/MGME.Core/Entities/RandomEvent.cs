@@ -6,12 +6,9 @@ namespace MGME.Core.Entities
     public class RandomEvent : BaseEntity
     {
         [Required]
-        public string Focus { get; set; }
+        public string Description { get; set; }
 
-        [Required]
-        public string Meaning { get; set; }
-
-        public string Interpetation { get; set; }
+        public string Interpretation { get; set; }
 
         [ForeignKey("SceneItem")]
         public int SceneItemId { get; set; }
