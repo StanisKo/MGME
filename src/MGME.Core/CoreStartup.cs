@@ -55,7 +55,10 @@ namespace MGME.Core
 
             services.AddScoped<ISceneService, SceneService>();
 
+            services.AddScoped<SceneSorter>();
+
             services.AddScoped<ISceneItemService, SceneItemService>();
+
 
             services.AddSingleton<IRollingService, RollingService>();
 

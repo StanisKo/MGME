@@ -22,11 +22,11 @@ namespace MGME.Web.Controllers
         }
 
         [HttpGet]
-        public async Task <IActionResult> GetAllScenes([FromQuery, BindRequired] int adventureId, int? selectedPage)
+        public async Task <IActionResult> GetAllScenes([FromQuery, BindRequired] int adventureId, int? page)
         {
             PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>> response = await _sceneService.GetAllScenes(
                 adventureId,
-                selectedPage
+                page
             );
 
             if (response.Success)

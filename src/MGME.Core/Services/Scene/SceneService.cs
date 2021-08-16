@@ -13,6 +13,7 @@ using MGME.Core.DTOs.Scene;
 using MGME.Core.Interfaces.Services;
 using MGME.Core.Interfaces.Repositories;
 using MGME.Core.Utils;
+using MGME.Core.Utils.Sorters;
 
 namespace MGME.Core.Services.SceneService
 {
@@ -28,11 +29,14 @@ namespace MGME.Core.Services.SceneService
 
         private readonly IMapper _mapper;
 
+        private readonly SceneSorter _sorter;
+
         public SceneService(IEntityRepository<Scene> repository,
                             IEntityRepository<Adventure> adventureRepository,
                             IRollingService rollingService,
                             IRandomEventService randomEventService,
                             IMapper mapper,
+                            SceneSorter sorter,
                             IHttpContextAccessor httpContextAccessor): base(httpContextAccessor)
         {
             _sceneRepository = repository;
@@ -42,6 +46,7 @@ namespace MGME.Core.Services.SceneService
             _randomEventService = randomEventService;
 
             _mapper = mapper;
+            _sorter = sorter;
         }
 
         public async Task <PaginatedDataServiceResponse<IEnumerable<GetSceneListDTO>>> GetAllScenes(int adventureId, int? selectedPage)
@@ -88,6 +93,8 @@ namespace MGME.Core.Services.SceneService
                         Resolved = scene.Resolved,
                         CreatedAt = scene.CreatedAt
                     },
+                    // We always sort on timeptamp descending
+                    orderBy: _sorter.DetermineSorting("-created"),
                     page: selectedPage
                 );
 
