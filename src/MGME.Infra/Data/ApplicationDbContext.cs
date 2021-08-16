@@ -100,7 +100,7 @@ namespace MGME.Infra.Data
 
             /*
             Threads are unique within the context of one PlayerCharacter
-            or one Adventure, but can repeat accross those entities
+            or one Adventure, but can repeat across those entities
             */
 
             modelBuilder.Entity<Thread>().HasIndex(

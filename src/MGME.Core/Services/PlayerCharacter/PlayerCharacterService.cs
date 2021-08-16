@@ -45,7 +45,7 @@ namespace MGME.Core.Services.PlayerCharacterService
 
         public async Task <PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>> GetAllPlayerCharacters(string sortingParameter, int? selectedPage)
         {
-            PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = new PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>>();
+            PaginatedDataServiceResponse<IEnumerable<GetPlayerCharacterListDTO>> response = new();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -54,7 +54,7 @@ namespace MGME.Core.Services.PlayerCharacterService
 
                 int? numberOfResults = null;
 
-                if (selectedPage != null)
+                if (selectedPage is not null)
                 {
                     numberOfResults = await _playerCharacterRepository.GetEntitiesCountAsync(
                         playerCharacter => playerCharacter.UserId == userId
@@ -64,12 +64,12 @@ namespace MGME.Core.Services.PlayerCharacterService
                 IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await QueryPlayerCharacters(
                     new Ref<int>(userId),
                     new Ref<string>(sortingParameter),
-                    selectedPage != null ? new Ref<int>((int)selectedPage) : null
+                    selectedPage is not null ? new Ref<int>((int)selectedPage) : null
                 );
 
                 response.Data = playerCharacters;
 
-                if (selectedPage != null)
+                if (selectedPage is not null)
                 {
                     response.Pagination.Page = selectedPage;
                     response.Pagination.NumberOfResults = numberOfResults;
@@ -89,13 +89,13 @@ namespace MGME.Core.Services.PlayerCharacterService
 
         public async Task <DataServiceResponse<GetPlayerCharacterDetailDTO>> GetPlayerCharacter(int id)
         {
-            DataServiceResponse<GetPlayerCharacterDetailDTO> response = new DataServiceResponse<GetPlayerCharacterDetailDTO>();
+            DataServiceResponse<GetPlayerCharacterDetailDTO> response = new();
 
             int userId = GetUserIdFromHttpContext();
 
             try
             {
-                GetPlayerCharacterDetailDTO playerCharacter = await _playerCharacterRepository.GetEntityAsync<GetPlayerCharacterDetailDTO>(
+                GetPlayerCharacterDetailDTO playerCharacter = await _playerCharacterRepository.GetEntityAsync(
                     id: id,
                     predicate: playerCharacter => playerCharacter.UserId == userId,
                     include: new[]
@@ -125,7 +125,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                     }
                 );
 
-                if (playerCharacter == null)
+                if (playerCharacter is null)
                 {
                     response.Success = false;
                     response.Message = "Character doesn't exist";
@@ -147,13 +147,13 @@ namespace MGME.Core.Services.PlayerCharacterService
 
         public async Task <BaseServiceResponse> AddPlayerCharacter(AddPlayerCharacterDTO newPlayerCharacter)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             bool thereAreNewNonPlayerCharactersToAdd = newPlayerCharacter.NewNonPlayerCharacters?.Any() == true;
 
-            bool thereAreExisitingNonPlayerCharactersToAdd = newPlayerCharacter.ExistingNonPlayerCharacters?.Any() == true;
+            bool thereAreExistingNonPlayerCharactersToAdd = newPlayerCharacter.ExistingNonPlayerCharacters?.Any() == true;
 
-            if (!thereAreNewNonPlayerCharactersToAdd && !thereAreExisitingNonPlayerCharactersToAdd)
+            if (!thereAreNewNonPlayerCharactersToAdd && !thereAreExistingNonPlayerCharactersToAdd)
             {
                 response.Success = false;
                 response.Message = "At least one new or existing NPC must be provided";
@@ -168,7 +168,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 // Check if player character with such name already exists for this user
                 bool playerCharacterExists = await _playerCharacterRepository.CheckIfEntityExistsAsync(
                     playerCharacter => playerCharacter.UserId == userId
-                        && playerCharacter.Name.ToLower() == newPlayerCharacter.Name.ToLower()
+                        && String.Equals(playerCharacter.Name.ToLower(), newPlayerCharacter.Name.ToLower())
                 );
 
                 if (playerCharacterExists)
@@ -179,7 +179,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                     return response;
                 }
 
-                List<NonPlayerCharacter> newNonPlayerCharactersToAdd = new List<NonPlayerCharacter>();
+                List<NonPlayerCharacter> newNonPlayerCharactersToAdd = new();
 
                 if (thereAreNewNonPlayerCharactersToAdd)
                 {
@@ -225,7 +225,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 ).ToList();
 
                 // Finally create and write character to db
-                PlayerCharacter characterToAdd = new PlayerCharacter()
+                PlayerCharacter characterToAdd = new()
                 {
                     Name = newPlayerCharacter.Name,
                     Description = newPlayerCharacter.Description,
@@ -246,7 +246,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                 meet conditions above, since we don't supply it to the client app,
                 but it never hurts to double check
                 */
-                if (thereAreExisitingNonPlayerCharactersToAdd)
+                if (thereAreExistingNonPlayerCharactersToAdd)
                 {
                     Expression<Func<NonPlayerCharacter, bool>> predicate =
                         nonPlayerCharacter => nonPlayerCharacter.UserId == userId
@@ -289,11 +289,11 @@ namespace MGME.Core.Services.PlayerCharacterService
 
         public async Task <BaseServiceResponse> UpdatePlayerCharacter(UpdatePlayerCharacterDTO updatedPlayerCharacter)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             int userId = GetUserIdFromHttpContext();
 
-            if (updatedPlayerCharacter.Name == null && updatedPlayerCharacter.Description == null)
+            if (updatedPlayerCharacter.Name is null && updatedPlayerCharacter.Description is null)
             {
                 response.Success = false;
                 response.Message = "To update character, either name or description must be provided";
@@ -313,7 +313,7 @@ namespace MGME.Core.Services.PlayerCharacterService
                     predicate: playerCharacter => playerCharacter.UserId == userId
                 );
 
-                if (playerCharacterToUpdate == null)
+                if (playerCharacterToUpdate is null)
                 {
                     response.Success = false;
                     response.Message = "Character doesn't exists";
@@ -321,13 +321,13 @@ namespace MGME.Core.Services.PlayerCharacterService
                     return response;
                 }
 
-                (PlayerCharacter playerCharacterWithUpdates, List<string> propertiesToUpdate) = UpdateVariableNumberOfFields<PlayerCharacter>(
+                (PlayerCharacter playerCharacterWithUpdates, List<string> propertiesToUpdate) = UpdateVariableNumberOfFields(
                     playerCharacterToUpdate,
                     updatedPlayerCharacter
                 );
 
                 await _playerCharacterRepository.UpdateEntityAsync(
-                    playerCharacterToUpdate,
+                    playerCharacterWithUpdates,
                     propertiesToUpdate
                 );
 
@@ -345,20 +345,18 @@ namespace MGME.Core.Services.PlayerCharacterService
 
         public async Task <BaseServiceResponse> DeletePlayerCharacters(IEnumerable<int> ids)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
-
-            int userId = GetUserIdFromHttpContext();
+            BaseServiceResponse response = new();
 
             try
             {
                 await _playerCharacterRepository.DeleteEntitiesAsync(ids);
 
-                (char suffix, string verb) args = (
+                (char suffix, string verb) = (
                     ids.Count() > 1 ? ('s', "were") : ('\0', "was")
                 );
 
                 response.Success = true;
-                response.Message = $"Character{args.suffix} {args.verb} successfully deleted";
+                response.Message = $"Character{suffix} {verb} successfully deleted";
             }
             catch (Exception exception)
             {
@@ -371,7 +369,7 @@ namespace MGME.Core.Services.PlayerCharacterService
 
         public async Task <BaseServiceResponse> AddToPlayerCharacter(AddToPlayerCharacterDTO ids)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -395,9 +393,15 @@ namespace MGME.Core.Services.PlayerCharacterService
                     return response;
                 }
 
+                /*
+                We query only those, that don't have adventure and use their count and count of provided ids
+                to deduce a possible error -- weather some of the NonPlayerCharacters by provided ids already
+                take part in an Adventure; and in such, save a join on Adventure
+                */
                 IEnumerable<NonPlayerCharacter> nonPlayerCharactersToAdd = await _nonPlayerCharacterRepository.GetEntititesAsync(
                     predicate: nonPlayerCharacter => nonPlayerCharacter.UserId == userId
                         && ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id)
+                            && nonPlayerCharacter.Adventures.Count == 0
                 );
 
                 IEnumerable<int> matches = playerCharacterToAddTo.NonPlayerCharacters.Select(
@@ -421,13 +425,25 @@ namespace MGME.Core.Services.PlayerCharacterService
                 }
 
                 bool nonPlayerCharacterAlreadyTaken = nonPlayerCharactersToAdd.Any(
-                    nonPlayerCharacter => nonPlayerCharacter.PlayerCharacterId != null
+                    nonPlayerCharacter => nonPlayerCharacter.PlayerCharacterId is not null
                 );
 
                 if (nonPlayerCharacterAlreadyTaken)
                 {
                     response.Success = false;
                     response.Message = "One of the NPCs already belongs to another Character";
+
+                    return response;
+                }
+
+                // If potential error, there will always be less queried NonPlayerCharacters
+                bool nonPlayerCharacterAlreadyTakesPartInAdventure =
+                    nonPlayerCharactersToAdd.Count() != ids.NonPlayerCharacters.Count();
+
+                if (nonPlayerCharacterAlreadyTakesPartInAdventure)
+                {
+                    response.Success = false;
+                    response.Message = "One of the NPCs already takes part in Adventure and cannot be added to a Character";
 
                     return response;
                 }
@@ -445,12 +461,12 @@ namespace MGME.Core.Services.PlayerCharacterService
                     "NonPlayerCharacters"
                 );
 
-                (char suffix, string verb) args = (
+                (char suffix, string verb) = (
                     nonPlayerCharactersToAdd.Count() > 1 ? ('s', "were") : ('\0', "was")
                 );
 
                 response.Success = true;
-                response.Message = $"NPC{args.suffix} {args.verb} successfully added";
+                response.Message = $"NPC{suffix} {verb} successfully added";
 
             }
             catch (Exception exception)
@@ -470,7 +486,7 @@ namespace MGME.Core.Services.PlayerCharacterService
 
             Therefore, we can avoid querying unnecessary data, as we only need names and ids
             */
-            IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync<GetPlayerCharacterListDTO>(
+            IEnumerable<GetPlayerCharacterListDTO> playerCharacters = await _playerCharacterRepository.GetEntititesAsync(
                 predicate: playerCharacter => playerCharacter.UserId == userId.Value,
                 include: selectedPage != null ? new[]
                 {
@@ -489,9 +505,9 @@ namespace MGME.Core.Services.PlayerCharacterService
                             Id = thread.Id,
                             Name = thread.Name
                         }
-                    ).Where(
+                    ).FirstOrDefault(
                         thread => playerCharacter.Threads.Count == 1
-                    ).FirstOrDefault() : null,
+                    ) : null,
 
                     ThreadCount = selectedPage != null ? playerCharacter.Threads.Count : null,
 
@@ -501,9 +517,9 @@ namespace MGME.Core.Services.PlayerCharacterService
                             Id = adventure.Id,
                             Title = adventure.Title
                         }
-                    ).Where(
+                    ).FirstOrDefault(
                         adventure => playerCharacter.Adventures.Count == 1
-                    ).FirstOrDefault() : null,
+                    ) : null,
 
                     AdventureCount = selectedPage != null ? playerCharacter.Adventures.Count : null,
 
@@ -513,14 +529,14 @@ namespace MGME.Core.Services.PlayerCharacterService
                             Id = nonPlayerCharacter.Id,
                             Name = nonPlayerCharacter.Name
                         }
-                    ).Where(
+                    ).FirstOrDefault(
                         nonPlayerCharacter => playerCharacter.NonPlayerCharacters.Count == 1
-                    ).FirstOrDefault() : null,
+                    ) : null,
 
                     NonPlayerCharacterCount = selectedPage != null ? playerCharacter.NonPlayerCharacters.Count : null
                 } ,
                 orderBy: _sorter.DetermineSorting(sortingParameter.Value),
-                page: selectedPage?.Value ?? null
+                page: selectedPage?.Value
             );
 
             return playerCharacters;

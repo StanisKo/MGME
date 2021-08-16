@@ -34,7 +34,7 @@ namespace MGME.Core.Services.UserService
 
         public async Task <DataServiceResponse<GetOrUpdateUserDTO>> GetUser()
         {
-            DataServiceResponse<GetOrUpdateUserDTO> response = new DataServiceResponse<GetOrUpdateUserDTO>();
+            DataServiceResponse<GetOrUpdateUserDTO> response = new();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -50,7 +50,7 @@ namespace MGME.Core.Services.UserService
                     }
                 );
 
-                if (user == null)
+                if (user is null)
                 {
                     response.Success = false;
                     response.Message = "User not found";
@@ -72,7 +72,7 @@ namespace MGME.Core.Services.UserService
 
         public async Task <BaseServiceResponse> UpdateUser(GetOrUpdateUserDTO updatedUser)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -88,7 +88,7 @@ namespace MGME.Core.Services.UserService
                     }
                 );
 
-                if (userToUpdate == null)
+                if (userToUpdate is null)
                 {
                     response.Success = false;
                     response.Message = "User does not exist";
@@ -96,7 +96,7 @@ namespace MGME.Core.Services.UserService
                     return response;
                 }
 
-                (GetOrUpdateUserDTO userWithUpdates, List<string> propertiesToUpdate) = UpdateVariableNumberOfFields<GetOrUpdateUserDTO>(
+                (GetOrUpdateUserDTO userWithUpdates, List<string> propertiesToUpdate) = UpdateVariableNumberOfFields(
                     userToUpdate,
                     updatedUser
                 );
@@ -107,7 +107,7 @@ namespace MGME.Core.Services.UserService
                 );
 
                 response.Success = true;
-                response.Message = $"User was successfully updated";
+                response.Message = "User was successfully updated";
             }
             catch (Exception exception)
             {
@@ -118,9 +118,9 @@ namespace MGME.Core.Services.UserService
             return response;
         }
 
-        public async Task <BaseServiceResponse> ChageUserPassword(ChangeUserPasswordDTO passwords)
+        public async Task <BaseServiceResponse> ChangeUserPassword(ChangeUserPasswordDTO passwords)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -136,7 +136,7 @@ namespace MGME.Core.Services.UserService
                     }
                 );
 
-                if (userToChangePassword == null)
+                if (userToChangePassword is null)
                 {
                     response.Success = false;
                     response.Message = "User does not exist";
@@ -169,7 +169,11 @@ namespace MGME.Core.Services.UserService
 
                 await _repository.UpdateEntityAsync(
                     _mapper.Map<User>(userToChangePassword),
-                    new[] { nameof(User.PasswordHash), nameof(User.PasswordSalt) }
+                    new[]
+                    {
+                        "PasswordHash",
+                        "PasswordSalt"
+                    }
                 );
 
                 response.Success = true;
@@ -186,7 +190,7 @@ namespace MGME.Core.Services.UserService
 
         public async Task <BaseServiceResponse> DeleteUser()
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -194,7 +198,7 @@ namespace MGME.Core.Services.UserService
             {
                 User userToDelete = await _repository.GetEntityAsync(userId);
 
-                if (userToDelete == null)
+                if (userToDelete is null)
                 {
                     response.Success = false;
                     response.Message = "User does not exist";

@@ -3,7 +3,7 @@ using System.IO;
 
 // Thank you: https://dusted.codes/dotenv-in-dotnet
 
-namespace MGME.Web
+namespace MGME.Web.Utils
 {
     public static class DotEnv
     {

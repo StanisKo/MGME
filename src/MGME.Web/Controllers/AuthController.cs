@@ -14,9 +14,9 @@ namespace MGME.Web.Controllers
 {
     public class AuthController : BaseAPIController
     {
-        private IAuthService _authService;
+        private readonly IAuthService _authService;
 
-        private IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
         public AuthController(IAuthService authService, IConfiguration configuration)
         {
@@ -192,23 +192,23 @@ namespace MGME.Web.Controllers
         */
         private void WriteRefreshTokenToCookie(string token)
         {
+            // Secure = true is not needed, as this is not production project
             Response.Cookies.Append("refreshToken", token, new CookieOptions()
             {
                 HttpOnly = true,
-                Secure = true,
                 Expires = DateTime.UtcNow.AddHours(
                     Convert.ToInt32(_configuration["TokensLifetime:RefreshTokenHours"])
                 )
             });
         }
 
-        // Instead of refresh token, we use simple flag to imitate sesssions
+        // Instead of refresh token, we use simple flag to imitate sessions
         private void AddSessionCookie()
         {
+            // Secure = true is not needed, as this is not production project
             Response.Cookies.Append("sessionIsActive", true.ToString(), new CookieOptions()
             {
                 HttpOnly = true,
-                Secure = true,
                 Expires = DateTime.UtcNow.AddHours(
                     Convert.ToInt32(_configuration["TokensLifetime:RefreshTokenHours"])
                 )

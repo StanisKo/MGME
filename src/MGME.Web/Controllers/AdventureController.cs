@@ -36,8 +36,21 @@ namespace MGME.Web.Controllers
             return BadRequest(response);
         }
 
+        [HttpGet("{id}")]
+        public async Task <IActionResult> GetAdventure(int id)
+        {
+            DataServiceResponse<GetAdventureDetailDTO> response = await _adventureService.GetAdventure(id);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
+
         [HttpPost("Add")]
-        public async Task <IActionResult> AddAventure(AddAdventureDTO newAdventure)
+        public async Task <IActionResult> AddAdventure(AddAdventureDTO newAdventure)
         {
             BaseServiceResponse response = await _adventureService.AddAdventure(newAdventure);
 

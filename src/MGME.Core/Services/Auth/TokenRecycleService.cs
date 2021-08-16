@@ -14,7 +14,7 @@ using MGME.Core.Interfaces.Repositories;
 
 namespace MGME.Core.Services.AuthService
 {
-    public class TokenRecycleService : IHostedService, IDisposable
+    public sealed class TokenRecycleService : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
 
@@ -24,7 +24,8 @@ namespace MGME.Core.Services.AuthService
 
         private Timer _timer;
 
-        private int _numberOfDbRuns = 0;
+        private int _numberOfDbRuns;
+
         private const int _MAX_DB_RUNS = 1;
 
         public TokenRecycleService(ILogger<TokenRecycleService> logger,
@@ -45,8 +46,20 @@ namespace MGME.Core.Services.AuthService
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            int interval = (int)TimeSpan.FromHours(
-                Convert.ToInt32(_configuration["TokensLifetime:RefreshTokenHours"])
+            /*
+            We use access token lifetime as interval for recycling refresh tokens
+            To clean tokens as often as possible and avoid possible loopholes:
+
+            E.g.: application starts, hosted service does it's job, user logs in
+            4 hours into runtime. If recycling interval is set to lifetime of refresh
+            token (8hr), then script will run halfway into user's session and won't recycle anything.
+
+            Session will end 4 hours after than point, but the script will be 4 hours away from next run,
+            effectively leaving already expired refreshToken sitting in the database intact; give or take
+            any number of hours within session time
+            */
+            int interval = (int)TimeSpan.FromMinutes(
+                Convert.ToInt32(_configuration["TokensLifetime:AccessTokenMinutes"])
             ).TotalMilliseconds;
 
             _timer = new Timer(RecycleExpiredTokens, null, 0, interval);

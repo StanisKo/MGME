@@ -406,7 +406,7 @@ export const CreateAdventureModal = (
 
             if (!availableNonPlayerCharacters) {
                 const availableNonPlayerCharacters = await fetchAvailableNonPlayerCharacters(
-                    NON_PLAYER_CHARACTER_FILTER.AVAILABLE_FOR_PLAYER_CHARACTERS
+                    NON_PLAYER_CHARACTER_FILTER.AVAILABLE_FOR_ADVENTURES
                 );
 
                 setAvailableNonPlayerCharacters(availableNonPlayerCharacters.data);
