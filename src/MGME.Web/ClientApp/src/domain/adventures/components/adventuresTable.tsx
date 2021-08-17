@@ -9,7 +9,7 @@ import { fetchAdventures } from '../requests';
 
 import { HeadCell, Pagination } from '../../../shared/interfaces';
 import { SortOrder, TABLE_DISPLAY_MODE } from '../../../shared/const';
-import { isSelected } from '../../../shared/helpers';
+import { isSelected, redirectToEntity } from '../../../shared/helpers';
 
 import {
     Table,
@@ -385,23 +385,24 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                             return (
                                 <TableRow
                                     hover
-                                    onClick={handleSelect(adventure.id)}
-                                    role="checkbox"
                                     aria-checked={isItemSelected}
                                     tabIndex={-1}
                                     key={adventure.title}
                                     selected={isItemSelected}
+                                    onClick={redirectToEntity('adventure', adventure.id)}
                                 >
                                     <TableCell padding="checkbox">
                                         {mode === TABLE_DISPLAY_MODE.TO_SHOW ? (
                                             <Checkbox
                                                 checked={isItemSelected}
                                                 inputProps={{ 'aria-labelledby': labelId }}
+                                                onClick={handleSelect(adventure.id)}
                                             />
                                         ) : (
                                             <Radio
                                                 checked={isItemSelected}
                                                 inputProps={{ 'aria-labelledby': labelId }}
+                                                onClick={handleSelect(adventure.id)}
                                             />
                                         )}
                                     </TableCell>
