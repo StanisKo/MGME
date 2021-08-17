@@ -22,3 +22,12 @@ export interface Adventure extends BaseEntity {
     sceneCount: number;
     createdAt: string;
 }
+
+export interface AdventureDetail extends BaseEntity {
+    title: string;
+    context: string;
+    chaosFactor: number;
+    playerCharacters: RelatedPlayerCharacter[];
+    nonPlayerCharacter: RelatedNonPlayerCharacter[];
+    threads: RelatedThread[];
+}

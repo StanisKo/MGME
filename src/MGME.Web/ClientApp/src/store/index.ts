@@ -4,6 +4,7 @@ import { AuthState, AuthReducer } from './reducers/auth';
 import { UserState, UserReducer } from './reducers/user';
 import { CataloguesState, CataloguesReducer } from './reducers/catalogues';
 import { AdventuresState, AdventuresReducer } from './reducers/adventures';
+import { SingleAdventureState, SingleAdventureReducer } from './reducers/singleAdventure';
 
 import { UpdateStore, LoginUser, UpdateToken, LogoutUser } from './actionTypes';
 
@@ -13,6 +14,7 @@ interface ApplicationState {
     user: UserState | undefined;
     catalogues: CataloguesState | undefined;
     adventures: AdventuresState | undefined;
+    singleAdventure: SingleAdventureState | undefined;
 }
 
 // Config
@@ -21,7 +23,8 @@ const configureStore = (initialState?: ApplicationState): Store => {
         auth: AuthReducer,
         user: UserReducer,
         catalogues: CataloguesReducer,
-        adventures: AdventuresReducer
+        adventures: AdventuresReducer,
+        singleAdventure: SingleAdventureReducer
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

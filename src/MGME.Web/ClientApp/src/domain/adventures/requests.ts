@@ -1,7 +1,8 @@
-import { Adventure } from './interfaces';
+import { Adventure, AdventureDetail } from './interfaces';
 
 import {
     BaseServiceResponse,
+    DataServiceResponse,
     NewEntityToAdd,
     PaginatedDataServiceResponse,
     ReadFromApi
@@ -90,6 +91,17 @@ export const deleteAdventures = async (ids: number[]): Promise<BaseServiceRespon
             body: { ids: ids },
             page: 'adventures',
             keys: ['dataset']
+        }
+    );
+};
+
+export const fetchAdventure = async (id: number): Promise<void> => {
+
+    await DataController.FetchAndSave<DataServiceResponse<AdventureDetail>>(
+        {
+            url: URLBuilder.ReadFrom(`adventure/${id}`),
+            page: 'singleAdventure',
+            key: 'adventureData'
         }
     );
 };
