@@ -6,5 +6,6 @@ export const ROUTES = {
     CONFIRM_EMAIL: `${root}confirm-email`,
     CATALOGUES: `${root}catalogues`,
     ADVENTURES: `${root}adventures`,
-    USER_PROFILE: `${root}profile`
+    USER_PROFILE: `${root}profile`,
+    ADVENTURE_DETAIL: `${root}adventure/:id`
 };

@@ -17,7 +17,9 @@ import { Login, ConfirmEmail } from './domain/auth';
 import { UserProfile } from './domain/user';
 
 import { Catalogues } from './domain/catalogues';
+
 import { Adventures } from './domain/adventures';
+import { AdventureDetail } from './domain/adventures/components';
 
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
 
@@ -159,6 +161,8 @@ export const Application = (): ReactElement => {
                         <PrivateRoute component={Catalogues} path={ROUTES.CATALOGUES} />
 
                         <PrivateRoute component={Adventures} path={ROUTES.ADVENTURES} />
+
+                        <PrivateRoute component={AdventureDetail} path={ROUTES.ADVENTURE_DETAIL} />
                     </Switch>
                 </Router>
             </ThemeProvider>
