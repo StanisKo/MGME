@@ -39,7 +39,7 @@ export const SingleAdventureReducer: Reducer<SingleAdventureState> = (
                     ...state[key as keyof SingleAdventureState],
 
                     // Add/update things in THIS key
-                    ...payload
+                    ...payload.data
                 }
             };
 

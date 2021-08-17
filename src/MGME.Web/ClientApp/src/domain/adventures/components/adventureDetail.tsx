@@ -11,7 +11,8 @@ import { parseIDFromURL } from '../../../shared/helpers';
 
 import { LinearProgress } from '@material-ui/core';
 
-export const SingleAdventure = (): ReactElement => {
+// TODO: rename single adventure into adventure detail; think of naming
+export const AdventureDetailPage = (): ReactElement => {
     const isAuthorized: boolean = useSelector(
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
     );
@@ -31,6 +32,6 @@ export const SingleAdventure = (): ReactElement => {
     }, [isAuthorized]);
 
     return adventure !== null ? (
-        <div>{}</div>
+        <div>{adventure.title}</div>
     ) : <LinearProgress />;
 };
