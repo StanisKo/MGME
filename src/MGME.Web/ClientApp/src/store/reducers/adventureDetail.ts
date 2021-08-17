@@ -6,21 +6,21 @@ import { DataServiceResponse } from '../../shared/interfaces';
 
 import { UpdateStore } from '..';
 
-export interface SingleAdventureState {
+export interface AdventureDetailState {
     adventureData: AdventureDetail;
 }
 
-export const SingleAdventureReducer: Reducer<SingleAdventureState> = (
-    state: SingleAdventureState | undefined, incomingAction: Action): SingleAdventureState => {
+export const AdventureDetailReducer: Reducer<AdventureDetailState> = (
+    state: AdventureDetailState | undefined, incomingAction: Action): AdventureDetailState => {
 
     if (state === undefined) {
-        return {} as SingleAdventureState;
+        return {} as AdventureDetailState;
     }
 
     const { type, reducer, key, payload } =
         incomingAction as UpdateStore<DataServiceResponse<AdventureDetail>>;
 
-    if (reducer !== 'singleAdventure') {
+    if (reducer !== 'adventureDetail') {
         return state;
     }
 
@@ -36,7 +36,7 @@ export const SingleAdventureReducer: Reducer<SingleAdventureState> = (
                 [key]: {
 
                     // Retain previous state of THIS key
-                    ...state[key as keyof SingleAdventureState],
+                    ...state[key as keyof AdventureDetailState],
 
                     // Add/update things in THIS key
                     ...payload.data

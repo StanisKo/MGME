@@ -18,7 +18,7 @@ export const AdventureDetailPage = (): ReactElement => {
     );
 
     const adventure: AdventureDetail | null = useSelector(
-        (store: ApplicationState) => store.singleAdventure?.adventureData ?? null
+        (store: ApplicationState) => store.adventureDetail?.adventureData ?? null
     );
 
     useEffect(() => {

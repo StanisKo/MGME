@@ -100,7 +100,7 @@ export const fetchAdventure = async (id: number): Promise<void> => {
     await DataController.FetchAndSave<DataServiceResponse<AdventureDetail>>(
         {
             url: URLBuilder.ReadFrom(`adventure/${id}`),
-            page: 'singleAdventure',
+            page: 'adventureDetail',
             key: 'adventureData'
         }
     );
