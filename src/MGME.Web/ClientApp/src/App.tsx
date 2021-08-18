@@ -18,8 +18,8 @@ import { UserProfile } from './domain/user';
 
 import { Catalogues } from './domain/catalogues';
 
-import { Adventures } from './domain/adventures';
-import { AdventureDetailPage } from './domain/adventures/components';
+import { Adventures } from './domain/adventure';
+import { AdventureDetailPage } from './domain/adventure/components';
 
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
 

@@ -1,13 +1,20 @@
 import { Action, Reducer } from 'redux';
 
-import { AdventureDetail } from '../../domain/adventures/interfaces';
+import { AdventureDetail } from '../../domain/adventure/interfaces';
+import { Scene } from '../../domain/scene/interfaces';
 
-import { DataServiceResponse } from '../../shared/interfaces';
+import { DataServiceResponse, Pagination } from '../../shared/interfaces';
 
 import { UpdateStore } from '..';
 
 export interface AdventureDetailState {
-    adventureData: AdventureDetail;
+    adventureData: AdventureDetail,
+
+    scenes: {
+        data: Scene[],
+        pagination: Pagination,
+        selected: number
+    }
 }
 
 export const AdventureDetailReducer: Reducer<AdventureDetailState> = (

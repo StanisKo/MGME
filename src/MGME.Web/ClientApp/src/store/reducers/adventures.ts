@@ -1,6 +1,6 @@
 import { Action, Reducer } from 'redux';
 
-import { Adventure } from '../../domain/adventures/interfaces';
+import { Adventure } from '../../domain/adventure/interfaces';
 
 import { PaginatedDataServiceResponse, Pagination } from '../../shared/interfaces';
 

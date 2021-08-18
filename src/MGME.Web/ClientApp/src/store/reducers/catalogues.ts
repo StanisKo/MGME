@@ -2,7 +2,7 @@ import { Action, Reducer } from 'redux';
 
 import { PlayerCharacter } from '../../domain/playerCharacter/interfaces';
 import { NonPlayerCharacter } from '../../domain/nonPlayerCharacter/interfaces';
-import { Adventure } from '../../domain/adventures/interfaces';
+import { Adventure } from '../../domain/adventure/interfaces';
 
 import { PaginatedDataServiceResponse, Pagination } from '../../shared/interfaces';
 

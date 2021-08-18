@@ -2,7 +2,7 @@ import { BaseEntity } from '../../shared/interfaces';
 
 import { RelatedNonPlayerCharacter } from '../nonPlayerCharacter/interfaces';
 
-import { RelatedAdventure } from '../adventures/interfaces';
+import { RelatedAdventure } from '../adventure/interfaces';
 
 import { RelatedThread } from '../threads/interfaces';
 

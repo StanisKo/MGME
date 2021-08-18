@@ -7,11 +7,12 @@ import { AdventureDetail } from '../interfaces';
 
 import { fetchAdventure } from '../requests';
 
+import { fetchScenes } from '../../scene/requests';
+
 import { parseIDFromURL } from '../../../shared/helpers';
 
 import { LinearProgress } from '@material-ui/core';
 
-// TODO: rename single adventure into adventure detail; think of naming
 export const AdventureDetailPage = (): ReactElement => {
     const isAuthorized: boolean = useSelector(
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
@@ -27,6 +28,8 @@ export const AdventureDetailPage = (): ReactElement => {
 
             if (isAuthorized) {
                 await fetchAdventure(adventureId);
+
+                await fetchScenes(adventureId);
             }
         })();
     }, [isAuthorized]);

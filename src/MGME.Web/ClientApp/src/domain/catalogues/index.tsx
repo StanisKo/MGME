@@ -11,8 +11,8 @@ import { deletePlayerCharacters, addToPlayerCharacter } from '../playerCharacter
 import { NonPlayerCharactersTable, CreateNonPlayerCharacterModal } from '../nonPlayerCharacter/components';
 import { deleteNonPlayerCharacters } from '../nonPlayerCharacter/requests';
 
-import { AdventuresTable } from '../adventures/components';
-import { addToAdventure } from '../adventures/requests';
+import { AdventuresTable } from '../adventure/components';
+import { addToAdventure } from '../adventure/requests';
 
 import {
     Paper,

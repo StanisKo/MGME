@@ -22,3 +22,9 @@ export enum TABLE_DISPLAY_MODE {
     TO_SHOW = 0,
     TO_ADD_TO = 1
 }
+
+export enum SceneType {
+    NORMAL = 0,
+    ALTERED = 1,
+    INTERRUPTED = 2
+}
