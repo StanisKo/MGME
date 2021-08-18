@@ -49,6 +49,9 @@ const useStyles = makeStyles((theme: Theme) =>
         noEntities: {
             fontSize: '18px',
             color: '#808080'
+        },
+        clickable: {
+            cursor: 'pointer'
         }
     })
 );
@@ -313,7 +316,7 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPlayerCharacters, selectedNonPlayerCharacters]);
 
-    const { root, visuallyHidden, noEntities } = useStyles();
+    const { root, visuallyHidden, noEntities, clickable } = useStyles();
 
     return (
         mode === TABLE_DISPLAY_MODE.TO_SHOW
@@ -390,6 +393,7 @@ export const AdventuresTable = ({ mode }: AdventureTableProps): ReactElement => 
                                     key={adventure.title}
                                     selected={isItemSelected}
                                     onClick={redirectToEntity('adventure', adventure.id)}
+                                    className={clickable}
                                 >
                                     <TableCell padding="checkbox">
                                         {mode === TABLE_DISPLAY_MODE.TO_SHOW ? (

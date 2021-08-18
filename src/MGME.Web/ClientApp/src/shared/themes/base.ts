@@ -41,6 +41,11 @@ export const base = createTheme({
             root: {
                 borderBottom: '1px solid transparent'
             }
+        },
+        MuiTypography: {
+            root: {
+                color: '#505050'
+            }
         }
     }
 });
