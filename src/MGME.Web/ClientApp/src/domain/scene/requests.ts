@@ -4,7 +4,7 @@ import { PaginatedDataServiceResponse, ReadFromApi } from '../../shared/interfac
 
 import { URLBuilder, DataController } from '../../shared/utils';
 
-export const fetchScenes = async (adventureId: number, page?: string): Promise<void> => {
+export const fetchScenes = async (adventureId: number, page?: number): Promise<void> => {
     const params: ReadFromApi['params'] = {
         adventureId: adventureId
     };

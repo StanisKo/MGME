@@ -16,7 +16,6 @@ import {
     Paper,
     Grid,
     Typography,
-    Tooltip,
     AppBar,
     Toolbar,
     CircularProgress
@@ -36,6 +35,9 @@ const useStyles = makeStyles((theme: Theme) =>
         withTooltip: {
             cursor: 'pointer'
         },
+        main: {
+            // minHeight: '25vh'
+        },
         appBar: {
             backgroundColor: 'transparent',
             boxShadow: '0 0 0 0',
@@ -48,7 +50,6 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
-// Description should be accordion, not tooltip
 // Controlling buttons should have tooltips
 export const AdventureDetailPage = (): ReactElement => {
     const isAuthorized: boolean = useSelector(
@@ -63,7 +64,7 @@ export const AdventureDetailPage = (): ReactElement => {
         (store: ApplicationState) => store.adventureDetail?.scenes?.data ?? null
     );
 
-    const { centered, withTooltip, appBar, toolBar } = useStyles();
+    const { centered, main, appBar, toolBar } = useStyles();
 
     useEffect(() => {
         (async (): Promise<void> => {
@@ -72,7 +73,7 @@ export const AdventureDetailPage = (): ReactElement => {
             if (isAuthorized) {
                 await fetchAdventure(adventureId);
 
-                await fetchScenes(adventureId);
+                await fetchScenes(adventureId, 1);
             }
         })();
     }, [isAuthorized]);
@@ -81,57 +82,67 @@ export const AdventureDetailPage = (): ReactElement => {
         <div className={centered}>
             <Paper elevation={0} className={centered}>
                 {adventure && scenes ? (
-                    <Grid container justifyContent="center">
 
-                        <Grid container item xs={12}>
-                            <Grid item xs={1}>
-                                <Sticky>
-                                    <AppBar className={appBar}>
-                                        <Toolbar className={toolBar}>
-                                            <Typography>
-                                                chaos factor
-                                            </Typography>
-                                            <Typography>
-                                                npc
-                                            </Typography>
-                                            <Typography>
-                                                threads
-                                            </Typography>
-                                        </Toolbar>
-                                    </AppBar>
-                                </Sticky>
-                            </Grid>
+                    // Main Container
+                    <Grid container xs={12} className={main}>
 
-                            <Grid item xs={10}>
-                                <Tooltip title={adventure.context} className={withTooltip}>
-                                    <Typography align="center" variant="h5" component="h5">
-                                        {adventure.title}
-                                    </Typography>
-                                </Tooltip>
-                            </Grid>
+                        {/* Left Control */}
+                        <Grid item xs={1}>
+                            <Sticky>
+                                <AppBar className={appBar}>
+                                    <Toolbar className={toolBar}>
+                                        <Typography>
+                                            chaos factor
+                                        </Typography>
+                                        <Typography>
+                                            npc
+                                        </Typography>
+                                        <Typography>
+                                            threads
+                                        </Typography>
+                                    </Toolbar>
+                                </AppBar>
+                            </Sticky>
+                        </Grid>
 
-                            <Grid item xs={1}>
-                                <Sticky>
-                                    <AppBar className={appBar}>
-                                        <Toolbar className={toolBar}>
-                                            <Typography>
-                                                create scene
-                                            </Typography>
-                                            <Typography>
-                                                ask question
-                                            </Typography>
-                                            <Typography>
-                                                battle
-                                            </Typography>
-                                        </Toolbar>
-                                    </AppBar>
-                                </Sticky>
+                        {/* Scenes */}
+                        <Grid item container justifyContent="center" xs={10}>
+                            
+                            {/* Margins, etc; get rid of min height, work on controls first, then work on main */}
+                            <Typography align="center" variant="h5" component="h5">
+                                {adventure.title}
+                            </Typography>
+
+                            <Typography align="center" variant="h6" component="h6">
+                                {adventure.context}
+                            </Typography>
+
+                            <Grid item container xs={12} justifyContent="center" direction="column">
+                                {scenes.map((scene: Scene) => {
+                                    return <div style={{ margin: '1em' }}>{scene.title}</div>;
+                                })}
                             </Grid>
                         </Grid>
 
-                        <Grid container item xs={12}>
-                            Scenes
+                        {/* Right Control */}
+                        <Grid item xs={1}>
+                            <Sticky>
+                                <AppBar className={appBar}>
+                                    <Toolbar className={toolBar}>
+                                        <Typography>
+                                            create scene
+                                        </Typography>
+                                        <Typography>
+                                            ask question
+                                        </Typography>
+                                        <Typography>
+                                            battle
+                                        </Typography>
+                                    </Toolbar>
+                                </AppBar>
+                            </Sticky>
                         </Grid>
+
                     </Grid>
                 ) : (
                     <CircularProgress />
