@@ -11,7 +11,16 @@ import { fetchScenes } from '../../scene/requests';
 
 import { parseIDFromURL } from '../../../shared/helpers';
 
-import { Theme, Paper, Grid, Typography, Tooltip, CircularProgress } from '@material-ui/core';
+import {
+    Theme,
+    Paper,
+    Grid,
+    Typography,
+    Tooltip,
+    AppBar,
+    Toolbar,
+    CircularProgress
+} from '@material-ui/core';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -23,6 +32,14 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         withTooltip: {
             cursor: 'pointer'
+        },
+        appBar: {
+            backgroundColor: 'transparent',
+            borderRadius: '5px'
+        },
+        toolBar: {
+            display: 'flex',
+            flexDirection: 'column'
         }
     })
 );
@@ -40,7 +57,7 @@ export const AdventureDetailPage = (): ReactElement => {
         (store: ApplicationState) => store.adventureDetail?.scenes?.data ?? null
     );
 
-    const { centered, withTooltip } = useStyles();
+    const { centered, withTooltip, appBar, toolBar } = useStyles();
 
     useEffect(() => {
         (async (): Promise<void> => {
@@ -56,18 +73,45 @@ export const AdventureDetailPage = (): ReactElement => {
 
     return (
         <div className={centered}>
-            <Paper elevation={0}>
-                <Grid container justifyContent="center">
-                    {adventure && scenes ? (
-                        <Tooltip title={adventure.context} className={withTooltip}>
-                            <Typography align="center" variant="h5" component="h5">
-                                {adventure.title}
-                            </Typography>
-                        </Tooltip>
-                    ) : (
-                        <CircularProgress />
-                    )}
-                </Grid>
+            <Paper elevation={0} className={centered}>
+                {adventure && scenes ? (
+                    <Grid container justifyContent="center">
+
+                        <Grid container item xs={12}>
+                            <Grid item xs={1}>
+                                <AppBar position="sticky" className={appBar}>
+                                    <Toolbar className={toolBar}>
+                                        <Typography>
+                                            chaos factor
+                                        </Typography>
+                                        <Typography>
+                                            npc
+                                        </Typography>
+                                        <Typography>
+                                            threads
+                                        </Typography>
+                                    </Toolbar>
+                                </AppBar>
+                            </Grid>
+
+                            <Grid item xs={10}>
+                                <Tooltip title={adventure.context} className={withTooltip}>
+                                    <Typography align="center" variant="h5" component="h5">
+                                        {adventure.title}
+                                    </Typography>
+                                </Tooltip>
+                            </Grid>
+
+                            <Grid item xs={1}>
+
+                            </Grid>
+                        </Grid>
+
+                        <div style={{height: '1000px'}}>debug</div>
+                    </Grid>
+                ) : (
+                    <CircularProgress />
+                )}
             </Paper>
         </div>
     );
