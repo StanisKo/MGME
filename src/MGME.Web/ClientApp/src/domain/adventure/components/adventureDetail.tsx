@@ -24,6 +24,9 @@ import {
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
+// Bless you: https://github.com/gm0t/react-sticky-el
+import Sticky from 'react-sticky-el';
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         centered: {
@@ -35,7 +38,8 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         appBar: {
             backgroundColor: 'transparent',
-            borderRadius: '5px'
+            boxShadow: '0 0 0 0',
+            paddingTop: '2em'
         },
         toolBar: {
             display: 'flex',
@@ -44,6 +48,8 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
+// Description should be accordion, not tooltip
+// Controlling buttons should have tooltips
 export const AdventureDetailPage = (): ReactElement => {
     const isAuthorized: boolean = useSelector(
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
@@ -79,19 +85,21 @@ export const AdventureDetailPage = (): ReactElement => {
 
                         <Grid container item xs={12}>
                             <Grid item xs={1}>
-                                <AppBar position="sticky" className={appBar}>
-                                    <Toolbar className={toolBar}>
-                                        <Typography>
-                                            chaos factor
-                                        </Typography>
-                                        <Typography>
-                                            npc
-                                        </Typography>
-                                        <Typography>
-                                            threads
-                                        </Typography>
-                                    </Toolbar>
-                                </AppBar>
+                                <Sticky>
+                                    <AppBar className={appBar}>
+                                        <Toolbar className={toolBar}>
+                                            <Typography>
+                                                chaos factor
+                                            </Typography>
+                                            <Typography>
+                                                npc
+                                            </Typography>
+                                            <Typography>
+                                                threads
+                                            </Typography>
+                                        </Toolbar>
+                                    </AppBar>
+                                </Sticky>
                             </Grid>
 
                             <Grid item xs={10}>
@@ -103,11 +111,27 @@ export const AdventureDetailPage = (): ReactElement => {
                             </Grid>
 
                             <Grid item xs={1}>
-
+                                <Sticky>
+                                    <AppBar className={appBar}>
+                                        <Toolbar className={toolBar}>
+                                            <Typography>
+                                                create scene
+                                            </Typography>
+                                            <Typography>
+                                                ask question
+                                            </Typography>
+                                            <Typography>
+                                                battle
+                                            </Typography>
+                                        </Toolbar>
+                                    </AppBar>
+                                </Sticky>
                             </Grid>
                         </Grid>
 
-                        <div style={{height: '1000px'}}>debug</div>
+                        <Grid container item xs={12}>
+                            Scenes
+                        </Grid>
                     </Grid>
                 ) : (
                     <CircularProgress />
