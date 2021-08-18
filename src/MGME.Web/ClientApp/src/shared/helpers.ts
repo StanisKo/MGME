@@ -1,3 +1,5 @@
+import { MouseEvent } from 'react';
+
 import { history } from './utils';
 
 // At least 8 chars, 1 upper case and 1 lower case, and 1 digit
@@ -19,6 +21,12 @@ export const parseIDFromURL = (): number => {
 };
 
 // Curry it, since we are using it as a handler
-export const redirectToEntity = (entity: string, id: number) => (): void => {
+export const redirectToEntity = (entity: string, id: number) => (event: MouseEvent<HTMLElement>): void => {
+    const eventTargetType = (event.target as HTMLElement).getAttribute('type');
+
+    if (eventTargetType === 'checkbox' || eventTargetType === 'radio') {
+        return;
+    }
+
     history.push(`/${entity}/${id}`);
 };
