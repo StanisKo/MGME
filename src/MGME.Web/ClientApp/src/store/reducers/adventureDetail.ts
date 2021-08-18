@@ -3,7 +3,7 @@ import { Action, Reducer } from 'redux';
 import { AdventureDetail } from '../../domain/adventure/interfaces';
 import { Scene } from '../../domain/scene/interfaces';
 
-import { DataServiceResponse, Pagination } from '../../shared/interfaces';
+import { DataServiceResponse, PaginatedDataServiceResponse, Pagination } from '../../shared/interfaces';
 
 import { UpdateStore } from '..';
 
@@ -24,12 +24,15 @@ export const AdventureDetailReducer: Reducer<AdventureDetailState> = (
         return {} as AdventureDetailState;
     }
 
-    const { type, reducer, key, payload } =
-        incomingAction as UpdateStore<DataServiceResponse<AdventureDetail>>;
+    const { type, reducer, key, payload } = incomingAction as UpdateStore<
+        DataServiceResponse<AdventureDetail> | PaginatedDataServiceResponse<Scene[]>
+    >;
 
     if (reducer !== 'adventureDetail') {
         return state;
     }
+
+    const { success, message, ...sanitizedPayload } = payload;
 
     switch (type) {
         case 'UPDATE_STORE':
@@ -45,8 +48,15 @@ export const AdventureDetailReducer: Reducer<AdventureDetailState> = (
                     // Retain previous state of THIS key
                     ...state[key as keyof AdventureDetailState],
 
-                    // Add/update things in THIS key
-                    ...payload.data
+                    /*
+                    Add/update things in THIS key
+
+                    If incoming data is information on adventure, we only need 'data' value
+
+                    Otherwise, it's data with pagination, or custom value
+                    places into store by script
+                    */
+                    ...(key === 'adventureData' ? sanitizedPayload.data : sanitizedPayload)
                 }
             };
 

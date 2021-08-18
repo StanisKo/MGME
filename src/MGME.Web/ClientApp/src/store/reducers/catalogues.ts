@@ -42,6 +42,8 @@ export const CataloguesReducer: Reducer<CataloguesState> = (
         return state;
     }
 
+    const { success, message, ...sanitizedPayload } = payload;
+
     switch (type) {
         case 'UPDATE_STORE':
 
@@ -57,7 +59,7 @@ export const CataloguesReducer: Reducer<CataloguesState> = (
                     ...state[key as keyof CataloguesState],
 
                     // Add/update things in THIS key
-                    ...payload
+                    ...sanitizedPayload
                 }
             };
 

@@ -23,12 +23,14 @@ export const UserReducer: Reducer<UserState> = (state: UserState | undefined, in
         return state;
     }
 
+    const { success, message, ...sanitizedPayload } = payload;
+
     switch (type) {
         case 'UPDATE_STORE':
 
             return {
                 // We only need to update 1 key/value that is already inside payload...
-                ...payload
+                ...sanitizedPayload
             };
 
         default:

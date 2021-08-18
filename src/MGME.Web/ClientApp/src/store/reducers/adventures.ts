@@ -28,6 +28,8 @@ export const AdventuresReducer: Reducer<AdventuresState> = (
         return state;
     }
 
+    const { success, message, ...sanitizedPayload } = payload;
+
     switch (type) {
         case 'UPDATE_STORE':
 
@@ -43,7 +45,7 @@ export const AdventuresReducer: Reducer<AdventuresState> = (
                     ...state[key as keyof AdventuresState],
 
                     // Add/update things in THIS key
-                    ...payload
+                    ...sanitizedPayload
                 }
             };
 
