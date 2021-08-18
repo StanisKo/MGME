@@ -11,7 +11,7 @@ import { fetchScenes } from '../../scene/requests';
 
 import { parseIDFromURL } from '../../../shared/helpers';
 
-import { Theme, Paper, Grid, Typography, CircularProgress } from '@material-ui/core';
+import { Theme, Paper, Grid, Typography, Tooltip, CircularProgress } from '@material-ui/core';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -40,7 +40,7 @@ export const AdventureDetailPage = (): ReactElement => {
         (store: ApplicationState) => store.adventureDetail?.scenes?.data ?? null
     );
 
-    const { centered } = useStyles();
+    const { centered, withTooltip } = useStyles();
 
     useEffect(() => {
         (async (): Promise<void> => {
@@ -54,17 +54,16 @@ export const AdventureDetailPage = (): ReactElement => {
         })();
     }, [isAuthorized]);
 
-    const initialized = adventure && scenes;
-    console.log(initialized);
-
     return (
         <div className={centered}>
             <Paper elevation={0}>
                 <Grid container justifyContent="center">
-                    {initialized ? (
-                        <Typography align="center" variant="h5" component="h5">
-                            {adventure?.title}
-                        </Typography>
+                    {adventure && scenes ? (
+                        <Tooltip title={adventure.context} className={withTooltip}>
+                            <Typography align="center" variant="h5" component="h5">
+                                {adventure.title}
+                            </Typography>
+                        </Tooltip>
                     ) : (
                         <CircularProgress />
                     )}
