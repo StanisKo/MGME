@@ -2,17 +2,19 @@ import { ReactElement, useState, ChangeEvent, MouseEvent } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { ApplicationState } from '../../store';
+
 import { logoutUser } from '../../domain/auth/requests';
 
 import { LogoutUser } from '../../store';
+
+import { ROUTES } from '../const';
 
 import { AppBar, Toolbar, Tabs, Tab, IconButton, Menu, MenuItem, Theme } from '@material-ui/core';
 
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { ApplicationState } from '../../store';
-import { ROUTES } from '../const';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

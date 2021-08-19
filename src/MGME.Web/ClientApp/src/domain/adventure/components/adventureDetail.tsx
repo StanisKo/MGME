@@ -18,8 +18,19 @@ import {
     Typography,
     AppBar,
     Toolbar,
+    IconButton,
+    Tooltip,
+    Badge,
     CircularProgress
 } from '@material-ui/core';
+
+import ImportExportRoundedIcon from '@material-ui/icons/ImportExportRounded';
+import PeopleRoundedIcon from '@material-ui/icons/PeopleRounded';
+import PlaylistAddCheckRoundedIcon from '@material-ui/icons/PlaylistAddCheckRounded';
+
+import AddRoundedIcon from '@material-ui/icons/AddRounded';
+import ContactSupportRoundedIcon from '@material-ui/icons/ContactSupportRounded';
+import SportsKabaddiRoundedIcon from '@material-ui/icons/SportsKabaddiRounded';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -46,11 +57,14 @@ const useStyles = makeStyles((theme: Theme) =>
         toolBar: {
             display: 'flex',
             flexDirection: 'column'
+        },
+        buttonElement: {
+            marginTop: '0.5em',
+            marginBottom: '0.5em'
         }
     })
 );
 
-// Controlling buttons should have tooltips
 export const AdventureDetailPage = (): ReactElement => {
     const isAuthorized: boolean = useSelector(
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
@@ -64,7 +78,7 @@ export const AdventureDetailPage = (): ReactElement => {
         (store: ApplicationState) => store.adventureDetail?.scenes?.data ?? null
     );
 
-    const { centered, main, appBar, toolBar } = useStyles();
+    const { centered, main, appBar, toolBar, buttonElement } = useStyles();
 
     useEffect(() => {
         (async (): Promise<void> => {
@@ -85,21 +99,53 @@ export const AdventureDetailPage = (): ReactElement => {
 
                     // Main Container
                     <Grid container xs={12} className={main}>
-
+                        
+                        {
+                        /*
+                        Chaos factor icons should be different based on factor
+                        Battle icon should be sword
+                        Fate question icon should be D20
+                        */
+                        }
                         {/* Left Control */}
                         <Grid item xs={1}>
                             <Sticky>
                                 <AppBar className={appBar}>
                                     <Toolbar className={toolBar}>
-                                        <Typography>
-                                            chaos factor
-                                        </Typography>
-                                        <Typography>
-                                            npc
-                                        </Typography>
-                                        <Typography>
-                                            threads
-                                        </Typography>
+                                        <IconButton
+                                            color="primary"
+                                            size="medium"
+                                            aria-label="chaos-factor"
+                                            className={buttonElement}
+                                        >
+                                            <Tooltip title="Chaos Factor">
+                                                <Badge badgeContent={adventure.chaosFactor} color="secondary">
+                                                    <ImportExportRoundedIcon fontSize="large" />
+                                                </Badge>
+                                            </Tooltip>
+                                        </IconButton>
+
+                                        <IconButton
+                                            color="primary"
+                                            size="medium"
+                                            aria-label="modify-npcs"
+                                            className={buttonElement}
+                                        >
+                                            <Tooltip title="Modify NPCs">
+                                                <PeopleRoundedIcon fontSize="large" />
+                                            </Tooltip>
+                                        </IconButton>
+
+                                        <IconButton
+                                            color="primary"
+                                            size="medium"
+                                            aria-label="modify-threads"
+                                            className={buttonElement}
+                                        >
+                                            <Tooltip title="Modify Threads">
+                                                <PlaylistAddCheckRoundedIcon fontSize="large" />
+                                            </Tooltip>
+                                        </IconButton>
                                     </Toolbar>
                                 </AppBar>
                             </Sticky>
@@ -129,15 +175,38 @@ export const AdventureDetailPage = (): ReactElement => {
                             <Sticky>
                                 <AppBar className={appBar}>
                                     <Toolbar className={toolBar}>
-                                        <Typography>
-                                            create scene
-                                        </Typography>
-                                        <Typography>
-                                            ask question
-                                        </Typography>
-                                        <Typography>
-                                            battle
-                                        </Typography>
+                                        <IconButton
+                                            color="primary"
+                                            size="medium"
+                                            aria-label="add-scene"
+                                            className={buttonElement}
+                                        >
+                                            <Tooltip title="Add New Scene">
+                                                <AddRoundedIcon fontSize="large" />
+                                            </Tooltip>
+                                        </IconButton>
+
+                                        <IconButton
+                                            color="primary"
+                                            size="medium"
+                                            aria-label="ask-fate-question"
+                                            className={buttonElement}
+                                        >
+                                            <Tooltip title="Ask Fate Question">
+                                                <ContactSupportRoundedIcon fontSize="large" />
+                                            </Tooltip>
+                                        </IconButton>
+
+                                        <IconButton
+                                            color="primary"
+                                            size="medium"
+                                            aria-label="start battle"
+                                            className={buttonElement}
+                                        >
+                                            <Tooltip title="Start Battle">
+                                                <SportsKabaddiRoundedIcon fontSize="large" />
+                                            </Tooltip>
+                                        </IconButton>
                                     </Toolbar>
                                 </AppBar>
                             </Sticky>
