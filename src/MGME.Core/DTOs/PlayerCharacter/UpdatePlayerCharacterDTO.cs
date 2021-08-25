@@ -2,11 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MGME.Core.DTOs.PlayerCharacter
 {
-    public class UpdatePlayerCharacterDTO
+    public class UpdatePlayerCharacterDTO : BaseEntityDTO
     {
-        [Required]
-        public int Id { get; set; }
-
         [StringLength(254)]
         public string Name { get; set; }
 

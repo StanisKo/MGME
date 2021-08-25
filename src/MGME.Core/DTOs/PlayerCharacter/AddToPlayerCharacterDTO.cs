@@ -6,7 +6,7 @@ namespace MGME.Core.DTOs.PlayerCharacter
     public class AddToPlayerCharacterDTO
     {
         [Required]
-        public int PlayerCharacter { get; set; }
+        public int PlayerCharacterId { get; set; }
 
         [Required]
         [MinLength(1)]

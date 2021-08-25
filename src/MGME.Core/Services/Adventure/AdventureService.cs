@@ -335,7 +335,7 @@ namespace MGME.Core.Services.AdventureService
             try
             {
                 Adventure adventureToAddTo = await _adventureRepository.GetEntityAsync(
-                    id: ids.Adventure,
+                    id: ids.AdventureId,
                     predicate: adventure => adventure.UserId == userId,
                     tracking: true,
                     splitQuery: true,
@@ -478,7 +478,7 @@ namespace MGME.Core.Services.AdventureService
             try
             {
                 bool providedAdventureIsValid = await _adventureRepository.CheckIfEntityExistsAsync(
-                    adventure => adventure.Id == newNonPlayerCharacter.Adventure && adventure.UserId == userId
+                    adventure => adventure.Id == newNonPlayerCharacter.AdventureId && adventure.UserId == userId
                 );
 
                 if (!providedAdventureIsValid)

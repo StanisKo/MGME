@@ -168,7 +168,7 @@ namespace MGME.Core.Services.NonPlayerCharacterService
                 {
                     Name = newNonPlayerCharacter.Name,
                     Description = newNonPlayerCharacter.Description,
-                    PlayerCharacterId = newNonPlayerCharacter.PlayerCharacter, // null if not provided
+                    PlayerCharacterId = newNonPlayerCharacter.PlayerCharacterId, // null if not provided
                     UserId = userId
                 };
 

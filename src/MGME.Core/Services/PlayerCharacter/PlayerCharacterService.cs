@@ -376,7 +376,7 @@ namespace MGME.Core.Services.PlayerCharacterService
             try
             {
                 PlayerCharacter playerCharacterToAddTo = await _playerCharacterRepository.GetEntityAsync(
-                    id: ids.PlayerCharacter,
+                    id: ids.PlayerCharacterId,
                     predicate: playerCharacter => playerCharacter.UserId == userId,
                     tracking: true,
                     include: new[]
