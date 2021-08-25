@@ -6,7 +6,7 @@ import { ApplicationState } from '../../../store';
 import { AdventureDetail } from '../interfaces';
 import { fetchAdventure } from '../requests';
 
-import { determineChaosFactorIconComponent } from '../helpers';
+import { determineChaosFactorIconComponent, returnCalledComponent } from '../helpers';
 
 import { Scene } from '../../scene/interfaces';
 import { fetchScenes } from '../../scene/requests';
@@ -91,6 +91,8 @@ export const AdventureDetailPage = (): ReactElement => {
         })();
     }, [isAuthorized]);
 
+    // TODO: all icons should be filled
+
     return (
         <div className={centered}>
             <Paper elevation={0} className={centered}>
@@ -116,9 +118,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                             className={buttonElement}
                                         >
                                             <Tooltip title={`Chaos Factor: ${adventure.chaosFactor}`}>
-                                                <span>
-                                                    {determineChaosFactorIconComponent(adventure.chaosFactor)}
-                                                </span>
+                                                {determineChaosFactorIconComponent(adventure.chaosFactor)}
                                             </Tooltip>
                                         </IconButton>
 
@@ -140,9 +140,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                             className={buttonElement}
                                         >
                                             <Tooltip title="Modify Threads">
-                                                <span>
-                                                    <ThreadListIcon />
-                                                </span>
+                                                {returnCalledComponent(ThreadListIcon)}
                                             </Tooltip>
                                         </IconButton>
                                     </Toolbar>
@@ -192,9 +190,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                             className={buttonElement}
                                         >
                                             <Tooltip title="Ask Fate Question">
-                                                <span>
-                                                    <FateQuestionIcon />
-                                                </span>
+                                                {returnCalledComponent(FateQuestionIcon)}
                                             </Tooltip>
                                         </IconButton>
 
@@ -205,9 +201,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                             className={buttonElement}
                                         >
                                             <Tooltip title="Start Battle">
-                                                <span>
-                                                    <StartBattleIcon />
-                                                </span>
+                                                {returnCalledComponent(StartBattleIcon)}
                                             </Tooltip>
                                         </IconButton>
                                     </Toolbar>
