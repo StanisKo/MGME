@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using MGME.Core.DTOs;
 using MGME.Core.DTOs.Adventure;
+using MGME.Core.DTOs.NonPlayerCharacter;
 
 namespace MGME.Core.Interfaces.Services
 {
@@ -17,5 +18,9 @@ namespace MGME.Core.Interfaces.Services
         Task <BaseServiceResponse> AddToAdventure(AddToAdventureDTO ids);
 
         Task <BaseServiceResponse> DeleteAdventure(IEnumerable<int> ids);
+
+        Task<BaseServiceResponse> AddNewNonPlayerCharacterToAdventure(AddNonPlayerCharacterDTO newNonPlayerCharacter);
+
+        Task<BaseServiceResponse> RemoveNonPlayerCharacterFromAdventure(IEnumerable<int> ids);
     }
 }

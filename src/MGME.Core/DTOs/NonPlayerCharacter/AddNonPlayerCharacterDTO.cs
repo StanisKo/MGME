@@ -11,5 +11,8 @@ namespace MGME.Core.DTOs.NonPlayerCharacter
 
         // Nullable if we want to add NPCs without binding them to PlayerCharacters
         public int? PlayerCharacter { get; set; }
+
+        // Is here for when we want to add new NonPlayerCharacter to the Adventure
+        public int? Adventure { get; set; }
     }
 }

@@ -469,6 +469,40 @@ namespace MGME.Core.Services.AdventureService
             return response;
         }
 
+        public async Task <BaseServiceResponse> AddNewNonPlayerCharacterToAdventure(AddNonPlayerCharacterDTO newNonPlayerCharacter)
+        {
+            BaseServiceResponse response = new();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                bool providedAdventureIsValid = await _adventureRepository.CheckIfEntityExistsAsync(
+                    adventure => adventure.Id == newNonPlayerCharacter.Adventure && adventure.UserId == userId
+                );
+
+                if (!providedAdventureIsValid)
+                {
+                    response.Success = false;
+                    response.Message = "Adventure with such id does not exist";
+
+                    return response;
+                }
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
+        }
+
+        public async Task <BaseServiceResponse> RemoveNonPlayerCharacterFromAdventure(IEnumerable<int> ids)
+        {
+            throw new NotImplementedException();
+        }
+
         private async Task <IEnumerable<GetAdventureListDTO>> QueryAdventures(Ref<string> sortingParameter, Ref<int> selectedPage, Ref<int> userId)
         {
             IEnumerable<GetAdventureListDTO> adventures = await _adventureRepository.GetEntititesAsync(
