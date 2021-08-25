@@ -6,6 +6,8 @@ import { ApplicationState } from '../../../store';
 import { AdventureDetail } from '../interfaces';
 import { fetchAdventure } from '../requests';
 
+import { determineChaosFactorIconComponent } from '../helpers';
+
 import { Scene } from '../../scene/interfaces';
 import { fetchScenes } from '../../scene/requests';
 
@@ -20,7 +22,7 @@ import {
     Toolbar,
     IconButton,
     Tooltip,
-    Badge,
+    // Badge,
     CircularProgress
 } from '@material-ui/core';
 
@@ -46,6 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
         withTooltip: {
             cursor: 'pointer'
         },
+        // ?
         main: {
             // minHeight: '25vh'
         },
@@ -119,9 +122,9 @@ export const AdventureDetailPage = (): ReactElement => {
                                             className={buttonElement}
                                         >
                                             <Tooltip title="Chaos Factor">
-                                                <Badge badgeContent={adventure.chaosFactor} color="secondary">
-                                                    CF
-                                                </Badge>
+                                                <span>
+                                                    {determineChaosFactorIconComponent(adventure.chaosFactor)}
+                                                </span>
                                             </Tooltip>
                                         </IconButton>
 
