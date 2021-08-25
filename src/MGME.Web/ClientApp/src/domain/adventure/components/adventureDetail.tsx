@@ -24,13 +24,13 @@ import {
     CircularProgress
 } from '@material-ui/core';
 
-import ImportExportRoundedIcon from '@material-ui/icons/ImportExportRounded';
+import { StartBattleIcon } from './icons';
+
 import PeopleRoundedIcon from '@material-ui/icons/PeopleRounded';
 import PlaylistAddCheckRoundedIcon from '@material-ui/icons/PlaylistAddCheckRounded';
 
 import AddRoundedIcon from '@material-ui/icons/AddRounded';
 import ContactSupportRoundedIcon from '@material-ui/icons/ContactSupportRounded';
-import SportsKabaddiRoundedIcon from '@material-ui/icons/SportsKabaddiRounded';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -98,7 +98,7 @@ export const AdventureDetailPage = (): ReactElement => {
                 {adventure && scenes ? (
 
                     // Main Container
-                    <Grid container xs={12} className={main}>
+                    <Grid container className={main}>
                         
                         {
                         /*
@@ -120,7 +120,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                         >
                                             <Tooltip title="Chaos Factor">
                                                 <Badge badgeContent={adventure.chaosFactor} color="secondary">
-                                                    <ImportExportRoundedIcon fontSize="large" />
+                                                    CF
                                                 </Badge>
                                             </Tooltip>
                                         </IconButton>
@@ -165,7 +165,7 @@ export const AdventureDetailPage = (): ReactElement => {
 
                             <Grid item container xs={12} justifyContent="center" direction="column">
                                 {scenes.map((scene: Scene) => {
-                                    return <div style={{ margin: '1em' }}>{scene.title}</div>;
+                                    return <div key={scene.id} style={{ margin: '1em' }}>{scene.title}</div>;
                                 })}
                             </Grid>
                         </Grid>
@@ -204,7 +204,9 @@ export const AdventureDetailPage = (): ReactElement => {
                                             className={buttonElement}
                                         >
                                             <Tooltip title="Start Battle">
-                                                <SportsKabaddiRoundedIcon fontSize="large" />
+                                                <span>
+                                                    <StartBattleIcon />
+                                                </span>
                                             </Tooltip>
                                         </IconButton>
                                     </Toolbar>
