@@ -22,17 +22,13 @@ import {
     Toolbar,
     IconButton,
     Tooltip,
-    // Badge,
     CircularProgress
 } from '@material-ui/core';
 
-import { StartBattleIcon } from './icons';
+import { StartBattleIcon, FateQuestionIcon, ThreadListIcon } from './icons';
 
 import PeopleRoundedIcon from '@material-ui/icons/PeopleRounded';
-import PlaylistAddCheckRoundedIcon from '@material-ui/icons/PlaylistAddCheckRounded';
-
 import AddRoundedIcon from '@material-ui/icons/AddRounded';
-import ContactSupportRoundedIcon from '@material-ui/icons/ContactSupportRounded';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -105,8 +101,6 @@ export const AdventureDetailPage = (): ReactElement => {
                         
                         {
                         /*
-                        Chaos factor icons should be different based on factor
-                        Battle icon should be sword
                         Fate question icon should be D20
                         */
                         }
@@ -121,7 +115,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                             aria-label="chaos-factor"
                                             className={buttonElement}
                                         >
-                                            <Tooltip title="Chaos Factor">
+                                            <Tooltip title={`Chaos Factor: ${adventure.chaosFactor}`}>
                                                 <span>
                                                     {determineChaosFactorIconComponent(adventure.chaosFactor)}
                                                 </span>
@@ -146,7 +140,9 @@ export const AdventureDetailPage = (): ReactElement => {
                                             className={buttonElement}
                                         >
                                             <Tooltip title="Modify Threads">
-                                                <PlaylistAddCheckRoundedIcon fontSize="large" />
+                                                <span>
+                                                    <ThreadListIcon />
+                                                </span>
                                             </Tooltip>
                                         </IconButton>
                                     </Toolbar>
@@ -196,7 +192,9 @@ export const AdventureDetailPage = (): ReactElement => {
                                             className={buttonElement}
                                         >
                                             <Tooltip title="Ask Fate Question">
-                                                <ContactSupportRoundedIcon fontSize="large" />
+                                                <span>
+                                                    <FateQuestionIcon />
+                                                </span>
                                             </Tooltip>
                                         </IconButton>
 
