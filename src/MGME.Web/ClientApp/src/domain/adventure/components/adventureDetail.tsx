@@ -41,9 +41,8 @@ const useStyles = makeStyles((theme: Theme) =>
         withTooltip: {
             cursor: 'pointer'
         },
-        // ?
         main: {
-            // minHeight: '25vh'
+            minHeight: '35vh'
         },
         appBar: {
             backgroundColor: 'transparent',
@@ -87,8 +86,6 @@ export const AdventureDetailPage = (): ReactElement => {
             }
         })();
     }, [isAuthorized]);
-
-    // TODO: all icons should be filled, tooltip should be of main/secondary color
 
     return (
         <div className={centered}>
