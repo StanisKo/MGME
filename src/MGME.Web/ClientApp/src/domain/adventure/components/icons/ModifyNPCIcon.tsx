@@ -13,7 +13,8 @@ export const ModifyNPCIcon = (): ReactElement => {
             y="0px"
             fill="#524878"
             width="100%"
-            height="100%" viewBox="0 0 83.818 83.818"
+            height="100%"
+            viewBox="0 0 83.818 83.818"
             enableBackground="0 0 83.818 83.818"
         >
             <g>
