@@ -270,6 +270,18 @@ namespace MGME.Infra.Data.Repositories
         }
 
 
+        public async Task UnlinkEntitiesAsync(BaseEntity linkedEntity, string linkingCollection)
+        {
+            // No changes to the linked entity
+            _database.Entry(linkedEntity).State = EntityState.Unchanged;
+
+            // Only change the collection on the linked entity (and thus remove entries in the mapping table)
+            _database.Entry(linkedEntity).Collection(linkingCollection).IsModified = true;
+
+            await _database.SaveChangesAsync();
+        }
+
+
         public async Task DeleteEntityAsync(TEntity entity)
         {
             _database.Set<TEntity>().Remove(entity);

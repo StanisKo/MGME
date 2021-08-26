@@ -55,6 +55,13 @@ namespace MGME.Core.Interfaces.Repositories
         Task LinkEntitiesAsync(IEnumerable<TEntity> entities, BaseEntity linkedEntity, string linkingCollection);
 
 
+        /*
+        Update linkingCollection on linkedEntity to reflect removed entities (we don't need to query them)
+        Used for both many-to-one and many-to-many relationships
+        */
+        Task UnlinkEntitiesAsync(BaseEntity linkedEntity, string linkingCollection);
+
+
         // Delete one entity
         Task DeleteEntityAsync(TEntity entity);
 

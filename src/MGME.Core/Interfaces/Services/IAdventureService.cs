@@ -15,12 +15,12 @@ namespace MGME.Core.Interfaces.Services
 
         Task <DataServiceResponse<GetAdventureDetailDTO>> GetAdventure(int id);
 
-        Task <BaseServiceResponse> AddToAdventure(AddToAdventureDTO ids);
+        Task <BaseServiceResponse> AddToAdventure(AddRemoveToFromAdventureDTO ids);
+
+        Task<BaseServiceResponse> RemoveFromAdventure(AddRemoveToFromAdventureDTO ids);
 
         Task <BaseServiceResponse> DeleteAdventure(IEnumerable<int> ids);
 
         Task<BaseServiceResponse> AddNewNonPlayerCharacterToAdventure(AddNonPlayerCharacterDTO newNonPlayerCharacter);
-
-        Task<BaseServiceResponse> RemoveNonPlayerCharacterFromAdventure(IEnumerable<int> ids);
     }
 }

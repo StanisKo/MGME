@@ -314,7 +314,7 @@ namespace MGME.Core.Services.AdventureService
             return response;
         }
 
-        public async Task <BaseServiceResponse> AddToAdventure(AddToAdventureDTO ids)
+        public async Task <BaseServiceResponse> AddToAdventure(AddRemoveToFromAdventureDTO ids)
         {
             BaseServiceResponse response = new();
 
@@ -445,6 +445,84 @@ namespace MGME.Core.Services.AdventureService
             return response;
         }
 
+        public async Task<BaseServiceResponse> RemoveFromAdventure(AddRemoveToFromAdventureDTO ids)
+        {
+            BaseServiceResponse response = new();
+
+            int userId = GetUserIdFromHttpContext();
+
+            bool thereArePlayerCharactersToRemove = ids.PlayerCharacters?.Any() == true;
+
+            bool thereAreNonPlayerCharactersToRemove = ids.NonPlayerCharacters?.Any() == true;
+
+            if (!thereArePlayerCharactersToRemove && !thereAreNonPlayerCharactersToRemove)
+            {
+                response.Success = false;
+                response.Message = "At least one character or one npc id has to be provided";
+
+                return response;
+            }
+
+            try
+            {
+                Adventure adventureToRemoveFrom = await _adventureRepository.GetEntityAsync(
+                    id: ids.AdventureId,
+                    predicate: adventure => adventure.UserId == userId,
+                    tracking: true,
+                    splitQuery: true,
+                    include: new[]
+                    {
+                        "PlayerCharacters",
+                        "NonPlayerCharacters"
+                    }
+                );
+
+                if (adventureToRemoveFrom is null)
+                {
+                    response.Success = false;
+                    response.Message = "Adventure doesn't exist";
+
+                    return response;
+                }
+
+                if (thereArePlayerCharactersToRemove)
+                {
+                    adventureToRemoveFrom.PlayerCharacters = adventureToRemoveFrom.PlayerCharacters.Where(
+                        playerCharacter => ids.PlayerCharacters.Contains(playerCharacter.Id)
+                    ).ToList();
+
+                    await _adventureRepository.UnlinkEntitiesAsync(
+                        adventureToRemoveFrom,
+                        "PlayerCharacters"
+                    );
+                }
+
+                if (thereAreNonPlayerCharactersToRemove)
+                {
+                    adventureToRemoveFrom.NonPlayerCharacters = adventureToRemoveFrom.NonPlayerCharacters.Where(
+                        nonPlayerCharacter => ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id)
+                    ).ToList();
+
+                    await _adventureRepository.UnlinkEntitiesAsync(
+                        adventureToRemoveFrom,
+                        "NonPlayerCharacters"
+                    );
+                }
+
+                response.Success = true;
+
+                // We never remove PlayerCharacters and NonPlayerCharacters together at once
+                response.Message = $"{(thereArePlayerCharactersToRemove ? "Characters" : "NPCs")} were successfully removed";
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
+        }
+
         public async Task <BaseServiceResponse> DeleteAdventure(IEnumerable<int> ids)
         {
             BaseServiceResponse response = new();
@@ -521,11 +599,6 @@ namespace MGME.Core.Services.AdventureService
             return response;
         }
 
-        public async Task <BaseServiceResponse> RemoveNonPlayerCharacterFromAdventure(IEnumerable<int> ids)
-        {
-            throw new NotImplementedException();
-        }
-
         private async Task <IEnumerable<GetAdventureListDTO>> QueryAdventures(Ref<string> sortingParameter, Ref<int> selectedPage, Ref<int> userId)
         {
             IEnumerable<GetAdventureListDTO> adventures = await _adventureRepository.GetEntititesAsync(
@@ -587,7 +660,7 @@ namespace MGME.Core.Services.AdventureService
             return adventures;
         }
 
-        private static bool CheckForMatches<TEntity>(AddToAdventureDTO ids, Adventure adventureToAddTo, BaseServiceResponse response) where TEntity: BaseEntity
+        private static bool CheckForMatches<TEntity>(AddRemoveToFromAdventureDTO ids, Adventure adventureToAddTo, BaseServiceResponse response) where TEntity: BaseEntity
         {
             Type typeOfDTO = ids.GetType();
             Type typeOfModel = adventureToAddTo.GetType();

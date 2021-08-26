@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MGME.Core.DTOs.Adventure
 {
-    public class AddToAdventureDTO
+    public class AddRemoveToFromAdventureDTO
     {
         [Required]
         public int AdventureId { get; set; }
