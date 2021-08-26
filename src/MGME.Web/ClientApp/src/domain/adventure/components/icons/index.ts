@@ -5,6 +5,7 @@ import { ChaosFactorHardIcon } from './ChaosFactorHardIcon';
 import { FateQuestionIcon } from './FateQuestionIcon';
 import { ThreadListIcon } from './ThreadListIcon';
 import { AddNewSceneIcon } from './AddNewSceneIcon';
+import { ModifyNPCIcon } from './ModifyNPCIcon';
 
 export {
     StartBattleIcon,
@@ -13,5 +14,6 @@ export {
     ChaosFactorHardIcon,
     FateQuestionIcon,
     ThreadListIcon,
-    AddNewSceneIcon
+    AddNewSceneIcon,
+    ModifyNPCIcon
 };

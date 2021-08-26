@@ -25,9 +25,7 @@ import {
     CircularProgress
 } from '@material-ui/core';
 
-import { StartBattleIcon, FateQuestionIcon, ThreadListIcon, AddNewSceneIcon } from './icons';
-
-import PeopleRoundedIcon from '@material-ui/icons/PeopleRounded';
+import { StartBattleIcon, FateQuestionIcon, ThreadListIcon, AddNewSceneIcon, ModifyNPCIcon } from './icons';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -122,7 +120,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                             className={buttonElement}
                                         >
                                             <Tooltip title="Modify NPCs">
-                                                <PeopleRoundedIcon fontSize="large" />
+                                                {returnCalledComponent(ModifyNPCIcon)}
                                             </Tooltip>
                                         </IconButton>
 
