@@ -22,7 +22,10 @@ import {
     Toolbar,
     IconButton,
     Tooltip,
-    CircularProgress
+    CircularProgress,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails
 } from '@material-ui/core';
 
 import { StartBattleIcon, FateQuestionIcon, ThreadListIcon, AddNewSceneIcon, ModifyNPCIcon } from './icons';
@@ -56,6 +59,10 @@ const useStyles = makeStyles((theme: Theme) =>
         buttonElement: {
             marginTop: '0.5em',
             marginBottom: '0.5em'
+        },
+        accordion: {
+            backgroundColor: 'transparent',
+            boxShadow: '0 0 0 0'
         }
     })
 );
@@ -73,7 +80,7 @@ export const AdventureDetailPage = (): ReactElement => {
         (store: ApplicationState) => store.adventureDetail?.scenes?.data ?? null
     );
 
-    const { centered, main, appBar, toolBar, buttonElement } = useStyles();
+    const { centered, main, appBar, toolBar, buttonElement, accordion } = useStyles();
 
     useEffect(() => {
         (async (): Promise<void> => {
@@ -138,20 +145,28 @@ export const AdventureDetailPage = (): ReactElement => {
 
                         {/* Scenes */}
                         <Grid item container justifyContent="center" xs={10}>
-                            
-                            {/* Margins, etc; get rid of min height, work on controls first, then work on main */}
-                            <Typography align="center" variant="h5" component="h5">
-                                {adventure.title}
-                            </Typography>
+                            <Grid item xs={12}>
+                                <Typography align="center" variant="h5" component="h5">
+                                    {adventure.title}
+                                </Typography>
+                            </Grid>
 
-                            <Typography align="center" variant="h6" component="h6">
-                                {adventure.context}
-                            </Typography>
-
-                            <Grid item container xs={12} justifyContent="center" direction="column">
-                                {scenes.map((scene: Scene) => {
-                                    return <div key={scene.id} style={{ margin: '1em' }}>{scene.title}</div>;
-                                })}
+                            <Grid item xs={12}>
+                                <Accordion className={accordion}>
+                                    <AccordionSummary
+                                        aria-controls="playerCharacters-content"
+                                        id="playerCharacters-header"
+                                    >
+                                        <Typography>
+                                            Context
+                                        </Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Typography align="center">
+                                            {adventure.context}
+                                        </Typography>
+                                    </AccordionDetails>
+                                </Accordion>
                             </Grid>
                         </Grid>
 
