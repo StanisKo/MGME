@@ -25,10 +25,9 @@ import {
     CircularProgress
 } from '@material-ui/core';
 
-import { StartBattleIcon, FateQuestionIcon, ThreadListIcon } from './icons';
+import { StartBattleIcon, FateQuestionIcon, ThreadListIcon, AddNewSceneIcon } from './icons';
 
 import PeopleRoundedIcon from '@material-ui/icons/PeopleRounded';
-import AddRoundedIcon from '@material-ui/icons/AddRounded';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
@@ -91,7 +90,7 @@ export const AdventureDetailPage = (): ReactElement => {
         })();
     }, [isAuthorized]);
 
-    // TODO: all icons should be filled
+    // TODO: all icons should be filled, tooltip should be of main/secondary color
 
     return (
         <div className={centered}>
@@ -100,12 +99,6 @@ export const AdventureDetailPage = (): ReactElement => {
 
                     // Main Container
                     <Grid container className={main}>
-                        
-                        {
-                        /*
-                        Fate question icon should be D20
-                        */
-                        }
                         {/* Left Control */}
                         <Grid item xs={1}>
                             <Sticky>
@@ -179,7 +172,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                             className={buttonElement}
                                         >
                                             <Tooltip title="Add New Scene">
-                                                <AddRoundedIcon fontSize="large" />
+                                                {returnCalledComponent(AddNewSceneIcon)}
                                             </Tooltip>
                                         </IconButton>
 

@@ -4,6 +4,7 @@ import { ChaosFactorMediumIcon } from './ChaosFactorMediumIcon';
 import { ChaosFactorHardIcon } from './ChaosFactorHardIcon';
 import { FateQuestionIcon } from './FateQuestionIcon';
 import { ThreadListIcon } from './ThreadListIcon';
+import { AddNewSceneIcon } from './AddNewSceneIcon';
 
 export {
     StartBattleIcon,
@@ -11,5 +12,6 @@ export {
     ChaosFactorMediumIcon,
     ChaosFactorHardIcon,
     FateQuestionIcon,
-    ThreadListIcon
+    ThreadListIcon,
+    AddNewSceneIcon
 };
