@@ -76,6 +76,19 @@ namespace MGME.Web.Controllers
             return BadRequest(response);
         }
 
+        [HttpPost("RemoveFrom")]
+        public async Task<IActionResult> RemoveFromAdventure(AddRemoveToFromAdventureDTO ids)
+        {
+            BaseServiceResponse response = await _adventureService.RemoveFromAdventure(ids);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return BadRequest(response);
+        }
+
         [HttpDelete("Delete")]
         public async Task <IActionResult> DeleteAdventure(EntitiesToDelete adventuresToDelete)
         {

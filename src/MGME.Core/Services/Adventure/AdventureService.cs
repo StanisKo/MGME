@@ -503,6 +503,9 @@ namespace MGME.Core.Services.AdventureService
                         nonPlayerCharacter => ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id)
                     ).ToList();
 
+                    Console.WriteLine(adventureToRemoveFrom.NonPlayerCharacters.Count);
+
+                    // TODO: This doesn't work, investigate
                     await _adventureRepository.UnlinkEntitiesAsync(
                         adventureToRemoveFrom,
                         "NonPlayerCharacters"
