@@ -477,17 +477,44 @@ namespace MGME.Core.Services.AdventureService
 
             try
             {
-                bool providedAdventureIsValid = await _adventureRepository.CheckIfEntityExistsAsync(
-                    adventure => adventure.Id == newNonPlayerCharacter.AdventureId && adventure.UserId == userId
+                Adventure adventureToAddTo = await _adventureRepository.GetEntityAsync(
+                    id: newNonPlayerCharacter.AdventureId,
+                    predicate: adventure => adventure.UserId == userId,
+                    include: new[]
+                    {
+                        "NonPlayerCharacters"
+                    }
                 );
 
-                if (!providedAdventureIsValid)
+                if (adventureToAddTo is null)
                 {
                     response.Success = false;
                     response.Message = "Adventure with such id does not exist";
 
                     return response;
                 }
+
+                NonPlayerCharacter nonPlayerCharacterToAdd = _mapper.Map<NonPlayerCharacter>(newNonPlayerCharacter);
+
+                nonPlayerCharacterToAdd.UserId = userId;
+
+                nonPlayerCharacterToAdd.Adventures = new List<Adventure>();
+
+                await _nonPlayerCharacterRepository.AddEntityAsync(nonPlayerCharacterToAdd);
+
+                nonPlayerCharacterToAdd.Adventures.Add(adventureToAddTo);
+
+                await _adventureRepository.LinkEntitiesAsync(
+                    new List<Adventure>()
+                    {
+                        adventureToAddTo
+                    },
+                    nonPlayerCharacterToAdd,
+                    "Adventures"
+                );
+
+                response.Success = true;
+                response.Message = "NPC was successfully added to Adventure";
             }
             catch (Exception exception)
             {

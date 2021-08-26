@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 using MGME.Core.DTOs;
 using MGME.Core.DTOs.Adventure;
+using MGME.Core.DTOs.NonPlayerCharacter;
 using MGME.Core.Interfaces.Services;
 
 namespace MGME.Web.Controllers
@@ -88,6 +89,21 @@ namespace MGME.Web.Controllers
             }
 
             return NotFound(response);
+        }
+
+        [HttpPost("AddNewNPC")]
+        public async Task <IActionResult> AddNewNonPlayerCharacterToAdventure(AddNonPlayerCharacterDTO newNonPlayerCharacter)
+        {
+            BaseServiceResponse response = await _adventureService.AddNewNonPlayerCharacterToAdventure(
+                newNonPlayerCharacter
+            );
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return BadRequest(response);
         }
     }
 }
