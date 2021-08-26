@@ -11,7 +11,7 @@ import {
 import { URLBuilder, DataController } from '../../shared/utils';
 
 interface AddToAdventureParams {
-    adventure: number;
+    adventureId: number;
     playerCharacters?: number[];
     nonPlayerCharacters?: number[];
     keys: string[];
@@ -28,14 +28,19 @@ type CreateAdventureParams = {
 }
 
 export const addToAdventure = async (
-    { adventure, playerCharacters, nonPlayerCharacters, keys }: AddToAdventureParams): Promise<BaseServiceResponse> => {
+    {
+        adventureId,
+        playerCharacters,
+        nonPlayerCharacters,
+        keys
+    }: AddToAdventureParams): Promise<BaseServiceResponse> => {
 
     return await DataController.UpdateAndRefetch(
         {
             url: URLBuilder.WriteTo('adventure', 'addto'),
             method: 'POST',
             body: {
-                adventure: adventure,
+                adventureId: adventureId,
                 playerCharacters: playerCharacters ?? [],
                 nonPlayerCharacters: nonPlayerCharacters ?? []
             },

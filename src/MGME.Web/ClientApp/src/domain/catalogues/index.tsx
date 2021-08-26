@@ -159,7 +159,7 @@ export const Catalogues = (): ReactElement => {
         const response = await addToAdventure(
             {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                adventure: selectedAdventure!,
+                adventureId: selectedAdventure!,
                 // If single character was selected, send nothing, otherwise send list
                 playerCharacters: typeof(selectedPlayerCharacters) === 'number'
                     ? []
@@ -221,7 +221,7 @@ export const Catalogues = (): ReactElement => {
         // Temp hardcode
         const response = await addToPlayerCharacter(
             {
-                playerCharacter: selectedPlayerCharacters as number,
+                playerCharacterId: selectedPlayerCharacters as number,
                 nonPlayerCharacters: selectedNonPlayerCharacters
             }
         );

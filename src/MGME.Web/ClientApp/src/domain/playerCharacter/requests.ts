@@ -23,7 +23,7 @@ type CreateCharacterParams = {
 }
 
 type AddToPlayerCharacterParams = {
-    playerCharacter: number;
+    playerCharacterId: number;
     nonPlayerCharacters: number[];
 }
 

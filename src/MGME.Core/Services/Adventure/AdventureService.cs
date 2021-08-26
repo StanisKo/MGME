@@ -479,11 +479,7 @@ namespace MGME.Core.Services.AdventureService
             {
                 Adventure adventureToAddTo = await _adventureRepository.GetEntityAsync(
                     id: newNonPlayerCharacter.AdventureId,
-                    predicate: adventure => adventure.UserId == userId,
-                    include: new[]
-                    {
-                        "NonPlayerCharacters"
-                    }
+                    predicate: adventure => adventure.UserId == userId
                 );
 
                 if (adventureToAddTo is null)
