@@ -275,7 +275,7 @@ namespace MGME.Infra.Data.Repositories
             // No changes to the linked entity
             _database.Entry(linkedEntity).State = EntityState.Unchanged;
 
-            // Only change the collection on the linked entity (and thus remove entries in the mapping table)
+            // Only change the collection on the linked entity (and thus remove entries from the mapping table)
             _database.Entry(linkedEntity).Collection(linkingCollection).IsModified = true;
 
             await _database.SaveChangesAsync();

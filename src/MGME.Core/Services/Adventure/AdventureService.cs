@@ -488,7 +488,7 @@ namespace MGME.Core.Services.AdventureService
                 if (thereArePlayerCharactersToRemove)
                 {
                     adventureToRemoveFrom.PlayerCharacters = adventureToRemoveFrom.PlayerCharacters.Where(
-                        playerCharacter => ids.PlayerCharacters.Contains(playerCharacter.Id)
+                        playerCharacter => !ids.PlayerCharacters.Contains(playerCharacter.Id)
                     ).ToList();
 
                     await _adventureRepository.UnlinkEntitiesAsync(
@@ -500,12 +500,9 @@ namespace MGME.Core.Services.AdventureService
                 if (thereAreNonPlayerCharactersToRemove)
                 {
                     adventureToRemoveFrom.NonPlayerCharacters = adventureToRemoveFrom.NonPlayerCharacters.Where(
-                        nonPlayerCharacter => ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id)
+                        nonPlayerCharacter => !ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id)
                     ).ToList();
 
-                    Console.WriteLine(adventureToRemoveFrom.NonPlayerCharacters.Count);
-
-                    // TODO: This doesn't work, investigate
                     await _adventureRepository.UnlinkEntitiesAsync(
                         adventureToRemoveFrom,
                         "NonPlayerCharacters"
