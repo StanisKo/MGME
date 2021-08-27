@@ -28,6 +28,8 @@ import {
     AccordionDetails
 } from '@material-ui/core';
 
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 import { StartBattleIcon, FateQuestionIcon, ThreadListIcon, AddNewSceneIcon, ModifyNPCIcon } from './icons';
 
 import { createStyles, makeStyles } from '@material-ui/core/styles';
@@ -62,7 +64,8 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         accordion: {
             backgroundColor: 'transparent',
-            boxShadow: '0 0 0 0'
+            boxShadow: '0 0 0 0',
+            border: '1px solid rgba(80, 80, 80, 0.1)'
         }
     })
 );
@@ -93,6 +96,9 @@ export const AdventureDetailPage = (): ReactElement => {
             }
         })();
     }, [isAuthorized]);
+
+    // Can't create new scenes if there are unresolved scenes (reversed since it's faster)
+    const cantAddNewScene = scenes?.some(scene => !scene.resolved);
 
     return (
         <div className={centered}>
@@ -154,10 +160,11 @@ export const AdventureDetailPage = (): ReactElement => {
                             <Grid item xs={12}>
                                 <Accordion className={accordion}>
                                     <AccordionSummary
-                                        aria-controls="playerCharacters-content"
-                                        id="playerCharacters-header"
+                                        expandIcon={<ExpandMoreIcon />}
+                                        aria-controls="adventure-context"
+                                        id="adventure-context"
                                     >
-                                        <Typography>
+                                        <Typography style={{ fontStyle: 'italic' }}>
                                             Context
                                         </Typography>
                                     </AccordionSummary>
@@ -180,6 +187,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                             size="medium"
                                             aria-label="add-scene"
                                             className={buttonElement}
+                                            disabled={cantAddNewScene}
                                         >
                                             <Tooltip title="Add New Scene">
                                                 {returnCalledComponent(AddNewSceneIcon)}
