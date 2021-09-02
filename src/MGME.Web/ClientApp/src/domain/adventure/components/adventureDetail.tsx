@@ -98,7 +98,7 @@ export const AdventureDetailPage = (): ReactElement => {
     }, [isAuthorized]);
 
     // Can't create new scenes if there are unresolved scenes (reversed since it's faster)
-    const cantAddNewScene = scenes?.some(scene => !scene.resolved);
+    const cantAddNewScene = scenes?.some(scene => !scene.resolved) ?? false;
 
     return (
         <div className={centered}>
@@ -182,17 +182,17 @@ export const AdventureDetailPage = (): ReactElement => {
                             <Sticky>
                                 <AppBar className={appBar}>
                                     <Toolbar className={toolBar}>
-                                        <IconButton
-                                            color="primary"
-                                            size="medium"
-                                            aria-label="add-scene"
-                                            className={buttonElement}
-                                            disabled={cantAddNewScene}
-                                        >
-                                            <Tooltip title="Add New Scene">
-                                                {returnCalledComponent(AddNewSceneIcon)}
-                                            </Tooltip>
-                                        </IconButton>
+                                        <Tooltip title="Add New Scene">
+                                            <IconButton
+                                                color="primary"
+                                                size="medium"
+                                                aria-label="add-scene"
+                                                className={buttonElement}
+                                                disabled={cantAddNewScene}
+                                            >
+                                                <AddNewSceneIcon disabled={cantAddNewScene} />
+                                            </IconButton>
+                                        </Tooltip>
 
                                         <IconButton
                                             color="primary"

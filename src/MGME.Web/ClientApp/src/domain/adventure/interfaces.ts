@@ -31,3 +31,7 @@ export interface AdventureDetail extends BaseEntity {
     nonPlayerCharacter: RelatedNonPlayerCharacter[];
     threads: RelatedThread[];
 }
+
+export interface IconProps {
+    disabled: boolean;
+}
