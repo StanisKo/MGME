@@ -487,9 +487,19 @@ namespace MGME.Core.Services.AdventureService
 
                 if (thereArePlayerCharactersToRemove)
                 {
-                    adventureToRemoveFrom.PlayerCharacters = adventureToRemoveFrom.PlayerCharacters.Where(
+                    List<PlayerCharacter> remainingPlayerCharacters = adventureToRemoveFrom.PlayerCharacters.Where(
                         playerCharacter => !ids.PlayerCharacters.Contains(playerCharacter.Id)
                     ).ToList();
+
+                    if (!remainingPlayerCharacters.Any())
+                    {
+                        response.Success = false;
+                        response.Message = "There cannot be less than one Character taking part in Adventure";
+
+                        return response;
+                    }
+
+                    adventureToRemoveFrom.PlayerCharacters = remainingPlayerCharacters;
 
                     await _adventureRepository.UnlinkEntitiesAsync(
                         adventureToRemoveFrom,
@@ -499,9 +509,19 @@ namespace MGME.Core.Services.AdventureService
 
                 if (thereAreNonPlayerCharactersToRemove)
                 {
-                    adventureToRemoveFrom.NonPlayerCharacters = adventureToRemoveFrom.NonPlayerCharacters.Where(
+                    List<NonPlayerCharacter> remainingNonPlayerCharacters = adventureToRemoveFrom.NonPlayerCharacters.Where(
                         nonPlayerCharacter => !ids.NonPlayerCharacters.Contains(nonPlayerCharacter.Id)
                     ).ToList();
+
+                    if (!remainingNonPlayerCharacters.Any())
+                    {
+                        response.Success = false;
+                        response.Message = "There cannot be less than one NPC taking part in Adventure";
+
+                        return response;
+                    }
+
+                    adventureToRemoveFrom.NonPlayerCharacters = remainingNonPlayerCharacters;
 
                     await _adventureRepository.UnlinkEntitiesAsync(
                         adventureToRemoveFrom,

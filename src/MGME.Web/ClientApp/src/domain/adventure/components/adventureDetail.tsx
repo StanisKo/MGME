@@ -123,16 +123,16 @@ export const AdventureDetailPage = (): ReactElement => {
                                             </Tooltip>
                                         </IconButton>
 
-                                        <IconButton
-                                            color="primary"
-                                            size="medium"
-                                            aria-label="modify-npcs"
-                                            className={buttonElement}
-                                        >
-                                            <Tooltip title="Modify NPCs">
-                                                {returnCalledComponent(ModifyNPCIcon)}
-                                            </Tooltip>
-                                        </IconButton>
+                                        <Tooltip title="Modify NPCs">
+                                            <IconButton
+                                                color="primary"
+                                                size="medium"
+                                                aria-label="modify-npcs"
+                                                className={buttonElement}
+                                            >
+                                                <ModifyNPCIcon />
+                                            </IconButton>
+                                        </Tooltip>
 
                                         <IconButton
                                             color="primary"
