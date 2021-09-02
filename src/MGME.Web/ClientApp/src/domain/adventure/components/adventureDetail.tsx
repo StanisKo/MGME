@@ -6,7 +6,7 @@ import { ApplicationState } from '../../../store';
 import { AdventureDetail } from '../interfaces';
 import { fetchAdventure } from '../requests';
 
-import { determineChaosFactorIconComponent, returnCalledComponent } from '../helpers';
+import { determineChaosFactorIconComponent } from '../helpers';
 
 import { Scene } from '../../scene/interfaces';
 import { fetchScenes } from '../../scene/requests';
@@ -97,7 +97,7 @@ export const AdventureDetailPage = (): ReactElement => {
         })();
     }, [isAuthorized]);
 
-    // Can't create new scenes if there are unresolved scenes
+    // Can create new scenes only if all scenes are resolved
     const canAddNewScene = scenes && scenes.length ? scenes.some(scene => !scene.resolved) : true;
 
     return (
@@ -134,16 +134,16 @@ export const AdventureDetailPage = (): ReactElement => {
                                             </IconButton>
                                         </Tooltip>
 
-                                        <IconButton
-                                            color="primary"
-                                            size="medium"
-                                            aria-label="modify-threads"
-                                            className={buttonElement}
-                                        >
-                                            <Tooltip title="Modify Threads">
-                                                {returnCalledComponent(ThreadListIcon)}
-                                            </Tooltip>
-                                        </IconButton>
+                                        <Tooltip title="Modify Threads">
+                                            <IconButton
+                                                color="primary"
+                                                size="medium"
+                                                aria-label="modify-threads"
+                                                className={buttonElement}
+                                            >
+                                                <ThreadListIcon />
+                                            </IconButton>
+                                        </Tooltip>
                                     </Toolbar>
                                 </AppBar>
                             </Sticky>
@@ -194,27 +194,37 @@ export const AdventureDetailPage = (): ReactElement => {
                                             </IconButton>
                                         </Tooltip>
 
-                                        <IconButton
-                                            color="primary"
-                                            size="medium"
-                                            aria-label="ask-fate-question"
-                                            className={buttonElement}
-                                        >
-                                            <Tooltip title="Ask Fate Question">
-                                                {returnCalledComponent(FateQuestionIcon)}
-                                            </Tooltip>
-                                        </IconButton>
+                                        <Tooltip title="Ask Fate Question">
+                                            <IconButton
+                                                color="primary"
+                                                size="medium"
+                                                aria-label="ask-fate-question"
+                                                className={buttonElement}
+                                                /*
+                                                Can ask fate question only if there is active (unresolved scene)
+                                                Opposite of when user can create new scene
+                                                */
+                                                disabled={canAddNewScene}
+                                            >
+                                                <FateQuestionIcon disabled={canAddNewScene} />
+                                            </IconButton>
+                                        </Tooltip>
 
-                                        <IconButton
-                                            color="primary"
-                                            size="medium"
-                                            aria-label="start battle"
-                                            className={buttonElement}
-                                        >
-                                            <Tooltip title="Start Battle">
-                                                {returnCalledComponent(StartBattleIcon)}
-                                            </Tooltip>
-                                        </IconButton>
+                                        <Tooltip title="Start Battle">
+                                            <IconButton
+                                                color="primary"
+                                                size="medium"
+                                                aria-label="start battle"
+                                                className={buttonElement}
+                                                /*
+                                                Can start battle only if there is active (unresolved scene)
+                                                Opposite of when user can create new scene
+                                                */
+                                                disabled={canAddNewScene}
+                                            >
+                                                <StartBattleIcon disabled={canAddNewScene} />
+                                            </IconButton>
+                                        </Tooltip>
                                     </Toolbar>
                                 </AppBar>
                             </Sticky>

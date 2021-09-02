@@ -2,8 +2,10 @@
 
 import { ReactElement } from 'react';
 
+import { IconProps } from '../../interfaces';
+
 // Icon made by Freepik from www.flaticon.com
-export const FateQuestionIcon = (): ReactElement => {
+export const FateQuestionIcon = ({ disabled }: IconProps): ReactElement => {
     return (
         <svg
             id="Capa_1"
@@ -11,39 +13,39 @@ export const FateQuestionIcon = (): ReactElement => {
             height="100%"
             viewBox="0 0 512 512"
             width="100%"
-            fill="#524878"
+            fill={disabled ? '#A4A299' : '#524878'}
             xmlns="http://www.w3.org/2000/svg"
         >
             <g>
                 <g>
                     <g id="XMLID_75_">
-                        <path d="m375.47 188.244-119.47 206.929-119.471-206.929z" fill="#b3a4ed"/>
+                        <path d="m375.47 188.244-119.47 206.929-119.471-206.929z" fill={disabled ? '#00000000' : '#b3a4ed'} />
                     </g>
                     <g id="XMLID_74_">
-                        <path d="m375.47 188.244-119.47-178.244-119.471 178.244z" fill="#9b89e0"/>
+                        <path d="m375.47 188.244-119.47-178.244-119.471 178.244z" fill={disabled ? '#00000000' : '#9b89e0'} />
                     </g>
                     <g id="XMLID_73_">
-                        <path d="m375.47 188.244-119.47-178.244 215.965 123.445z" fill="#b3a4ed"/>
+                        <path d="m375.47 188.244-119.47-178.244 215.965 123.445z" fill={disabled ? '#00000000' : '#b3a4ed'} />
                     </g>
                     <g id="XMLID_72_">
-                        <path d="m136.53 188.244 119.47-178.244-215.965 123.445z" fill="#b3a4ed"/>
+                        <path d="m136.53 188.244 119.47-178.244-215.965 123.445z" fill={disabled ? '#00000000' : '#b3a4ed'} />
                     </g>
                     <g id="XMLID_71_">
-                        <path d="m375.47 188.244-119.47 206.929 215.965-19.783z" fill="#7e6eb8"/>
+                        <path d="m375.47 188.244-119.47 206.929 215.965-19.783z" fill={disabled ? '#00000000' : '#7e6eb8'} />
                     </g>
                     <g id="XMLID_70_">
-                        <path d="m375.47 188.244 96.495-54.799v241.945z" fill="#7e6eb8"/>
+                        <path d="m375.47 188.244 96.495-54.799v241.945z" fill={disabled ? '#00000000' : '#7e6eb8'} />
                     </g><g id="XMLID_69_">
-                        <path d="m136.53 188.244-96.495-54.799v241.945z" fill="#7e6eb8"/>
+                        <path d="m136.53 188.244-96.495-54.799v241.945z" fill={disabled ? '#00000000' : '#7e6eb8'} />
                     </g>
                     <g id="XMLID_68_">
-                        <path d="m256 502v-106.827l215.965-19.783z" fill="#695c99"/>
+                        <path d="m256 502v-106.827l215.965-19.783z" fill={disabled ? '#00000000' : '#695c99'} />
                     </g>
                     <g id="XMLID_67_">
-                        <path d="m256 502v-106.827l-215.965-19.783z" fill="#695c99"/>
+                        <path d="m256 502v-106.827l-215.965-19.783z" fill={disabled ? '#00000000' : '#695c99'} />
                     </g>
                     <g id="XMLID_66_">
-                        <path d="m136.53 188.244 119.47 206.929-215.965-19.783z" fill="#7e6eb8"/>
+                        <path d="m136.53 188.244 119.47 206.929-215.965-19.783z" fill={disabled ? '#00000000' : '#7e6eb8'} />
                     </g>
                 </g>
                 <g>

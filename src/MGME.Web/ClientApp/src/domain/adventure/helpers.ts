@@ -24,8 +24,3 @@ export const determineChaosFactorIconComponent = (chaosFactor: number): ReactEle
     return ChaosFactorHardIcon();
 };
 
-/*
-A monkey-patch around mui tooltips: we either wrap svg component into span,
-what messes icon background, or return component as a call -- otherwise Tooltip doesn't work
-*/
-export const returnCalledComponent = (component: () => ReactElement): ReactElement => component();

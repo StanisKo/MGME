@@ -2,8 +2,10 @@
 
 import { ReactElement } from 'react';
 
+import { IconProps } from '../../interfaces';
+
 // Icon made by Freepik from www.flaticon.com
-export const StartBattleIcon = (): ReactElement => {
+export const StartBattleIcon = ({ disabled }: IconProps): ReactElement => {
     return (
         <svg
             id="Capa_1"
@@ -11,7 +13,7 @@ export const StartBattleIcon = (): ReactElement => {
             height="100%"
             viewBox="0 0 512 512"
             width="100%"
-            fill="#524878"
+            fill={disabled ? '#A4A299' : '#524878'}
             xmlns="http://www.w3.org/2000/svg"
         >
             <g>
