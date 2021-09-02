@@ -97,8 +97,8 @@ export const AdventureDetailPage = (): ReactElement => {
         })();
     }, [isAuthorized]);
 
-    // Can't create new scenes if there are unresolved scenes (reversed since it's faster)
-    const cantAddNewScene = scenes?.some(scene => !scene.resolved) ?? false;
+    // Can't create new scenes if there are unresolved scenes
+    const canAddNewScene = scenes && scenes.length ? scenes.some(scene => !scene.resolved) : true;
 
     return (
         <div className={centered}>
@@ -188,9 +188,9 @@ export const AdventureDetailPage = (): ReactElement => {
                                                 size="medium"
                                                 aria-label="add-scene"
                                                 className={buttonElement}
-                                                disabled={cantAddNewScene}
+                                                disabled={!canAddNewScene}
                                             >
-                                                <AddNewSceneIcon disabled={cantAddNewScene} />
+                                                <AddNewSceneIcon disabled={!canAddNewScene} />
                                             </IconButton>
                                         </Tooltip>
 
