@@ -51,7 +51,7 @@ interface Props {
     adventureChaosFactor: number;
 }
 
-export const CreateNonPlayerCharacterModal = (
+export const CreateSceneModal = (
     {
         handleDialogClose,
         classes,
@@ -63,7 +63,7 @@ export const CreateNonPlayerCharacterModal = (
 
     // Used exclusively for input validation
     const scenes: Scene[] | null = useSelector(
-        (state: ApplicationState) => state.adventureDetail.scenes?.data ?? null
+        (state: ApplicationState) => state.adventureDetail?.scenes?.data ?? null
     );
 
     const [sceneTitles, setSceneTitles] = useState<string[]>([]);
@@ -131,7 +131,7 @@ export const CreateNonPlayerCharacterModal = (
                 setup: setup.trim(),
                 adventureId: adventureId,
                 // We only provide chaos factor if it's not the first scene
-                ...(scenes.length > 1 ? { adventureChaosFactor: adventureChaosFactor } : null)
+                ...((scenes ?? []).length > 1 ? { adventureChaosFactor: adventureChaosFactor } : null)
             }
         );
 

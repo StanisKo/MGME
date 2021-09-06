@@ -1,4 +1,4 @@
-import { ReactElement, useEffect } from 'react';
+import { ReactElement, useState, useEffect, SyntheticEvent } from 'react';
 import { useSelector } from 'react-redux';
 
 import { ApplicationState } from '../../../store';
@@ -9,8 +9,11 @@ import { fetchAdventure } from '../requests';
 import { determineChaosFactorIconComponent } from '../helpers';
 
 import { Scene } from '../../scene/interfaces';
+import { CreateSceneModal } from '../../scene/components';
 import { fetchScenes } from '../../scene/requests';
 
+import { BaseServiceResponse } from '../../../shared/interfaces';
+import { Alert } from '../../../shared/components';
 import { parseIDFromURL } from '../../../shared/helpers';
 
 import {
@@ -25,7 +28,8 @@ import {
     CircularProgress,
     Accordion,
     AccordionSummary,
-    AccordionDetails
+    AccordionDetails,
+    Snackbar
 } from '@material-ui/core';
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -83,11 +87,35 @@ export const AdventureDetailPage = (): ReactElement => {
         (store: ApplicationState) => store.adventureDetail?.scenes?.data ?? null
     );
 
-    const { centered, main, appBar, toolBar, buttonElement, accordion } = useStyles();
+    const [adventureId, setAdventureId] = useState<number>(0);
+
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+
+    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+
+    const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
+
+    const handleDialogOpen = (): void => {
+        setDialogOpen(true);
+    };
+
+    const handleDialogClose = (): void => {
+        setDialogOpen(false);
+    };
+
+    const handleSnackbarClose = (event?: SyntheticEvent, reason?: string): void => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenSnackbar(false);
+    };
+
+    const { centered, main, appBar, toolBar, buttonElement, accordion, ...classes } = useStyles();
 
     useEffect(() => {
         (async (): Promise<void> => {
-            const adventureId = parseIDFromURL();
+            setAdventureId(parseIDFromURL());
 
             if (isAuthorized) {
                 await fetchAdventure(adventureId);
@@ -95,146 +123,170 @@ export const AdventureDetailPage = (): ReactElement => {
                 await fetchScenes(adventureId, 1);
             }
         })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthorized]);
 
     // Can create new scenes only if all scenes are resolved
     const canAddNewScene = scenes && scenes.length ? scenes.some(scene => !scene.resolved) : true;
 
     return (
-        <div className={centered}>
-            <Paper elevation={0} className={centered}>
-                {adventure && scenes ? (
+        <>
+            <div className={centered}>
+                <Paper elevation={0} className={centered}>
+                    {adventure && scenes ? (
 
-                    // Main Container
-                    <Grid container className={main}>
-                        {/* Left Control */}
-                        <Grid item xs={1}>
-                            <Sticky>
-                                <AppBar className={appBar}>
-                                    <Toolbar className={toolBar}>
-                                        <IconButton
-                                            color="primary"
-                                            size="medium"
-                                            aria-label="chaos-factor"
-                                            className={buttonElement}
-                                        >
-                                            <Tooltip title={`Chaos Factor: ${adventure.chaosFactor}`}>
-                                                {determineChaosFactorIconComponent(adventure.chaosFactor)}
+                        // Main Container
+                        <Grid container className={main}>
+                            {/* Left Control */}
+                            <Grid item xs={1}>
+                                <Sticky>
+                                    <AppBar className={appBar}>
+                                        <Toolbar className={toolBar}>
+                                            <IconButton
+                                                color="primary"
+                                                size="medium"
+                                                aria-label="chaos-factor"
+                                                className={buttonElement}
+                                            >
+                                                <Tooltip title={`Chaos Factor: ${adventure.chaosFactor}`}>
+                                                    {determineChaosFactorIconComponent(adventure.chaosFactor)}
+                                                </Tooltip>
+                                            </IconButton>
+
+                                            <Tooltip title="Modify NPCs">
+                                                <IconButton
+                                                    color="primary"
+                                                    size="medium"
+                                                    aria-label="modify-npcs"
+                                                    className={buttonElement}
+                                                >
+                                                    <ModifyNPCIcon />
+                                                </IconButton>
                                             </Tooltip>
-                                        </IconButton>
 
-                                        <Tooltip title="Modify NPCs">
-                                            <IconButton
-                                                color="primary"
-                                                size="medium"
-                                                aria-label="modify-npcs"
-                                                className={buttonElement}
-                                            >
-                                                <ModifyNPCIcon />
-                                            </IconButton>
-                                        </Tooltip>
-
-                                        <Tooltip title="Modify Threads">
-                                            <IconButton
-                                                color="primary"
-                                                size="medium"
-                                                aria-label="modify-threads"
-                                                className={buttonElement}
-                                            >
-                                                <ThreadListIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </Toolbar>
-                                </AppBar>
-                            </Sticky>
-                        </Grid>
-
-                        {/* Scenes */}
-                        <Grid item container justifyContent="center" xs={10}>
-                            <Grid item xs={12}>
-                                <Typography align="center" variant="h5" component="h5">
-                                    {adventure.title}
-                                </Typography>
+                                            <Tooltip title="Modify Threads">
+                                                <IconButton
+                                                    color="primary"
+                                                    size="medium"
+                                                    aria-label="modify-threads"
+                                                    className={buttonElement}
+                                                >
+                                                    <ThreadListIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </Toolbar>
+                                    </AppBar>
+                                </Sticky>
                             </Grid>
 
-                            <Grid item xs={12}>
-                                <Accordion className={accordion}>
-                                    <AccordionSummary
-                                        expandIcon={<ExpandMoreIcon />}
-                                        aria-controls="adventure-context"
-                                        id="adventure-context"
-                                    >
-                                        <Typography style={{ fontStyle: 'italic' }}>
-                                            Context
-                                        </Typography>
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                        <Typography align="center">
-                                            {adventure.context}
-                                        </Typography>
-                                    </AccordionDetails>
-                                </Accordion>
+                            {/* Scenes */}
+                            <Grid item container justifyContent="center" xs={10}>
+                                <Grid item xs={12}>
+                                    <Typography align="center" variant="h5" component="h5">
+                                        {adventure.title}
+                                    </Typography>
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <Accordion className={accordion}>
+                                        <AccordionSummary
+                                            expandIcon={<ExpandMoreIcon />}
+                                            aria-controls="adventure-context"
+                                            id="adventure-context"
+                                        >
+                                            <Typography style={{ fontStyle: 'italic' }}>
+                                                Context
+                                            </Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                            <Typography align="center">
+                                                {adventure.context}
+                                            </Typography>
+                                        </AccordionDetails>
+                                    </Accordion>
+                                </Grid>
                             </Grid>
+
+                            {/* Right Control */}
+                            <Grid item xs={1}>
+                                <Sticky>
+                                    <AppBar className={appBar}>
+                                        <Toolbar className={toolBar}>
+                                            <Tooltip title="Add New Scene">
+                                                <IconButton
+                                                    color="primary"
+                                                    size="medium"
+                                                    aria-label="add-scene"
+                                                    className={buttonElement}
+                                                    disabled={!canAddNewScene}
+                                                    onClick={handleDialogOpen}
+                                                >
+                                                    <AddNewSceneIcon disabled={!canAddNewScene} />
+                                                </IconButton>
+                                            </Tooltip>
+
+                                            <Tooltip title="Ask Fate Question">
+                                                <IconButton
+                                                    color="primary"
+                                                    size="medium"
+                                                    aria-label="ask-fate-question"
+                                                    className={buttonElement}
+                                                    /*
+                                                    Can ask fate question only if there is active (unresolved scene)
+                                                    Opposite of when user can create new scene
+                                                    */
+                                                    disabled={canAddNewScene}
+                                                >
+                                                    <FateQuestionIcon disabled={canAddNewScene} />
+                                                </IconButton>
+                                            </Tooltip>
+
+                                            <Tooltip title="Start Battle">
+                                                <IconButton
+                                                    color="primary"
+                                                    size="medium"
+                                                    aria-label="start battle"
+                                                    className={buttonElement}
+                                                    /*
+                                                    Can start battle only if there is active (unresolved scene)
+                                                    Opposite of when user can create new scene
+                                                    */
+                                                    disabled={canAddNewScene}
+                                                >
+                                                    <StartBattleIcon disabled={canAddNewScene} />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </Toolbar>
+                                    </AppBar>
+                                </Sticky>
+                            </Grid>
+
                         </Grid>
+                    ) : (
+                        <CircularProgress />
+                    )}
+                </Paper>
+            </div>
 
-                        {/* Right Control */}
-                        <Grid item xs={1}>
-                            <Sticky>
-                                <AppBar className={appBar}>
-                                    <Toolbar className={toolBar}>
-                                        <Tooltip title="Add New Scene">
-                                            <IconButton
-                                                color="primary"
-                                                size="medium"
-                                                aria-label="add-scene"
-                                                className={buttonElement}
-                                                disabled={!canAddNewScene}
-                                            >
-                                                <AddNewSceneIcon disabled={!canAddNewScene} />
-                                            </IconButton>
-                                        </Tooltip>
+            {adventure && dialogOpen && (
+                <CreateSceneModal
+                    handleDialogClose={handleDialogClose}
+                    classes={classes as unknown as { [key: string]: string }}
+                    setResponse={setResponse}
+                    setOpenSnackBar={setOpenSnackbar}
+                    adventureId={adventureId}
+                    adventureChaosFactor={adventure.chaosFactor}
+                />
+            )}
 
-                                        <Tooltip title="Ask Fate Question">
-                                            <IconButton
-                                                color="primary"
-                                                size="medium"
-                                                aria-label="ask-fate-question"
-                                                className={buttonElement}
-                                                /*
-                                                Can ask fate question only if there is active (unresolved scene)
-                                                Opposite of when user can create new scene
-                                                */
-                                                disabled={canAddNewScene}
-                                            >
-                                                <FateQuestionIcon disabled={canAddNewScene} />
-                                            </IconButton>
-                                        </Tooltip>
-
-                                        <Tooltip title="Start Battle">
-                                            <IconButton
-                                                color="primary"
-                                                size="medium"
-                                                aria-label="start battle"
-                                                className={buttonElement}
-                                                /*
-                                                Can start battle only if there is active (unresolved scene)
-                                                Opposite of when user can create new scene
-                                                */
-                                                disabled={canAddNewScene}
-                                            >
-                                                <StartBattleIcon disabled={canAddNewScene} />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </Toolbar>
-                                </AppBar>
-                            </Sticky>
-                        </Grid>
-
-                    </Grid>
-                ) : (
-                    <CircularProgress />
-                )}
-            </Paper>
-        </div>
+            <Snackbar open={openSnackbar} onClose={handleSnackbarClose}>
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity={response.success ? 'success' : 'warning'}
+                >
+                    {response.message}
+                </Alert>
+            </Snackbar>
+        </>
     );
 };
