@@ -1,8 +1,16 @@
 import { Scene } from './interfaces';
 
-import { PaginatedDataServiceResponse, ReadFromApi } from '../../shared/interfaces';
+import { BaseServiceResponse, PaginatedDataServiceResponse, ReadFromApi } from '../../shared/interfaces';
 
 import { URLBuilder, DataController } from '../../shared/utils';
+
+type CreateSceneProps = {
+    title: string;
+    setup: string;
+    adventureId: number;
+    adventureChaosFactor?: number;
+    randomEvent?: string;
+};
 
 export const fetchScenes = async (adventureId: number, page?: number): Promise<void> => {
     const params: ReadFromApi['params'] = {
@@ -22,3 +30,16 @@ export const fetchScenes = async (adventureId: number, page?: number): Promise<v
         }
     );
 };
+
+export const createScene = async (params: CreateSceneProps): Promise<BaseServiceResponse> => {
+    return DataController.UpdateAndRefetch(
+        {
+            url: URLBuilder.WriteTo('scene', 'add'),
+            method: 'POST',
+            body: params,
+            page: 'adventureDetail',
+            keys: ['scenes']
+        }
+    );
+};
+
