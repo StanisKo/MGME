@@ -16,19 +16,9 @@ import {
     DialogContent,
     Grid,
     TextField,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    List,
-    ListItem,
-    ListItemText,
-    LinearProgress,
     DialogActions,
-    Button,
-    Typography
+    Button
 } from '@material-ui/core';
-
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
@@ -85,8 +75,6 @@ export const CreateNonPlayerCharacterModal = (
     const [setup, setSetup] = useState<string>('');
     const [setupError, setSetupError] = useState<boolean>(false);
     const [setupHelperText, setSetupHelperText] = useState<string>('');
-
-    const [expanded, setExpanded] = useState<boolean>(false);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
@@ -174,18 +162,18 @@ export const CreateNonPlayerCharacterModal = (
             aria-describedby="alert-dialog-description"
         >
             <DialogTitle id="alert-dialog-title" className={classes.centered}>
-                Create NPC
+                Create Scene
             </DialogTitle>
             <DialogContent>
                 <Grid container spacing={4}>
                     <Grid item xs={12}>
                         <TextField
-                            error={nameError}
-                            helperText={nameHelperText}
+                            error={titleError}
+                            helperText={titleHelperText}
                             variant="outlined"
                             required
                             fullWidth
-                            label="Name"
+                            label="Title"
                             onChange={handleInputChange}
                             inputProps={{ inputtype: INPUT_TYPE.ENTITY_NAME }}
                             className={root}
@@ -194,58 +182,16 @@ export const CreateNonPlayerCharacterModal = (
 
                     <Grid item xs={12}>
                         <TextField
+                            error={setupError}
+                            helperText={setupHelperText}
                             variant="outlined"
+                            required
                             fullWidth
-                            label="Description"
+                            label="Setup"
                             onChange={handleInputChange}
                             inputProps={{ inputtype: INPUT_TYPE.ENTITY_DESCRIPTION }}
+                            className={root}
                         />
-                    </Grid>
-
-                    <Grid item xs={12}>
-                        {playerCharacters ? (
-                            <Accordion
-                                expanded={expanded}
-                                onChange={handleAccordionExpand}
-                            >
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="playerCharacters-content"
-                                    id="playerCharacter-header"
-                                >
-                                    {/*
-                                    So, this: if user selects character, show character's name
-                                    as accordion title; otherwise show strings based on weather
-                                    available characters exist
-                                    */}
-                                    <Typography>
-                                        {playerCharacterToAdd > 0 ? playerCharacters?.find(
-                                            character => character.id === playerCharacterToAdd
-                                        )?.name : playerCharacters?.length
-                                            ? 'Available Characters'
-                                            : 'No available Characters'
-                                        }
-                                    </Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <List style={{ width: '100%' }}>
-                                        {playerCharacters?.map((playerCharacter, index) => {
-                                            return (
-                                                <ListItem
-                                                    key={`avaialable-character-${index}`}
-                                                    button
-                                                    onClick={handleAddingPlayerCharacter(
-                                                        playerCharacter.id
-                                                    )}
-                                                >
-                                                    <ListItemText primary={playerCharacter.name} />
-                                                </ListItem>
-                                            );
-                                        })}
-                                    </List>
-                                </AccordionDetails>
-                            </Accordion>
-                        ) : <LinearProgress />}
                     </Grid>
                 </Grid>
             </DialogContent>
@@ -257,7 +203,7 @@ export const CreateNonPlayerCharacterModal = (
                     onClick={handleCreate}
                     variant="contained"
                     color="primary"
-                    disabled={!name || nameError}
+                    disabled={!title || titleError || !setup || setupError}
                 >
                     Create
                 </Button>
