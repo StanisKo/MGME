@@ -182,7 +182,7 @@ export const AdventureDetailPage = (): ReactElement => {
                             </Grid>
 
                             {/* Scenes */}
-                            <Grid item container justifyContent="center" xs={10}>
+                            <Grid item container justifyContent="center" xs={10} spacing={4}>
                                 <Grid item xs={12}>
                                     <Typography align="center" variant="h5" component="h5">
                                         {adventure.title}
@@ -206,6 +206,29 @@ export const AdventureDetailPage = (): ReactElement => {
                                             </Typography>
                                         </AccordionDetails>
                                     </Accordion>
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    {scenes && scenes.length && scenes.map(scene => {
+                                        return (
+                                            <Accordion className={accordion} key={scene.id}>
+                                                <AccordionSummary
+                                                    expandIcon={<ExpandMoreIcon />}
+                                                    aria-controls={`scene-${scene.id}-content`}
+                                                    id={`scene-${scene.id}-content`}
+                                                >
+                                                    <Typography style={{ fontStyle: 'italic' }}>
+                                                        {scene.title}
+                                                    </Typography>
+                                                </AccordionSummary>
+                                                <AccordionDetails>
+                                                    <Typography align="center">
+                                                        {scene.setup}
+                                                    </Typography>
+                                                </AccordionDetails>
+                                            </Accordion>
+                                        );
+                                    })}
                                 </Grid>
                             </Grid>
 
