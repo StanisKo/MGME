@@ -18,7 +18,11 @@ import {
     TextField,
     DialogActions,
     Button,
-    Box
+    Box,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    Typography
 } from '@material-ui/core';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -76,6 +80,8 @@ export const CreateSceneModal = (
     const [setup, setSetup] = useState<string>('');
     const [setupError, setSetupError] = useState<boolean>(false);
     const [setupHelperText, setSetupHelperText] = useState<string>('');
+
+    const [randomEvent] = useState<string>('');
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
@@ -194,13 +200,37 @@ export const CreateSceneModal = (
                             className={root}
                         />
                     </Grid>
+
+                    <Grid item xs={12}>
+                        <Accordion expanded={randomEvent.length > 0} disabled={!randomEvent}>
+                            <AccordionSummary
+                                aria-controls="random-event"
+                                id="random-event"
+                            >
+                                <Typography>
+                                    Random Event
+                                </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <Typography align="center">
+                                    {randomEvent}
+                                </Typography>
+                            </AccordionDetails>
+                        </Accordion>
+                    </Grid>
                 </Grid>
             </DialogContent>
             <Box mt={2}>
                 <DialogActions className={clsx(classes.centered, classes.buttons)}>
+
                     <Button onClick={handleDialogClose} variant="contained" color="secondary">
                         Cancel
                     </Button>
+
+                    <Button variant="outlined" color="primary">
+                        Randomize
+                    </Button>
+
                     <Button
                         onClick={handleCreate}
                         variant="contained"

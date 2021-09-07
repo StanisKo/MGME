@@ -222,7 +222,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                                     aria-controls={`scene-${scene.id}-content`}
                                                     id={`scene-${scene.id}-content`}
                                                 >
-                                                    <Typography style={{ fontStyle: 'italic' }}>
+                                                    <Typography>
                                                         {scene.title}
                                                     </Typography>
                                                 </AccordionSummary>
