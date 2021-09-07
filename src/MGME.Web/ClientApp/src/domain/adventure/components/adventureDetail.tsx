@@ -53,6 +53,11 @@ const useStyles = makeStyles((theme: Theme) =>
         main: {
             minHeight: '35vh'
         },
+        buttons: {
+            '& button': {
+                margin: '0 .5em 0 .5em'
+            }
+        },
         appBar: {
             backgroundColor: 'transparent',
             boxShadow: '0 0 0 0',
@@ -111,7 +116,7 @@ export const AdventureDetailPage = (): ReactElement => {
         setOpenSnackbar(false);
     };
 
-    const { centered, main, appBar, toolBar, buttonElement, accordion, ...classes } = useStyles();
+    const { main, appBar, toolBar, buttonElement, accordion, ...classes } = useStyles();
 
     useEffect(() => {
         (async (): Promise<void> => {
@@ -133,8 +138,8 @@ export const AdventureDetailPage = (): ReactElement => {
 
     return (
         <>
-            <div className={centered}>
-                <Paper elevation={0} className={centered}>
+            <div className={classes.centered}>
+                <Paper elevation={0} className={classes.centered}>
                     {adventure && scenes ? (
 
                         // Main Container

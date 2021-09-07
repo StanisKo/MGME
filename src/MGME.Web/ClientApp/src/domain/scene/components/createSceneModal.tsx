@@ -17,7 +17,8 @@ import {
     Grid,
     TextField,
     DialogActions,
-    Button
+    Button,
+    Box
 } from '@material-ui/core';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -195,19 +196,21 @@ export const CreateSceneModal = (
                     </Grid>
                 </Grid>
             </DialogContent>
-            <DialogActions className={clsx(classes.centered, classes.buttons)}>
-                <Button onClick={handleDialogClose} variant="contained" color="secondary">
-                    Cancel
-                </Button>
-                <Button
-                    onClick={handleCreate}
-                    variant="contained"
-                    color="primary"
-                    disabled={!title || titleError || !setup || setupError}
-                >
-                    Create
-                </Button>
-            </DialogActions>
+            <Box mt={2}>
+                <DialogActions className={clsx(classes.centered, classes.buttons)}>
+                    <Button onClick={handleDialogClose} variant="contained" color="secondary">
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleCreate}
+                        variant="contained"
+                        color="primary"
+                        disabled={!title || titleError || !setup || setupError}
+                    >
+                        Create
+                    </Button>
+                </DialogActions>
+            </Box>
         </Dialog>
     );
 };
