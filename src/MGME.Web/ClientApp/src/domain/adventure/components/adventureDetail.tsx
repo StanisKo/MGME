@@ -129,7 +129,7 @@ export const AdventureDetailPage = (): ReactElement => {
     }, [isAuthorized]);
 
     // Can create new scenes only if all scenes are resolved
-    const canAddNewScene = scenes && scenes.length ? scenes.some(scene => !scene.resolved) : true;
+    const canAddNewScene = scenes?.every(scene => scene.resolved) ?? true;
 
     return (
         <>
@@ -209,7 +209,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                 </Grid>
 
                                 <Grid item xs={12}>
-                                    {scenes && scenes.length && scenes.map(scene => {
+                                    {(scenes && scenes.length) ? scenes.map(scene => {
                                         return (
                                             <Accordion className={accordion} key={scene.id}>
                                                 <AccordionSummary
@@ -228,7 +228,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                                 </AccordionDetails>
                                             </Accordion>
                                         );
-                                    })}
+                                    }) : null}
                                 </Grid>
                             </Grid>
 
