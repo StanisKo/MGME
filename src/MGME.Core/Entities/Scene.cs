@@ -18,7 +18,7 @@ namespace MGME.Core.Entities
         [Required]
         public string Setup { get; set; }
 
-        public string InterruptEvent { get; set; }
+        public string RandomEvent { get; set; }
 
         public string ModifiedSetup { get; set; }
 

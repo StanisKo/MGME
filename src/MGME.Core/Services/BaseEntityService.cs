@@ -11,9 +11,9 @@ namespace MGME.Core.Services
     {
         protected readonly IHttpContextAccessor _httpContextAccessor;
 
-        public BaseEntityService(IHttpContextAccessor httpContextAcessor)
+        protected BaseEntityService(IHttpContextAccessor httpContextAccessor)
         {
-            _httpContextAccessor = httpContextAcessor;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         protected int GetUserIdFromHttpContext()
@@ -22,13 +22,6 @@ namespace MGME.Core.Services
                 _httpContextAccessor.HttpContext.User.FindFirstValue(
                     ClaimTypes.NameIdentifier
                 )
-            );
-        }
-
-        protected string GetUserRoleFromHttpContext()
-        {
-            return _httpContextAccessor.HttpContext.User.FindFirstValue(
-                    ClaimTypes.Role
             );
         }
 
@@ -42,11 +35,11 @@ namespace MGME.Core.Services
 
             PropertyInfo[] updatedProperties = updateSource.GetType().GetProperties();
 
-            List<string> propertiesToUpdate = new List<string>();
+            List<string> propertiesToUpdate = new();
 
             foreach (PropertyInfo updatedProperty in updatedProperties)
             {
-                if (updatedProperty.GetValue(updateSource) == null || updatedProperty.Name == "Id")
+                if (updatedProperty.GetValue(updateSource) is null || updatedProperty.Name == "Id")
                 {
                     continue;
                 }

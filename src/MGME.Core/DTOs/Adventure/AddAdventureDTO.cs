@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 using MGME.Core.DTOs.Thread;
 using MGME.Core.DTOs.NonPlayerCharacter;
-using System.ComponentModel.DataAnnotations;
 
 namespace MGME.Core.DTOs.Adventure
 {

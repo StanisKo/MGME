@@ -4,6 +4,9 @@
 # Visual Studio 2019 Mac cache/options directory
 .vs/*
 
+# Rider
+.idea
+
 # TODOs
 docs/*.todo
 
@@ -92,9 +95,6 @@ $RECYCLE.BIN/
 *.user
 *.userosscache
 *.sln.docstates
-
-# User-specific files (MonoDevelop/Xamarin Studio)
-*.userprefs
 
 # Build results
 [Dd]ebug/

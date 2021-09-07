@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 
+using MGME.Web.Utils;
 using MGME.Infra.Data;
 
 namespace MGME.Web
@@ -17,18 +18,6 @@ namespace MGME.Web
     {
         public static void Main(string[] args)
         {
-            /*
-            Environment file parsing is necessary only for local development
-
-            Since we cannot point asp to .env file as we can via docker-compose,
-            We need to pin down the file and load the variables into memory programmatically
-            */
-            string rootDirectory = Directory.GetCurrentDirectory();
-
-            string environmentFile = Path.Combine(rootDirectory, "../../.env");
-
-            DotEnv.Load(environmentFile);
-
             IHost host = CreateHostBuilder(args).Build();
 
             using (IServiceScope scope = host.Services.CreateScope())
@@ -57,9 +46,21 @@ namespace MGME.Web
             host.Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            /*
+            Environment file parsing is necessary only for local development
 
-            Host.CreateDefaultBuilder(args).ConfigureAppConfiguration((_, config) =>
+            Since we cannot point asp to .env file as we can via docker-compose,
+            We need to pin down the file and load the variables into memory programmatically
+            */
+            string rootDirectory = Directory.GetCurrentDirectory();
+
+            string environmentFile = Path.Combine(rootDirectory, "../../.env");
+
+            DotEnv.Load(environmentFile);
+
+            return Host.CreateDefaultBuilder(args).ConfigureAppConfiguration((_, config) =>
                 {
                     config.AddEnvironmentVariables();
                 }
@@ -68,5 +69,6 @@ namespace MGME.Web
                     webBuilder.UseStartup<Startup>();
                 }
             );
+        }
     }
 }

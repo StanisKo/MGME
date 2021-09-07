@@ -15,7 +15,7 @@ namespace MGME.Core.Utils.Sorters
             return base.DetermineSorting(sortingParameter, _adventureSortingOptions);
         }
 
-        private Dictionary<string, List<Expression<Func<Adventure, object>>>> _adventureSortingOptions = new()
+        private readonly Dictionary<string, List<Expression<Func<Adventure, object>>>> _adventureSortingOptions = new()
         {
             {
                 "title", new()

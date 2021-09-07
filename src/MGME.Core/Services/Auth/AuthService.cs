@@ -28,8 +28,6 @@ namespace MGME.Core.Services.AuthService
 {
     public class AuthService : BaseEntityService, IAuthService
     {
-        private readonly IAuthRepository _authRepository;
-
         private readonly IEntityRepository<User> _userRepository;
 
         private readonly IEntityRepository<RefreshToken> _tokenRepository;
@@ -46,8 +44,7 @@ namespace MGME.Core.Services.AuthService
 
         private readonly SymmetricSecurityKey _securityKey;
 
-        public AuthService(IAuthRepository authRepository,
-                           IEntityRepository<User> userRepository,
+        public AuthService(IEntityRepository<User> userRepository,
                            IEntityRepository<RefreshToken> tokenRepository,
                            IHashingService hashingService,
                            IMapper mapper,
@@ -55,7 +52,6 @@ namespace MGME.Core.Services.AuthService
                            IWebHostEnvironment environment,
                            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
-            _authRepository = authRepository;
             _userRepository = userRepository;
             _tokenRepository = tokenRepository;
 
@@ -76,11 +72,13 @@ namespace MGME.Core.Services.AuthService
 
         public async Task <BaseServiceResponse> RegisterUser(string name, string email, string password)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             try
             {
-                bool userNameIsTaken = await _authRepository.CheckIfUserExistsAsync(name, nameof(User.Name));
+                bool userNameIsTaken = await _userRepository.CheckIfEntityExistsAsync(
+                    user => String.Equals(user.Name.ToLower(), name.ToLower())
+                );
 
                 if (userNameIsTaken)
                 {
@@ -90,7 +88,9 @@ namespace MGME.Core.Services.AuthService
                     return response;
                 }
 
-                bool emailIsTaken = await _authRepository.CheckIfUserExistsAsync(email, nameof(User.Email));
+                bool emailIsTaken = await _userRepository.CheckIfEntityExistsAsync(
+                    user => String.Equals(user.Email.ToLower(), email.ToLower())
+                );
 
                 if (emailIsTaken)
                 {
@@ -102,7 +102,7 @@ namespace MGME.Core.Services.AuthService
 
                 _hashingService.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
-                User userToRegister = new User()
+                User userToRegister = new()
                 {
                     Name = name,
                     Email = email,
@@ -128,7 +128,7 @@ namespace MGME.Core.Services.AuthService
 
         public async Task <DataServiceResponse<UserTokensDTO>> LoginUser(string name, string password)
         {
-            DataServiceResponse<UserTokensDTO> response = new DataServiceResponse<UserTokensDTO>();
+            DataServiceResponse<UserTokensDTO> response = new();
 
             try
             {
@@ -136,7 +136,7 @@ namespace MGME.Core.Services.AuthService
                     predicate: user => user.Name == name
                 );
 
-                if (userToLogin == null)
+                if (userToLogin is null)
                 {
                     response.Success = false;
                     response.Message = "Either username or password is wrong";
@@ -199,7 +199,7 @@ namespace MGME.Core.Services.AuthService
 
         public async Task <BaseServiceResponse> LogoutUser(string token)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             try
             {
@@ -216,7 +216,7 @@ namespace MGME.Core.Services.AuthService
                     }
                 );
 
-                if (tokenOwner == null)
+                if (tokenOwner is null)
                 {
                     response.Success = false;
                     response.Message = "Token is invalid";
@@ -243,17 +243,20 @@ namespace MGME.Core.Services.AuthService
 
         public async Task <DataServiceResponse<UserTokensDTO>> RefreshAccessToken(string token)
         {
-            DataServiceResponse<UserTokensDTO> response = new DataServiceResponse<UserTokensDTO>();
+            DataServiceResponse<UserTokensDTO> response = new();
 
             try
             {
                 // We query for user and not DTO, since we need additional values for JWT claims
                 User tokenOwner = await _userRepository.GetEntityAsync(
                     predicate: user => user.RefreshTokens.Any(ownedToken => ownedToken.Token == token),
-                    include: new[] { "RefreshTokens" }
+                    include: new[]
+                    {
+                        "RefreshTokens"
+                    }
                 );
 
-                if (tokenOwner == null)
+                if (tokenOwner is null)
                 {
                     response.Success = false;
                     response.Message = "Token is invalid";
@@ -321,7 +324,7 @@ namespace MGME.Core.Services.AuthService
 
         public async Task <BaseServiceResponse> ConfirmEmailAddress(string token)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             JwtSecurityToken securityToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
 
@@ -352,7 +355,7 @@ namespace MGME.Core.Services.AuthService
                         ValidateLifetime = true,
                         ClockSkew = TimeSpan.Zero
                     },
-                    out SecurityToken validatedToken
+                    out SecurityToken _
                 );
 
                 // Besides id, we only need one field ...
@@ -365,7 +368,7 @@ namespace MGME.Core.Services.AuthService
                     }
                 );
 
-                if (userToConfirmEmail == null)
+                if (userToConfirmEmail is null)
                 {
                     response.Success = false;
                     response.Message = "User does not exist";
@@ -398,12 +401,12 @@ namespace MGME.Core.Services.AuthService
 
                 /*
                 We could've used a DTO here as well
-                But ommitting two fields (hash and salt) and then using automapper
+                But omitting two fields (hash and salt) and then using automapper
                 didn't seem like considerable performance improvement
                 */
                 User userToResendEmail = await _userRepository.GetEntityAsync(userId);
 
-                if (userToResendEmail == null)
+                if (userToResendEmail is null)
                 {
                     response.Success = false;
                     response.Message = "User does not exist";
@@ -439,16 +442,15 @@ namespace MGME.Core.Services.AuthService
             return response;
         }
 
-        private string CreateRefreshToken()
+        private static string CreateRefreshToken()
         {
             byte[] randomInt = new byte[32];
 
-            using (RNGCryptoServiceProvider generator = new RNGCryptoServiceProvider())
-            {
-                generator.GetBytes(randomInt);
+            using RNGCryptoServiceProvider generator = new();
 
-                return Convert.ToBase64String(randomInt);
-            }
+            generator.GetBytes(randomInt);
+
+            return Convert.ToBase64String(randomInt);
         }
 
         private RefreshToken CreateRefreshTokenEntity(int userId, string token)
@@ -465,7 +467,7 @@ namespace MGME.Core.Services.AuthService
 
         private string CreateAccessToken(User user, DateTime expires)
         {
-            List<Claim> claims = new List<Claim>()
+            List<Claim> claims = new()
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Role, user.Role)
@@ -476,7 +478,7 @@ namespace MGME.Core.Services.AuthService
                 SecurityAlgorithms.HmacSha512Signature
             );
 
-            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor()
+            SecurityTokenDescriptor tokenDescriptor = new()
             {
                 Subject = new ClaimsIdentity(claims),
                 Issuer = _configuration["Host"],
@@ -533,33 +535,34 @@ namespace MGME.Core.Services.AuthService
                                          + Path.DirectorySeparatorChar.ToString()
                                          + "ConfirmEmail.html";
 
-            string template = null;
+            string template;
 
-            using (StreamReader SourceReader = File.OpenText(pathToEmailTemplate))
+            using (StreamReader sourceReader = File.OpenText(pathToEmailTemplate))
             {
-                template = SourceReader.ReadToEnd();
+                template = await sourceReader.ReadToEndAsync();
             }
 
-            BodyBuilder bodyBuilder = new BodyBuilder();
-
-            /*
-            We avoid formatting the template, since it contains other source of {} brackets
-            and use replace to insert the link
-            We also don't use Razor since it's a simple job
-            */
-            bodyBuilder.HtmlBody = template.Replace("confirmation-url", confirmationURL);
+            BodyBuilder bodyBuilder = new()
+            {
+                /*
+                We avoid formatting the template, since it contains other source of {} brackets
+                and use replace to insert the link
+                We also don't use Razor since it's a simple job
+                */
+                HtmlBody = template.Replace("confirmation-url", confirmationURL),
+            };
 
             confirmationMessage.Body = bodyBuilder.ToMessageBody();
 
-            using (SmtpClient smtpClient = new SmtpClient())
+            using (SmtpClient smtpClient = new())
             {
-                smtpClient.Connect(
+                await smtpClient.ConnectAsync(
                     _configuration["EmailConfiguration:SmtpServer"],
                     Convert.ToInt32(_configuration["EmailConfiguration:Port"]),
                     true
                 );
 
-                smtpClient.Authenticate(
+                await smtpClient.AuthenticateAsync(
                     _configuration["EmailConfiguration:From"],
                     Environment.GetEnvironmentVariable(
                         "EMAILSENDERPASSWORD"

@@ -21,7 +21,7 @@ namespace MGME.Core.Utils.Sorters
             if (!allowedParameters.Contains(parameter))
             {
                 throw new Exception(
-                    $"Provided sorting parameter is not supported. Sorting must be: {string.Join(", ", allowedParameters)}"
+                    $"Provided sorting parameter is not supported. Sorting must be: {String.Join(", ", allowedParameters)}"
                 );
             }
 

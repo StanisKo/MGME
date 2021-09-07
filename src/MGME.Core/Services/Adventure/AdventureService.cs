@@ -50,7 +50,7 @@ namespace MGME.Core.Services.AdventureService
 
         public async Task <PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>>> GetAllAdventures(string sortingParameter, int selectedPage)
         {
-            PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>> response = new PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>>();
+            PaginatedDataServiceResponse<IEnumerable<GetAdventureListDTO>> response = new();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -83,15 +83,85 @@ namespace MGME.Core.Services.AdventureService
             return response;
         }
 
+        public async Task <DataServiceResponse<GetAdventureDetailDTO>> GetAdventure(int id)
+        {
+            DataServiceResponse<GetAdventureDetailDTO> response = new();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+                GetAdventureDetailDTO adventure = await _adventureRepository.GetEntityAsync(
+                    id: id,
+                    predicate: adventure => adventure.UserId == userId,
+                    include: new[]
+                    {
+                        "PlayerCharacters",
+                        "NonPlayerCharacters",
+                        "Threads"
+                    },
+                    select: adventure => new GetAdventureDetailDTO()
+                    {
+                        Id = adventure.Id,
+                        Title = adventure.Title,
+                        Context = adventure.Context,
+                        ChaosFactor = adventure.ChaosFactor,
+
+                        PlayerCharacters = adventure.PlayerCharacters.Select(
+                            playerCharacter => new GetPlayerCharacterDTO()
+                            {
+                                Id = playerCharacter.Id,
+                                Name = playerCharacter.Name
+                            }
+                        ),
+
+                        NonPlayerCharacters = adventure.NonPlayerCharacters.Select(
+                            nonPlayerCharacter => new GetNonPlayerCharacterDTO()
+                            {
+                                Id = nonPlayerCharacter.Id,
+                                Name = nonPlayerCharacter.Name
+                            }
+                        ),
+
+                        Threads = adventure.Threads.Select(
+                            thread => new GetThreadDTO()
+                            {
+                                Id = thread.Id,
+                                Name = thread.Name
+                            }
+                        )
+                    }
+                );
+
+                if (adventure is null)
+                {
+                    response.Success = false;
+                    response.Message = "Adventure doesn't exist";
+
+                    return response;
+                }
+
+                response.Data = adventure;
+                response.Success = true;
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
+        }
+
         public async Task <BaseServiceResponse> AddAdventure(AddAdventureDTO newAdventure)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             bool thereAreNewNonPlayerCharactersToAdd = newAdventure.NewNonPlayerCharacters?.Any() == true;
 
-            bool thereAreExisitingNonPlayerCharactersToAdd = newAdventure.ExistingNonPlayerCharacters?.Any() == true;
+            bool thereAreExistingNonPlayerCharactersToAdd = newAdventure.ExistingNonPlayerCharacters?.Any() == true;
 
-            if (!thereAreNewNonPlayerCharactersToAdd && !thereAreExisitingNonPlayerCharactersToAdd)
+            if (!thereAreNewNonPlayerCharactersToAdd && !thereAreExistingNonPlayerCharactersToAdd)
             {
                 response.Success = false;
                 response.Message = "At least one new or existing NPC must be provided";
@@ -105,7 +175,7 @@ namespace MGME.Core.Services.AdventureService
             {
                 bool adventureExists = await _adventureRepository.CheckIfEntityExistsAsync(
                     adventure => adventure.UserId == userId
-                        && adventure.Title.ToLower() == newAdventure.Title.ToLower()
+                        && String.Equals(adventure.Title.ToLower(), newAdventure.Title.ToLower())
                 );
 
                 if (adventureExists)
@@ -116,7 +186,7 @@ namespace MGME.Core.Services.AdventureService
                     return response;
                 }
 
-                List<NonPlayerCharacter> newNonPlayerCharactersToAdd = new List<NonPlayerCharacter>();
+                List<NonPlayerCharacter> newNonPlayerCharactersToAdd = new();
 
                 if (thereAreNewNonPlayerCharactersToAdd)
                 {
@@ -161,7 +231,7 @@ namespace MGME.Core.Services.AdventureService
                     thread => _mapper.Map<Thread>(thread)
                 ).ToList();
 
-                Adventure adventureToAdd = new Adventure()
+                Adventure adventureToAdd = new()
                 {
                     Title = newAdventure.Title,
                     Context = newAdventure.Context,
@@ -194,10 +264,10 @@ namespace MGME.Core.Services.AdventureService
                 addedAdventure.PlayerCharacters = playerCharacters.ToList();
 
                 await _playerCharacterRepository.LinkEntitiesAsync(
-                        playerCharacters,
-                        addedAdventure,
-                        "PlayerCharacters"
-                    );
+                    playerCharacters,
+                    addedAdventure,
+                    "PlayerCharacters"
+                );
 
                 /*
                 Add existing NonPlayerCharacters if any
@@ -210,12 +280,12 @@ namespace MGME.Core.Services.AdventureService
                 meet conditions above, since we don't supply it to the client app,
                 but it never hurts to double check
                 */
-                if (thereAreExisitingNonPlayerCharactersToAdd)
+                if (thereAreExistingNonPlayerCharactersToAdd)
                 {
                     Expression<Func<NonPlayerCharacter, bool>> predicate =
                         nonPlayerCharacter => nonPlayerCharacter.UserId == userId
-                                && nonPlayerCharacter.PlayerCharacterId == null
-                                    && newAdventure.ExistingNonPlayerCharacters.Contains(nonPlayerCharacter.Id);
+                            && nonPlayerCharacter.PlayerCharacterId == null
+                                && newAdventure.ExistingNonPlayerCharacters.Contains(nonPlayerCharacter.Id);
 
                     IEnumerable<NonPlayerCharacter> existingNonPlayerCharacters =
                         await _nonPlayerCharacterRepository.GetEntititesAsync(
@@ -246,7 +316,7 @@ namespace MGME.Core.Services.AdventureService
 
         public async Task <BaseServiceResponse> AddToAdventure(AddToAdventureDTO ids)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             bool thereArePlayerCharactersToAdd = ids.PlayerCharacters?.Any() == true;
 
@@ -276,7 +346,7 @@ namespace MGME.Core.Services.AdventureService
                     }
                 );
 
-                if (adventureToAddTo == null)
+                if (adventureToAddTo is null)
                 {
                     response.Success = false;
                     response.Message = "Adventure doesn't exist";
@@ -335,6 +405,18 @@ namespace MGME.Core.Services.AdventureService
                         predicate: predicate
                     );
 
+                    bool nonPlayerCharacterAlreadyTakenByPlayerCharacter = nonPlayerCharactersToAdd.Any(
+                        nonPlayerCharacter => nonPlayerCharacter.PlayerCharacterId is not null
+                    );
+
+                    if (nonPlayerCharacterAlreadyTakenByPlayerCharacter)
+                    {
+                        response.Success = false;
+                        response.Message = "One of the NPCs is already taken by a Character and cannot be added to Adventure";
+
+                        return response;
+                    }
+
                     for (int i = 0; i < nonPlayerCharactersToAdd.Count(); i++)
                     {
                         adventureToAddTo.NonPlayerCharacters.Add(
@@ -365,7 +447,7 @@ namespace MGME.Core.Services.AdventureService
 
         public async Task <BaseServiceResponse> DeleteAdventure(IEnumerable<int> ids)
         {
-            BaseServiceResponse response = new BaseServiceResponse();
+            BaseServiceResponse response = new();
 
             int userId = GetUserIdFromHttpContext();
 
@@ -373,12 +455,13 @@ namespace MGME.Core.Services.AdventureService
             {
                 await _adventureRepository.DeleteEntitiesAsync(ids);
 
-                (char suffix, string verb) args = (
+                (char suffix, string verb) = (
                     ids.Count() > 1 ? ('s', "were") : ('\0', "was")
                 );
 
                 response.Success = true;
-                response.Message = $"Adventure{args.suffix} {args.verb} successfully deleted";
+
+                response.Message = $"Adventure{suffix} {verb} successfully deleted";
             }
             catch (Exception exception)
             {
@@ -391,7 +474,7 @@ namespace MGME.Core.Services.AdventureService
 
         private async Task <IEnumerable<GetAdventureListDTO>> QueryAdventures(Ref<string> sortingParameter, Ref<int> selectedPage, Ref<int> userId)
         {
-            IEnumerable<GetAdventureListDTO> adventures = await _adventureRepository.GetEntititesAsync<GetAdventureListDTO>(
+            IEnumerable<GetAdventureListDTO> adventures = await _adventureRepository.GetEntititesAsync(
                 predicate: adventure => adventure.UserId == userId.Value,
                 include: new[]
                 {
@@ -410,9 +493,9 @@ namespace MGME.Core.Services.AdventureService
                             Id = thread.Id,
                             Name = thread.Name
                         }
-                    ).Where(
+                    ).FirstOrDefault(
                         thread => adventure.Threads.Count == 1
-                    ).FirstOrDefault(),
+                    ),
                     ThreadCount = adventure.Threads.Count,
 
                     ChaosFactor = adventure.ChaosFactor,
@@ -423,9 +506,9 @@ namespace MGME.Core.Services.AdventureService
                             Id = playerCharacter.Id,
                             Name = playerCharacter.Name
                         }
-                    ).Where(
+                    ).FirstOrDefault(
                         playerCharacter => adventure.PlayerCharacters.Count == 1
-                    ).FirstOrDefault(),
+                    ),
                     PlayerCharacterCount = adventure.PlayerCharacters.Count,
 
                     NonPlayerCharacter = adventure.NonPlayerCharacters.Select(
@@ -434,9 +517,9 @@ namespace MGME.Core.Services.AdventureService
                             Id = nonPlayerCharacter.Id,
                             Name = nonPlayerCharacter.Name
                         }
-                    ).Where(
+                    ).FirstOrDefault(
                         nonPlayerCharacter => adventure.NonPlayerCharacters.Count == 1
-                    ).FirstOrDefault(),
+                    ),
                     NonPlayerCharacterCount = adventure.NonPlayerCharacters.Count,
 
                     SceneCount = adventure.Scenes.Count,
@@ -450,7 +533,7 @@ namespace MGME.Core.Services.AdventureService
             return adventures;
         }
 
-        private bool CheckForMatches<TEntity>(AddToAdventureDTO ids, Adventure adventureToAddTo, BaseServiceResponse response) where TEntity: BaseEntity
+        private static bool CheckForMatches<TEntity>(AddToAdventureDTO ids, Adventure adventureToAddTo, BaseServiceResponse response) where TEntity: BaseEntity
         {
             Type typeOfDTO = ids.GetType();
             Type typeOfModel = adventureToAddTo.GetType();

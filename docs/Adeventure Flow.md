@@ -10,7 +10,7 @@ User creates a scene
         |
         |
         v
-        If seeded with random event <b>GOTO Random Event Flow</b>
+        If seeded with random event <b>GOTO Random Event Flow</b> and use it as an input for setup
         |
         |
         |
@@ -25,17 +25,22 @@ User creates a scene
     |
     |
     v
-    Create scene and return to the caller
+    If rollResult <= chaosFactor then scene must be modified
         |
         |
         |
         v
-        If scene <i>interrupted</i>, <b>GOTO Random Event Flow</b> and modify setup based on output
+        If rollResult is odd, alter the scene setup
         |
         |
         |
         v
-        Else if scene <i>altered</i>, modify setup
+        Else if rollResult is even, scene is <i>interrupted</i>
+            |
+            |
+            |
+            v
+            <b>GOTO Random Event Flow</b> and modify setup based on output
         |
         |
         |
@@ -90,7 +95,7 @@ User resolves the adventure
 
 ### Random Event Flow: ###
 <pre>
-Random even is requested
+Random event is requested
 |
 |
 |
@@ -130,7 +135,7 @@ Roll 1D100
     |
     |
     v
-    <i>Event Meaning</i> and <i>Event Subject</i> dictionaries of int: string are initialized
+    <i>Event Meaning</i> and <i>Event Subject</i> arrays of strings are initialized
     |
     |
     |
@@ -140,7 +145,19 @@ Roll 1D100
     |
     |
     v
-    Create random event instance and return to the caller
+    Generate random event
+        |
+        |
+        |
+        v
+        If random event is request on scene creatation, return event to the caller
+        And write it to the scene field
+        |
+        |
+        |
+        v
+        Else if random event is requested after asking fate question, create an instance
+        and bind it to scene item
 </pre>
 
 
