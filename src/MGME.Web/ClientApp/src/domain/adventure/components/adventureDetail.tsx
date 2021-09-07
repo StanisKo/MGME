@@ -115,7 +115,9 @@ export const AdventureDetailPage = (): ReactElement => {
 
     useEffect(() => {
         (async (): Promise<void> => {
-            setAdventureId(parseIDFromURL());
+            const adventureId = parseIDFromURL();
+
+            setAdventureId(adventureId);
 
             if (isAuthorized) {
                 await fetchAdventure(adventureId);
