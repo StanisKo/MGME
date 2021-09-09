@@ -5,7 +5,7 @@ import { ApplicationState } from '../../../store';
 
 import { Scene } from '../interfaces';
 
-import { createScene } from '../requests';
+import { createScene, requestRandomEvent } from '../requests';
 
 import { BaseServiceResponse } from '../../../shared/interfaces';
 import { INPUT_TYPE } from '../../../shared/const';
@@ -81,7 +81,7 @@ export const CreateSceneModal = (
     const [setupError, setSetupError] = useState<boolean>(false);
     const [setupHelperText, setSetupHelperText] = useState<string>('');
 
-    const [randomEvent] = useState<string>('');
+    const [randomEvent, setRandomEvent] = useState<string>('');
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const inputType = Number(event.target.attributes.getNamedItem('inputtype')?.value);
@@ -131,14 +131,26 @@ export const CreateSceneModal = (
         }
     };
 
+    const handleRequestRandomEvent = async (): Promise<void> => {
+        const randomEvent = await requestRandomEvent();
+
+        setRandomEvent(randomEvent);
+    };
+
     const handleCreate = async (): Promise<void> => {
         const response = await createScene(
             {
                 title: title.trim(),
+
                 setup: setup.trim(),
+
                 adventureId: adventureId,
+
                 // We only provide chaos factor if it's not the first scene
-                ...((scenes ?? []).length > 1 ? { adventureChaosFactor: adventureChaosFactor } : null)
+                ...((scenes ?? []).length > 1 ? { adventureChaosFactor: adventureChaosFactor } : null),
+
+                // If user seeded initial scene with random event, we send it to API as well
+                ...(randomEvent ? { randomEvent: randomEvent } : null)
             }
         );
 
@@ -227,7 +239,7 @@ export const CreateSceneModal = (
                         Cancel
                     </Button>
 
-                    <Button variant="outlined" color="primary">
+                    <Button onClick={handleRequestRandomEvent} variant="outlined" color="primary">
                         Randomize
                     </Button>
 

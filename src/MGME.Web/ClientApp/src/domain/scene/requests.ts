@@ -1,6 +1,11 @@
 import { Scene } from './interfaces';
 
-import { BaseServiceResponse, PaginatedDataServiceResponse, ReadFromApi } from '../../shared/interfaces';
+import {
+    BaseServiceResponse,
+    DataServiceResponse,
+    PaginatedDataServiceResponse,
+    ReadFromApi
+} from '../../shared/interfaces';
 
 import { URLBuilder, DataController } from '../../shared/utils';
 
@@ -41,5 +46,16 @@ export const createScene = async (params: CreateSceneProps): Promise<BaseService
             keys: ['scenes']
         }
     );
+};
+
+export const requestRandomEvent = async (): Promise<string> => {
+    const response = await DataController.FetchAndSave<DataServiceResponse<string>>(
+        {
+            url: URLBuilder.ReadFrom('randomevent'),
+            returnResponse: true
+        }
+    ) as DataServiceResponse<string>;
+
+    return response.data;
 };
 
