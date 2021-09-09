@@ -29,7 +29,8 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
-    Snackbar
+    Snackbar,
+    Button
 } from '@material-ui/core';
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -46,6 +47,10 @@ const useStyles = makeStyles((theme: Theme) =>
         centered: {
             display: 'flex',
             justifyContent: 'center'
+        },
+        toRight: {
+            display: 'flex',
+            justifyContent: 'flex-end'
         },
         withTooltip: {
             cursor: 'pointer'
@@ -116,7 +121,7 @@ export const AdventureDetailPage = (): ReactElement => {
         setOpenSnackbar(false);
     };
 
-    const { main, appBar, toolBar, buttonElement, accordion, ...classes } = useStyles();
+    const { main, appBar, toolBar, buttonElement, accordion, toRight, ...classes } = useStyles();
 
     useEffect(() => {
         (async (): Promise<void> => {
@@ -216,20 +221,34 @@ export const AdventureDetailPage = (): ReactElement => {
                                 <Grid item xs={12}>
                                     {(scenes && scenes.length) ? scenes.map(scene => {
                                         return (
+                                            // This should be a separate component
+                                            // When expanded, we should fetch all the scene items
                                             <Accordion className={accordion} key={scene.id}>
                                                 <AccordionSummary
                                                     expandIcon={<ExpandMoreIcon />}
                                                     aria-controls={`scene-${scene.id}-content`}
                                                     id={`scene-${scene.id}-content`}
                                                 >
-                                                    <Typography>
+                                                    <Typography style={{ fontStyle: 'italic' }}>
                                                         {scene.title}
                                                     </Typography>
                                                 </AccordionSummary>
                                                 <AccordionDetails>
-                                                    <Typography align="center">
-                                                        {scene.setup}
-                                                    </Typography>
+                                                    <Grid container spacing={2}>
+
+                                                        <Grid item xs={12}>
+                                                            <Typography align="left">
+                                                                {scene.setup}
+                                                            </Typography>
+                                                        </Grid>
+
+                                                        <Grid item xs={12} className={toRight}>
+                                                            <Button variant="outlined" color="primary">
+                                                                Resolve
+                                                            </Button>
+                                                        </Grid>
+
+                                                    </Grid>
                                                 </AccordionDetails>
                                             </Accordion>
                                         );
