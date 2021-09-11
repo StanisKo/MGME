@@ -37,7 +37,7 @@ export const fetchScenes = async (adventureId: number, page?: number): Promise<v
 };
 
 export const createScene = async (params: CreateSceneProps): Promise<BaseServiceResponse> => {
-    return DataController.UpdateAndRefetch(
+    return await DataController.UpdateAndRefetch(
         {
             url: URLBuilder.WriteTo('scene', 'add'),
             method: 'POST',
@@ -59,3 +59,14 @@ export const requestRandomEvent = async (): Promise<string> => {
     return response.data;
 };
 
+export const resolveScene = async (adventureId: number, sceneId: number): Promise<void> => {
+    await DataController.UpdateAndRefetch(
+        {
+            url: URLBuilder.WriteTo('scene', 'resolve'),
+            method: 'PUT',
+            body: { adventureId, sceneId },
+            page: 'adventureDetail',
+            keys: ['scenes']
+        }
+    );
+};

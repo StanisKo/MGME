@@ -221,6 +221,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                     {(scenes && scenes.length) ? scenes.map(scene => {
                                         return (
                                             <SceneAccordion
+                                                adventureId={adventureId}
                                                 scene={scene}
                                                 classes={classes as unknown as { [key: string]: string }}
                                             />

@@ -2,6 +2,8 @@ import { ReactElement } from 'react';
 
 import { Scene } from '../interfaces';
 
+import { resolveScene } from '../requests';
+
 import {
     Typography,
     Grid,
@@ -14,11 +16,17 @@ import {
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 interface SceneProps {
+    adventureId: number;
     scene: Scene;
     classes: { [key: string]: string };
 }
 
-export const SceneAccordion = ({ scene, classes }: SceneProps): ReactElement => {
+export const SceneAccordion = ({ adventureId, scene, classes }: SceneProps): ReactElement => {
+
+    const handleResolve = async (): Promise<void> => {
+        await resolveScene(adventureId, scene.id);
+    };
+
     return (
         <Accordion className={classes.accordion} key={scene.id}>
             <AccordionSummary
@@ -27,11 +35,11 @@ export const SceneAccordion = ({ scene, classes }: SceneProps): ReactElement => 
                 id={`scene-${scene.id}-content`}
             >
                 <Typography style={{ fontStyle: 'italic' }}>
-                    {scene.title}
+                    {scene.randomEvent ? `${scene.title}. Seed — ${scene.randomEvent}` : scene.title}
                 </Typography>
             </AccordionSummary>
             <AccordionDetails>
-                <Grid container spacing={2}>
+                <Grid container spacing={4}>
 
                     <Grid item xs={12}>
                         <Typography align="left">
@@ -40,7 +48,7 @@ export const SceneAccordion = ({ scene, classes }: SceneProps): ReactElement => 
                     </Grid>
 
                     <Grid item xs={12} className={classes.toRight}>
-                        <Button variant="outlined" color="primary">
+                        <Button onClick={handleResolve} variant="outlined" color="primary">
                             Resolve
                         </Button>
                     </Grid>
