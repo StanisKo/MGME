@@ -217,15 +217,17 @@ export const AdventureDetailPage = (): ReactElement => {
                                     </Accordion>
                                 </Grid>
 
-                                <Grid item xs={12}>
+                                <Grid item xs={12} container spacing={2}>
                                     {(scenes && scenes.length) ? scenes.map(scene => {
                                         return (
-                                            <SceneAccordion
-                                                key={`scene-${scene.id}`}
-                                                adventureId={adventureId}
-                                                scene={scene}
-                                                classes={classes as unknown as { [key: string]: string }}
-                                            />
+                                            <Grid item xs={12}>
+                                                <SceneAccordion
+                                                    key={`scene-${scene.id}`}
+                                                    adventureId={adventureId}
+                                                    scene={scene}
+                                                    classes={classes as unknown as { [key: string]: string }}
+                                                />
+                                            </Grid>
                                         );
                                     }) : null}
                                 </Grid>
