@@ -9,7 +9,7 @@ import { fetchAdventure } from '../requests';
 import { determineChaosFactorIconComponent } from '../helpers';
 
 import { Scene } from '../../scene/interfaces';
-import { CreateSceneModal } from '../../scene/components';
+import { CreateSceneModal, SceneAccordion } from '../../scene/components';
 import { fetchScenes } from '../../scene/requests';
 
 import { BaseServiceResponse } from '../../../shared/interfaces';
@@ -29,8 +29,7 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
-    Snackbar,
-    Button
+    Snackbar
 } from '@material-ui/core';
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -121,7 +120,7 @@ export const AdventureDetailPage = (): ReactElement => {
         setOpenSnackbar(false);
     };
 
-    const { main, appBar, toolBar, buttonElement, accordion, toRight, ...classes } = useStyles();
+    const { main, appBar, toolBar, buttonElement, ...classes } = useStyles();
 
     useEffect(() => {
         (async (): Promise<void> => {
@@ -200,7 +199,7 @@ export const AdventureDetailPage = (): ReactElement => {
                                 </Grid>
 
                                 <Grid item xs={12}>
-                                    <Accordion className={accordion}>
+                                    <Accordion className={classes.accordion}>
                                         <AccordionSummary
                                             expandIcon={<ExpandMoreIcon />}
                                             aria-controls="adventure-context"
@@ -221,36 +220,10 @@ export const AdventureDetailPage = (): ReactElement => {
                                 <Grid item xs={12}>
                                     {(scenes && scenes.length) ? scenes.map(scene => {
                                         return (
-                                            // This should be a separate component
-                                            // When expanded, we should fetch all the scene items
-                                            <Accordion className={accordion} key={scene.id}>
-                                                <AccordionSummary
-                                                    expandIcon={<ExpandMoreIcon />}
-                                                    aria-controls={`scene-${scene.id}-content`}
-                                                    id={`scene-${scene.id}-content`}
-                                                >
-                                                    <Typography style={{ fontStyle: 'italic' }}>
-                                                        {scene.title}
-                                                    </Typography>
-                                                </AccordionSummary>
-                                                <AccordionDetails>
-                                                    <Grid container spacing={2}>
-
-                                                        <Grid item xs={12}>
-                                                            <Typography align="left">
-                                                                {scene.setup}
-                                                            </Typography>
-                                                        </Grid>
-
-                                                        <Grid item xs={12} className={toRight}>
-                                                            <Button variant="outlined" color="primary">
-                                                                Resolve
-                                                            </Button>
-                                                        </Grid>
-
-                                                    </Grid>
-                                                </AccordionDetails>
-                                            </Accordion>
+                                            <SceneAccordion
+                                                scene={scene}
+                                                classes={classes as unknown as { [key: string]: string }}
+                                            />
                                         );
                                     }) : null}
                                 </Grid>
