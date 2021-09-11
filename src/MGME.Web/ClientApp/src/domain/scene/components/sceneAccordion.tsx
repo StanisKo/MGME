@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
 
 import { Scene } from '../interfaces';
 
@@ -22,6 +22,16 @@ interface SceneProps {
 }
 
 export const SceneAccordion = ({ adventureId, scene, classes }: SceneProps): ReactElement => {
+
+    const [resolveIsRequested, setResolveIsRequested] = useState<boolean>(false);
+
+    const requestResolve = (): void => {
+        setResolveIsRequested(true);
+    };
+
+    const cancelResolve = (): void => {
+        setResolveIsRequested(false);
+    };
 
     const handleResolve = async (): Promise<void> => {
         await resolveScene(adventureId, scene.id);
@@ -47,10 +57,36 @@ export const SceneAccordion = ({ adventureId, scene, classes }: SceneProps): Rea
                         </Typography>
                     </Grid>
 
-                    <Grid item xs={12} className={classes.toRight}>
-                        <Button onClick={handleResolve} variant="outlined" color="primary">
-                            Resolve
-                        </Button>
+                    <Grid item xs={12} className={resolveIsRequested ? classes.centered : classes.toRight}>
+                        {resolveIsRequested ? (
+                            <>
+                                <Button
+                                    onClick={cancelResolve}
+                                    variant="outlined"
+                                    color="primary"
+                                    disabled={scene.resolved}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={handleResolve}
+                                    variant="outlined"
+                                    color="primary"
+                                    disabled={scene.resolved}
+                                >
+                                    Resolve
+                                </Button>
+                            </>
+                        ) : (
+                            <Button
+                                onClick={requestResolve}
+                                variant="outlined"
+                                color="primary"
+                                disabled={scene.resolved}
+                            >
+                                Resolve
+                            </Button>
+                        )}
                     </Grid>
 
                 </Grid>
