@@ -21,6 +21,8 @@ namespace MGME.Core.Interfaces.Services
 
         Task <BaseServiceResponse> DeleteAdventure(IEnumerable<int> ids);
 
+        Task <BaseServiceResponse> UpdateAdventure(UpdateAdventureDTO updatedAdventure);
+
         Task<BaseServiceResponse> AddNewNonPlayerCharacterToAdventure(AddNonPlayerCharacterDTO newNonPlayerCharacter);
     }
 }

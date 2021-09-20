@@ -83,6 +83,9 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
+// TODO: pagination of scenes, request scene items on expand
+// Change chaos factor before resolving the scene
+
 export const AdventureDetailPage = (): ReactElement => {
     const isAuthorized: boolean = useSelector(
         (store: ApplicationState) => Boolean(store.auth?.token) ?? false
@@ -223,7 +226,6 @@ export const AdventureDetailPage = (): ReactElement => {
                                             <Grid item xs={12}>
                                                 <SceneAccordion
                                                     key={`scene-${scene.id}`}
-                                                    adventureId={adventureId}
                                                     scene={scene}
                                                     classes={classes as unknown as { [key: string]: string }}
                                                 />

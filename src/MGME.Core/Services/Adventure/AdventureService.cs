@@ -567,6 +567,63 @@ namespace MGME.Core.Services.AdventureService
             return response;
         }
 
+        public async Task <BaseServiceResponse> UpdateAdventure(UpdateAdventureDTO updatedAdventure)
+        {
+            BaseServiceResponse response = new();
+
+            int userId = GetUserIdFromHttpContext();
+
+            try
+            {
+
+                Adventure adventureToUpdate = await _adventureRepository.GetEntityAsync(
+                    id: updatedAdventure.Id,
+                    predicate: adventure => adventure.UserId == userId
+                );
+
+                if (adventureToUpdate is null)
+                {
+                    response.Success = false;
+                    response.Message = "Adventure with such id does not exist";
+
+                    return response;
+                }
+
+                // TODO: https://stackoverflow.com/questions/2712511/data-annotations-for-validation-at-least-one-required-field
+                bool inputIsInvalid =
+                    updatedAdventure.Title is null
+                        || updatedAdventure.Context is null | updatedAdventure.ChaosFactor is null;
+
+                if (inputIsInvalid)
+                {
+                    response.Success = false;
+                    response.Message = "To update Adventure, either title, context or chaos factor must be provided";
+
+                    return response;
+                }
+
+                (Adventure adventureWithUpdates, List<string> propertiesToUpdate) = UpdateVariableNumberOfFields(
+                    adventureToUpdate,
+                    updatedAdventure
+                );
+
+                await _adventureRepository.UpdateEntityAsync(
+                    adventureWithUpdates,
+                    propertiesToUpdate
+                );
+
+                response.Success = true;
+                response.Message = "Adventure was successfully updated";
+            }
+            catch (Exception exception)
+            {
+                response.Success = false;
+                response.Message = exception.Message;
+            }
+
+            return response;
+        }
+
         public async Task <BaseServiceResponse> AddNewNonPlayerCharacterToAdventure(AddNonPlayerCharacterDTO newNonPlayerCharacter)
         {
             BaseServiceResponse response = new();
