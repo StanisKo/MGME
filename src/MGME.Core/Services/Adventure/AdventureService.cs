@@ -589,6 +589,20 @@ namespace MGME.Core.Services.AdventureService
                     return response;
                 }
 
+                // We also manage it on the front end, but always good to double check
+                bool chaosFactorIsOutOfBounds =
+                    updatedAdventure.ChaosFactor is not null
+                        && (updatedAdventure.ChaosFactor < adventureToUpdate.ChaosFactor - 1 
+                                || updatedAdventure.ChaosFactor > adventureToUpdate.ChaosFactor + 1);
+
+                if (chaosFactorIsOutOfBounds)
+                {
+                    response.Success = false;
+                    response.Message = "Chaos factor cannot be less or more than one step from current chaos factor";
+
+                    return response;
+                }
+
                 (Adventure adventureWithUpdates, List<string> propertiesToUpdate) = UpdateVariableNumberOfFields(
                     adventureToUpdate,
                     updatedAdventure

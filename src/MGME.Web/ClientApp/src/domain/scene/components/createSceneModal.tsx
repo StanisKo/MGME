@@ -160,6 +160,8 @@ export const CreateSceneModal = (
 
         if (response.success) {
             handleDialogClose();
+
+            setRandomEvent('');
         }
     };
 

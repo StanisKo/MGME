@@ -37,6 +37,8 @@ export const SceneAccordion = ({ scene, classes }: SceneProps): ReactElement | n
 
     const [chaosFactor, setChaosFactor] = useState<number>(adventure?.chaosFactor ?? 5);
 
+    const [chaosFactorIsOutOfBounds, setChaosFactorIsOutOfBounds] = useState<boolean>(false);
+
     const requestResolve = (): void => {
         setResolveIsRequested(true);
     };
@@ -46,7 +48,21 @@ export const SceneAccordion = ({ scene, classes }: SceneProps): ReactElement | n
     };
 
     const handleChangeChaosFactor = (event: ChangeEvent<unknown>, value: number | number[]): void => {
-        setChaosFactor(value as number);
+        const newChaosFactor = value as number;
+
+        // Check necessary only for TS compiler; on time of execution we know adventure is there
+        if (adventure) {
+
+            if (newChaosFactor < adventure.chaosFactor - 1 || newChaosFactor > adventure.chaosFactor + 1) {
+                setChaosFactorIsOutOfBounds(true);
+            }
+            else {
+                setChaosFactorIsOutOfBounds(false);
+            }
+
+        }
+
+        setChaosFactor(newChaosFactor);
 
         /*
         What's up Material UI?
@@ -56,7 +72,6 @@ export const SceneAccordion = ({ scene, classes }: SceneProps): ReactElement | n
     };
 
     const handleResolve = async (): Promise<void> => {
-        // Check necessary only for TS compiler; on time of execution we know adventure is there
         if (adventure) {
             await updateAdventure({ id: adventure.id, chaosFactor: chaosFactor });
 
@@ -97,7 +112,15 @@ export const SceneAccordion = ({ scene, classes }: SceneProps): ReactElement | n
                                 >
                                     Cancel
                                 </Button>
-                                <Tooltip title="Adjust the Chaos Factor before resolving the scene">
+                                <Tooltip
+                                    title={
+                                        chaosFactorIsOutOfBounds
+                                            // eslint-disable-next-line max-len
+                                            ? 'Chaos Factor cannot be less or more than 1 step from current'
+                                            : 'Adjust the Chaos Factor before resolving the scene'
+                                    }
+                                >
+                                    {/* TODO: The UX should be rethought */}
                                     <Slider
                                         style={{ margin: '0 2em 0 2em' }}
                                         key={`slider-${adventure.chaosFactor}`}
@@ -113,7 +136,10 @@ export const SceneAccordion = ({ scene, classes }: SceneProps): ReactElement | n
                                     onClick={handleResolve}
                                     variant="outlined"
                                     color="primary"
-                                    disabled={scene.resolved || chaosFactor === adventure.chaosFactor}
+                                    disabled={
+                                        scene.resolved
+                                            || chaosFactor === adventure.chaosFactor || chaosFactorIsOutOfBounds
+                                    }
                                 >
                                     Resolve
                                 </Button>
