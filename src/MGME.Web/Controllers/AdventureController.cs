@@ -104,6 +104,21 @@ namespace MGME.Web.Controllers
             return NotFound(response);
         }
 
+        [HttpPut("Update")]
+        public async Task <IActionResult> UpdateAdventure(UpdateAdventureDTO updatedAdventure)
+        {
+            BaseServiceResponse response = await _adventureService.UpdateAdventure(
+                updatedAdventure
+            );
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return NotFound(response);
+        }
+
         [HttpPost("AddNewNPC")]
         public async Task <IActionResult> AddNewNonPlayerCharacterToAdventure(AddNonPlayerCharacterDTO newNonPlayerCharacter)
         {

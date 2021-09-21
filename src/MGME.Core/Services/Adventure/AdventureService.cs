@@ -589,19 +589,6 @@ namespace MGME.Core.Services.AdventureService
                     return response;
                 }
 
-                // TODO: https://stackoverflow.com/questions/2712511/data-annotations-for-validation-at-least-one-required-field
-                bool inputIsInvalid =
-                    updatedAdventure.Title is null
-                        || updatedAdventure.Context is null | updatedAdventure.ChaosFactor is null;
-
-                if (inputIsInvalid)
-                {
-                    response.Success = false;
-                    response.Message = "To update Adventure, either title, context or chaos factor must be provided";
-
-                    return response;
-                }
-
                 (Adventure adventureWithUpdates, List<string> propertiesToUpdate) = UpdateVariableNumberOfFields(
                     adventureToUpdate,
                     updatedAdventure

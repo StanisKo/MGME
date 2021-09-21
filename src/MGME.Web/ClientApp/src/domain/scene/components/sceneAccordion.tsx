@@ -8,6 +8,7 @@ import { resolveScene } from '../requests';
 
 import { AdventureDetail } from '../../adventure/interfaces';
 import { chaosFactorOptions } from '../../adventure/helpers';
+import { updateAdventure } from '../../adventure/requests';
 
 import {
     Typography,
@@ -16,7 +17,8 @@ import {
     AccordionSummary,
     AccordionDetails,
     Button,
-    Slider
+    Slider,
+    Tooltip
 } from '@material-ui/core';
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -56,9 +58,11 @@ export const SceneAccordion = ({ scene, classes }: SceneProps): ReactElement | n
     const handleResolve = async (): Promise<void> => {
         // Check necessary only for TS compiler; on time of execution we know adventure is there
         if (adventure) {
-            // We first update the adventure, and only then resolve the scene
+            await updateAdventure({ id: adventure.id, chaosFactor: chaosFactor });
 
             await resolveScene(adventure.id, scene.id);
+
+            setResolveIsRequested(false);
         }
     };
 
@@ -93,20 +97,23 @@ export const SceneAccordion = ({ scene, classes }: SceneProps): ReactElement | n
                                 >
                                     Cancel
                                 </Button>
-                                <Slider
-                                    key={`slider-${adventure.chaosFactor}`}
-                                    defaultValue={adventure.chaosFactor}
-                                    step={1}
-                                    min={1}
-                                    max={9}
-                                    marks={chaosFactorOptions}
-                                    onChange={handleChangeChaosFactor}
-                                />
+                                <Tooltip title="Adjust the Chaos Factor before resolving the scene">
+                                    <Slider
+                                        style={{ margin: '0 2em 0 2em' }}
+                                        key={`slider-${adventure.chaosFactor}`}
+                                        defaultValue={adventure.chaosFactor}
+                                        step={1}
+                                        min={1}
+                                        max={9}
+                                        marks={chaosFactorOptions}
+                                        onChange={handleChangeChaosFactor}
+                                    />
+                                </Tooltip>
                                 <Button
                                     onClick={handleResolve}
                                     variant="outlined"
                                     color="primary"
-                                    disabled={scene.resolved && chaosFactor !== adventure.chaosFactor}
+                                    disabled={scene.resolved || chaosFactor === adventure.chaosFactor}
                                 >
                                     Resolve
                                 </Button>

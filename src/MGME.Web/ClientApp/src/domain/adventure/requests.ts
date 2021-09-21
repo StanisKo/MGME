@@ -25,7 +25,14 @@ type CreateAdventureParams = {
     threads: NewEntityToAdd[];
     newNonPlayerCharacters: NewEntityToAdd[];
     existingNonPlayerCharacters: number[];
-}
+};
+
+type UpdateAdventureParams = {
+    id: number;
+    title?: string;
+    context?: string;
+    chaosFactor?: number;
+};
 
 export const addToAdventure = async (
     {
@@ -107,6 +114,18 @@ export const fetchAdventure = async (id: number): Promise<void> => {
             url: URLBuilder.ReadFrom(`adventure/${id}`),
             page: 'adventureDetail',
             key: 'adventureData'
+        }
+    );
+};
+
+export const updateAdventure = async (params: UpdateAdventureParams): Promise<BaseServiceResponse> => {
+    return await DataController.UpdateAndRefetch(
+        {
+            url: URLBuilder.WriteTo('adventure', 'update'),
+            method: 'PUT',
+            body: params,
+            page: 'adventureDetail',
+            keys: ['adventureData']
         }
     );
 };
