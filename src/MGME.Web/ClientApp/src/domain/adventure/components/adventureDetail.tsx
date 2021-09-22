@@ -168,8 +168,10 @@ export const AdventureDetailPage = (): ReactElement => {
         }
     }, [pagination]);
 
-    // Can create new scenes only if all scenes are resolved
-    const canAddNewScene = scenes?.every(scene => scene.resolved) ?? true;
+    const currentPageCanFitMoreScenes = scenes?.length !== 15 ?? true;
+
+    // Can create new scenes only if all scenes are resolved and we're on a page that can still fit new scenes
+    const canAddNewScene = (scenes?.every(scene => scene.resolved) && currentPageCanFitMoreScenes) || true;
 
     const { main, appBar, toolBar, buttonElement, ...classes } = useStyles();
 

@@ -95,7 +95,7 @@ namespace MGME.Core.Services.SceneService
                     },
                     // We always sort on timestamp ascending
                     orderBy: _sorter.DetermineSorting("created"),
-                    page: selectedPage
+                    page: selectedPage == 0 ? 1 : selectedPage // In case if there no scenes, we request 1st page
                 );
 
                 response.Data = scenes;
