@@ -150,7 +150,7 @@ export const CreateSceneModal = (
                 ...((scenes ?? []).length > 0 ? { adventureChaosFactor: adventureChaosFactor } : null),
 
                 // If user seeded initial scene with random event, we send it to API as well
-                ...(randomEvent ? { randomEvent: randomEvent } : null)
+                ...(((scenes ?? []).length === 0) && randomEvent ? { randomEvent: randomEvent } : null)
             }
         );
 

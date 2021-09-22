@@ -12,7 +12,7 @@ import { Scene } from '../../scene/interfaces';
 import { CreateSceneModal, SceneAccordion } from '../../scene/components';
 import { fetchScenes } from '../../scene/requests';
 
-import { BaseServiceResponse } from '../../../shared/interfaces';
+import { BaseServiceResponse, Pagination } from '../../../shared/interfaces';
 import { Alert } from '../../../shared/components';
 import { parseIDFromURL } from '../../../shared/helpers';
 
@@ -29,7 +29,9 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
-    Snackbar
+    Snackbar,
+    Box,
+    TablePagination
 } from '@material-ui/core';
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -83,7 +85,7 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
-// TODO: pagination of scenes, request scene items on expand
+// TODO: Disable scene creation if all scenes are resolved AND there are more pages than 1
 
 export const AdventureDetailPage = (): ReactElement => {
     const isAuthorized: boolean = useSelector(
@@ -98,6 +100,10 @@ export const AdventureDetailPage = (): ReactElement => {
         (store: ApplicationState) => store.adventureDetail?.scenes?.data ?? null
     );
 
+    const pagination: Pagination | null = useSelector(
+        (store: ApplicationState) => store.adventureDetail?.scenes?.pagination ?? null
+    );
+
     const [adventureId, setAdventureId] = useState<number>(0);
 
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -105,6 +111,8 @@ export const AdventureDetailPage = (): ReactElement => {
     const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
 
     const [response, setResponse] = useState<BaseServiceResponse>({} as BaseServiceResponse);
+
+    const [page, setPage] = useState(0);
 
     const handleDialogOpen = (): void => {
         setDialogOpen(true);
@@ -122,7 +130,9 @@ export const AdventureDetailPage = (): ReactElement => {
         setOpenSnackbar(false);
     };
 
-    const { main, appBar, toolBar, buttonElement, ...classes } = useStyles();
+    const handlePageChange = (event: unknown, newPage: number): void => {
+        setPage(newPage);
+    };
 
     useEffect(() => {
         (async (): Promise<void> => {
@@ -133,14 +143,35 @@ export const AdventureDetailPage = (): ReactElement => {
             if (isAuthorized) {
                 await fetchAdventure(adventureId);
 
-                await fetchScenes(adventureId, 1);
+                await fetchScenes(adventureId);
             }
         })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthorized]);
 
+    useEffect(() => {
+        (async (): Promise<void> => {
+            if (isAuthorized && scenes !== null) {
+                await fetchScenes(adventureId, page + 1);
+            }
+        })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page]);
+
+    /*
+    API returns last page, since paging for scenes is reversed
+    Therefore, we also bring UI in sync (since it doesn't know about last page on render)
+    */
+    useEffect(() => {
+        if (pagination) {
+            setPage(pagination.page - 1);
+        }
+    }, [pagination]);
+
     // Can create new scenes only if all scenes are resolved
     const canAddNewScene = scenes?.every(scene => scene.resolved) ?? true;
+
+    const { main, appBar, toolBar, buttonElement, ...classes } = useStyles();
 
     return (
         <>
@@ -230,6 +261,21 @@ export const AdventureDetailPage = (): ReactElement => {
                                             </Grid>
                                         );
                                     }) : null}
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    {scenes?.length ? (
+                                        <Box mt={2}>
+                                            <TablePagination
+                                                component="div"
+                                                rowsPerPage={15}
+                                                rowsPerPageOptions={[]}
+                                                count={pagination?.numberOfResults ?? 0}
+                                                page={page}
+                                                onPageChange={handlePageChange}
+                                            />
+                                        </Box>
+                                    ) : null}
                                 </Grid>
                             </Grid>
 
