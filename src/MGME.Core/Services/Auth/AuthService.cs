@@ -395,10 +395,8 @@ namespace MGME.Core.Services.AuthService
                 response.Success = true;
                 response.Message = "Your email was successfully confirmed";
             }
-            catch (SecurityTokenExpiredException exception)
+            catch (SecurityTokenExpiredException)
             {
-                _ = exception;
-
                 /*
                 We could've used a DTO here as well
                 But omitting two fields (hash and salt) and then using automapper
@@ -549,7 +547,7 @@ namespace MGME.Core.Services.AuthService
                 and use replace to insert the link
                 We also don't use Razor since it's a simple job
                 */
-                HtmlBody = template.Replace("confirmation-url", confirmationURL),
+                HtmlBody = template.Replace("confirmation-url", confirmationURL)
             };
 
             confirmationMessage.Body = bodyBuilder.ToMessageBody();
