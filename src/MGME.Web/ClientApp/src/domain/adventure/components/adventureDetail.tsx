@@ -179,7 +179,8 @@ export const AdventureDetailPage = (): ReactElement => {
 
     const allPresentScenesAreResolved = Boolean(scenes?.every(scene => scene.resolved));
 
-    const canAddNewScene = currentPageCanFitMoreScenes ? allPresentScenesAreResolved : false;
+    // The paging logic should be included with || in render condition, make it a separate variable
+    const canAddNewScene = currentPageCanFitMoreScenes ? allPresentScenesAreResolved : pagination?.page === 1 ?? true;
 
     const { main, appBar, toolBar, buttonElement, ...classes } = useStyles();
 
