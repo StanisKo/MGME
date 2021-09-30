@@ -170,14 +170,16 @@ export const AdventureDetailPage = (): ReactElement => {
         }
     }, [pagination]);
 
+    /*
+    Can create new scenes only if a page can still fit new scenes and all previous scenes are resolved
+
+    NOTE: WIP, still buggy
+    */
     const currentPageCanFitMoreScenes = scenes?.length !== 15 ?? true;
 
-    /*
-    Can create new scenes only if all scenes are resolved and we're on a page that can still fit new scenes
+    const allPresentScenesAreResolved = Boolean(scenes?.every(scene => scene.resolved));
 
-    WIP
-    */
-    const canAddNewScene = currentPageCanFitMoreScenes ? scenes?.every(scene => scene.resolved) ?? true : false;
+    const canAddNewScene = currentPageCanFitMoreScenes ? allPresentScenesAreResolved : false;
 
     const { main, appBar, toolBar, buttonElement, ...classes } = useStyles();
 
@@ -315,9 +317,13 @@ export const AdventureDetailPage = (): ReactElement => {
                                                     Can ask fate question only if there is active (unresolved scene)
                                                     Opposite of when user can create new scene
                                                     */
-                                                    disabled={canAddNewScene}
+                                                    disabled={
+                                                        !currentPageCanFitMoreScenes || allPresentScenesAreResolved
+                                                    }
                                                 >
-                                                    <FateQuestionIcon disabled={canAddNewScene} />
+                                                    <FateQuestionIcon disabled={
+                                                        !currentPageCanFitMoreScenes || allPresentScenesAreResolved
+                                                    } />
                                                 </IconButton>
                                             </Tooltip>
 
@@ -331,9 +337,13 @@ export const AdventureDetailPage = (): ReactElement => {
                                                     Can start battle only if there is active (unresolved scene)
                                                     Opposite of when user can create new scene
                                                     */
-                                                    disabled={canAddNewScene}
+                                                    disabled={
+                                                        !currentPageCanFitMoreScenes || allPresentScenesAreResolved
+                                                    }
                                                 >
-                                                    <StartBattleIcon disabled={canAddNewScene} />
+                                                    <StartBattleIcon disabled={
+                                                        !currentPageCanFitMoreScenes || allPresentScenesAreResolved
+                                                    } />
                                                 </IconButton>
                                             </Tooltip>
                                         </Toolbar>
