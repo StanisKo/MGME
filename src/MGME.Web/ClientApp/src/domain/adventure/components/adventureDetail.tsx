@@ -86,6 +86,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 // TODO: Disable scene creation if all scenes are resolved AND there are more pages than 1
+// TODO: menu highlight bug on detail pages
+// TODO: resolve random event bug
 
 export const AdventureDetailPage = (): ReactElement => {
     const isAuthorized: boolean = useSelector(
@@ -170,8 +172,12 @@ export const AdventureDetailPage = (): ReactElement => {
 
     const currentPageCanFitMoreScenes = scenes?.length !== 15 ?? true;
 
-    // Can create new scenes only if all scenes are resolved and we're on a page that can still fit new scenes
-    const canAddNewScene = (scenes?.every(scene => scene.resolved) && currentPageCanFitMoreScenes) || true;
+    /*
+    Can create new scenes only if all scenes are resolved and we're on a page that can still fit new scenes
+
+    WIP
+    */
+    const canAddNewScene = currentPageCanFitMoreScenes ? scenes?.every(scene => scene.resolved) ?? true : false;
 
     const { main, appBar, toolBar, buttonElement, ...classes } = useStyles();
 
