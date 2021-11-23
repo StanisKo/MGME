@@ -1,6 +1,7 @@
 import { RequestConfig } from '../interfaces';
 
-export const request = async <TResult>({ url, method, headers, body }: RequestConfig): Promise<TResult> => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const request = async <TResult>({ url, method, headers, body }: RequestConfig): Promise<TResult | any> => {
     const args: RequestInit = {
         method: method,
         headers: {
