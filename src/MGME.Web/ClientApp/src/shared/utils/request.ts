@@ -19,7 +19,10 @@ export const request = async <TResult>({ url, method, headers, body }: RequestCo
         return parsedResponse;
     }
     catch (error) {
-        return error;
+        // We log the error and return empty dict into the scope to not break the UI
+        console.log(error);
+
+        return {} as TResult;
     }
 };
 
