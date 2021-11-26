@@ -547,6 +547,8 @@ namespace MGME.Core.Services.AdventureService
         {
             BaseServiceResponse response = new();
 
+            int userId = GetUserIdFromHttpContext();
+
             try
             {
                 await _adventureRepository.DeleteEntitiesAsync(ids);
@@ -556,6 +558,7 @@ namespace MGME.Core.Services.AdventureService
                 );
 
                 response.Success = true;
+
                 response.Message = $"Adventure{suffix} {verb} successfully deleted";
             }
             catch (Exception exception)
