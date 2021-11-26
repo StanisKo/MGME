@@ -516,10 +516,11 @@ namespace MGME.Core.Services.AuthService
                 )
             );
 
-            string clientCallbackURL = _httpContextAccessor.HttpContext.Request.Scheme
-                                       + "://"
-                                       + _httpContextAccessor.HttpContext.Request.Host
-                                       + "/confirm-email";
+            StringBuilder stringBuilder = new(_configuration["Client"]);
+
+            stringBuilder.Append("/confirm-email");
+
+            string clientCallbackURL = stringBuilder.ToString();
 
             string confirmationURL = QueryHelpers.AddQueryString(
                 clientCallbackURL,
