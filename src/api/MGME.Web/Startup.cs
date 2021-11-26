@@ -38,12 +38,6 @@ namespace MGME.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            if (_environment.IsDevelopment())
-            {
-                // Local dev ? use localhost : otherwise service name is used when running in container
-                Environment.SetEnvironmentVariable("SQL_HOST", "localhost");
-            }
-
             NpgsqlConnectionStringBuilder connectionStringBuilder = new NpgsqlConnectionStringBuilder()
             {
                 Host = Environment.GetEnvironmentVariable("SQL_HOST"),
@@ -101,11 +95,6 @@ namespace MGME.Web
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MGME.Web", Version = "v1" });
             });
-
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/build";
-            });
         }
 
         public void Configure(IApplicationBuilder app)
@@ -121,8 +110,6 @@ namespace MGME.Web
 
             app.UseStaticFiles();
 
-            app.UseSpaStaticFiles();
-
             app.UseAuthentication();
 
             app.UseAuthorization();
@@ -130,16 +117,6 @@ namespace MGME.Web
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-            });
-
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp";
-
-                if (_environment.IsDevelopment())
-                {
-                    spa.UseReactDevelopmentServer(npmScript: "start");
-                }
             });
         }
     }
